@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>彰濱秀傳紀念醫院</title>
+    <title>彰濱秀傳醫院 GTA：多樓層門診病房與鹿港開放世界</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -28,6 +28,38 @@
             height: 100vh;
             cursor: crosshair;
         }
+        #welcome-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            color: #f8fafc;
+            background: radial-gradient(ellipse at 50% 35%, rgba(15,118,110,.34), transparent 48%), linear-gradient(145deg, #071522 0%, #0f2133 54%, #102d35 100%);
+            font-family: 'Noto Sans TC', 'Inter', sans-serif;
+        }
+        #welcome-screen.is-hidden { display: none; }
+        .welcome-card {
+            width: min(540px, 100%);
+            padding: clamp(28px, 6vw, 54px);
+            border: 1px solid rgba(153,246,228,.3);
+            border-radius: 28px;
+            background: rgba(8,18,31,.82);
+            box-shadow: 0 28px 90px rgba(0,0,0,.55);
+            text-align: center;
+            backdrop-filter: blur(16px);
+        }
+        .welcome-mark { font-size: 13px; font-weight: 800; letter-spacing: .22em; color: #5eead4; }
+        .welcome-title { margin: 12px 0 8px; font-size: clamp(30px, 7vw, 48px); font-weight: 900; }
+        .welcome-copy { color: #cbd5e1; line-height: 1.8; }
+        .welcome-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 30px; }
+        .welcome-button { min-height: 52px; border: 0; border-radius: 14px; font: inherit; font-weight: 900; cursor: pointer; transition: transform .15s ease, filter .15s ease; }
+        .welcome-button:hover { transform: translateY(-2px); filter: brightness(1.12); }
+        #welcome-start { color: #062b2b; background: linear-gradient(135deg, #5eead4, #38bdf8); }
+        #welcome-close { color: #e2e8f0; background: #334155; border: 1px solid rgba(255,255,255,.15); }
+        #welcome-status { min-height: 1.5em; margin-top: 16px; color: #fcd34d; font-size: 13px; }
         /* GTA 風格文字陰影 */
         .gta-text-shadow {
             text-shadow: 0 2px 6px rgba(0, 0, 0, 0.92), 0 0 2px rgba(0, 0, 0, 1);
@@ -126,6 +158,19 @@
 
     <!-- 3D 遊戲主畫布 -->
     <canvas id="game-canvas"></canvas>
+
+    <div id="welcome-screen" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+        <div class="welcome-card">
+            <div class="welcome-mark">CHANG BING SHOW CHWAN HOSPITAL</div>
+            <h1 id="welcome-title" class="welcome-title">彰濱秀傳醫院</h1>
+            <p class="welcome-copy">醫療大樓探索遊戲<br>漫遊門診、病房與院區，認識醫院各樓層空間。</p>
+            <div class="welcome-actions">
+                <button id="welcome-start" class="welcome-button" type="button">▶ 開始遊戲</button>
+                <button id="welcome-close" class="welcome-button" type="button">✕ 關閉遊戲</button>
+            </div>
+            <div id="welcome-status" aria-live="polite"></div>
+        </div>
+    </div>
 
     <!-- 受傷紅色螢幕邊緣光暈 -->
     <div id="damage-vignette" class="fixed inset-0 z-10 opacity-0"></div>
@@ -1917,6 +1962,7 @@
             // 遊戲狀態（主角為資訊處工程師，預設位於 1F 門診大廳門口）
             this.cash = 500;
             this.gameMinutes = 16 * 60 + 23;
+            this.gameStarted = false;
             this.isPointerLocked = false;
             this.drivingVehicle = null;
             this.sirenActive = false;
@@ -1938,7 +1984,7 @@
 
             // 玩家狀態（主角：彰濱秀傳醫院・資訊處工程師）
             this.player = {
-                pos: new THREE.Vector3(0.0, 0, -2.5),
+                pos: new THREE.Vector3(0.0, 0, 46),
                 vel: new THREE.Vector3(0, 0, 0),
                 yaw: Math.PI,
                 onGround: true,
@@ -1966,6 +2012,10 @@
             this.keys = {};
             this.npcProfiles = [];
             this.npcEntities = [];
+            this.staffCrowd = [];
+            this.outpatientBoards = [];
+            this.outpatientCallClock = 0;
+            this.outpatientCallIndex = 0;
             this.trafficVehicles = [];
             this.hitParticles = [];
             this.cameraShake = 0;
@@ -1982,12 +2032,45 @@
             this.loadNPCProfiles();
             this.spawnAllNPCs();
             this.switchHospitalFloor('1F', true);
+            this.spawnHospitalStaff();
             this.spawnVehicles();
             this.createRescueMission(true);
             this.bindInputs();
             this.bindElevatorUI();
             this.bindEditorUI();
+            this.bindWelcomeScreen();
             this.animate();
+        }
+
+        bindWelcomeScreen() {
+            const screen = document.getElementById('welcome-screen');
+            const status = document.getElementById('welcome-status');
+            document.getElementById('welcome-start').addEventListener('click', () => {
+                const safeSpawns = [[0,46],[0,42],[0,34],[0,22],[8,22],[-8,22],[0,0]];
+                const spawn = safeSpawns.find(([x,z]) => !this.checkCollision(x,z,0.48)) || safeSpawns[0];
+                this.player.pos.set(spawn[0],0,spawn[1]);
+                this.player.vel.set(0,0,0);
+                this.player.yaw = Math.PI;
+                this.player.rig.group.position.copy(this.player.pos);
+                this.player.rig.group.rotation.y = this.player.yaw;
+                this.cameraOrbit.yaw = Math.PI;
+                this.gameStarted = true;
+                status.textContent = '';
+                document.getElementById('welcome-title').textContent = '彰濱秀傳醫院';
+                document.getElementById('welcome-start').textContent = '▶ 開始遊戲';
+                screen.classList.add('is-hidden');
+                this.updateCamera(1);
+                this.updateLocationAndInteractPrompt();
+            });
+            document.getElementById('welcome-close').addEventListener('click', () => {
+                this.gameStarted = false;
+                this.isPointerLocked = false;
+                if (document.pointerLockElement) document.exitPointerLock();
+                screen.classList.remove('is-hidden');
+                status.textContent = '遊戲已關閉；可直接關閉此瀏覽器分頁。';
+                document.getElementById('welcome-title').textContent = '遊戲已關閉';
+                document.getElementById('welcome-start').textContent = '↻ 重新開始';
+            });
         }
 
         // ------------------------------------------------------------------------
@@ -2061,7 +2144,7 @@
         }
 
         isPointInsideHospitalFootprint(x, z) {
-            return x >= -35.8 && x <= 35.8 && z >= -32.2 && z <= 11.8;
+            return x >= -70.8 && x <= 70.8 && z >= -70.8 && z <= 60.8;
         }
 
         checkCollision(x, z, radius = 0.38) {
@@ -2075,7 +2158,12 @@
 
             // 2. 若在非 1F 樓層，限制只能在醫療大樓室內邊界內移動（防止從窗戶掉落）
             if (this.currentFloor !== '1F') {
-                if (x - radius < -34.6 || x + radius > 34.6 || z - radius < -30.6 || z + radius > 10.6) {
+                const fullPlanFloor = ['2F','3F','B1'].includes(this.currentFloor);
+                const widePlanFloor = fullPlanFloor || ['5F','6F','7F','8F'].includes(this.currentFloor);
+                const halfWidth = widePlanFloor ? 69.6 : 34.6;
+                const minZ = fullPlanFloor ? -69.6 : (widePlanFloor ? -45.6 : -30.6);
+                const maxZ = fullPlanFloor ? 59.6 : (widePlanFloor ? 25.6 : 10.6);
+                if (x - radius < -halfWidth || x + radius > halfWidth || z - radius < minZ || z + radius > maxZ) {
                     return true;
                 }
                 return false;
@@ -2090,7 +2178,7 @@
             }
 
             // 4. 園區外圍邊界
-            if (x < -105 || x > 105 || z < -85 || z > 78) return true;
+            if (x < -150 || x > 150 || z < -155 || z > 155) return true;
             return false;
         }
 
@@ -2103,7 +2191,7 @@
 
             // 1. 園區綠地基底
             const ground = new THREE.Mesh(
-                new THREE.PlaneGeometry(300, 250),
+                new THREE.PlaneGeometry(360, 330),
                 new THREE.MeshStandardMaterial({ color: '#4d7c4f', roughness: 0.9 })
             );
             ground.rotation.x = -Math.PI / 2;
@@ -2112,28 +2200,28 @@
 
             // 2. 園區南側聯外幹道與東西向院區道路。
             const roadMat = new THREE.MeshStandardMaterial({ map: asphaltTex, roughness: 0.85 });
-            const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(250, 18), roadMat);
+            const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(320, 18), roadMat);
             mainRoad.rotation.x = -Math.PI / 2;
-            mainRoad.position.set(0, 0.02, 78);
+            mainRoad.position.set(0, 0.02, 114);
             mainRoad.receiveShadow = true;
             this.exteriorGroup.add(mainRoad);
 
             // 南北向院區道路（東側急診通道 X = +42、西側心理健康中心大道 X = -42）
-            [-42, 42].forEach((rx) => {
+            [-86, 86].forEach((rx) => {
                 const sideRoad = new THREE.Mesh(new THREE.PlaneGeometry(12, 200), roadMat);
                 sideRoad.rotation.x = -Math.PI / 2;
-                sideRoad.position.set(rx, 0.02, 0);
+                sideRoad.position.set(rx, 0.02, 6);
                 sideRoad.receiveShadow = true;
                 this.exteriorGroup.add(sideRoad);
             });
 
             // 雙黃線與斑馬線
             const yellowLine = new THREE.Mesh(
-                new THREE.PlaneGeometry(220, 0.25),
+                new THREE.PlaneGeometry(310, 0.25),
                 new THREE.MeshBasicMaterial({ color: '#facc15' })
             );
             yellowLine.rotation.x = -Math.PI / 2;
-            yellowLine.position.set(0, 0.03, 78);
+            yellowLine.position.set(0, 0.03, 114);
             this.exteriorGroup.add(yellowLine);
 
             [-12, 12].forEach((zx) => {
@@ -2143,48 +2231,48 @@
                         new THREE.MeshBasicMaterial({ color: '#f8fafc' })
                     );
                     stripe.rotation.x = -Math.PI / 2;
-                    stripe.position.set(zx, 0.035, 78 + s);
+                    stripe.position.set(zx, 0.035, 114 + s);
                     this.exteriorGroup.add(stripe);
                 }
             });
 
             // 3. 南側鹿港商店街人行道（重現第一張街頭截圖：灰方格地磚、龍紋刺青、快炒通宵、安全島）
             const southSidewalk = new THREE.Mesh(
-                new THREE.BoxGeometry(220, 0.16, 28),
+                new THREE.BoxGeometry(320, 0.16, 28),
                 new THREE.MeshStandardMaterial({ map: sidewalkTex, roughness: 0.8 })
             );
-            southSidewalk.position.set(0, 0.08, 101);
+            southSidewalk.position.set(0, 0.08, 137);
             southSidewalk.receiveShadow = true;
             this.exteriorGroup.add(southSidewalk);
 
             // 紅黃相間路緣石與防撞白黃柱
             const redCurb = new THREE.Mesh(
-                new THREE.BoxGeometry(220, 0.18, 0.35),
+                new THREE.BoxGeometry(320, 0.18, 0.35),
                 new THREE.MeshStandardMaterial({ color: '#dc2626' })
             );
-            redCurb.position.set(0, 0.09, 87.1);
+            redCurb.position.set(0, 0.09, 123.1);
             this.exteriorGroup.add(redCurb);
 
-            for (let bx = -30; bx <= 30; bx += 6) {
+            for (let bx = -55; bx <= 55; bx += 11) {
                 const bollard = new THREE.Mesh(
                     new THREE.CylinderGeometry(0.11, 0.11, 0.9, 12),
                     new THREE.MeshStandardMaterial({ color: '#f8fafc' })
                 );
-                bollard.position.set(bx, 0.55, 87.6);
+                bollard.position.set(bx, 0.55, 123.6);
                 const band = new THREE.Mesh(
                     new THREE.CylinderGeometry(0.115, 0.115, 0.16, 12),
                     new THREE.MeshBasicMaterial({ color: '#facc15' })
                 );
-                band.position.set(bx, 0.82, 87.6);
+                band.position.set(bx, 0.82, 123.6);
                 this.exteriorGroup.add(bollard, band);
             }
 
             // 商店街建築群（龍紋刺青 TATTOO、快炒通宵、超商、旋轉理髮燈）
             const shopSpecs = [
-                { x: 22, z: 111, w: 12, d: 11, h: 12, col: '#475569', sign: '龍紋刺青 TATTOO', sub: 'LUKANG ART STUDIO', sBg: '#0f172a', sBd: '#22d3ee' },
-                { x: 8, z: 111, w: 13, d: 11, h: 14, col: '#64748b', sign: '鹿港快炒通宵', sub: 'SEAFOOD & TAIWANESE CUISINE', sBg: '#991b1b', sBd: '#facc15' },
-                { x: -7, z: 111, w: 13, d: 11, h: 13, col: '#52525b', sign: '秀傳特約藥妝超商', sub: 'CONVENIENCE & PHARMACY', sBg: '#065f46', sBd: '#34d399' },
-                { x: -23, z: 111, w: 15, d: 11, h: 16, col: '#4b5563', sign: '彰濱活力養生會館', sub: 'HEALTH & WELLNESS', sBg: '#312e81', sBd: '#a78bfa' }
+                { x: 22, z: 147, w: 12, d: 11, h: 12, col: '#475569', sign: '龍紋刺青 TATTOO', sub: 'LUKANG ART STUDIO', sBg: '#0f172a', sBd: '#22d3ee' },
+                { x: 8, z: 147, w: 13, d: 11, h: 14, col: '#64748b', sign: '鹿港快炒通宵', sub: 'SEAFOOD & TAIWANESE CUISINE', sBg: '#991b1b', sBd: '#facc15' },
+                { x: -7, z: 147, w: 13, d: 11, h: 13, col: '#52525b', sign: '秀傳特約藥妝超商', sub: 'CONVENIENCE & PHARMACY', sBg: '#065f46', sBd: '#34d399' },
+                { x: -23, z: 147, w: 15, d: 11, h: 16, col: '#4b5563', sign: '彰濱活力養生會館', sub: 'HEALTH & WELLNESS', sBg: '#312e81', sBd: '#a78bfa' }
             ];
             shopSpecs.forEach((sp) => {
                 const bldg = new THREE.Mesh(
@@ -2207,7 +2295,7 @@
 
             // 旋轉理髮三色燈柱
             const poleGroup = new THREE.Group();
-            poleGroup.position.set(16.1, 2.2, 105.3);
+            poleGroup.position.set(16.1, 2.2, 141.3);
             this.barberPole = new THREE.Mesh(
                 new THREE.CylinderGeometry(0.11, 0.11, 0.85, 16),
                 new THREE.MeshStandardMaterial({ color: '#ef4444', emissive: '#1d4ed8', emissiveIntensity: 0.25 })
@@ -2238,12 +2326,12 @@
             const sageFrameMat = new THREE.MeshStandardMaterial({ color: '#5b7a75', roughness: 0.45 });
             const creamMat = new THREE.MeshStandardMaterial({ color: '#ebe4d3', roughness: 0.5 });
 
-            // 醫院前庭迎賓圓環廣場（Z = +12..+24）
+            // 醫院正門外的入口廣場。
             const plaza = new THREE.Mesh(
-                new THREE.BoxGeometry(74, 0.14, 16),
+                new THREE.BoxGeometry(100, 0.14, 14),
                 new THREE.MeshStandardMaterial({ color: '#cbd5e1', roughness: 0.75 })
             );
-            plaza.position.set(0, 0.07, 16);
+            plaza.position.set(0, 0.07, 63.5);
             plaza.receiveShadow = true;
             this.exteriorGroup.add(plaza);
 
@@ -2251,17 +2339,17 @@
             const upperWing = new THREE.Group();
             const northBlock = new THREE.Mesh(new THREE.BoxGeometry(68,24,27),brickMat);
             northBlock.position.set(0,16.6,-18.5);
-            const westWing = new THREE.Mesh(new THREE.BoxGeometry(20,24,25),brickMat);
-            westWing.position.set(-26,16.6,6.5);
-            const eastWing = new THREE.Mesh(new THREE.BoxGeometry(20,24,25),brickMat);
-            eastWing.position.set(26,16.6,6.5);
+            const westWing = new THREE.Mesh(new THREE.BoxGeometry(20,24,40),brickMat);
+            westWing.position.set(-26,16.6,20);
+            const eastWing = new THREE.Mesh(new THREE.BoxGeometry(20,24,40),brickMat);
+            eastWing.position.set(26,16.6,20);
             [northBlock,westWing,eastWing].forEach(m=>{m.castShadow=true;m.receiveShadow=true;upperWing.add(m);});
             this.exteriorGroup.add(upperWing);
 
             // 平屋頂分段、中央兩座採光/設備方艙與兩端圓形屋頂塔樓。
             const roofMat=new THREE.MeshStandardMaterial({color:'#64748b',roughness:0.62});
             const creamRoofMat=new THREE.MeshStandardMaterial({color:'#e7dfcf',roughness:0.68});
-            [[-15,-18,28,20],[15,-18,28,20],[-26,6,14,21],[26,6,14,21]].forEach(([x,z,w,d])=>{
+            [[-15,-18,28,20],[15,-18,28,20],[-26,20,14,36],[26,20,14,36]].forEach(([x,z,w,d])=>{
                 const roof=new THREE.Mesh(new THREE.BoxGeometry(w,0.35,d),roofMat);roof.position.set(x,28.78,z);this.exteriorGroup.add(roof);
             });
             [-3.5,3.5].forEach(x=>{
@@ -2280,35 +2368,29 @@
                 this.exteriorGroup.add(towerBase,towerRing,towerGlass);
             });
 
-            // 一樓外圍包覆紅磚外牆（留出南側大門入口 X: -6..+6 與東側急診通道 X: +35）
+            // 一樓外圍牆延伸到完整 1F 平面範圍，南側保留正門、東側保留疏散通道。
             const wallH = 4.6;
-            // 西側外牆
-            const westWall = new THREE.Mesh(new THREE.BoxGeometry(0.8, wallH, 44), brickMat);
-            westWall.position.set(-35.6, wallH * 0.5, -10);
-            this.addOutdoorCollider(-35.6, -10, 1.0, 44);
+            const westWall = new THREE.Mesh(new THREE.BoxGeometry(0.8, wallH, 130), brickMat);
+            westWall.position.set(-70.4, wallH * 0.5, -5);
+            this.addOutdoorCollider(-70.4, -5, 1.0, 130);
 
-            // 東側外牆（北段與南段，中間留急診室通道）
-            const eastWallS = new THREE.Mesh(new THREE.BoxGeometry(0.8, wallH, 24), brickMat);
-            eastWallS.position.set(35.6, wallH * 0.5, 0);
-            this.addOutdoorCollider(35.6, 0, 1.0, 24);
+            const eastWallS = new THREE.Mesh(new THREE.BoxGeometry(0.8, wallH, 60), brickMat);
+            eastWallS.position.set(70.4, wallH * 0.5, 30);
+            this.addOutdoorCollider(70.4, 30, 1.0, 60);
+            const eastWallN = new THREE.Mesh(new THREE.BoxGeometry(0.8, wallH, 45), brickMat);
+            eastWallN.position.set(70.4, wallH * 0.5, -47.5);
+            this.addOutdoorCollider(70.4, -47.5, 1.0, 45);
 
-            const eastWallN = new THREE.Mesh(new THREE.BoxGeometry(0.8, wallH, 12), brickMat);
-            eastWallN.position.set(35.6, wallH * 0.5, -26);
-            this.addOutdoorCollider(35.6, -26, 1.0, 12);
+            const northWall = new THREE.Mesh(new THREE.BoxGeometry(140, wallH, 0.8), brickMat);
+            northWall.position.set(0, wallH * 0.5, -70.4);
+            this.addOutdoorCollider(0, -70.4, 140, 1.0);
 
-            // 北側外牆
-            const northWall = new THREE.Mesh(new THREE.BoxGeometry(72, wallH, 0.8), brickMat);
-            northWall.position.set(0, wallH * 0.5, -31.8);
-            this.addOutdoorCollider(0, -31.8, 72, 1.0);
-
-            // 南側左右翼外牆（X: -36..-7 與 X: +7..+36）
-            const southWallL = new THREE.Mesh(new THREE.BoxGeometry(29, wallH, 0.8), brickMat);
-            southWallL.position.set(-21.5, wallH * 0.5, 11.8);
-            this.addOutdoorCollider(-21.5, 11.8, 29, 1.0);
-
-            const southWallR = new THREE.Mesh(new THREE.BoxGeometry(29, wallH, 0.8), brickMat);
-            southWallR.position.set(21.5, wallH * 0.5, 11.8);
-            this.addOutdoorCollider(21.5, 11.8, 29, 1.0);
+            const southWallL = new THREE.Mesh(new THREE.BoxGeometry(60, wallH, 0.8), brickMat);
+            southWallL.position.set(-40, wallH * 0.5, 60.4);
+            this.addOutdoorCollider(-40, 60.4, 60, 1.0);
+            const southWallR = new THREE.Mesh(new THREE.BoxGeometry(60, wallH, 0.8), brickMat);
+            southWallR.position.set(40, wallH * 0.5, 60.4);
+            this.addOutdoorCollider(40, 60.4, 60, 1.0);
 
             this.exteriorGroup.add(westWall, eastWallS, eastWallN, northWall, southWallL, southWallR);
 
@@ -2317,29 +2399,29 @@
                 new THREE.CylinderGeometry(10.5, 10.5, 9.5, 32, 1, true, -Math.PI * 0.45, Math.PI * 0.9),
                 glassMat
             );
-            rotundaGlass.position.set(0, 6.9, 10.5);
+            rotundaGlass.position.set(0, 6.9, 50);
             this.exteriorGroup.add(rotundaGlass);
 
             // 半圓柱玻璃帷幕的鼠尾草綠直立窗框與懸挑圓弧屋簷環
             for (let a = -Math.PI * 0.44; a <= Math.PI * 0.44; a += Math.PI * 0.088) {
                 const mullion = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 9.8, 8), sageFrameMat);
-                mullion.position.set(Math.sin(a) * 10.55, 6.9, 10.5 + Math.cos(a) * 10.55);
+                mullion.position.set(Math.sin(a) * 10.55, 6.9, 50 + Math.cos(a) * 10.55);
                 this.exteriorGroup.add(mullion);
             }
             const rotundaRoofRing = new THREE.Mesh(
                 new THREE.CylinderGeometry(11.5, 11.5, 0.65, 36, 1, false, -Math.PI * 0.48, Math.PI * 0.96),
                 sageFrameMat
             );
-            rotundaRoofRing.position.set(0, 11.8, 10.5);
+            rotundaRoofRing.position.set(0, 11.8, 50);
             this.exteriorGroup.add(rotundaRoofRing);
 
             // 一樓迎賓車道雨庇門廊（Porte-Cochère）與自動玻璃滑門
             const canopyRoof = new THREE.Mesh(new THREE.BoxGeometry(18, 1.1, 8.5), creamMat);
-            canopyRoof.position.set(0, 4.9, 16.0);
+            canopyRoof.position.set(0, 4.9, 64.0);
             canopyRoof.castShadow = true;
             this.exteriorGroup.add(canopyRoof);
 
-            [[-7.5, 19.5], [7.5, 19.5], [-7.5, 13.0], [7.5, 13.0]].forEach(([px, pz]) => {
+            [[-7.5, 67.5], [7.5, 67.5], [-7.5, 60.5], [7.5, 60.5]].forEach(([px, pz]) => {
                 const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.95, 4.6, 0.95), brickMat);
                 pillar.position.set(px, 2.3, pz);
                 pillar.castShadow = true;
@@ -2347,13 +2429,13 @@
                 this.addOutdoorCollider(px, pz, 0.95, 0.95);
             });
 
-            // 自動玻璃雙開滑門（Z = 11.8）
+            // 自動玻璃雙開滑門（Z = 60）
             const doorL = new THREE.Mesh(new THREE.BoxGeometry(2.6, 3.4, 0.14), glassMat);
-            doorL.position.set(-1.35, 1.7, 11.8);
+            doorL.position.set(-1.35, 1.7, 60);
             const doorR = new THREE.Mesh(new THREE.BoxGeometry(2.6, 3.4, 0.14), glassMat);
-            doorR.position.set(1.35, 1.7, 11.8);
+            doorR.position.set(1.35, 1.7, 60);
             this.exteriorGroup.add(doorL, doorR);
-            this.slidingDoors.push({ left: doorL, right: doorR, closedX: 1.35, openX: 3.6, gateZ: 11.8 });
+            this.slidingDoors.push({ left: doorL, right: doorR, closedX: 1.35, openX: 3.6, gateZ: 60 });
 
             // 正門招牌「彰濱秀傳醫療財團法人彰濱秀傳紀念醫院」
             const mainSignTex = HospitalAndStreetTextures.createSignBoard(
@@ -2370,7 +2452,7 @@
                 new THREE.BoxGeometry(16.8, 1.35, 0.25),
                 new THREE.MeshBasicMaterial({ map: mainSignTex })
             );
-            mainSign.position.set(0, 5.1, 20.3);
+            mainSign.position.set(0, 5.1, 69.3);
             this.exteriorGroup.add(mainSign);
 
             // 頂樓深青綠色機房與「秀 ✚ 傳」經典標誌（重現 68817202_0.jpg 屋頂招牌）
@@ -2415,23 +2497,23 @@
                     cab.position.set(px,1.08,pz-0.05);this.exteriorGroup.add(cab);
                 }
             };
-            addLot(0,46,72,34,2);       // 正門前停車區
-            addLot(-8,-56,68,24,2);     // 北側大停車區
-            addLot(82,-27,34,38,3);     // 急診與東側停車場
-            addLot(-55,-43,32,24,2);    // 心理健康中心旁停車區
+            addLot(0,84,72,34,2);       // 正門前停車區
+            addLot(-8,-101,68,24,2);    // 北側大停車區
+            addLot(92,-45,34,38,3);     // 急診與東側停車場
+            addLot(-51,-98,32,24,2);    // 心理健康中心旁停車區
 
             // 北側連接道與院區東西向通道。
-            const northDrive=new THREE.Mesh(new THREE.PlaneGeometry(172,11),roadMat);
-            northDrive.rotation.x=-Math.PI/2;northDrive.position.set(0,0.025,-39);this.exteriorGroup.add(northDrive);
+            const northDrive=new THREE.Mesh(new THREE.PlaneGeometry(220,11),roadMat);
+            northDrive.rotation.x=-Math.PI/2;northDrive.position.set(0,0.025,-84);this.exteriorGroup.add(northDrive);
             const westDrive=new THREE.Mesh(new THREE.PlaneGeometry(10,54),roadMat);
-            westDrive.rotation.x=-Math.PI/2;westDrive.position.set(-42,0.025,-50);this.exteriorGroup.add(westDrive);
+            westDrive.rotation.x=-Math.PI/2;westDrive.position.set(-86,0.025,-84);this.exteriorGroup.add(westDrive);
             const eastDrive=new THREE.Mesh(new THREE.PlaneGeometry(10,54),roadMat);
-            eastDrive.rotation.x=-Math.PI/2;eastDrive.position.set(42,0.025,-50);this.exteriorGroup.add(eastDrive);
+            eastDrive.rotation.x=-Math.PI/2;eastDrive.position.set(86,0.025,-84);this.exteriorGroup.add(eastDrive);
             // 急診迴車彎以短路段近似衛星圖中的弧形車道。
             for(let i=0;i<8;i++){
                 const seg=new THREE.Mesh(new THREE.PlaneGeometry(5.5,9),roadMat);
                 seg.rotation.x=-Math.PI/2;seg.rotation.z=(i-3.5)*0.11;
-                seg.position.set(58+i*2.1,0.03,-8+Math.abs(i-3.5)*1.25);this.exteriorGroup.add(seg);
+                seg.position.set(102+i*2.1,0.03,-42+Math.abs(i-3.5)*1.25);this.exteriorGroup.add(seg);
             }
         }
 
@@ -2441,18 +2523,18 @@
 
             // 1. 東北側急診大樓與入口標示。
             const erBuilding=new THREE.Mesh(new THREE.BoxGeometry(26,13,20),brickMat);
-            erBuilding.position.set(69,6.5,-68);erBuilding.castShadow=true;
-            this.exteriorGroup.add(erBuilding);this.addOutdoorCollider(69,-68,26,20);
+            erBuilding.position.set(110,6.5,-90);erBuilding.castShadow=true;
+            this.exteriorGroup.add(erBuilding);this.addOutdoorCollider(110,-90,26,20);
             const erSignTex = HospitalAndStreetTextures.createSignBoard('彰濱秀傳醫院急診', 'EMERGENCY 24H', '#b91c1c', '#fca5a5');
             const erSign = new THREE.Mesh(new THREE.BoxGeometry(6.5, 1.2, 0.25), new THREE.MeshBasicMaterial({ map: erSignTex }));
             erSign.rotation.y = Math.PI / 2;
-            erSign.position.set(82.2, 4.4, -68);
+            erSign.position.set(123.2, 4.4, -90);
             this.exteriorGroup.add(erSign);
 
             // 2. 東側急診停車場標示（停車格由 buildCampusParkingAndRoads 建立）。
             const pSignTex = HospitalAndStreetTextures.createSignBoard('P 紀念醫院停車場', 'PARKING LOT', '#1d4ed8', '#93c5fd');
             const pSign = new THREE.Mesh(new THREE.BoxGeometry(5.5, 1.4, 0.25), new THREE.MeshBasicMaterial({ map: pSignTex }));
-            pSign.position.set(82, 3.6, -5);
+            pSign.position.set(109, 3.6, -21);
             this.exteriorGroup.add(pSign);
 
             // 3. 西南側：秀傳亞洲遠距微創手術中心 IRCAD Taiwan（X = -68, Z = +6）
@@ -2478,27 +2560,27 @@
 
             // 4. 西北側：心理健康中心 & 紅綠戶外籃球場（X = -58, Z = -46）
             const mhcBldg = new THREE.Mesh(new THREE.BoxGeometry(25, 13, 20), brickMat);
-            mhcBldg.position.set(-82, 6.5, -67);
-            this.addOutdoorCollider(-82, -67, 25, 20);
+            mhcBldg.position.set(-96, 6.5, -67);
+            this.addOutdoorCollider(-96, -67, 25, 20);
 
             const courtBase = new THREE.Mesh(
                 new THREE.PlaneGeometry(15, 24),
                 new THREE.MeshStandardMaterial({ color: '#15803d', roughness: 0.7 })
             );
             courtBase.rotation.x = -Math.PI / 2;
-            courtBase.position.set(-54, 0.04, -65);
+            courtBase.position.set(-68, 0.04, -65);
             const courtInner = new THREE.Mesh(
                 new THREE.PlaneGeometry(12, 20),
                 new THREE.MeshStandardMaterial({ color: '#b91c1c', roughness: 0.7 })
             );
             courtInner.rotation.x = -Math.PI / 2;
-            courtInner.position.set(-54, 0.05, -65);
+            courtInner.position.set(-68, 0.05, -65);
             this.exteriorGroup.add(mhcBldg, courtBase, courtInner);
 
             // 園區行道樹
             const trunkMat = new THREE.MeshStandardMaterial({ color: '#5c4033' });
             const leafMat = new THREE.MeshStandardMaterial({ color: '#2e7d32' });
-            [[-16, 22], [16, 22], [-26, 22], [26, 22], [-44, 45], [44, 45], [-48, 22], [48, -22]].forEach(([tx, tz]) => {
+            [[-76, -40], [76, -40], [-76, 30], [76, 30], [-74, 80], [74, 80], [-40, -75], [40, -75]].forEach(([tx, tz]) => {
                 const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.32, 2.6, 8), trunkMat);
                 trunk.position.set(tx, 1.3, tz);
                 const crown = new THREE.Mesh(new THREE.SphereGeometry(1.75, 12, 10), leafMat);
@@ -2559,28 +2641,33 @@
         buildFloorBaseShell(floorInfo) {
             const is1F = floorInfo.code === '1F';
             const isB1 = floorInfo.code === 'B1';
+            const isWidePlan = ['1F','2F','3F','B1'].includes(floorInfo.code);
+            const isWideWard = ['5F','6F','7F','8F'].includes(floorInfo.code);
+            const floorWidth = isWidePlan || isWideWard ? 140 : 70.4;
+            const floorDepth = isWidePlan ? 130 : (isWideWard ? 70 : 43.2);
+            const floorCenterZ = isWidePlan ? -5 : (isWideWard ? -10 : -10);
 
             // 亮面拋光磁磚/磨石子地板（重現 cbshow-medically06.jpg 反光光澤地板）
             const floorColor = isB1 ? '#cbd5e1' : (floorInfo.type === 'clinic_3f' ? '#e7d5be' : '#e8e2d5');
             const interiorFloor = new THREE.Mesh(
-                new THREE.BoxGeometry(70.4, 0.24, 43.2),
+                new THREE.BoxGeometry(floorWidth, 0.24, floorDepth),
                 new THREE.MeshStandardMaterial({ color: floorColor, roughness: 0.24, metalness: 0.08 })
             );
-            interiorFloor.position.set(0, 0.12, -10.0);
+            interiorFloor.position.set(0, 0.12, floorCenterZ);
             interiorFloor.receiveShadow = true;
             this.floorInteriorGroup.add(interiorFloor);
 
             // 白色格柵天花板與嵌入式 LED 燈盤（Y = 4.35）
             const ceiling = new THREE.Mesh(
-                new THREE.PlaneGeometry(70.4, 43.2),
+                new THREE.PlaneGeometry(floorWidth, floorDepth),
                 new THREE.MeshStandardMaterial({ color: '#f8fafc', roughness: 0.7, side: THREE.DoubleSide })
             );
             ceiling.rotation.x = Math.PI / 2;
-            ceiling.position.set(0, 4.35, -10.0);
+            ceiling.position.set(0, 4.35, floorCenterZ);
             this.floorInteriorGroup.add(ceiling);
 
-            for (let lz = -26; lz <= 6; lz += 6.5) {
-                for (let lx = -22; lx <= 22; lx += 11) {
+            for (let lz = floorCenterZ-floorDepth/2+5; lz <= floorCenterZ+floorDepth/2-5; lz += is1F ? 12 : 6.5) {
+                for (let lx = -floorWidth/2+8; lx <= floorWidth/2-8; lx += is1F ? 14 : 11) {
                     const ledPanel = new THREE.Mesh(
                         new THREE.PlaneGeometry(2.4, 0.85),
                         new THREE.MeshBasicMaterial({ color: '#ffffff', side: THREE.DoubleSide })
@@ -2598,22 +2685,22 @@
                 const winGlassMat = new THREE.MeshBasicMaterial({ color: isB1 ? '#334155' : '#bae6fd' });
 
                 // 南北兩側牆體
-                [11.2, -31.2].forEach((wz) => {
-                    const wMesh = new THREE.Mesh(new THREE.BoxGeometry(70, 4.35, 0.5), wallMat);
+                [floorCenterZ+floorDepth/2-0.4, floorCenterZ-floorDepth/2+0.4].forEach((wz) => {
+                    const wMesh = new THREE.Mesh(new THREE.BoxGeometry(floorWidth, 4.35, 0.5), wallMat);
                     wMesh.position.set(0, 2.175, wz);
-                    const wainscot = new THREE.Mesh(new THREE.BoxGeometry(69.8, 1.15, 0.54), pinkWainscotMat);
+                    const wainscot = new THREE.Mesh(new THREE.BoxGeometry(floorWidth-0.2, 1.15, 0.54), pinkWainscotMat);
                     wainscot.position.set(0, 0.58, wz);
                     this.floorInteriorGroup.add(wMesh, wainscot);
                 });
 
                 // 東西兩側採光窗牆（重現病房與走廊盡頭的大面採光窗 + 綠色窗簾）
-                [-35.0, 35.0].forEach((wx) => {
-                    const wMesh = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4.35, 42.5), wallMat);
-                    wMesh.position.set(wx, 2.175, -10);
+                [-floorWidth/2+0.25, floorWidth/2-0.25].forEach((wx) => {
+                    const wMesh = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4.35, floorDepth), wallMat);
+                    wMesh.position.set(wx, 2.175, floorCenterZ);
                     this.floorInteriorGroup.add(wMesh);
 
                     if (!isB1) {
-                        for (let wz = -24; wz <= 4; wz += 9.5) {
+                        for (let wz = floorCenterZ-floorDepth/2+8; wz <= floorCenterZ+floorDepth/2-8; wz += Math.max(9.5,floorDepth/5)) {
                             const winPane = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 2.1), winGlassMat);
                             winPane.rotation.y = wx < 0 ? Math.PI / 2 : -Math.PI / 2;
                             winPane.position.set(wx + (wx < 0 ? 0.28 : -0.28), 2.35, wz);
@@ -2705,6 +2792,8 @@
         // 1F：門診大廳 + 門診廊道（100% 還原 cbshow-medically06.jpg：1120~1125 紫紅診間旗幟、圓弧模組沙發候診座、綠白牆面與血壓測量站）
         // ------------------------------------------------------------------------
         buildFloor1F_LobbyAndClinics() {
+            this.buildFloor1F_EvacuationPlan();
+            return;
             // A. 南側門診大廳：掛號批價櫃台 & 領藥處（Z = -5.5）
             const counterMat = new THREE.MeshStandardMaterial({ color: '#f8fafc', roughness: 0.35 });
             const tealTrimMat = new THREE.MeshStandardMaterial({ color: '#0d9488', roughness: 0.4 });
@@ -3096,6 +3185,140 @@
             this.addFloorCollider(-7.5, -21.5, 0.9, 11.5);
         }
 
+        buildFloor1F_EvacuationPlan() {
+            // 依完整 1F 疏散圖將樓層展開成左右翼與南側門診群；中央保持連續公共動線。
+            const rooms=[
+                [-57,-49,15,12,'工務處 / 設備','#fef3c7'],[-41,-49,14,12,'中央監控 / 前室','#dbeafe'],
+                [-57,-34,15,11,'PACS / 超音波','#cffafe'],[-41,-34,14,11,'骨密度 / CT 控制室','#cffafe'],
+                [-25,-34,14,11,'MRI / 磁振造影','#cffafe'],[-10,-34,13,11,'血管攝影 / X光','#cffafe'],
+                [8,-34,13,11,'急救區 / 護理站','#fee2e2'],[25,-34,14,11,'腦波室 / 主任室','#dbeafe'],
+                [43,-49,13,12,'切片染色 / 病理室','#cffafe'],[57,-49,15,12,'洗腎室','#fbcfe8'],
+                [43,-34,13,11,'腎臟科 / 藥理室','#fbcfe8'],[58,-34,14,11,'正壓隔離病房','#d1fae5'],
+                [-58,-17,13,10,'64切 CT / 控制室','#cffafe'],[-44,-17,13,10,'DAY LIGHT / 檢查室','#cffafe'],
+                [-30,-17,13,10,'乳房攝影 / VIP ROOM','#cffafe'],[-15,-17,13,10,'控制室 / CT','#dbeafe'],
+                [0,-17,13,10,'急診診療 / 觀察','#fee2e2'],[15,-17,13,10,'門診 / 診療室','#fbcfe8'],
+                [30,-17,13,10,'藥劑科 / 領藥','#cffafe'],[45,-17,13,10,'推床區 / 治療室','#fef3c7'],
+                [59,-17,12,10,'洗腎 / 沖洗室','#fbcfe8'],[-57,-3,14,10,'檢驗科 / 庫房','#cffafe'],
+                [-42,-3,13,10,'討論室 / 主任室','#dbeafe'],[-27,-3,13,10,'VIP / 候診','#bfdbfe'],
+                [27,-3,13,10,'藥劑科 / 領藥等候','#cffafe'],[42,-3,13,10,'復健 / 推床區','#fef3c7'],
+                [57,-3,12,10,'診療室 / 治療室','#fbcfe8'],[-58,27,15,11,'人文館 / 教材組','#bfdbfe'],
+                [58,27,14,11,'國際會議室 / 電腦教室','#bfdbfe'],[-58,43,14,10,'統一超商 / 服務台','#fb923c'],
+                [-42,43,12,10,'婦幼門診 / 衛浴','#fbcfe8'],[42,43,12,10,'門診 / 診間','#fbcfe8'],
+                [58,43,14,10,'圖書館 / 電腦查詢','#fb923c']
+            ];
+            rooms.forEach(([x,z,w,d,label,color])=>this.addPlanRoom(x,z,w,d,label,color));
+
+            // 門診改為連續開放的公共長廊，兩側以獨立診間門牌與門扇面向候診走道。
+            this.buildOpenOutpatientCorridor();
+
+            // 中央急診及門診大廳、候診區、挑空與入口廣場保持開放。
+            this.addPlanRoom(0,-1,23,18,'中央急診 / 候診大廳','#d1fae5',false);
+            this.addPlanRoom(0,21,48,17,'中央共食區 / 挑空中庭','#d1fae5',false);
+            this.addPlanRoom(0,50,20,10,'入口門廳','#e2e8f0',false);
+            const bed=this.createDetailedHospitalBed(8,-5,Math.PI/2,true);this.floorInteriorGroup.add(bed);
+
+            // 圖上分布於兩翼端部、影像區及中央的樓梯與電梯核心。
+            [[-65,-58,'西北樓梯 / 電梯'],[65,-58,'東北樓梯 / 電梯'],[-65,-18,'西側樓梯 / 電梯'],
+             [65,-18,'東側樓梯 / 電梯'],[-65,22,'西翼緊急出口'],[65,22,'東翼緊急出口'],
+             [-65,52,'西南樓梯'],[65,52,'東南樓梯'],[0,-7,'中央樓梯 / 電梯'],[0,46,'入口側樓梯 / 電梯']]
+                .forEach(([x,z,label])=>this.addPlanCore(x,z,label));
+
+            // 室內主要外圍牆段，保留入口和跨翼走廊缺口。
+            const wallMat=new THREE.MeshStandardMaterial({color:'#e7e2d5',roughness:0.75});
+            const wall=(w,d,x,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,3.2,d),wallMat);m.position.set(x,1.85,z);this.floorInteriorGroup.add(m);};
+            wall(140,0.35,0,-70);wall(0.35,130,-70,-5);wall(0.35,130,70,-5);
+            wall(54,0.35,-43,60);wall(54,0.35,43,60);
+        }
+
+        buildOpenOutpatientCorridor() {
+            this.outpatientBoards = [];
+            const wood = new THREE.MeshStandardMaterial({ color: '#a76e43', roughness: 0.78 });
+            const trim = new THREE.MeshStandardMaterial({ color: '#d6b28c', roughness: 0.65 });
+            const door = new THREE.MeshStandardMaterial({ color: '#d6c2b5', roughness: 0.65 });
+            const signMat = new THREE.MeshStandardMaterial({ color: '#f1eee6', roughness: 0.75 });
+            const floorMat = new THREE.MeshStandardMaterial({ color: '#e6dfd3', roughness: 0.88 });
+            const rooms = [
+                ['1120','腸胃科'],['1121','心臟內科'],['1122','腎臟科'],['1123','腎臟科'],['1125','腎臟科'],
+                ['1126','一般內科'],['1127','神經內科'],['1128','神經外科'],['1129','一般外科'],['1130','泌尿科'],
+                ['1131','骨科'],['1132','胸腔外科'],['1133','整形外科'],['1135','口腔顎面外科'],
+                ['1136','小兒科'],['1137','耳鼻喉科'],['1138','眼科'],['1139','復健科'],['1150','婦產科'],
+                ['1151','皮膚科'],['1152','家醫科'],['1153','神經科'],['1155','胸腔內科'],['1156','感染科'],
+                ['1157','新陳代謝科'],['1158','免疫風濕科'],['1159','一般外科'],['1160','泌尿科'],['1161','骨科']
+            ];
+            const startX = -55.3, width = 7.9, frontNorth = 5.8, backNorth = -3.5, frontSouth = 20.2, backSouth = 29.5;
+            const addWall = (w, d, x, z) => {
+                const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, 3.05, d), wood);
+                mesh.position.set(x, 1.78, z); this.floorInteriorGroup.add(mesh);
+                this.addFloorCollider(x, z, w, d);
+                const band = new THREE.Mesh(new THREE.BoxGeometry(w, 0.16, d + 0.025), trim);
+                band.position.set(x, 0.72, z); this.floorInteriorGroup.add(band);
+            };
+            const hallFloor = new THREE.Mesh(new THREE.BoxGeometry(111.5, 0.035, 14.1), floorMat);
+            hallFloor.position.set(0, 0.27, 13); this.floorInteriorGroup.add(hallFloor);
+            rooms.forEach(([number, department], index) => {
+                const row = index < 14 ? 'north' : 'south';
+                const localIndex = index < 14 ? index : index - 14;
+                const x = startX + localIndex * width;
+                const center = x + width / 2;
+                const front = row === 'north' ? frontNorth : frontSouth;
+                const back = row === 'north' ? backNorth : backSouth;
+                const depth = Math.abs(front - back);
+                const middle = (front + back) / 2;
+                const roomFloor = new THREE.Mesh(new THREE.BoxGeometry(width - 0.12, 0.025, depth - 0.12), new THREE.MeshStandardMaterial({ color: '#f0e8dd', roughness: 0.9 }));
+                roomFloor.position.set(center, 0.27, middle); this.floorInteriorGroup.add(roomFloor);
+                // 診間深處隔牆，側牆分隔各室，走廊側只在門的位置留開口。
+                addWall(width, 0.16, center, back);
+                addWall(0.16, depth, x, middle);
+                if (localIndex === 13) addWall(0.16, depth, x + width, middle);
+                const opening = 1.55;
+                const segment = (width - opening) / 2;
+                addWall(segment, 0.16, x + segment / 2, front);
+                addWall(segment, 0.16, x + width - segment / 2, front);
+                const leaf = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.25, opening - 0.08), door);
+                leaf.position.set(center, 1.38, front); this.floorInteriorGroup.add(leaf);
+                const roomSign = new THREE.Mesh(new THREE.BoxGeometry(1.55, 0.62, 0.09), signMat);
+                roomSign.position.set(center, 2.94, row === 'north' ? front + 0.2 : front - 0.2);
+                this.floorInteriorGroup.add(roomSign);
+                const labelTex = HospitalAndStreetTextures.createSignBoard(`${number} 診間`, department, '#7c4930', '#f4d9b8', '#fffaf2', '#fffaf2', 360, 120);
+                const label = new THREE.Mesh(new THREE.PlaneGeometry(1.48, 0.54), new THREE.MeshBasicMaterial({ map: labelTex }));
+                label.position.set(center, 2.94, row === 'north' ? front + 0.255 : front - 0.255);
+                if (row === 'south') label.rotation.y = Math.PI;
+                this.floorInteriorGroup.add(label);
+            });
+            // 長廊電子叫號屏：定時輪播目前號碼與診間，畫面始終朝向走廊。
+            const canvas = document.createElement('canvas');
+            canvas.width = 640; canvas.height = 360;
+            const ctx = canvas.getContext('2d');
+            const texture = new THREE.CanvasTexture(canvas);
+            const screen = new THREE.Mesh(new THREE.PlaneGeometry(4.0, 2.25), new THREE.MeshBasicMaterial({ map: texture, toneMapped: false }));
+            screen.position.set(0, 3.15, 6.25);
+            this.floorInteriorGroup.add(screen);
+            this.outpatientBoards.push({ canvas, ctx, texture, screen, elapsed: 10 });
+            this.drawOutpatientCallBoard(this.outpatientBoards[0]);
+        }
+
+        drawOutpatientCallBoard(board) {
+            const { ctx, canvas, texture } = board;
+            const rooms = [['1125','腎臟科'],['1123','腎臟科'],['1122','腎臟科'],['1121','心臟內科'],['1120','腸胃科'],['1131','骨科'],['1136','小兒科']];
+            const item = rooms[this.outpatientCallIndex % rooms.length];
+            ctx.fillStyle = '#122a36'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#63dfcc'; ctx.font = 'bold 39px sans-serif'; ctx.fillText('門診看診叫號', 34, 58);
+            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 31px sans-serif'; ctx.fillText(`目前看診：${item[0]} 診間`, 36, 133);
+            ctx.fillStyle = '#facc15'; ctx.font = 'bold 94px sans-serif'; ctx.fillText(String(240 + (this.outpatientCallIndex * 3) % 58).padStart(3, '0'), 36, 250);
+            ctx.fillStyle = '#bae6fd'; ctx.font = '27px sans-serif'; ctx.fillText(`${item[1]}　請至診間外等候`, 36, 315);
+            texture.needsUpdate = true;
+        }
+
+        updateOutpatientBoards(dt) {
+            if (this.currentFloor !== '1F' || !this.outpatientBoards.length) return;
+            this.outpatientCallClock += dt;
+            if (this.outpatientCallClock >= 7) {
+                this.outpatientCallClock = 0;
+                this.outpatientCallIndex++;
+                this.outpatientBoards.forEach((board) => this.drawOutpatientCallBoard(board));
+            }
+        }
+
         // ------------------------------------------------------------------------
         // 5F / 6F / 7F / 8F：住院病房區（100% 還原 images (2).jpg 雙人病房實景：
         // 粉紅護牆板、薄荷綠床單被褥與枕頭病床、米色雙層床頭置物櫃、淡藍圍簾、綠色窗簾大窗、壁掛電視與黃色醫療廢棄物桶）
@@ -3104,14 +3327,22 @@
             const floorNum = floorInfo.code.replace('F', ''); // '5', '6', '7', '8'
             if (floorInfo.code === '5F') {
                 this.buildFloor5F_EvacuationPlan();
+                this.addWardCareStations();
                 return;
             }
             if (floorInfo.code === '6F') {
                 this.buildFloor6F_EvacuationPlan(floorInfo);
+                this.addWardCareStations();
                 return;
             }
             if (floorInfo.code === '7F') {
                 this.buildFloor7F_EvacuationPlan();
+                this.addWardCareStations();
+                return;
+            }
+            if (floorInfo.code === '8F') {
+                this.buildFloor8F_EvacuationPlan();
+                this.addWardCareStations();
                 return;
             }
             const creamWallMat = new THREE.MeshStandardMaterial({ color: '#f5f0e6', roughness: 0.55 });
@@ -3335,35 +3566,44 @@
         // B1：地下美食街與放射線醫學影像中心 (MRI / CT)
         // ------------------------------------------------------------------------
         buildFloorB1_FoodCourtAndRadiology() {
-            // 配置依 B1 疏散圖分區：左翼復健/小兒與影像區、中央共食區、右側放射治療及服務區。
-            const palette = ['#dbeafe','#dcfce7','#fef3c7','#fce7f3','#e0f2fe','#ffedd5'];
-            const rooms = [
-                [-29,-25,10,7,'復健科'],[-18,-25,10,7,'運動治療區'],[-29,-16,10,7,'小兒科'],[-18,-16,10,7,'治療室 / 討論室'],
-                [-29,-6,10,7,'影像檢查區'],[-18,-6,10,7,'SPECT / 控制室'],[-29,4,10,7,'藥庫 / 資料室'],[-18,4,10,7,'門診診間'],
-                [-7,-25,8,7,'語言治療'],[-7,-16,8,7,'門診區'],[-7,-6,8,7,'護理 / 休息區'],[-7,4,8,7,'診療室'],
-                [3,-25,8,7,'耳鼻喉科'],[3,-16,8,7,'超音波 / 報告室'],[3,-6,8,7,'商店'],[3,4,8,7,'內視鏡'],
-                [14,-25,8,7,'配膳 / 洗滌區'],[14,-16,8,7,'員工餐廳'],[14,-6,8,7,'CT / 控制室'],[14,4,8,7,'直線加速器'],
-                [25,-25,8,7,'病歷室 / 診療'],[25,-16,8,7,'化學治療'],[25,-6,8,7,'Gamma Knife'],[25,4,8,7,'倉庫']
+            // B1 全幅配置：西側復健/小兒與影像，右側放射治療/服務，南側門診與美食區。
+            const rooms=[
+                [-58,-50,18,13,'倉儲 / 工務區','#fef3c7'],[-38,-50,18,13,'生技室 / 控制室','#fef3c7'],
+                [-58,-34,18,13,'Suction / 復健器材','#fef3c7'],[-38,-34,18,13,'復健科 / 運動治療','#fbcfe8'],
+                [-18,-50,17,13,'MRI / PACS','#cffafe'],[0,-50,17,13,'CT / 放射線攝影','#cffafe'],
+                [18,-50,17,13,'VIP 治療 / 控制室','#dbeafe'],[38,-50,17,13,'化學治療','#fbcfe8'],
+                [57,-50,18,13,'Gamma Knife / 倉庫','#fef3c7'],[-58,-17,18,13,'小兒科 / 診間','#fbcfe8'],
+                [-38,-17,18,13,'語言治療 / 討論室','#fbcfe8'],[-18,-17,17,13,'血液腫瘤 / 放射線科','#cffafe'],
+                [0,-17,17,13,'CT / 控制室 / 候診','#dbeafe'],[18,-17,17,13,'檢查室 / 藥庫','#dbeafe'],
+                [38,-17,17,13,'病理室 / 切片染色','#fbcfe8'],[57,-17,18,13,'直線加速器 / 倉庫','#fef3c7'],
+                [-58,1,18,13,'神經內外科 / 中醫','#bfdbfe'],[-38,1,18,13,'腦波室 / 神經傳導','#bfdbfe'],
+                [-18,1,17,13,'門診診間 / 免疫科','#fbcfe8'],[0,1,17,13,'復健科 / 治療室','#fbcfe8'],
+                [18,1,17,13,'配膳 / 洗滌 / 冷藏','#fef3c7'],[38,1,17,13,'員工餐廳 / 廚房','#fb923c'],
+                [57,1,18,13,'會議室 / 員工服務','#bfdbfe'],[-58,19,18,13,'藥庫 / 資料室','#cffafe'],
+                [-38,19,18,13,'門診診間 / 藥局','#fbcfe8'],[-18,19,17,13,'門診 / 治療室','#fbcfe8'],
+                [18,19,17,13,'商店 / 食品區','#fb923c'],[38,19,17,13,'中庭共食區','#d1fae5'],
+                [57,19,18,13,'會議室 / 倉庫','#bfdbfe'],[-55,42,18,13,'小兒科 / 影像檢查','#cffafe'],
+                [-35,42,18,13,'診療室 / SPECT','#cffafe'],[-15,42,18,13,'門診 / 休息區','#fbcfe8'],
+                [15,42,18,13,'員工餐廳 / 配膳','#fb923c'],[35,42,18,13,'腸胃科 / 內視鏡','#cffafe'],
+                [55,42,18,13,'會議室 / 書庫','#bfdbfe']
             ];
-            rooms.forEach(([x,z,w,d,label],i) => this.addPlanRoom(x,z,w,d,label,palette[i%palette.length]));
-            // 中央共食與員工用餐區保留連通空間，僅設置低矮櫃台和標牌。
-            this.addPlanRoom(-1,-2,8,5,'中庭共食區','#d1fae5',false);
-            this.addPlanRoom(20,0,9,6,'員工餐廳','#fb923c',false);
-            // 標註版平面圖指定的專科診間與檢查空間。
-            this.addPlanRoom(-24,-14,8,5,'免疫 / 中醫科','#fbcfe8');
-            this.addPlanRoom(-24,1,9,7,'神內 / 神外 / 中醫','#bfdbfe');
-            this.addPlanRoom(-13,1,9,7,'腦波室 / 神經傳導','#bfdbfe');
+            rooms.forEach(([x,z,w,d,label,color])=>this.addPlanRoom(x,z,w,d,label,color));
+            // 保留中央主要共食區及兩段連通走廊，並標示紅框註記的神經與免疫診療區。
+            this.addPlanRoom(0,25,36,18,'中央共食區 / 主走廊','#d1fae5',false);
+            this.addPlanRoom(-43,-1,13,10,'免疫 / 中醫科','#fbcfe8',false);
+            this.addPlanRoom(-43,17,13,12,'神內 / 神外 / 中醫','#bfdbfe',false);
+            this.addPlanRoom(-27,17,13,12,'腦波室 / 神經傳導','#bfdbfe',false);
             const highlightMat=new THREE.MeshStandardMaterial({color:'#dc2626',emissive:'#7f1d1d',emissiveIntensity:0.25});
-            [[-24,-10,8,0.12],[-24,-18,8,0.12],[-28,-14,0.12,8],[-20,-14,0.12,8],
-             [-18,5,20,0.14],[-18,-3,20,0.14],[-28,1,0.14,8],[-8,1,0.14,8]]
+            [[-43,-6,13,0.14],[-43,-12,13,0.14],[-49,-9,0.14,6],[-37,-9,0.14,6],
+             [-43,23,28,0.14],[-43,11,28,0.14],[-57,17,0.14,12],[-29,17,0.14,12]]
                 .forEach(([x,z,w,d])=>{const bar=new THREE.Mesh(new THREE.BoxGeometry(w,0.1,d),highlightMat);bar.position.set(x,0.34,z);this.floorInteriorGroup.add(bar);});
-            this.addPlanCore(-31,-23,'西側樓梯 / 電梯');
-            this.addPlanCore(0,7,'中央樓梯 / 電梯');
-            this.addPlanCore(32,-23,'東側樓梯 / 電梯');
-            this.addPlanCore(32,7,'南側緊急出口');
+            [[-65,-61,'西北樓梯 / 電梯'],[0,-62,'北側樓梯 / 電梯'],[65,-61,'東北樓梯 / 電梯'],
+             [-65,-4,'西側樓梯 / 電梯'],[65,-4,'東側樓梯 / 電梯'],[-65,53,'西南緊急出口'],
+             [0,53,'中央樓梯 / 電梯'],[65,53,'東南緊急出口']]
+                .forEach(([x,z,label])=>this.addPlanCore(x,z,label));
             // MRI / CT 設備作為可辨識的室內設施。
             const scanner = new THREE.Mesh(new THREE.TorusGeometry(1.05,0.38,14,24),new THREE.MeshStandardMaterial({color:'#f8fafc',roughness:0.3}));
-            scanner.position.set(24,1.35,-5);
+            scanner.position.set(0,1.35,-18);
             this.floorInteriorGroup.add(scanner);
         }
 
@@ -3381,6 +3621,44 @@
             wall(w,0.16,x,z+d/2); wall(0.16,d-1.15,x-w/2,z);
             wall(0.16,d-1.15,x+w/2,z);
             this.addFloorCollider(x,z+d/2,w,0.2);
+            if (['5F','6F','7F','8F'].includes(this.currentFloor) && /病房/.test(label)) this.addSmartWardRoomFurniture(x,z,w,d);
+        }
+
+        addSmartWardRoomFurniture(x,z,w,d) {
+            const bedXs=[x-Math.min(1.18,w*0.23),x+Math.min(1.18,w*0.23)];
+            bedXs.forEach((bx,index)=>{
+                const bz=z+0.25;
+                this.floorInteriorGroup.add(this.createDetailedHospitalBed(bx,bz,0,false));
+                const patient=new THREE.Group();
+                const gown=new THREE.MeshStandardMaterial({color:index?'#9db8d1':'#b2d3c2',roughness:0.86});
+                const skin=new THREE.MeshStandardMaterial({color:'#dfb69c',roughness:0.9});
+                const hair=new THREE.MeshStandardMaterial({color:'#51463f',roughness:0.9});
+                const torso=new THREE.Mesh(new THREE.BoxGeometry(0.66,0.31,0.92),gown);torso.position.set(0,0.86,0.08);
+                const head=new THREE.Mesh(new THREE.SphereGeometry(0.19,10,8),skin);head.position.set(0,0.88,-0.64);
+                const cap=new THREE.Mesh(new THREE.SphereGeometry(0.195,10,6,0,Math.PI*2,0,Math.PI*0.48),hair);cap.position.copy(head.position);
+                patient.add(torso,head,cap);patient.position.set(bx,0,bz);this.floorInteriorGroup.add(patient);
+                const monitor=new THREE.Mesh(new THREE.BoxGeometry(0.62,0.42,0.16),new THREE.MeshStandardMaterial({color:'#1e293b',emissive:'#0e7490',emissiveIntensity:0.35,roughness:0.32}));
+                monitor.position.set(bx+(index?0.9:-0.9),1.25,bz-0.65);
+                const screen=new THREE.Mesh(new THREE.PlaneGeometry(0.44,0.25),new THREE.MeshBasicMaterial({color:'#67e8f9'}));screen.position.set(monitor.position.x,1.27,monitor.position.z+0.09);
+                const iv=new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,1.8,8),new THREE.MeshStandardMaterial({color:'#cbd5e1',metalness:0.6}));iv.position.set(bx+(index?0.95:-0.95),0.96,bz+0.65);
+                const bag=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.28,0.12),new THREE.MeshStandardMaterial({color:'#dbeafe',transparent:true,opacity:0.85}));bag.position.set(iv.position.x,1.88,iv.position.z);
+                this.floorInteriorGroup.add(monitor,screen,iv,bag);
+            });
+            const curtain=new THREE.Mesh(new THREE.PlaneGeometry(1.6,2.05),new THREE.MeshStandardMaterial({color:'#8ac9a5',transparent:true,opacity:0.42,side:THREE.DoubleSide}));
+            curtain.position.set(x,1.82,z+d*0.19);this.floorInteriorGroup.add(curtain);
+        }
+
+        addWardCareStations() {
+            const deskMat=new THREE.MeshStandardMaterial({color:'#d9dedb',roughness:0.6});
+            const monitorMat=new THREE.MeshStandardMaterial({color:'#173544',emissive:'#0e7490',emissiveIntensity:0.5,roughness:0.3});
+            [-40,-20,0,20,40].forEach((x)=>{
+                const desk=new THREE.Mesh(new THREE.BoxGeometry(1.9,0.16,0.78),deskMat);desk.position.set(x,0.94,-13.4);
+                const leg=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.86,0.12),deskMat);leg.position.set(x,0.48,-13.4);
+                const monitor=new THREE.Mesh(new THREE.BoxGeometry(0.82,0.58,0.1),monitorMat);monitor.position.set(x,1.36,-13.65);
+                const display=new THREE.Mesh(new THREE.PlaneGeometry(0.68,0.4),new THREE.MeshBasicMaterial({color:'#67e8f9'}));display.position.set(x,1.37,-13.59);
+                const keyboard=new THREE.Mesh(new THREE.BoxGeometry(0.62,0.035,0.2),new THREE.MeshStandardMaterial({color:'#475569'}));keyboard.position.set(x,1.04,-13.05);
+                this.floorInteriorGroup.add(desk,leg,monitor,display,keyboard);
+            });
         }
 
         addPlanCore(x,z,label) {
@@ -3393,74 +3671,112 @@
         }
 
         buildFloor2F_EvacuationPlan() {
-            // 2F：中央開刀房群，北側外科加護，東北洗腎，南側婦幼與專科門診。
+            // 2F 全幅配置：左翼 ICU/NICU、中部手術核心、右翼洗腎/牙科，南側為婦產與門診翼。
             const rooms=[
-                [-28,-24,9,7,'外科加護 / 恢復室','#f5e9e3'],[-18,-24,9,7,'外科 ICU / 治療','#f5e9e3'],
-                [-28,-14,9,7,'護理站 / ISO','#fbcfe8'],[-18,-14,9,7,'器材供應 / 備準室','#fef3c7'],
-                [-28,-4,9,7,'內科加護 / ISO','#f5e9e3'],[-18,-4,9,7,'討論室 / 醫師辦公','#bfdbfe'],
-                [0,-27,8,7,'OR-8 / OR-9','#6ee7b7'],[9,-27,8,7,'OR-6 / OR-7','#6ee7b7'],[18,-27,8,7,'OR-1 / OR-2','#6ee7b7'],
-                [27,-27,8,7,'OR-3 / 開刀房','#6ee7b7'],[26,-16,8,7,'消毒 / 儲藏室','#fef3c7'],
-                [28,-5,8,7,'洗腎區 / 準備室','#fbcfe8'],[-27,7,8,6,'NICU / PICU','#cffafe'],
-                [-17,7,9,6,'婦產科病房 / LDR','#fbcfe8'],[10,7,9,6,'牙科門診','#fbcfe8'],[23,7,9,6,'牙科治療 / X-RAY','#fbcfe8']
+                [-58,-52,14,12,'RT / 檢查室','#fef3c7'],[-42,-52,14,12,'值班室 / 討論室','#dbeafe'],
+                [-58,-37,14,12,'外科 ICU / 恢復室','#f5e9e3'],[-42,-37,14,12,'外科 ICU / 器材供應','#f5e9e3'],
+                [-26,-37,13,12,'小導管 / 控制室','#fbcfe8'],[-11,-37,13,12,'恢復室 / 庫房','#f5e9e3'],
+                [5,-37,13,12,'器材供應 / 護理站','#fef3c7'],[20,-37,13,12,'洗腎區 / 急救器材','#fbcfe8'],
+                [36,-37,13,12,'特殊洗腎 / 電氣室','#fbcfe8'],[52,-52,15,12,'洗腎區 / 準備室','#fbcfe8'],
+                [52,-37,15,12,'CAPD / 醫師室','#bfdbfe'],[-58,-21,14,12,'RT 隔離室 / ISO','#cffafe'],
+                [-42,-21,14,12,'護理站 / 器材供應','#d1fae5'],[-26,-21,13,12,'內科 ICU / ISO','#f5e9e3'],
+                [-11,-21,13,12,'內科 ICU / 備準室','#f5e9e3'],[5,-21,13,12,'手術恢復 / N/S','#fbcfe8'],
+                [20,-21,13,12,'OR-8 / OR-9','#6ee7b7'],[36,-21,13,12,'OR-6 / OR-7','#6ee7b7'],
+                [52,-21,15,12,'OR-1 / OR-2 / OR-3','#6ee7b7'],[-58,-5,14,12,'ICU 病房 / 護理站','#f5e9e3'],
+                [-42,-5,14,12,'隔離病房 / ISO','#f5e9e3'],[-26,-5,13,12,'醫師辦公 / 討論','#dbeafe'],
+                [52,-5,15,12,'消毒室 / 儲藏室','#fef3c7'],[-58,14,14,12,'NICU / PICU','#cffafe'],
+                [-42,14,14,12,'婦產科病房 / LDR','#fbcfe8'],[-26,14,13,12,'嬰兒室 / 產房','#fbcfe8'],
+                [36,14,13,12,'心臟血管中心','#fbcfe8'],[52,14,15,12,'牙科門診 / X-RAY','#fbcfe8'],
+                [-58,37,14,12,'產科病房 201–210','#fbcfe8'],[-42,37,14,12,'陽光室 / 治療室','#fef3c7'],
+                [36,37,13,12,'牙科診間 221–228','#fbcfe8'],[52,37,15,12,'牙科治療中心','#fbcfe8']
             ];
             rooms.forEach(([x,z,w,d,l,c])=>this.addPlanRoom(x,z,w,d,l,c));
-            this.addPlanRoom(0,-12,18,5,'開刀房前室 / 手術走廊','#d1fae5',false);
-            this.addPlanRoom(-3,0,25,7,'中庭挑空','#e2e8f0',false);
-            [[-31,-29,'西側樓梯 / 電梯'],[31,-29,'東側樓梯 / 電梯'],[-31,7,'NICU 樓梯'],[31,7,'牙科樓梯'],[0,6,'中央樓梯 / 電梯']]
+            this.addPlanRoom(0,-5,28,16,'開刀房前室 / 中央手術走廊','#d1fae5',false);
+            this.addPlanRoom(-20,43,28,16,'挑空中庭 / 家屬等候','#e2e8f0',false);
+            this.addPlanRoom(25,43,30,16,'挑空中庭','#e2e8f0',false);
+            [[-65,-59,'西北樓梯 / 電梯'],[65,-59,'東北樓梯 / 電梯'],[-65,-5,'西側樓梯 / 電梯'],
+             [65,-5,'東側樓梯 / 電梯'],[-65,53,'NICU 樓梯'],[65,53,'牙科樓梯'],[0,44,'中央樓梯 / 電梯']]
                 .forEach(([x,z,l])=>this.addPlanCore(x,z,l));
         }
 
         buildFloor3F_FloorPlan() {
-            // 3F：睡眠中心位於北翼，辦公與病房沿外圈，中央為護理與電梯核心，南翼為眼科與門診。
-            const upper=[];
-            for(let i=0;i<10;i++)upper.push([-18+i*4.0,-26,3.8,7,`睡眠中心 ${321-i}`,'#f5e9e3']);
-            for(let i=0;i<10;i++)upper.push([-18+i*4.0,-17,3.8,7,`睡眠中心 ${353+i}`,'#f5e9e3']);
-            const rooms=[...upper,
-                [-28,-7,8,7,'婦產科 VIP 病房','#fbcfe8'],[-17,-7,8,7,'美容 / 醫材供應','#d1fae5'],
-                [13,-7,8,7,'辦公室 / 庫房','#bfdbfe'],[25,-7,8,7,'行政 / 社工辦公','#bfdbfe'],
-                [-27,4,8,7,'一般慢性病房','#f5e9e3'],[-16,4,8,7,'護理部辦公室','#fef08a'],
-                [17,4,8,7,'眼科檢查 / 控制室','#d1fae5'],[27,4,8,7,'眼科診間','#fbcfe8'],
-                [-26,13,8,6,'病房 / 衛浴','#f5e9e3'],[-15,13,8,6,'眼科 / 臨床技能中心','#fbcfe8'],
-                [15,13,8,6,'眼科診間 3352–3363','#fbcfe8']
-            ];
+            // 3F 全幅配置：北側睡眠中心，中央行政/護理核心，南側慢性病房與眼科門診。
+            const rooms=[];
+            for(let i=0;i<12;i++)rooms.push([-55+i*10,-52,9.4,14,`睡眠中心 ${321-i}`,'#f5e9e3']);
+            for(let i=0;i<12;i++)rooms.push([-55+i*10,-34,9.4,14,`睡眠中心 ${353+i}`,'#f5e9e3']);
+            rooms.push(
+                [-62,-12,12,12,'病房 352–338','#f5e9e3'],[-48,-12,12,12,'婦產科 VIP 病房','#fbcfe8'],
+                [-34,-12,12,12,'美容 / 醫材供應','#d1fae5'],[-20,-12,12,12,'護理站 / 書記室','#d1fae5'],
+                [20,-12,12,12,'行政 / 社工辦公','#bfdbfe'],[34,-12,12,12,'行政組 / 續效組','#bfdbfe'],
+                [48,-12,12,12,'眼科 / 睡眠特別門診','#fbcfe8'],[62,-12,10,12,'病房 311–310','#f5e9e3'],
+                [-55,8,12,12,'病房 337–328','#f5e9e3'],[-41,8,12,12,'嬰兒室 / 哺乳室','#fbcfe8'],
+                [-27,8,12,12,'內科醫師辦公室','#bfdbfe'],[-13,8,12,12,'醫師及秘書辦公室','#bfdbfe'],
+                [20,8,12,12,'院長秘書室 / 檢驗科','#dbeafe'],[34,8,12,12,'眼科控制室','#d1fae5'],
+                [48,8,12,12,'眼科門診 3361–3363','#fbcfe8'],[62,8,10,12,'眼科治療室','#fbcfe8'],
+                [-55,29,12,12,'一般慢性病房 370–367','#f5e9e3'],[-41,29,12,12,'護理部辦公室','#fef08a'],
+                [-27,29,12,12,'病房 / 治療室','#f5e9e3'],[-13,29,12,12,'門診診間','#fbcfe8'],
+                [20,29,12,12,'班廷俱樂部 / 眼科','#fbcfe8'],[34,29,12,12,'眼科診間 3352','#fbcfe8'],
+                [48,29,12,12,'臨床技能中心','#d1fae5'],[62,29,10,12,'眼科 / 衛浴','#d1fae5']
+            );
             rooms.forEach(([x,z,w,d,l,c])=>this.addPlanRoom(x,z,w,d,l,c));
-            this.addPlanRoom(0,-7,9,5,'護理站 / 電梯廳','#d1fae5',false);
-            [[-31,-29,'西側樓梯 / 洗衣'],[31,-29,'東側樓梯 / 電梯'],[-31,13,'西側樓梯'],[31,13,'東側樓梯'],[0,13,'中央樓梯 / 電梯']]
+            this.addPlanRoom(0,-12,25,12,'中央護理站 / 電梯廳','#d1fae5',false);
+            this.addPlanRoom(0,14,28,12,'中庭 / 交誼區','#e2e8f0',false);
+            this.addPlanRoom(0,47,26,12,'南側挑空','#e2e8f0',false);
+            [[-65,-59,'西側樓梯 / 洗衣'],[65,-59,'東側樓梯 / 電梯'],[-65,35,'西側樓梯'],[65,35,'東側樓梯'],[0,52,'中央樓梯 / 電梯']]
                 .forEach(([x,z,l])=>this.addPlanCore(x,z,l));
         }
 
         buildFloor5F_EvacuationPlan() {
             // 5F：外圈病室、雙側護理站服務島、中央交誼/祈禱空間與南側醫師區。
             let left=552;
-            for(let z=-24;z<=-4;z+=4.8)this.addPlanRoom(-31,z,6,4.5,`${left--} 病房`,'#f5e9e3');
+            for(let z=-24;z<=-4;z+=4.8)this.addPlanRoom(-65,z,8,4.5,`${left--} 病房`,'#f5e9e3');
             let right=517;
-            for(let z=-24;z<=-4;z+=4.8)this.addPlanRoom(31,z,6,4.5,`${right++} 病房`,'#f5e9e3');
+            for(let z=-24;z<=-4;z+=4.8)this.addPlanRoom(65,z,8,4.5,`${right++} 病房`,'#f5e9e3');
             let n=553;
-            for(let i=0;i<20;i++)this.addPlanRoom(-27+i*2.85,-25,2.7,7,`${n++} 病房`,'#f5e9e3');
+            for(let i=0;i<20;i++)this.addPlanRoom(-57+i*6,-25,5.6,7,`${n++} 病房`,'#f5e9e3');
             n=537;
-            for(let i=0;i<10;i++)this.addPlanRoom(-25+i*2.85,-1,2.7,7,`${n--} 病房`,'#f5e9e3');
+            for(let i=0;i<10;i++)this.addPlanRoom(-56+i*5.6,-1,5.3,7,`${n--} 病房`,'#f5e9e3');
             n=517;
-            for(let i=0;i<10;i++)this.addPlanRoom(1+i*2.85,-1,2.7,7,`${n++} 病房`,'#f5e9e3');
+            for(let i=0;i<10;i++)this.addPlanRoom(1+i*5.6,-1,5.3,7,`${n++} 病房`,'#f5e9e3');
             [[-18,-13,'護理站 C / 討論室'],[-9,-13,'護理站 B / 器材'],[9,-13,'護理站 A / 輪椅'],[18,-13,'護理站 B / 治療室']]
-                .forEach(([x,z,l])=>this.addPlanRoom(x,z,6,3,l,'#fbcfe8',false));
+                .map(([x,z,l])=>[x*2,z,l]).forEach(([x,z,l])=>this.addPlanRoom(x,z,10,4,l,'#fbcfe8',false));
             this.addPlanRoom(0,7,10,5,'祈禱室 / 神明廳','#d1fae5',false);
-            [[-31,-29,'西端樓梯 / 電梯'],[31,-29,'東端樓梯 / 電梯'],[-31,5,'西側緊急樓梯'],[31,5,'東側緊急樓梯'],[0,5,'中央樓梯 / 電梯']]
+            [[-65,-29,'西端樓梯 / 電梯'],[65,-29,'東端樓梯 / 電梯'],[-65,5,'西側緊急樓梯'],[65,5,'東側緊急樓梯'],[0,5,'中央樓梯 / 電梯']]
                 .forEach(([x,z,l])=>this.addPlanCore(x,z,l));
         }
 
         buildFloor7F_EvacuationPlan() {
             // 7F：西側隔離房與病室、北側長排病房、中央服務島及南側商務/交誼空間。
             let n=735;
-            for(let i=0;i<20;i++)this.addPlanRoom(-27+i*2.85,-25,2.7,7,`${n++} 病房`,'#c084c3');
+            for(let i=0;i<20;i++)this.addPlanRoom(-57+i*6,-25,5.6,7,`${n++} 病房`,'#c084c3');
             n=727;
-            for(let i=0;i<10;i++)this.addPlanRoom(-25+i*2.85,-1,2.7,7,`${n--} 病房`,'#c084c3');
+            for(let i=0;i<10;i++)this.addPlanRoom(-56+i*5.6,-1,5.3,7,`${n--} 病房`,'#c084c3');
             n=701;
-            for(let i=0;i<10;i++)this.addPlanRoom(1+i*2.85,-1,2.7,7,`${n++} 病房`,'#f5e9e3');
-            for(let z=-24;z<=-4;z+=4.8){this.addPlanRoom(-31,z,6,4.5,'隔離 / 病房','#c084c3');this.addPlanRoom(31,z,6,4.5,'病房','#f5e9e3');}
-            [[-20,-13,'懇談室 / 辦公室'],[-10,-13,'護理站 A'],[10,-13,'護理站 B'],[20,-13,'器材供應 / 討論室']]
-                .forEach(([x,z,l])=>this.addPlanRoom(x,z,7,3,l,'#bfdbfe',false));
+            for(let i=0;i<10;i++)this.addPlanRoom(1+i*5.6,-1,5.3,7,`${n++} 病房`,'#f5e9e3');
+            for(let z=-24;z<=-4;z+=4.8){this.addPlanRoom(-65,z,8,4.5,'隔離 / 病房','#c084c3');this.addPlanRoom(65,z,8,4.5,'病房','#f5e9e3');}
+            [[-40,-13,'懇談室 / 辦公室'],[-20,-13,'護理站 A'],[20,-13,'護理站 B'],[40,-13,'器材供應 / 討論室']]
+                .forEach(([x,z,l])=>this.addPlanRoom(x,z,12,4,l,'#bfdbfe',false));
             this.addPlanRoom(0,7,16,5,'交誼廳 / 商務中心','#bfdbfe',false);
-            [[-31,-29,'西端樓梯 / 電梯'],[31,-29,'東端樓梯 / 電梯'],[-31,5,'西側緊急樓梯'],[31,5,'東側緊急樓梯'],[0,5,'中央樓梯 / 電梯']]
+            [[-65,-29,'西端樓梯 / 電梯'],[65,-29,'東端樓梯 / 電梯'],[-65,5,'西側緊急樓梯'],[65,5,'東側緊急樓梯'],[0,5,'中央樓梯 / 電梯']]
+                .forEach(([x,z,l])=>this.addPlanCore(x,z,l));
+        }
+
+        buildFloor8F_EvacuationPlan() {
+            // 8F 依 7F 環廊尺度延伸為尊榮病房、院長/行政區與資訊處機房。
+            let n=851;
+            for(let i=0;i<20;i++)this.addPlanRoom(-57+i*6,-25,5.6,7,`${n++} 尊榮病房`,'#f5e9e3');
+            n=831;
+            for(let i=0;i<10;i++)this.addPlanRoom(-56+i*5.6,-1,5.3,7,`${n++} 尊榮病房`,'#f5e9e3');
+            n=811;
+            for(let i=0;i<10;i++)this.addPlanRoom(1+i*5.6,-1,5.3,7,`${n++} 尊榮病房`,'#f5e9e3');
+            [[-65,-24,'貴賓病房 / 會客室'],[65,-24,'院長室 / 行政辦公'],[-65,-5,'病房 / 護理站'],[65,-5,'資訊處 / 控制室']]
+                .forEach(([x,z,l])=>this.addPlanRoom(x,z,8,8,l,'#bfdbfe'));
+            [[-40,-13,'護理站 A'],[-20,-13,'交誼廳'],[20,-13,'會議室'],[40,-13,'院長秘書室']]
+                .forEach(([x,z,l])=>this.addPlanRoom(x,z,12,4,l,'#bfdbfe',false));
+            this.addPlanRoom(49,-31,19,10,'資訊處核心機房','#dbeafe');
+            const rackMat=new THREE.MeshStandardMaterial({color:'#0f172a',metalness:0.7,roughness:0.25});
+            for(let rx=43;rx<=55;rx+=4){const rack=new THREE.Mesh(new THREE.BoxGeometry(1.4,2.5,2.0),rackMat);rack.position.set(rx,1.5,-31);this.floorInteriorGroup.add(rack);}
+            [[-65,-29,'西端樓梯 / 電梯'],[65,-29,'東端樓梯 / 電梯'],[-65,5,'西側緊急樓梯'],[65,5,'東側緊急樓梯'],[0,5,'中央樓梯 / 電梯']]
                 .forEach(([x,z,l])=>this.addPlanCore(x,z,l));
         }
 
@@ -3475,20 +3791,21 @@
                 const wallMat=new THREE.MeshStandardMaterial({color:'#e8ddd5',roughness:0.8});
                 const wall=(ww,dd,px,pz)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(ww,2.35,dd),wallMat);m.position.set(px,1.43,pz);this.floorInteriorGroup.add(m);};
                 wall(w,0.16,x,openToNorth ? z+d/2 : z-d/2);wall(0.16,d-0.9,x-w/2,z);wall(0.16,d-0.9,x+w/2,z);
+                this.addSmartWardRoomFurniture(x,z,w,d);
             };
             // North/south parallel wards, plus both end wings; room numbers follow the supplied plan.
             let n=653;
-            for(let i=0;i<20;i++)makeRoom(-27+i*2.85,-25,2.7,7,n++);
+            for(let i=0;i<20;i++)makeRoom(-57+i*6,-25,5.6,7,n++);
             n=637;
-            for(let i=0;i<10;i++)makeRoom(-25+i*2.85,-1,2.7,7,n--,true);
+            for(let i=0;i<10;i++)makeRoom(-56+i*5.6,-1,5.3,7,n--,true);
             n=601;
-            for(let i=0;i<10;i++)makeRoom(1+i*2.85,-1,2.7,7,n++,true);
-            for(let z=-24;z<=-3;z+=4.8){makeRoom(-31,z,6,4.55,652-Math.round((-24-z)/4.8));makeRoom(31,z,6,4.55,616+Math.round((-24-z)/4.8));}
+            for(let i=0;i<10;i++)makeRoom(1+i*5.6,-1,5.3,7,n++,true);
+            for(let z=-24;z<=-3;z+=4.8){makeRoom(-65,z,8,4.55,652-Math.round((-24-z)/4.8));makeRoom(65,z,8,4.55,616+Math.round((-24-z)/4.8));}
             // Broad continuous loop corridor and paired nursing/service islands.
-            const corridor=new THREE.Mesh(new THREE.BoxGeometry(59,0.035,7.8),green);corridor.position.set(0,0.27,-13.0);this.floorInteriorGroup.add(corridor);
-            [[-18,-13,'護理站 C'],[-9,-13,'治療室'],[9,-13,'治療室'],[18,-13,'護理站 B']].forEach(([x,z,t])=>this.addPlanRoom(x,z,5,3,t,'#fbcfe8',false));
-            this.addPlanCore(-31,-29,'西端樓梯 / 電梯');this.addPlanCore(31,-29,'東端樓梯 / 電梯');
-            this.addPlanCore(-31,5,'西側緊急樓梯');this.addPlanCore(31,5,'東側緊急樓梯');
+            const corridor=new THREE.Mesh(new THREE.BoxGeometry(120,0.035,7.8),green);corridor.position.set(0,0.27,-13.0);this.floorInteriorGroup.add(corridor);
+            [[-42,-13,'護理站 C'],[-21,-13,'治療室'],[21,-13,'治療室'],[42,-13,'護理站 B']].forEach(([x,z,t])=>this.addPlanRoom(x,z,12,4,t,'#fbcfe8',false));
+            this.addPlanCore(-65,-29,'西端樓梯 / 電梯');this.addPlanCore(65,-29,'東端樓梯 / 電梯');
+            this.addPlanCore(-65,5,'西側緊急樓梯');this.addPlanCore(65,5,'東側緊急樓梯');
             this.addPlanCore(0,5,'中央樓梯 / 電梯');
         }
 
@@ -3606,6 +3923,131 @@
                     ent.domEl.style.display = 'none';
                 }
             });
+            (this.staffCrowd || []).forEach((ent) => {
+                ent.group.visible = ent.floor === this.currentFloor;
+            });
+        }
+
+        // 大型醫院的常態人流：以低面數角色呈現護理師與推床傳送員，避免為每位員工建立互動標籤。
+        spawnHospitalStaff() {
+            this.staffCrowd.forEach((ent) => this.scene.remove(ent.group));
+            this.staffCrowd = [];
+            const floors = HOSPITAL_FLOORS.map((f) => f.code);
+            const skin = new THREE.MeshStandardMaterial({ color: '#e9b99b', roughness: 0.85 });
+            const nurseTop = new THREE.MeshStandardMaterial({ color: '#43a9a0', roughness: 0.8 });
+            const transporterTop = new THREE.MeshStandardMaterial({ color: '#52769b', roughness: 0.8 });
+            const doctorTop = new THREE.MeshStandardMaterial({ color: '#f1f5f9', roughness: 0.82 });
+            const pants = new THREE.MeshStandardMaterial({ color: '#263746', roughness: 0.9 });
+            const bedMat = new THREE.MeshStandardMaterial({ color: '#dce8ee', roughness: 0.7 });
+            const wheelMat = new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.9 });
+            const headGeo = new THREE.SphereGeometry(0.14, 8, 6);
+            const torsoGeo = new THREE.BoxGeometry(0.34, 0.46, 0.2);
+            const legGeo = new THREE.BoxGeometry(0.12, 0.32, 0.14);
+            const armGeo = new THREE.BoxGeometry(0.11, 0.38, 0.12);
+            const bedGeo = new THREE.BoxGeometry(0.72, 0.13, 1.35);
+            const wheelGeo = new THREE.CylinderGeometry(0.075, 0.075, 0.06, 8);
+            const wardFloors = ['5F','6F','7F','8F'];
+            const stationXs = [-40,-20,0,20,40];
+            const bedsideXs = [-44,-22,0,22,44];
+            for (let i = 0; i < 270; i++) {
+                const transporter = i >= 200 && i < 250;
+                const doctor = i >= 250;
+                const floor = doctor ? wardFloors[(i - 250) % wardFloors.length] : floors[i % floors.length];
+                const wide = ['1F','2F','3F','B1'].includes(floor);
+                let x = (Math.random() - 0.5) * (wide ? 86 : 52);
+                let z = (Math.random() - 0.5) * (wide ? 30 : 27) - (wide ? 2 : 10);
+                let duty = 'walk';
+                if (!transporter && !doctor && wardFloors.includes(floor)) {
+                    const nurseIndex = Math.floor(i / floors.length);
+                    if (nurseIndex < 5) {
+                        duty = 'computer'; x = stationXs[nurseIndex]; z = -13.4;
+                    } else if (nurseIndex < 10) {
+                        duty = 'bedside'; x = bedsideXs[nurseIndex - 5]; z = -23.2;
+                    }
+                }
+                const group = new THREE.Group();
+                const torso = new THREE.Mesh(torsoGeo, transporter ? transporterTop : doctor ? doctorTop : nurseTop);
+                torso.position.y = 0.86;
+                const head = new THREE.Mesh(headGeo, skin);
+                head.position.y = 1.2;
+                const leftLeg = new THREE.Mesh(legGeo, pants);
+                const rightLeg = new THREE.Mesh(legGeo, pants);
+                leftLeg.position.set(-0.09, 0.38, 0);
+                rightLeg.position.set(0.09, 0.38, 0);
+                const leftArm = new THREE.Mesh(armGeo, transporter ? transporterTop : doctor ? doctorTop : nurseTop);
+                const rightArm = new THREE.Mesh(armGeo, transporter ? transporterTop : doctor ? doctorTop : nurseTop);
+                leftArm.position.set(-0.25,0.88,0.02);rightArm.position.set(0.25,0.88,0.02);
+                [torso, head, leftLeg, rightLeg, leftArm, rightArm].forEach((m) => { m.castShadow = true; group.add(m); });
+                let bed = null;
+                if (transporter) {
+                    bed = new THREE.Group();
+                    const mattress = new THREE.Mesh(bedGeo, bedMat);
+                    mattress.position.y = 0.46;
+                    bed.add(mattress);
+                    [-0.3,0.3].forEach((wx) => [-0.48,0.48].forEach((wz) => {
+                        const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+                        wheel.rotation.z = Math.PI / 2;
+                        wheel.position.set(wx, 0.18, wz);
+                        bed.add(wheel);
+                    }));
+                    bed.position.set(0, 0, -1.1);
+                    group.add(bed);
+                }
+                group.position.set(x, 0, z);
+                group.visible = floor === this.currentFloor;
+                this.scene.add(group);
+                const angle = Math.random() * Math.PI * 2;
+                this.staffCrowd.push({ group, floor, transporter, doctor, duty, bed, leftLeg, rightLeg, leftArm, rightArm,
+                    x, z, angle, speed: 0.65 + Math.random() * 0.55, phase: Math.random() * 6.28,
+                    turnTimer: Math.random() * 4, homeX: x, homeZ: z, radius: wide ? 44 : 27 });
+            }
+        }
+
+        updateHospitalStaff(dt) {
+            const activeCars = this.trafficVehicles.filter((v) => v.aiDrive || v === this.drivingVehicle);
+            this.staffCrowd.forEach((ent) => {
+                if (ent.floor !== this.currentFloor) return;
+                if (ent.duty === 'computer') {
+                    ent.phase += dt * 5;
+                    ent.leftArm.rotation.x = -0.22 + Math.sin(ent.phase) * 0.13;
+                    ent.rightArm.rotation.x = -0.22 + Math.cos(ent.phase * 1.2) * 0.13;
+                    return;
+                }
+                if (ent.duty === 'bedside') {
+                    ent.phase += dt * 2.2;
+                    ent.leftArm.rotation.x = -0.55 + Math.sin(ent.phase) * 0.12;
+                    ent.rightArm.rotation.x = 0.08;
+                    return;
+                }
+                ent.turnTimer -= dt;
+                const playerNear = !this.drivingVehicle && Math.hypot(ent.x - this.player.pos.x, ent.z - this.player.pos.z) < 1.15;
+                const carNear = activeCars.some((v) => Math.hypot(ent.x - v.pos.x, ent.z - v.pos.z) < 3.2);
+                if (playerNear || carNear) {
+                    const awayX = ent.x - (carNear ? activeCars.find((v) => Math.hypot(ent.x - v.pos.x, ent.z - v.pos.z) < 3.2).pos.x : this.player.pos.x);
+                    const awayZ = ent.z - (carNear ? activeCars.find((v) => Math.hypot(ent.x - v.pos.x, ent.z - v.pos.z) < 3.2).pos.z : this.player.pos.z);
+                    ent.angle = Math.atan2(awayX, awayZ);
+                } else if (ent.turnTimer <= 0) {
+                    ent.turnTimer = 2 + Math.random() * 5;
+                    ent.angle += (Math.random() - 0.5) * 1.5;
+                }
+                const nx = ent.x + Math.sin(ent.angle) * ent.speed * dt;
+                const nz = ent.z + Math.cos(ent.angle) * ent.speed * dt;
+                const tooFar = Math.hypot(nx - ent.homeX, nz - ent.homeZ) > ent.radius;
+                if (!tooFar && !this.checkCollision(nx, nz, 0.28)) {
+                    ent.x = nx; ent.z = nz;
+                    ent.group.position.set(nx, 0, nz);
+                    ent.group.rotation.y = ent.angle;
+                    ent.phase += dt * 8;
+                    const gait = Math.sin(ent.phase) * 0.36;
+                    ent.leftLeg.rotation.x = gait;
+                    ent.rightLeg.rotation.x = -gait;
+                    ent.leftArm.rotation.x = -gait * 0.65;
+                    ent.rightArm.rotation.x = gait * 0.65;
+                } else {
+                    ent.angle += Math.PI * (0.55 + Math.random() * 0.45);
+                    ent.turnTimer = 0.4;
+                }
+            });
         }
 
         refreshNPCDomBadge(ent) {
@@ -3668,39 +4110,48 @@
                 const bodyMat = new THREE.MeshStandardMaterial({ color: bodyColor, roughness: 0.35, metalness: 0.25 });
                 const darkGlass = new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.2 });
 
-                const chassis = new THREE.Mesh(
-                    new THREE.BoxGeometry(isAmbulance ? 2.15 : 1.9, isAmbulance ? 1.55 : 0.72, isAmbulance ? 4.8 : 4.1),
-                    bodyMat
-                );
-                chassis.position.y = isAmbulance ? 1.15 : 0.65;
+                const chassis = new THREE.Mesh(new THREE.BoxGeometry(2.08, 1.18, 4.65), bodyMat);
+                chassis.position.y = 0.98;
                 chassis.castShadow = true;
                 car.add(chassis);
+                const cab = new THREE.Mesh(new THREE.BoxGeometry(1.92, 0.92, 1.58), bodyMat);
+                cab.position.set(0, 1.82, 1.18);
+                car.add(cab);
+                const windshield = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.66, 0.06), darkGlass);
+                windshield.position.set(0, 1.9, 1.99);
+                car.add(windshield);
+                const rearGlass = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.7, 0.06), darkGlass);
+                rearGlass.position.set(0, 1.72, -2.34);
+                car.add(rearGlass);
+                const sideWindowMat = new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.24, metalness: 0.1 });
+                [-1, 1].forEach((side) => {
+                    [-0.95, -0.03, 0.88].forEach((z) => {
+                        const windowPane = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.58, 0.72), sideWindowMat);
+                        windowPane.position.set(side * 1.045, 1.62, z);
+                        car.add(windowPane);
+                    });
+                    const cross = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.58, 0.5), new THREE.MeshBasicMaterial({ color: '#c62828' }));
+                    cross.position.set(side * 1.055, 1.02, -1.83);
+                    const crossBar = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.16, 0.82), new THREE.MeshBasicMaterial({ color: '#c62828' }));
+                    crossBar.position.set(side * 1.057, 1.02, -1.83);
+                    car.add(cross, crossBar);
+                });
 
                 if (isAmbulance) {
-                    const stripe = new THREE.Mesh(
-                        new THREE.BoxGeometry(2.18, 0.28, 4.84),
-                        new THREE.MeshBasicMaterial({ color: '#dc2626' })
-                    );
-                    stripe.position.y = 1.05;
-                    car.add(stripe);
 
                     const lightBarRed = new THREE.Mesh(
                         new THREE.BoxGeometry(0.65, 0.18, 0.28),
                         new THREE.MeshBasicMaterial({ color: '#ef4444' })
                     );
-                    lightBarRed.position.set(-0.45, 2.02, 1.45);
+                    lightBarRed.position.set(-0.45, 2.34, 0.55);
                     const lightBarBlue = new THREE.Mesh(
                         new THREE.BoxGeometry(0.65, 0.18, 0.28),
                         new THREE.MeshBasicMaterial({ color: '#3b82f6' })
                     );
-                    lightBarBlue.position.set(0.45, 2.02, 1.45);
+                    lightBarBlue.position.set(0.45, 2.34, 0.55);
                     car.add(lightBarRed, lightBarBlue);
                     car.userData.lightBarRed = lightBarRed;
                     car.userData.lightBarBlue = lightBarBlue;
-                } else {
-                    const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.68, 0.65, 2.15), darkGlass);
-                    cabin.position.set(0, 1.28, -0.15);
-                    car.add(cabin);
                 }
 
                 const wheelMat = new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.8 });
@@ -3727,8 +4178,8 @@
 
             const amb = makeCar(38.5, -18.5, 0, '#ffffff', true);
             this.trafficVehicles.push(amb);
-            this.trafficVehicles.push(makeCar(-18, 28.5, Math.PI / 2, '#f8fafc', false));
-            this.trafficVehicles.push(makeCar(26, 35.5, -Math.PI / 2, '#334155', false));
+            this.trafficVehicles.push(makeCar(-18, 28.5, Math.PI / 2, '#ffffff', false));
+            this.trafficVehicles.push(makeCar(26, 35.5, -Math.PI / 2, '#ffffff', false));
         }
 
         // ------------------------------------------------------------------------
@@ -4520,7 +4971,7 @@
             }
 
             // 3. 1F 急診區（X > 25, Z: -22..-12）按 E 免費治療恢復滿血
-            if (this.currentFloor === '1F' && this.player.pos.x > 24.5 && this.player.pos.z > -22 && this.player.pos.z < -12) {
+            if (this.currentFloor === '1F' && this.player.pos.x > 0 && this.player.pos.x < 18 && this.player.pos.z > -42 && this.player.pos.z < -28) {
                 this.player.hp = this.player.maxHp;
                 this.player.stamina = this.player.maxStamina;
                 this.updatePlayerBarsHUD();
@@ -4530,7 +4981,7 @@
             }
 
             // 4. B1 美食廣場（X < -9, Z: -10..-3）按 E 用餐恢復滿血與體力
-            if (this.currentFloor === 'B1' && this.player.pos.x < -9 && this.player.pos.z > -10 && this.player.pos.z < -3) {
+            if (this.currentFloor === 'B1' && this.player.pos.x > 30 && this.player.pos.x < 48 && this.player.pos.z > -6 && this.player.pos.z < 8) {
                 this.player.hp = this.player.maxHp;
                 this.player.stamina = this.player.maxStamina;
                 this.updatePlayerBarsHUD();
@@ -4601,6 +5052,10 @@
         // ------------------------------------------------------------------------
         animate() {
             requestAnimationFrame(() => this.animate());
+            if (!this.gameStarted) {
+                this.renderer.render(this.scene, this.camera);
+                return;
+            }
             const dt = Math.min(0.05, this.clock.getDelta());
 
             this.gameMinutes += dt * 0.4;
@@ -4617,7 +5072,9 @@
             }
 
             this.updateNPCs(dt);
+            this.updateHospitalStaff(dt);
             this.updateTrafficVehicles(dt);
+            this.updateOutpatientBoards(dt);
             this.updateSlidingDoors(dt);
             this.updateRescueMission(dt);
             this.updateParticles(dt);
@@ -4675,8 +5132,11 @@
 
                 const nx = p.pos.x + moveDir.x * speed * dt;
                 const nz = p.pos.z + moveDir.z * speed * dt;
-                if (!this.checkCollision(nx, p.pos.z, 0.36)) p.pos.x = nx;
-                if (!this.checkCollision(p.pos.x, nz, 0.36)) p.pos.z = nz;
+                const personBlocked = (this.staffCrowd || []).some((e) => e.floor === this.currentFloor && Math.hypot(e.x - nx, e.z - nz) < 0.78)
+                    || this.npcEntities.some((e) => (e.floor || '1F') === this.currentFloor && e.combatState !== 'ko' && Math.hypot(e.pos.x - nx, e.pos.z - nz) < 0.72);
+                const carBlocked = this.trafficVehicles.some((v) => Math.hypot(v.pos.x - nx, v.pos.z - nz) < 2.0);
+                if (!personBlocked && !carBlocked && !this.checkCollision(nx, p.pos.z, 0.36)) p.pos.x = nx;
+                if (!personBlocked && !carBlocked && !this.checkCollision(p.pos.x, nz, 0.36)) p.pos.z = nz;
 
                 p.walkCycle += dt * (isSprinting ? 14 : 9.5);
             } else {
@@ -4761,11 +5221,14 @@
 
             const nx = v.pos.x + Math.sin(v.yaw) * v.speed * dt;
             const nz = v.pos.z + Math.cos(v.yaw) * v.speed * dt;
-            if (!this.checkCollision(nx, nz, 1.35)) {
+            const personInPath = (this.staffCrowd || []).some((e) => e.floor === this.currentFloor && Math.hypot(e.x - nx, e.z - nz) < 2.15)
+                || this.npcEntities.some((e) => (e.floor || '1F') === this.currentFloor && e.combatState !== 'ko' && Math.hypot(e.pos.x - nx, e.pos.z - nz) < 1.75);
+            if (!personInPath && !this.checkCollision(nx, nz, 1.35)) {
                 v.pos.x = nx;
                 v.pos.z = nz;
             } else {
-                v.speed *= -0.3;
+                // 行人與車輛採安全停車反應，不造成傷害或穿透。
+                v.speed = 0;
             }
 
             v.mesh.position.copy(v.pos);
@@ -4826,6 +5289,25 @@
                     return;
                 }
 
+                if (ent.combatState !== 'hostile' && !this.drivingVehicle && Math.hypot(ent.pos.x - this.player.pos.x, ent.pos.z - this.player.pos.z) < 0.9) {
+                    const awayX = ent.pos.x - this.player.pos.x;
+                    const awayZ = ent.pos.z - this.player.pos.z;
+                    ent.yaw = Math.atan2(awayX, awayZ);
+                    ent.rig.group.rotation.y = ent.yaw;
+                    ent.rig.group.position.copy(ent.pos);
+                    return;
+                }
+
+                if (ent.combatState !== 'hostile') {
+                    const nearbyCar = this.trafficVehicles.find((v) => Math.hypot(ent.pos.x - v.pos.x, ent.pos.z - v.pos.z) < 2.0);
+                    if (nearbyCar) {
+                        ent.yaw = Math.atan2(ent.pos.x - nearbyCar.pos.x, ent.pos.z - nearbyCar.pos.z);
+                        ent.rig.group.rotation.y = ent.yaw;
+                        ent.rig.group.position.copy(ent.pos);
+                        return;
+                    }
+                }
+
                 let moving = false;
                 let moveSpeed = 2.1;
 
@@ -4884,7 +5366,7 @@
                         }
                     }
                 } else {
-                    const beh = ent.profile.behavior || 'stand';
+                    const beh = !ent.profile.behavior || ent.profile.behavior === 'stand' ? 'patrol' : ent.profile.behavior;
                     if (beh === 'follow') {
                         const toPlayer = new THREE.Vector3().subVectors(this.player.pos, ent.pos);
                         toPlayer.y = 0;
@@ -4963,9 +5445,15 @@
                     v.mesh.userData.lightBarBlue.material.color.set(active && !flashOn ? '#38bdf8' : '#1e3a8a');
                 }
                 if (v.aiDrive && this.currentFloor === '1F') {
-                    v.pos.x += v.dirX * 7.5 * dt;
-                    if (v.pos.x > 95) v.pos.x = -95;
-                    if (v.pos.x < -95) v.pos.x = 95;
+                    const nextX = v.pos.x + v.dirX * 7.5 * dt;
+                    const pedestrianAhead = (this.staffCrowd || []).some((e) => e.floor === '1F' && Math.abs(e.x - nextX) < 2.1 && Math.abs(e.z - v.pos.z) < 2.2)
+                        || this.npcEntities.some((e) => (e.floor || '1F') === '1F' && Math.abs(e.pos.x - nextX) < 2.1 && Math.abs(e.pos.z - v.pos.z) < 2.2)
+                        || (!this.drivingVehicle && Math.abs(this.player.pos.x - nextX) < 2.1 && Math.abs(this.player.pos.z - v.pos.z) < 2.2);
+                    if (!pedestrianAhead) {
+                        v.pos.x = nextX;
+                        if (v.pos.x > 95) v.pos.x = -95;
+                        if (v.pos.x < -95) v.pos.x = 95;
+                    }
                     v.mesh.position.copy(v.pos);
                 }
             });
@@ -5016,7 +5504,11 @@
                 }
             } else {
                 if (this.isPointInsideHospitalFootprint(px, pz)) {
-                    if (pz < -13.5 && Math.abs(px) < 12.5) {
+                    if (px > 0 && px < 18 && pz > -42 && pz < -28) {
+                        zoneName = '彰濱秀傳紀念醫院 ・ 1F 急診診療區';
+                    } else if (Math.abs(px) < 12.5 && pz > -18 && pz < -8) {
+                        zoneName = '彰濱秀傳紀念醫院 ・ 1F 中央電梯廳';
+                    } else if (pz < -13.5 && Math.abs(px) < 12.5) {
                         zoneName = '彰濱秀傳紀念醫院 ・ 1F 門診廊道 (1120~1125 診間)';
                     } else if (px > 24 && pz < -11) {
                         zoneName = '彰濱秀傳紀念醫院 ・ 1F 急診診療區';
@@ -5043,12 +5535,12 @@
                 promptTxt.textContent = `按 E 搭乘醫療大樓電梯（目前：${this.currentFloor}，可前往 B1～8F）`;
                 return;
             }
-            if (this.currentFloor === '1F' && px > 24.5 && pz > -22 && pz < -12) {
+            if (this.currentFloor === '1F' && px > 0 && px < 18 && pz > -42 && pz < -28) {
                 promptEl.classList.remove('hidden');
                 promptTxt.textContent = '按 E 進行急診醫療處置（免費恢復 100% 生命值與體力）';
                 return;
             }
-            if (this.currentFloor === 'B1' && px < -9 && pz > -10 && pz < -3) {
+            if (this.currentFloor === 'B1' && px > 30 && px < 48 && pz > -6 && pz < 8) {
                 promptEl.classList.remove('hidden');
                 promptTxt.textContent = '按 E 享用彰濱美食廣場餐點（恢復 100% 生命值與體力）';
                 return;
@@ -5119,7 +5611,8 @@
             ctx.fillStyle = '#1e293b';
             ctx.fillRect(0, 0, w, h);
 
-            const scale = 1.45;
+            const fullPlanFloors=['1F','2F','3F','B1','5F','6F','7F','8F'];
+            const scale = fullPlanFloors.includes(this.currentFloor) ? 0.78 : 1.45;
             ctx.save();
             ctx.translate(r, r);
             ctx.rotate(this.cameraOrbit.yaw);
@@ -5131,9 +5624,30 @@
             ctx.fillRect(-47 * scale, -80 * scale, 10 * scale, 140 * scale);
             ctx.fillRect(37 * scale, -80 * scale, 10 * scale, 140 * scale);
 
-            // 彰濱秀傳紀念醫院建築輪廓
+            // 彰濱秀傳醫療大樓完整 1F 雙翼與中央門診群；其他樓層沿用塔樓輪廓。
             ctx.fillStyle = '#c47b59';
-            ctx.fillRect(-36 * scale, -32 * scale, 72 * scale, 44 * scale);
+            if (this.currentFloor === '1F') {
+                ctx.fillRect(-70*scale,-70*scale,42*scale,58*scale);
+                ctx.fillRect(28*scale,-70*scale,42*scale,58*scale);
+                ctx.fillRect(-70*scale,-12*scale,140*scale,34*scale);
+                ctx.fillRect(-60*scale,22*scale,43*scale,38*scale);
+                ctx.fillRect(17*scale,22*scale,43*scale,38*scale);
+                ctx.fillRect(-17*scale,38*scale,34*scale,22*scale);
+                ctx.fillStyle = '#d1fae5';
+                ctx.fillRect(-15*scale,24*scale,30*scale,14*scale);
+                ctx.fillRect(-17*scale,-4*scale,34*scale,16*scale);
+            } else if (['2F','3F','B1'].includes(this.currentFloor)) {
+                ctx.fillRect(-70*scale,-70*scale,140*scale,130*scale);
+                ctx.fillStyle='#d1fae5';
+                ctx.fillRect(-14*scale,17*scale,28*scale,22*scale);
+                if (this.currentFloor==='2F') ctx.fillRect(-10*scale,-12*scale,20*scale,15*scale);
+            } else if (['5F','6F','7F','8F'].includes(this.currentFloor)) {
+                ctx.fillRect(-70*scale,-45*scale,140*scale,70*scale);
+                ctx.fillStyle='#d1fae5';
+                ctx.fillRect(-58*scale,-18*scale,116*scale,10*scale);
+            } else {
+                ctx.fillRect(-36 * scale, -32 * scale, 72 * scale, 44 * scale);
+            }
 
             // 電梯廳位置標示（青色亮點）
             ctx.fillStyle = '#2dd4bf';
