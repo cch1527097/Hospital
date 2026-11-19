@@ -51,13 +51,6 @@
       -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.14);
     }
-    .left-menu-panel {
-      background: linear-gradient(160deg, rgba(9, 15, 23, 0.90) 0%, rgba(13, 24, 36, 0.84) 60%, rgba(10, 20, 30, 0.92) 100%);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-right: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 16px 0 48px rgba(0, 0, 0, 0.65);
-    }
     #minimap-container {
       box-shadow: 0 0 0 4px rgba(15, 23, 34, 0.9), 0 0 0 6px rgba(255, 255, 255, 0.22), 0 12px 28px rgba(0, 0, 0, 0.65);
     }
@@ -68,131 +61,11 @@
     .prompt-pulse {
       animation: pulseGlow 1.5s infinite ease-in-out;
     }
-    .custom-scroll::-webkit-scrollbar {
-      width: 5px;
-    }
-    .custom-scroll::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.03);
-    }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: rgba(52, 211, 153, 0.45);
-      border-radius: 9999px;
-    }
   </style>
 </head>
 <body>
-  <!-- 主 3D 渲染畫布：開啟畫面與遊戲中皆即時同步渲染醫療大樓與 3D 角色 -->
+  <!-- 主 3D 渲染畫布 -->
   <canvas id="game-canvas"></canvas>
-
-  <!-- ====================================================================== -->
-  <!-- 開啟畫面層：所有選擇統一整合於左手邊選單                                  -->
-  <!-- ====================================================================== -->
-  <div id="start-overlay" class="fixed inset-0 z-40 pointer-events-none transition-opacity duration-500">
-    <!-- 左手邊統一功能選單 -->
-    <aside id="start-left-sidebar" class="pointer-events-auto fixed inset-y-0 left-0 w-full sm:w-[430px] left-menu-panel text-white flex flex-col justify-between p-5 sm:p-6 overflow-y-auto custom-scroll">
-      <div>
-        <!-- 園區標題與即時背景連線標籤 -->
-        <div class="pb-3.5 border-b border-white/10">
-          <div class="flex items-center justify-between gap-2">
-            <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-400/35">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span class="gta-font text-[10px] font-bold tracking-widest text-emerald-300 uppercase">LIVE 3D CAMPUS SYNC</span>
-            </div>
-            <span class="gta-font text-[11px] text-slate-400">VER 2.6</span>
-          </div>
-          <h1 class="text-2xl font-black tracking-wide text-amber-300 mt-1.5">彰濱秀傳健康園區</h1>
-          <p class="text-xs text-slate-300 mt-0.5">選擇您的園區身分與出發設定，右側即時同步 3D 角色與醫療大樓實景</p>
-        </div>
-
-        <!-- 選擇 1：角色身分選擇（資訊工程師 / 醫師 / 護理師 / 患者 等多種身分） -->
-        <div class="mt-4">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-black tracking-wider text-amber-300 uppercase">1. 選擇角色身分</span>
-            <span id="selected-role-pill" class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-[11px] font-bold text-emerald-300">
-              💻 資訊工程師
-            </span>
-          </div>
-
-          <!-- 8 種職業網格卡片 -->
-          <div id="role-grid" class="grid grid-cols-2 gap-2"></div>
-
-          <!-- 當前選中角色詳細說明與裝備預覽卡片 -->
-          <div class="mt-2.5 p-3 rounded-xl bg-black/45 border border-white/10 space-y-1.5">
-            <div class="flex items-center justify-between">
-              <span id="role-detail-title" class="font-black text-sm text-white">💻 資訊工程師 (IT Engineer)</span>
-              <span id="role-detail-cash" class="gta-font text-xs font-bold text-emerald-400">$0008800</span>
-            </div>
-            <p id="role-detail-desc" class="text-[11px] text-slate-300 leading-relaxed">
-              負責園區智慧醫療系統與核心機房維運，身穿深藍科技連帽外套、配戴識別證並手持行動工作筆電。
-            </p>
-            <div class="flex items-center justify-between pt-1 border-t border-white/10 text-[11px]">
-              <span class="text-slate-400">專屬配備：<strong id="role-detail-gear" class="text-sky-300">智慧筆電 / 資訊識別證</strong></span>
-              <span class="text-slate-400">專注值：<strong id="role-detail-armor" class="text-cyan-300">90%</strong></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 選擇 2：園區出發位置 -->
-        <div class="mt-4">
-          <span class="block text-xs font-black tracking-wider text-amber-300 uppercase mb-1.5">2. 選擇園區出發位置</span>
-          <div class="grid grid-cols-3 gap-1.5">
-            <button type="button" data-spawn="entrance" class="spawn-btn py-2 px-2 rounded-xl bg-emerald-600/80 border border-emerald-300/60 text-xs font-bold text-white text-center transition">
-              🏥 1F 大門車道
-            </button>
-            <button type="button" data-spawn="ambulance" class="spawn-btn py-2 px-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 text-center transition">
-              🚑 救護車旁
-            </button>
-            <button type="button" data-spawn="monument" class="spawn-btn py-2 px-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 text-center transition">
-              🏛️ 紀念牆廣場
-            </button>
-          </div>
-        </div>
-
-        <!-- 選擇 3：醫療大樓背景時段（即時同步背後大樓光影與窗燈） -->
-        <div class="mt-4">
-          <span class="block text-xs font-black tracking-wider text-amber-300 uppercase mb-1.5">3. 醫療大樓背景時段</span>
-          <div class="flex items-center gap-1.5 bg-black/45 p-1 rounded-xl border border-white/10">
-            <button type="button" data-time="day" class="lobby-time-btn flex-1 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 transition">
-              ☀️ 白天晴空
-            </button>
-            <button type="button" data-time="dusk" class="lobby-time-btn flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-300 hover:bg-white/10 transition">
-              🌇 黃昏夕陽
-            </button>
-            <button type="button" data-time="night" class="lobby-time-btn flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-300 hover:bg-white/10 transition">
-              🌙 夜晚燈火
-            </button>
-          </div>
-        </div>
-
-        <!-- 選擇 4：開啟畫面鏡頭展示視角 -->
-        <div class="mt-4">
-          <span class="block text-xs font-black tracking-wider text-amber-300 uppercase mb-1.5">4. 背景鏡頭運鏡模式</span>
-          <div class="grid grid-cols-2 gap-1.5">
-            <button type="button" data-preview-cam="character" class="preview-cam-btn py-1.5 px-2.5 rounded-xl bg-sky-600/75 border border-sky-300/60 text-xs font-bold text-white transition">
-              🧍 角色與醫療大樓同框
-            </button>
-            <button type="button" data-preview-cam="campus" class="preview-cam-btn py-1.5 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 transition">
-              🏥 醫療大樓全景環繞
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 底部主要進入按鈕 -->
-      <div class="mt-5 pt-4 border-t border-white/10 space-y-2">
-        <button
-          id="btn-start-game"
-          type="button"
-          class="w-full py-3.5 px-5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-emerald-500 hover:brightness-110 active:scale-[0.99] text-slate-950 font-black text-base tracking-wider shadow-xl transition flex items-center justify-center gap-2"
-        >
-          <span>▶ 進入健康園區開始遊玩</span>
-        </button>
-        <p class="text-[11px] text-center text-slate-400">
-          WASD 移動 ｜ 點擊畫面 360° 視角 ｜ F 鍵上下車 ｜ 走近大門自動進入 1F.html
-        </p>
-      </div>
-    </aside>
-  </div>
 
   <!-- ====================================================================== -->
   <!-- 右下角載入畫面視窗 (Bottom-Right Loading Screen Widget)                  -->
@@ -229,9 +102,9 @@
   </div>
 
   <!-- ====================================================================== -->
-  <!-- 遊戲中 HUD 介面 (進入健康園區後顯示)                                    -->
+  <!-- 遊戲中 HUD 介面 (直接進入健康園區顯示)                                   -->
   <!-- ====================================================================== -->
-  <div id="gameplay-hud" class="hidden">
+  <div id="gameplay-hud">
     <!-- 左上角：操作說明與環境控制面板 -->
     <div class="fixed top-3 left-3 sm:top-4 sm:left-4 z-20 flex flex-col gap-2 max-w-[310px] sm:max-w-[350px]">
       <div class="hud-panel rounded-xl p-3 text-white shadow-xl">
@@ -241,9 +114,6 @@
             <span class="font-bold text-sm sm:text-base tracking-wide text-amber-300">彰濱秀傳健康園區</span>
           </div>
           <div class="flex items-center gap-1">
-            <button id="btn-back-lobby" class="px-2 py-0.5 text-xs rounded-lg bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/30 text-amber-200 transition">
-              開啟選單
-            </button>
             <button id="toggle-help-btn" class="px-2 py-0.5 text-xs rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition">
               收合
             </button>
@@ -551,7 +421,7 @@
       rightLeg: null,
       materials: {},
       accessories: {},
-      pos: new THREE.Vector3(2.2, 0, 9.2),
+      pos: new THREE.Vector3(0, 0, 9.2),
       vel: new THREE.Vector3(0, 0, 0),
       yaw: Math.PI,
       radius: 0.45,
@@ -603,11 +473,9 @@
     };
 
     const gameState = {
-      started: false,
+      started: true,
       selectedRoleId: 'it_engineer',
       selectedSpawn: 'entrance',
-      previewCamMode: 'character',
-      previewOrbitAngle: 0,
       timeOfDay: 'day',
       clockMinutes: 14 * 60 + 30,
       cash: 8800,
@@ -2573,38 +2441,11 @@
         player.accessories.idBadge.visible = role.id !== 'patient';
       }
 
-      // 更新左側開啟選單顯示
-      document.getElementById('selected-role-pill').textContent = `${role.icon} ${role.name}`;
-      document.getElementById('role-detail-title').textContent = `${role.icon} ${role.name} (${role.en})`;
-      document.getElementById('role-detail-cash').textContent = `$${String(role.cash).padStart(7, '0')}`;
-      document.getElementById('role-detail-desc').textContent = role.desc;
-      document.getElementById('role-detail-gear').textContent = role.gear;
-      document.getElementById('role-detail-armor').textContent = `${role.armor}%`;
-
       // 更新遊戲中右上角 HUD 數值
       document.getElementById('hud-cash').textContent = `$${String(role.cash).padStart(7, '0')}`;
       document.getElementById('hud-health-bar').style.width = `${role.health}%`;
       document.getElementById('hud-armor-bar').style.width = `${role.armor}%`;
       document.getElementById('hud-role-badge').textContent = `${role.icon} ${role.name}`;
-
-      // 高亮選中的角色卡片
-      document.querySelectorAll('.role-card-btn').forEach((btn) => {
-        const active = btn.dataset.roleId === role.id;
-        btn.className = active
-          ? 'role-card-btn p-2.5 rounded-xl bg-emerald-600/35 border-2 border-emerald-400 text-left transition shadow-lg'
-          : 'role-card-btn p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition';
-      });
-
-      // 右下角狀態同步回饋
-      if (!gameState.started) {
-        setBottomRightLoader({
-          visible: true,
-          title: `已切換：${role.name}`,
-          subtitle: `3D 角色外觀與醫療大樓背景已同步`,
-          percent: 100,
-          spinning: false
-        });
-      }
     }
 
     function createDrivableVehicles() {
@@ -2695,7 +2536,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 7. 日夜環境與光影系統 (開啟畫面與遊戲中即時同步)
+    // 7. 日夜環境與光影系統
     // --------------------------------------------------------------------------
     function applyTimeOfDay(mode) {
       gameState.timeOfDay = mode;
@@ -2705,13 +2546,6 @@
         btn.className = active
           ? 'time-btn flex-1 py-1 text-xs font-bold rounded-md bg-amber-500 text-slate-950 transition'
           : 'time-btn flex-1 py-1 text-xs font-bold rounded-md text-slate-300 hover:bg-white/10 transition';
-      });
-
-      document.querySelectorAll('.lobby-time-btn').forEach((btn) => {
-        const active = btn.dataset.time === mode;
-        btn.className = active
-          ? 'lobby-time-btn flex-1 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 transition'
-          : 'lobby-time-btn flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-300 hover:bg-white/10 transition';
       });
 
       if (mode === 'day') {
@@ -2770,29 +2604,22 @@
     function applySpawnLocation(spawnKey) {
       gameState.selectedSpawn = spawnKey;
 
-      document.querySelectorAll('.spawn-btn').forEach((btn) => {
-        const active = btn.dataset.spawn === spawnKey;
-        btn.className = active
-          ? 'spawn-btn py-2 px-2 rounded-xl bg-emerald-600/80 border border-emerald-300/60 text-xs font-bold text-white text-center transition'
-          : 'spawn-btn py-2 px-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 text-center transition';
-      });
-
       if (player.inVehicle) toggleVehicleEnterExit();
 
       if (spawnKey === 'entrance') {
-        player.pos.set(gameState.started ? 0 : 2.2, 0, 9.2);
-        player.yaw = gameState.started ? Math.PI : 0.25;
+        player.pos.set(0, 0, 9.2);
+        player.yaw = Math.PI;
         camState.targetYaw = 0;
         camState.targetPitch = 0.23;
       } else if (spawnKey === 'ambulance') {
         const amb = vehicles[0];
         player.pos.set(amb.pos.x, 0, amb.pos.z + 3.4);
-        player.yaw = gameState.started ? Math.PI : 0.25;
+        player.yaw = Math.PI;
         camState.targetYaw = 0.22;
         camState.targetPitch = 0.23;
       } else if (spawnKey === 'monument') {
-        player.pos.set(gameState.started ? 0 : 2.2, 0, 21.5);
-        player.yaw = gameState.started ? Math.PI : 0.25;
+        player.pos.set(0, 0, 21.5);
+        player.yaw = Math.PI;
         camState.targetYaw = 0;
         camState.targetPitch = 0.24;
       }
@@ -2810,8 +2637,6 @@
     }
 
     function toggleVehicleEnterExit() {
-      if (!gameState.started) return;
-
       if (player.inVehicle) {
         const v = player.inVehicle;
         const sideSign = Math.cos(v.yaw) >= 0 ? -1 : 1;
@@ -2863,7 +2688,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 9. 每幀物理與開啟畫面同步醫療大樓背景鏡頭更新
+    // 9. 每幀物理與第三人稱鏡頭更新
     // --------------------------------------------------------------------------
     function updateSimulation(dt) {
       gameState.clockMinutes = (gameState.clockMinutes + dt * 2) % (24 * 60);
@@ -2893,44 +2718,6 @@
         mainEntrance.sensorRing.scale.set(pulse, pulse, 1);
       }
 
-      // ----------------------------------------------------------------------
-      // 開啟畫面模式：左手邊為統一選單，右側畫面同步展示 3D 角色與背後醫療大樓
-      // ----------------------------------------------------------------------
-      if (!gameState.started) {
-        gameState.previewOrbitAngle += dt * 0.22;
-        const swayX = Math.sin(gameState.previewOrbitAngle) * 2.2;
-
-        player.mesh.visible = true;
-        player.mesh.position.set(player.pos.x, 0, player.pos.z);
-        player.mesh.rotation.y = 0.34 + Math.sin(gameState.previewOrbitAngle * 0.9) * 0.14;
-
-        const breathe = Math.sin(sirenTimer * 0.25) * 0.03;
-        player.leftArm.rotation.x = breathe;
-        player.rightArm.rotation.x = -breathe;
-        player.leftLeg.rotation.x = 0;
-        player.rightLeg.rotation.x = 0;
-
-        if (gameState.previewCamMode === 'character') {
-          // 構圖偏移讓左側 430px 選單不遮擋角色，同時完整帶出背後「秀傳」醫療大樓
-          const desiredCamPos = new THREE.Vector3(player.pos.x - 1.75 + swayX * 0.35, 2.25, player.pos.z + 5.1);
-          const desiredLookAt = new THREE.Vector3(player.pos.x - 1.55, 3.4, -18.0);
-          camera.position.lerp(desiredCamPos, Math.min(1, dt * 4));
-          camState.targetPos.lerp(desiredLookAt, Math.min(1, dt * 4));
-          camera.lookAt(camState.targetPos);
-        } else {
-          // 醫療大樓全景環繞模式
-          const desiredCamPos = new THREE.Vector3(-6.0 + swayX * 4.5, 9.5 + Math.cos(gameState.previewOrbitAngle) * 1.2, 31.0);
-          const desiredLookAt = new THREE.Vector3(-4.5, 11.0, -18.0);
-          camera.position.lerp(desiredCamPos, Math.min(1, dt * 3));
-          camState.targetPos.lerp(desiredLookAt, Math.min(1, dt * 3));
-          camera.lookAt(camState.targetPos);
-        }
-        return;
-      }
-
-      // ----------------------------------------------------------------------
-      // 正式遊玩模式
-      // ----------------------------------------------------------------------
       const distToDoor = Math.hypot(player.pos.x - mainEntrance.x, player.pos.z - mainEntrance.z);
       const shouldOpenDoors = (!player.inVehicle && distToDoor < 8.0) || mainEntrance.isTransitioning;
       const targetOpen = shouldOpenDoors ? 1 : 0;
@@ -3193,8 +2980,6 @@
     const mctx = minimapCanvas.getContext('2d');
 
     function renderMinimap() {
-      if (!gameState.started) return;
-
       const size = minimapCanvas.width;
       const half = size / 2;
       const scale = 1.65;
@@ -3278,141 +3063,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 11. 開啟畫面統一左手邊選單互動邏輯
-    // --------------------------------------------------------------------------
-    function initStartScreenUI() {
-      const roleGrid = document.getElementById('role-grid');
-      roleGrid.innerHTML = '';
-
-      CHARACTER_ROLES.forEach((role) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.dataset.roleId = role.id;
-        btn.className = 'role-card-btn p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition';
-        btn.innerHTML = `
-          <div class="flex items-center justify-between">
-            <span class="text-base">${role.icon}</span>
-            <span class="gta-font text-[10px] font-bold text-emerald-300">$${role.cash}</span>
-          </div>
-          <div class="font-black text-xs text-white mt-1">${role.name}</div>
-          <div class="text-[10px] text-slate-400 truncate">${role.en}</div>
-        `;
-        btn.addEventListener('click', () => {
-          applyCharacterRole(role.id);
-        });
-        roleGrid.appendChild(btn);
-      });
-
-      applyCharacterRole('it_engineer');
-
-      // 出發位置切換
-      document.querySelectorAll('.spawn-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          applySpawnLocation(btn.dataset.spawn);
-        });
-      });
-
-      // 背景時段切換
-      document.querySelectorAll('.lobby-time-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          applyTimeOfDay(btn.dataset.time);
-        });
-      });
-
-      // 背景鏡頭運鏡模式切換
-      document.querySelectorAll('.preview-cam-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          gameState.previewCamMode = btn.dataset.previewCam;
-          document.querySelectorAll('.preview-cam-btn').forEach((b) => {
-            const active = b.dataset.previewCam === gameState.previewCamMode;
-            b.className = active
-              ? 'preview-cam-btn py-1.5 px-2.5 rounded-xl bg-sky-600/75 border border-sky-300/60 text-xs font-bold text-white transition'
-              : 'preview-cam-btn py-1.5 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 transition';
-          });
-        });
-      });
-
-      // 按下「進入健康園區開始遊玩」：右下角載入進度跑完後進入遊玩
-      document.getElementById('btn-start-game').addEventListener('click', () => {
-        const startBtn = document.getElementById('btn-start-game');
-        startBtn.disabled = true;
-        startBtn.classList.add('opacity-70');
-
-        let deployProgress = 18;
-        setBottomRightLoader({
-          visible: true,
-          title: '正在部署角色進入園區',
-          subtitle: '同步 3D 人物裝備與大門導航系統...',
-          percent: deployProgress,
-          spinning: true
-        });
-
-        const deployTimer = setInterval(() => {
-          deployProgress += 28;
-          if (deployProgress >= 100) {
-            clearInterval(deployTimer);
-            setBottomRightLoader({
-              visible: true,
-              title: '園區連線完成',
-              subtitle: '歡迎進入彰濱秀傳健康園區！',
-              percent: 100,
-              spinning: false
-            });
-
-            setTimeout(() => {
-              document.getElementById('start-overlay').classList.add('hidden');
-              document.getElementById('gameplay-hud').classList.remove('hidden');
-              setBottomRightLoader({ visible: false });
-
-              startBtn.disabled = false;
-              startBtn.classList.remove('opacity-70');
-
-              gameState.started = true;
-              applySpawnLocation(gameState.selectedSpawn);
-              applyCharacterRole(gameState.selectedRoleId);
-
-              const role = CHARACTER_ROLES.find((r) => r.id === gameState.selectedRoleId);
-              showToast(`已以「${role.name}」身分進入園區（靠近大門自動連接 1F.html）`);
-            }, 260);
-          } else {
-            setBottomRightLoader({
-              visible: true,
-              title: '正在部署角色進入園區',
-              subtitle: '同步 3D 人物裝備與大門導航系統...',
-              percent: deployProgress,
-              spinning: true
-            });
-          }
-        }, 85);
-      });
-
-      // 遊戲中左上角「開啟選單」按鈕，可隨時回到開啟畫面切換角色與設定
-      document.getElementById('btn-back-lobby').addEventListener('click', () => {
-        if (document.pointerLockElement) {
-          document.exitPointerLock();
-        }
-        if (player.inVehicle) {
-          toggleVehicleEnterExit();
-        }
-        gameState.started = false;
-        applySpawnLocation(gameState.selectedSpawn);
-        document.getElementById('gameplay-hud').classList.add('hidden');
-        document.getElementById('crosshair-dot').classList.add('hidden');
-        document.getElementById('start-overlay').classList.remove('hidden');
-
-        const role = CHARACTER_ROLES.find((r) => r.id === gameState.selectedRoleId);
-        setBottomRightLoader({
-          visible: true,
-          title: `當前身分：${role.name}`,
-          subtitle: '醫療大樓背景即時同步中',
-          percent: 100,
-          spinning: false
-        });
-      });
-    }
-
-    // --------------------------------------------------------------------------
-    // 12. 場景初始化、事件監聽與主迴圈
+    // 11. 場景初始化、事件監聽與主迴圈 (直接進入遊戲)
     // --------------------------------------------------------------------------
     function initScene() {
       const canvas = document.getElementById('game-canvas');
@@ -3430,7 +3081,7 @@
       scene.fog = new THREE.FogExp2(0x8ec5f0, 0.0028);
 
       camera = new THREE.PerspectiveCamera(56, window.innerWidth / window.innerHeight, 0.2, 450);
-      camera.position.set(0.45, 2.25, 14.3);
+      camera.position.set(0.35, 3.35, 17.2);
 
       renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -3482,25 +3133,29 @@
       setBottomRightLoader({
         visible: true,
         title: '園區 3D 場景載入中',
-        subtitle: '載入多職業 3D 角色與救護車載具...',
+        subtitle: '載入角色與救護車載具...',
         percent: 88,
         spinning: true
       });
 
       createPlayableCharacter();
       createDrivableVehicles();
-      initStartScreenUI();
+      applyCharacterRole('it_engineer');
+      applySpawnLocation('entrance');
       bindEvents();
 
+      setBottomRightLoader({
+        visible: true,
+        title: '園區連線完成',
+        subtitle: '歡迎進入彰濱秀傳健康園區！',
+        percent: 100,
+        spinning: false
+      });
+
       setTimeout(() => {
-        setBottomRightLoader({
-          visible: true,
-          title: '醫療大樓背景已同步',
-          subtitle: '請於左側選單選擇角色與出發設定',
-          percent: 100,
-          spinning: false
-        });
-      }, 320);
+        setBottomRightLoader({ visible: false });
+        showToast('歡迎進入彰濱秀傳健康園區（靠近大門自動連接 1F.html）');
+      }, 650);
     }
 
     function bindEvents() {
@@ -3509,8 +3164,6 @@
       const crosshair = document.getElementById('crosshair-dot');
 
       window.addEventListener('keydown', (e) => {
-        if (!gameState.started) return;
-
         keys[e.code] = true;
 
         if (e.code === 'KeyF') {
@@ -3555,8 +3208,6 @@
       let downY = 0;
 
       canvas.addEventListener('mousedown', (e) => {
-        if (!gameState.started) return;
-
         camState.isDragging = true;
         camState.lastMouseX = e.clientX;
         camState.lastMouseY = e.clientY;
@@ -3569,8 +3220,6 @@
       });
 
       window.addEventListener('mousemove', (e) => {
-        if (!gameState.started) return;
-
         if (camState.isPointerLocked) {
           const mx = e.movementX || 0;
           const my = e.movementY || 0;
@@ -3600,8 +3249,6 @@
           camState.isRightAiming = false;
         }
 
-        if (!gameState.started) return;
-
         if (e.target === canvas && e.button === 0 && moveDist < 5 && !camState.isPointerLocked) {
           if (canvas.requestPointerLock) {
             try {
@@ -3617,7 +3264,6 @@
       canvas.addEventListener(
         'wheel',
         (e) => {
-          if (!gameState.started) return;
           e.preventDefault();
           camState.targetDistance = THREE.MathUtils.clamp(camState.targetDistance + e.deltaY * 0.01, 3.6, 48);
         },
@@ -3627,7 +3273,6 @@
       canvas.addEventListener(
         'touchstart',
         (e) => {
-          if (!gameState.started) return;
           if (e.touches.length === 1) {
             camState.isDragging = true;
             camState.lastMouseX = e.touches[0].clientX;
@@ -3640,7 +3285,6 @@
       canvas.addEventListener(
         'touchmove',
         (e) => {
-          if (!gameState.started) return;
           if (camState.isDragging && e.touches.length === 1) {
             const dx = e.touches[0].clientX - camState.lastMouseX;
             const dy = e.touches[0].clientY - camState.lastMouseY;
