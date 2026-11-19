@@ -1,0 +1,3749 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>彰濱秀傳健康園區 - 3D 開放世界</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Three.js r128 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Google Fonts: Noto Sans TC & Chakra Petch -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0b131e;
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+    #game-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      touch-action: none;
+    }
+    #game-canvas:active {
+      cursor: grabbing;
+    }
+    .gta-font {
+      font-family: 'Chakra Petch', 'Noto Sans TC', sans-serif;
+      letter-spacing: 0.04em;
+    }
+    .gta-shadow {
+      text-shadow: 2px 2px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000;
+    }
+    .hud-panel {
+      background: rgba(12, 18, 26, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .left-menu-panel {
+      background: linear-gradient(160deg, rgba(9, 15, 23, 0.90) 0%, rgba(13, 24, 36, 0.84) 60%, rgba(10, 20, 30, 0.92) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 16px 0 48px rgba(0, 0, 0, 0.65);
+    }
+    #minimap-container {
+      box-shadow: 0 0 0 4px rgba(15, 23, 34, 0.9), 0 0 0 6px rgba(255, 255, 255, 0.22), 0 12px 28px rgba(0, 0, 0, 0.65);
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.68; }
+    }
+    .prompt-pulse {
+      animation: pulseGlow 1.5s infinite ease-in-out;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(52, 211, 153, 0.45);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 主 3D 渲染畫布：開啟畫面與遊戲中皆即時同步渲染醫療大樓與 3D 角色 -->
+  <canvas id="game-canvas"></canvas>
+
+  <!-- ====================================================================== -->
+  <!-- 開啟畫面層：所有選擇統一整合於左手邊選單                                  -->
+  <!-- ====================================================================== -->
+  <div id="start-overlay" class="fixed inset-0 z-40 pointer-events-none transition-opacity duration-500">
+    <!-- 左手邊統一功能選單 -->
+    <aside id="start-left-sidebar" class="pointer-events-auto fixed inset-y-0 left-0 w-full sm:w-[430px] left-menu-panel text-white flex flex-col justify-between p-5 sm:p-6 overflow-y-auto custom-scroll">
+      <div>
+        <!-- 園區標題與即時背景連線標籤 -->
+        <div class="pb-3.5 border-b border-white/10">
+          <div class="flex items-center justify-between gap-2">
+            <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-400/35">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span class="gta-font text-[10px] font-bold tracking-widest text-emerald-300 uppercase">LIVE 3D CAMPUS SYNC</span>
+            </div>
+            <span class="gta-font text-[11px] text-slate-400">VER 2.6</span>
+          </div>
+          <h1 class="text-2xl font-black tracking-wide text-amber-300 mt-1.5">彰濱秀傳健康園區</h1>
+          <p class="text-xs text-slate-300 mt-0.5">選擇您的園區身分與出發設定，右側即時同步 3D 角色與醫療大樓實景</p>
+        </div>
+
+        <!-- 選擇 1：角色身分選擇（資訊工程師 / 醫師 / 護理師 / 患者 等多種身分） -->
+        <div class="mt-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-black tracking-wider text-amber-300 uppercase">1. 選擇角色身分</span>
+            <span id="selected-role-pill" class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-[11px] font-bold text-emerald-300">
+              💻 資訊工程師
+            </span>
+          </div>
+
+          <!-- 8 種職業網格卡片 -->
+          <div id="role-grid" class="grid grid-cols-2 gap-2"></div>
+
+          <!-- 當前選中角色詳細說明與裝備預覽卡片 -->
+          <div class="mt-2.5 p-3 rounded-xl bg-black/45 border border-white/10 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span id="role-detail-title" class="font-black text-sm text-white">💻 資訊工程師 (IT Engineer)</span>
+              <span id="role-detail-cash" class="gta-font text-xs font-bold text-emerald-400">$0008800</span>
+            </div>
+            <p id="role-detail-desc" class="text-[11px] text-slate-300 leading-relaxed">
+              負責園區智慧醫療系統與核心機房維運，身穿深藍科技連帽外套、配戴識別證並手持行動工作筆電。
+            </p>
+            <div class="flex items-center justify-between pt-1 border-t border-white/10 text-[11px]">
+              <span class="text-slate-400">專屬配備：<strong id="role-detail-gear" class="text-sky-300">智慧筆電 / 資訊識別證</strong></span>
+              <span class="text-slate-400">專注值：<strong id="role-detail-armor" class="text-cyan-300">90%</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 選擇 2：園區出發位置 -->
+        <div class="mt-4">
+          <span class="block text-xs font-black tracking-wider text-amber-300 uppercase mb-1.5">2. 選擇園區出發位置</span>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button type="button" data-spawn="entrance" class="spawn-btn py-2 px-2 rounded-xl bg-emerald-600/80 border border-emerald-300/60 text-xs font-bold text-white text-center transition">
+              🏥 1F 大門車道
+            </button>
+            <button type="button" data-spawn="ambulance" class="spawn-btn py-2 px-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 text-center transition">
+              🚑 救護車旁
+            </button>
+            <button type="button" data-spawn="monument" class="spawn-btn py-2 px-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 text-center transition">
+              🏛️ 紀念牆廣場
+            </button>
+          </div>
+        </div>
+
+        <!-- 選擇 3：醫療大樓背景時段（即時同步背後大樓光影與窗燈） -->
+        <div class="mt-4">
+          <span class="block text-xs font-black tracking-wider text-amber-300 uppercase mb-1.5">3. 醫療大樓背景時段</span>
+          <div class="flex items-center gap-1.5 bg-black/45 p-1 rounded-xl border border-white/10">
+            <button type="button" data-time="day" class="lobby-time-btn flex-1 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 transition">
+              ☀️ 白天晴空
+            </button>
+            <button type="button" data-time="dusk" class="lobby-time-btn flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-300 hover:bg-white/10 transition">
+              🌇 黃昏夕陽
+            </button>
+            <button type="button" data-time="night" class="lobby-time-btn flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-300 hover:bg-white/10 transition">
+              🌙 夜晚燈火
+            </button>
+          </div>
+        </div>
+
+        <!-- 選擇 4：開啟畫面鏡頭展示視角 -->
+        <div class="mt-4">
+          <span class="block text-xs font-black tracking-wider text-amber-300 uppercase mb-1.5">4. 背景鏡頭運鏡模式</span>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button type="button" data-preview-cam="character" class="preview-cam-btn py-1.5 px-2.5 rounded-xl bg-sky-600/75 border border-sky-300/60 text-xs font-bold text-white transition">
+              🧍 角色與醫療大樓同框
+            </button>
+            <button type="button" data-preview-cam="campus" class="preview-cam-btn py-1.5 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 transition">
+              🏥 醫療大樓全景環繞
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部主要進入按鈕 -->
+      <div class="mt-5 pt-4 border-t border-white/10 space-y-2">
+        <button
+          id="btn-start-game"
+          type="button"
+          class="w-full py-3.5 px-5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-emerald-500 hover:brightness-110 active:scale-[0.99] text-slate-950 font-black text-base tracking-wider shadow-xl transition flex items-center justify-center gap-2"
+        >
+          <span>▶ 進入健康園區開始遊玩</span>
+        </button>
+        <p class="text-[11px] text-center text-slate-400">
+          WASD 移動 ｜ 點擊畫面 360° 視角 ｜ F 鍵上下車 ｜ 走近大門自動進入 1F.html
+        </p>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- 右下角載入畫面視窗 (Bottom-Right Loading Screen Widget)                  -->
+  <!-- ====================================================================== -->
+  <div id="bottom-right-loader" class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-72 sm:w-80 hud-panel rounded-2xl p-4 text-white shadow-[0_14px_38px_rgba(0,0,0,0.75)] border border-emerald-400/35 transition-all duration-500">
+    <div class="flex items-center gap-3">
+      <div id="br-loader-spinner" class="w-9 h-9 shrink-0 rounded-full border-emerald-500/30 border-t-amber-400 border-r-emerald-400 animate-spin" style="border-width: 3px;"></div>
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center justify-between gap-2">
+          <span id="br-loader-title" class="text-xs font-black tracking-wider text-amber-300 truncate">園區 3D 場景載入中</span>
+          <span id="br-loader-percent" class="gta-font text-xs font-bold text-emerald-400">0%</span>
+        </div>
+        <p id="br-loader-subtitle" class="text-[11px] text-slate-300 truncate mt-0.5">正在同步醫療大樓建築群...</p>
+      </div>
+    </div>
+    <div class="mt-2.5 w-full h-1.5 bg-black/70 rounded-full overflow-hidden border border-white/10">
+      <div id="br-loader-bar" class="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 transition-all duration-200" style="width: 0%;"></div>
+    </div>
+  </div>
+
+  <!-- 進入 1F 大廳轉場遮罩 -->
+  <div id="enter-lobby-overlay" class="fixed inset-0 z-50 hidden flex-col items-center justify-center bg-slate-950/95 text-white opacity-0 transition-opacity duration-300">
+    <div class="w-14 h-14 border-4 border-emerald-400 border-t-transparent rounded-full animate-spin mb-4"></div>
+    <h2 class="text-xl sm:text-2xl font-black tracking-wide text-emerald-400 mb-1">正在進入 1F 醫療大樓大廳</h2>
+    <p class="text-xs sm:text-sm text-slate-300 mb-4">已感應大門口，自動連接至 <span class="font-mono text-amber-300">1F.html</span> ...</p>
+    <a href="1F.html" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition">
+      若未自動跳轉請點此進入 1F
+    </a>
+  </div>
+
+  <!-- 自由視角 / 越肩準心 -->
+  <div id="crosshair-dot" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
+    <div id="crosshair-ring" class="w-3 h-3 rounded-full border-2 border-white/85 bg-emerald-400/40 shadow-[0_0_6px_rgba(0,0,0,0.9)] transition-transform duration-150"></div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- 遊戲中 HUD 介面 (進入健康園區後顯示)                                    -->
+  <!-- ====================================================================== -->
+  <div id="gameplay-hud" class="hidden">
+    <!-- 左上角：操作說明與環境控制面板 -->
+    <div class="fixed top-3 left-3 sm:top-4 sm:left-4 z-20 flex flex-col gap-2 max-w-[310px] sm:max-w-[350px]">
+      <div class="hud-panel rounded-xl p-3 text-white shadow-xl">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+            <span class="font-bold text-sm sm:text-base tracking-wide text-amber-300">彰濱秀傳健康園區</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button id="btn-back-lobby" class="px-2 py-0.5 text-xs rounded-lg bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/30 text-amber-200 transition">
+              開啟選單
+            </button>
+            <button id="toggle-help-btn" class="px-2 py-0.5 text-xs rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition">
+              收合
+            </button>
+          </div>
+        </div>
+
+        <!-- 時段切換按鈕列 -->
+        <div class="mt-2.5 flex items-center gap-1.5 bg-black/40 p-1 rounded-lg">
+          <button data-time="day" class="time-btn flex-1 py-1 text-xs font-bold rounded-md bg-amber-500 text-slate-950 transition">
+            ☀️ 白天
+          </button>
+          <button data-time="dusk" class="time-btn flex-1 py-1 text-xs font-bold rounded-md text-slate-300 hover:bg-white/10 transition">
+            🌇 黃昏
+          </button>
+          <button data-time="night" class="time-btn flex-1 py-1 text-xs font-bold rounded-md text-slate-300 hover:bg-white/10 transition">
+            🌙 夜晚
+          </button>
+        </div>
+
+        <!-- 視角/傳送快捷鍵 -->
+        <div class="mt-2 grid grid-cols-3 gap-1.5">
+          <button id="tp-plaza" class="py-1 px-1.5 text-[11px] font-medium rounded-lg bg-emerald-700/70 hover:bg-emerald-600/80 border border-emerald-400/30 transition">
+            🏥 大門車道
+          </button>
+          <button id="tp-ambulance" class="py-1 px-1.5 text-[11px] font-medium rounded-lg bg-rose-700/70 hover:bg-rose-600/80 border border-rose-400/30 transition">
+            🚑 救護車旁
+          </button>
+          <button id="tp-aerial" class="py-1 px-1.5 text-[11px] font-medium rounded-lg bg-sky-700/70 hover:bg-sky-600/80 border border-sky-400/30 transition">
+            🦅 園區鳥瞰
+          </button>
+        </div>
+
+        <!-- 詳細按鍵操作表 -->
+        <div id="help-content" class="mt-2.5 pt-2.5 border-t border-white/10 text-xs text-slate-200 space-y-1">
+          <div class="flex justify-between"><span class="text-slate-400">移動 / 駕駛</span><span class="font-bold text-amber-300">W A S D / 方向鍵</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">衝刺 / 跳躍煞車</span><span class="font-bold text-amber-300">Shift / Space</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">進入 / 離開車輛</span><span class="font-bold text-emerald-300">F 鍵</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">自動進入 1F 大廳</span><span class="font-bold text-emerald-300">步行靠近大門口</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">360° 自由滑鼠視角</span><span class="font-bold text-sky-300">點擊畫面 (ESC 釋放)</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">越肩精準橫移模式</span><span class="font-bold text-sky-300">按住滑鼠右鍵</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">切換第三人稱視距</span><span class="font-bold text-slate-200">C 鍵 / 滑鼠滾輪</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">救護車警燈 / 重置</span><span class="font-bold text-rose-300">Q 鍵 / R 鍵</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右上角：經典 GTA 狀態欄 -->
+    <div class="fixed top-3 right-3 sm:top-4 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
+      <div id="hud-clock" class="gta-font gta-shadow text-xl sm:text-2xl font-bold text-white leading-none">
+        14:30
+      </div>
+      <div id="hud-cash" class="gta-font gta-shadow text-2xl sm:text-3xl font-bold text-emerald-400 leading-tight mt-0.5">
+        $0008800
+      </div>
+
+      <div class="mt-1.5 w-36 sm:w-44 space-y-1.5">
+        <div class="w-full h-3 bg-black/75 rounded-sm p-0.5 border border-black">
+          <div id="hud-health-bar" class="h-full bg-gradient-to-r from-red-700 to-rose-500 rounded-xs transition-all duration-200" style="width: 100%;"></div>
+        </div>
+        <div class="w-full h-3 bg-black/75 rounded-sm p-0.5 border border-black">
+          <div id="hud-armor-bar" class="h-full bg-gradient-to-r from-sky-600 to-cyan-400 rounded-xs transition-all duration-200" style="width: 90%;"></div>
+        </div>
+      </div>
+
+      <div id="hud-stars" class="mt-1.5 flex items-center gap-1 text-base sm:text-lg gta-shadow">
+        <span class="text-slate-500">★</span>
+        <span class="text-slate-500">★</span>
+        <span class="text-slate-500">★</span>
+        <span class="text-slate-500">★</span>
+        <span class="text-slate-500">★</span>
+      </div>
+
+      <div id="hud-role-badge" class="mt-2 px-2.5 py-1 rounded-full bg-emerald-950/85 border border-emerald-400/40 text-xs font-bold text-emerald-300">
+        💻 資訊工程師
+      </div>
+      <div id="hud-mode-badge" class="mt-1 px-2.5 py-1 rounded-full bg-black/70 border border-white/15 text-xs font-bold text-amber-300">
+        步行探索中
+      </div>
+      <div id="hud-cam-badge" class="mt-1 px-2.5 py-0.5 rounded-full bg-sky-950/80 border border-sky-400/30 text-[11px] font-medium text-sky-200">
+        🖱️ 點擊畫面 360° 自由視角 ｜ 右鍵越肩
+      </div>
+    </div>
+
+    <!-- 中央下方：互動提示框 -->
+    <div id="interaction-prompt" class="hidden fixed bottom-28 sm:bottom-12 left-1/2 -translate-x-1/2 z-20 px-5 py-2.5 rounded-xl hud-panel text-white font-bold text-sm sm:text-base shadow-2xl prompt-pulse pointer-events-none">
+      按 <span class="px-2 py-0.5 mx-1 rounded bg-amber-400 text-slate-950 font-black">F</span> 駕駛 秀傳醫療救護車
+    </div>
+
+    <!-- 右上方通知氣泡 -->
+    <div id="toast-banner" class="hidden fixed top-48 right-4 z-30 px-4 py-2 rounded-xl hud-panel border-l-4 border-amber-400 text-white text-xs sm:text-sm font-medium shadow-xl transition-all duration-300">
+    </div>
+
+    <!-- 左下角：GTA 圓形即時雷達小地圖 -->
+    <div id="minimap-container" class="fixed bottom-4 left-4 z-20 w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden bg-slate-900">
+      <canvas id="minimap-canvas" width="200" height="200" class="w-full h-full block"></canvas>
+      <div class="absolute top-1 left-1/2 -translate-x-1/2 px-1.5 rounded bg-black/80 text-[10px] font-black text-amber-400 pointer-events-none">
+        N
+      </div>
+    </div>
+
+    <!-- 行動裝置/觸控虛擬按鍵 -->
+    <div id="touch-controls" class="md:hidden fixed bottom-4 right-4 z-20 flex flex-col items-end gap-2">
+      <div class="flex gap-2">
+        <button id="btn-touch-siren" class="w-12 h-12 rounded-full hud-panel text-rose-400 font-bold text-xs active:scale-95">
+          警燈
+        </button>
+        <button id="btn-touch-enter" class="w-12 h-12 rounded-full hud-panel text-emerald-400 font-bold text-xs active:scale-95">
+          上/下車
+        </button>
+        <button id="btn-touch-jump" class="w-12 h-12 rounded-full hud-panel text-amber-300 font-bold text-xs active:scale-95">
+          跳躍
+        </button>
+      </div>
+      <div class="grid grid-cols-3 gap-1.5 w-36 h-36">
+        <div></div>
+        <button data-key="KeyW" class="touch-dir rounded-xl hud-panel text-white font-bold text-lg active:bg-amber-500/50">▲</button>
+        <div></div>
+        <button data-key="KeyA" class="touch-dir rounded-xl hud-panel text-white font-bold text-lg active:bg-amber-500/50">◀</button>
+        <button data-key="KeyS" class="touch-dir rounded-xl hud-panel text-white font-bold text-lg active:bg-amber-500/50">▼</button>
+        <button data-key="KeyD" class="touch-dir rounded-xl hud-panel text-white font-bold text-lg active:bg-amber-500/50">▶</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * 彰濱秀傳健康園區 (Chang Bing Show Chwan Health Park) - 3D 開放世界原型
+     * ============================================================================
+     */
+
+    let scene, camera, renderer;
+    let sunLight, hemiLight;
+    const clock = new THREE.Clock();
+
+    // 8 種園區職業與角色設定 (含 3D 服裝材質色與專屬配件)
+    const CHARACTER_ROLES = [
+      {
+        id: 'it_engineer',
+        name: '資訊工程師',
+        en: 'IT Engineer',
+        icon: '💻',
+        cash: 8800,
+        health: 100,
+        armor: 90,
+        gear: '智慧筆電 / 資訊識別證',
+        desc: '負責園區智慧醫療系統與核心機房維運，身穿深藍科技連帽外套、配戴識別證並手持行動工作筆電。',
+        jacketColor: 0x1d4ed8,
+        teeColor: 0xf8fafc,
+        pantsColor: 0x1e293b,
+        badgeColor: 0x10b981,
+        hasGlasses: true,
+        hasStethoscope: false,
+        hasLaptop: true,
+        hasWristband: false
+      },
+      {
+        id: 'doctor',
+        name: '醫師',
+        en: 'Physician',
+        icon: '🩺',
+        cash: 12000,
+        health: 100,
+        armor: 95,
+        gear: '醫師白袍 / 聽診器 / 識別證',
+        desc: '秀傳醫療大樓主治醫師，身著專業白色醫師袍與天藍刷手服內搭，頸部配戴聽診器隨時支援臨床診療。',
+        jacketColor: 0xf8fafc,
+        teeColor: 0x0284c7,
+        pantsColor: 0x1e3a5f,
+        badgeColor: 0x38bdf8,
+        hasGlasses: true,
+        hasStethoscope: true,
+        hasLaptop: false,
+        hasWristband: false
+      },
+      {
+        id: 'nurse',
+        name: '護理師',
+        en: 'Registered Nurse',
+        icon: '💉',
+        cash: 7500,
+        health: 100,
+        armor: 90,
+        gear: '薄荷綠護理服 / 護理識別證',
+        desc: '第一線臨床照護護理師，身穿柔和薄荷綠醫療護理服與白色長褲，穿梭於大廳與各科病房之間。',
+        jacketColor: 0x14b8a6,
+        teeColor: 0xffffff,
+        pantsColor: 0xf1f5f9,
+        badgeColor: 0xf472b6,
+        hasGlasses: false,
+        hasStethoscope: false,
+        hasLaptop: false,
+        hasWristband: false
+      },
+      {
+        id: 'patient',
+        name: '患者',
+        en: 'Patient',
+        icon: '🏥',
+        cash: 3200,
+        health: 85,
+        armor: 65,
+        gear: '病患休閒服 / 住院識別手環',
+        desc: '前來彰濱秀傳健康園區就診與健檢的民眾，穿著舒適淺藍休閒服並配戴患者識別手環。',
+        jacketColor: 0x7dd3fc,
+        teeColor: 0xfefce8,
+        pantsColor: 0x64748b,
+        badgeColor: 0xfacc15,
+        hasGlasses: false,
+        hasStethoscope: false,
+        hasLaptop: false,
+        hasWristband: true
+      },
+      {
+        id: 'pharmacist',
+        name: '藥師',
+        en: 'Pharmacist',
+        icon: '💊',
+        cash: 8200,
+        health: 100,
+        armor: 88,
+        gear: '藥師白袍 / 綠十字識別證',
+        desc: '負責門診與住院藥事調劑及用藥安全諮詢，身穿整潔白袍與深綠內搭，配戴綠十字專業藥師證。',
+        jacketColor: 0xf1f5f9,
+        teeColor: 0x15803d,
+        pantsColor: 0x334155,
+        badgeColor: 0x22c55e,
+        hasGlasses: true,
+        hasStethoscope: false,
+        hasLaptop: false,
+        hasWristband: false
+      },
+      {
+        id: 'emt',
+        name: '救護技術員',
+        en: 'Paramedic EMT',
+        icon: '🚑',
+        cash: 6800,
+        health: 100,
+        armor: 100,
+        gear: '急救紅勤務服 / 聽診器',
+        desc: '負責緊急醫療救護與救護車調度出勤，身穿高辨識度急救紅勤務外套，具備高體能專注力。',
+        jacketColor: 0xdc2626,
+        teeColor: 0xfef08a,
+        pantsColor: 0x0f172a,
+        badgeColor: 0xfacc15,
+        hasGlasses: true,
+        hasStethoscope: true,
+        hasLaptop: false,
+        hasWristband: false
+      },
+      {
+        id: 'med_tech',
+        name: '醫事檢驗師',
+        en: 'Med Technologist',
+        icon: '🩻',
+        cash: 7400,
+        health: 100,
+        armor: 85,
+        gear: '檢驗白袍 / 防護眼鏡 / 筆電',
+        desc: '負責臨床檢驗分析與精密醫療儀器判讀，配備實驗室防護眼鏡與數據分析終端。',
+        jacketColor: 0xe2e8f0,
+        teeColor: 0x6d28d9,
+        pantsColor: 0x1e293b,
+        badgeColor: 0xa855f7,
+        hasGlasses: true,
+        hasStethoscope: false,
+        hasLaptop: true,
+        hasWristband: false
+      },
+      {
+        id: 'security',
+        name: '園區警衛',
+        en: 'Campus Security',
+        icon: '🛡️',
+        cash: 6000,
+        health: 100,
+        armor: 100,
+        gear: '執勤黑制服 / 園區保全徽章',
+        desc: '維護醫療大樓出入口秩序與大門車道交通動線，全天候守護醫護人員與就診民眾安全。',
+        jacketColor: 0x111827,
+        teeColor: 0x38bdf8,
+        pantsColor: 0x090d16,
+        badgeColor: 0xf59e0b,
+        hasGlasses: true,
+        hasStethoscope: false,
+        hasLaptop: false,
+        hasWristband: false
+      }
+    ];
+
+    const colliders = [];
+    const nightGlowMaterials = [];
+    const streetLampBulbs = [];
+    const streetLampLights = [];
+    const keys = {};
+
+    const player = {
+      mesh: null,
+      headGroup: null,
+      upperBodyGroup: null,
+      leftArm: null,
+      rightArm: null,
+      leftLeg: null,
+      rightLeg: null,
+      materials: {},
+      accessories: {},
+      pos: new THREE.Vector3(2.2, 0, 9.2),
+      vel: new THREE.Vector3(0, 0, 0),
+      yaw: Math.PI,
+      radius: 0.45,
+      height: 1.85,
+      onGround: true,
+      walkCycle: 0,
+      inVehicle: null
+    };
+
+    const mainEntrance = {
+      x: 0,
+      z: -4.45,
+      triggerZ: -2.05,
+      halfWidth: 3.5,
+      leftDoor: null,
+      rightDoor: null,
+      sensorRing: null,
+      doorOpenRatio: 0,
+      isTransitioning: false
+    };
+
+    const vehicles = [];
+    let ambulanceSirenOn = true;
+    let sirenTimer = 0;
+
+    const camPresets = [
+      { name: '越肩近距', dist: 4.8, shoulder: 0.72, pitch: 0.16 },
+      { name: '標準第三人稱', dist: 8.2, shoulder: 0.35, pitch: 0.23 },
+      { name: '園區廣角', dist: 14.5, shoulder: 0.0, pitch: 0.32 }
+    ];
+
+    const camState = {
+      presetIndex: 1,
+      yaw: 0,
+      pitch: 0.23,
+      distance: 8.2,
+      shoulderOffset: 0.35,
+      targetYaw: 0,
+      targetPitch: 0.23,
+      targetDistance: 8.2,
+      targetShoulderOffset: 0.35,
+      targetPos: new THREE.Vector3(0, 1.55, 9.2),
+      isDragging: false,
+      isRightAiming: false,
+      isPointerLocked: false,
+      lastMouseX: 0,
+      lastMouseY: 0,
+      mouseIdleTime: 0
+    };
+
+    const gameState = {
+      started: false,
+      selectedRoleId: 'it_engineer',
+      selectedSpawn: 'entrance',
+      previewCamMode: 'character',
+      previewOrbitAngle: 0,
+      timeOfDay: 'day',
+      clockMinutes: 14 * 60 + 30,
+      cash: 8800,
+      health: 100,
+      armor: 90,
+      wantedStars: 0
+    };
+
+    // --------------------------------------------------------------------------
+    // 0. 右下角載入畫面控制器 (Bottom-Right Loader Controller)
+    // --------------------------------------------------------------------------
+    function setBottomRightLoader({ visible = true, title, subtitle, percent, spinning = true }) {
+      const box = document.getElementById('bottom-right-loader');
+      const titleEl = document.getElementById('br-loader-title');
+      const subEl = document.getElementById('br-loader-subtitle');
+      const pctEl = document.getElementById('br-loader-percent');
+      const barEl = document.getElementById('br-loader-bar');
+      const spinEl = document.getElementById('br-loader-spinner');
+
+      if (!box) return;
+      if (visible) {
+        box.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+      } else {
+        box.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+      }
+
+      if (title !== undefined) titleEl.textContent = title;
+      if (subtitle !== undefined) subEl.textContent = subtitle;
+      if (percent !== undefined) {
+        const clamped = Math.max(0, Math.min(100, Math.round(percent)));
+        pctEl.textContent = `${clamped}%`;
+        barEl.style.width = `${clamped}%`;
+      }
+      if (spinning) {
+        spinEl.classList.add('animate-spin');
+        spinEl.classList.remove('border-emerald-400');
+      } else {
+        spinEl.classList.remove('animate-spin');
+        spinEl.classList.add('border-emerald-400');
+      }
+    }
+
+    // --------------------------------------------------------------------------
+    // 1. 程序化紋理工廠
+    // --------------------------------------------------------------------------
+    function createHospitalWallTextures(cols = 6, rows = 3, isMainTower = false) {
+      const w = 1024;
+      const h = 512;
+
+      const diffCanvas = document.createElement('canvas');
+      diffCanvas.width = w;
+      diffCanvas.height = h;
+      const ctx = diffCanvas.getContext('2d');
+
+      const emCanvas = document.createElement('canvas');
+      emCanvas.width = w;
+      emCanvas.height = h;
+      const ectx = emCanvas.getContext('2d');
+      ectx.fillStyle = '#000000';
+      ectx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#c86d44';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = 'rgba(130, 56, 28, 0.22)';
+      for (let y = 0; y < h; y += 8) {
+        ctx.fillRect(0, y, w, 1.5);
+      }
+      ctx.fillStyle = 'rgba(235, 165, 125, 0.14)';
+      for (let y = 2; y < h; y += 16) {
+        ctx.fillRect(0, y, w, 2);
+      }
+
+      const rowH = h / rows;
+      const colW = w / cols;
+
+      for (let r = 0; r < rows; r++) {
+        const y0 = r * rowH;
+
+        ctx.fillStyle = '#e8dec8';
+        ctx.fillRect(0, y0, w, rowH * 0.14);
+        ctx.fillStyle = '#cbbba0';
+        ctx.fillRect(0, y0 + rowH * 0.14, w, 3);
+
+        ctx.fillStyle = '#e5dbc4';
+        ctx.fillRect(0, y0 + rowH * 0.25, w, rowH * 0.05);
+
+        for (let c = 0; c < cols; c++) {
+          const x0 = c * colW;
+          const winW = colW * 0.56;
+          const winH = rowH * 0.44;
+          const winX = x0 + (colW - winW) / 2;
+          const winY = y0 + rowH * 0.36;
+
+          ctx.fillStyle = '#eadfc9';
+          ctx.beginPath();
+          ctx.moveTo(winX + winW * 0.22, y0 + rowH * 0.16);
+          ctx.lineTo(winX + winW * 0.78, y0 + rowH * 0.16);
+          ctx.lineTo(winX + winW * 0.68, y0 + rowH * 0.34);
+          ctx.lineTo(winX + winW * 0.32, y0 + rowH * 0.34);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = '#e8dec8';
+          ctx.fillRect(winX - 4, winY + winH, winW + 8, 6);
+
+          ctx.fillStyle = '#1e2c2a';
+          ctx.fillRect(winX - 3, winY - 3, winW + 6, winH + 6);
+
+          const grad = ctx.createLinearGradient(winX, winY, winX + winW, winY + winH);
+          grad.addColorStop(0, '#4e7382');
+          grad.addColorStop(0.5, '#729cab');
+          grad.addColorStop(1, '#395763');
+          ctx.fillStyle = grad;
+          ctx.fillRect(winX, winY, winW, winH);
+
+          ctx.fillStyle = '#243533';
+          ctx.fillRect(winX + winW * 0.48, winY, 3, winH);
+          ctx.fillRect(winX, winY + winH * 0.32, winW, 2.5);
+
+          const seed = (r * 17 + c * 31 + (isMainTower ? 7 : 3)) % 11;
+          if (seed < 7) {
+            ectx.fillStyle = seed % 2 === 0 ? '#ffe6a3' : '#d4f3ff';
+            ectx.fillRect(winX + 2, winY + 2, winW - 4, winH - 4);
+            ectx.fillStyle = '#000000';
+            ectx.fillRect(winX + winW * 0.48, winY, 3, winH);
+            ectx.fillRect(winX, winY + winH * 0.32, winW, 2.5);
+          }
+        }
+      }
+
+      const map = new THREE.CanvasTexture(diffCanvas);
+      map.wrapS = THREE.RepeatWrapping;
+      map.wrapT = THREE.ClampToEdgeWrapping;
+      map.anisotropy = 4;
+
+      const emissiveMap = new THREE.CanvasTexture(emCanvas);
+      emissiveMap.wrapS = THREE.RepeatWrapping;
+      emissiveMap.wrapT = THREE.ClampToEdgeWrapping;
+
+      return { map, emissiveMap };
+    }
+
+    function createRotundaCurtainWallTextures() {
+      const w = 1024;
+      const h = 512;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      const emCanvas = document.createElement('canvas');
+      emCanvas.width = w;
+      emCanvas.height = h;
+      const ectx = emCanvas.getContext('2d');
+
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#5c97a8');
+      grad.addColorStop(0.45, '#89c0cf');
+      grad.addColorStop(0.55, '#528799');
+      grad.addColorStop(1, '#3d6d7d');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      const emGrad = ectx.createLinearGradient(0, 0, 0, h);
+      emGrad.addColorStop(0, '#6bb8cc');
+      emGrad.addColorStop(0.5, '#ffe5a8');
+      emGrad.addColorStop(1, '#ffcf70');
+      ectx.fillStyle = emGrad;
+      ectx.fillRect(0, 0, w, h);
+
+      const vCols = 24;
+      const hRows = 8;
+      ctx.fillStyle = '#21453e';
+      ectx.fillStyle = '#000000';
+
+      for (let i = 0; i <= vCols; i++) {
+        const x = (i / vCols) * w;
+        ctx.fillRect(x - 2, 0, 4, h);
+        ectx.fillRect(x - 2, 0, 4, h);
+      }
+      for (let j = 0; j <= hRows; j++) {
+        const y = (j / hRows) * h;
+        const thick = (j === 0 || j === 4 || j === hRows) ? 8 : 3.5;
+        ctx.fillStyle = (j === 4) ? '#d8ceb8' : '#21453e';
+        ctx.fillRect(0, y - thick / 2, w, thick);
+        ectx.fillRect(0, y - thick / 2, w, thick);
+      }
+
+      const map = new THREE.CanvasTexture(canvas);
+      map.wrapS = THREE.RepeatWrapping;
+      map.anisotropy = 4;
+      const emissiveMap = new THREE.CanvasTexture(emCanvas);
+      emissiveMap.wrapS = THREE.RepeatWrapping;
+      return { map, emissiveMap };
+    }
+
+    function createParapetScreenTexture() {
+      const w = 512;
+      const h = 128;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = 'rgba(26, 68, 56, 0.72)';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#13362c';
+      ctx.fillRect(0, 0, w, 12);
+      ctx.fillRect(0, h - 12, w, 12);
+      ctx.fillRect(0, h * 0.48, w, 6);
+
+      const bars = 16;
+      for (let i = 0; i <= bars; i++) {
+        const x = (i / bars) * w;
+        ctx.fillRect(x - 3, 0, 6, h);
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.repeat.set(6, 1);
+      return tex;
+    }
+
+    function createShowChwanCrownTexture() {
+      const w = 1024;
+      const h = 256;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#153b30';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = '#255c4c';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(6, 6, w - 12, h - 12);
+
+      const cx = w / 2;
+      const cy = h / 2;
+      ctx.fillStyle = '#e6c245';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 46, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#1d6b47';
+      ctx.fillRect(cx - 12, cy - 30, 24, 60);
+      ctx.fillRect(cx - 30, cy - 12, 60, 24);
+
+      ctx.font = '900 132px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      ctx.shadowColor = 'rgba(255, 210, 60, 0.85)';
+      ctx.shadowBlur = 18;
+      ctx.fillStyle = '#ffd63b';
+      ctx.fillText('秀', cx - 190, cy + 6);
+      ctx.fillText('傳', cx + 190, cy + 6);
+
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#b88614';
+      ctx.lineWidth = 3;
+      ctx.strokeText('秀', cx - 190, cy + 6);
+      ctx.strokeText('傳', cx + 190, cy + 6);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createEntranceSignTexture() {
+      const w = 1024;
+      const h = 192;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#102e25';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = '#34d399';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(8, 8, w - 16, h - 16);
+
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath();
+      ctx.arc(115, h / 2, 46, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(103, h / 2 - 28, 24, 56);
+      ctx.fillRect(87, h / 2 - 12, 56, 24);
+
+      ctx.font = '900 54px "Noto Sans TC", sans-serif';
+      ctx.fillStyle = '#fef08a';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('1F 醫療大樓大廳入口', w / 2 + 35, h * 0.42);
+
+      ctx.font = '700 24px "Chakra Petch", sans-serif';
+      ctx.fillStyle = '#6ee7b7';
+      ctx.fillText('MAIN ENTRANCE  •  AUTO LINK TO 1F.HTML', w / 2 + 35, h * 0.76);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createMonumentWallTexture() {
+      const w = 2048;
+      const h = 320;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.78);
+      skyGrad.addColorStop(0, '#99c9e8');
+      skyGrad.addColorStop(0.6, '#d9eef9');
+      skyGrad.addColorStop(1, '#f0f7fc');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
+      const clouds = [[220, 75, 90], [640, 60, 110], [1120, 70, 100], [1620, 65, 115]];
+      clouds.forEach(([cx, cy, r]) => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r * 0.5, 0, Math.PI * 2);
+        ctx.arc(cx + r * 0.45, cy + 8, r * 0.4, 0, Math.PI * 2);
+        ctx.arc(cx - r * 0.45, cy + 10, r * 0.38, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      const grassGrad = ctx.createLinearGradient(0, h * 0.72, 0, h);
+      grassGrad.addColorStop(0, '#82c936');
+      grassGrad.addColorStop(0.5, '#59a822');
+      grassGrad.addColorStop(1, '#3b7d14');
+      ctx.fillStyle = grassGrad;
+      ctx.fillRect(0, h * 0.74, w, h * 0.26);
+
+      const treePositions = [180, 440, 1160, 1520, 1850];
+      treePositions.forEach((tx, idx) => {
+        const scale = idx % 2 === 0 ? 1.0 : 0.85;
+        ctx.fillStyle = '#6e4e32';
+        ctx.fillRect(tx - 7 * scale, h * 0.55, 14 * scale, h * 0.24);
+        ctx.fillStyle = idx % 2 === 0 ? '#6bb82d' : '#4e9c22';
+        ctx.beginPath();
+        ctx.ellipse(tx, h * 0.42, 46 * scale, 78 * scale, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(185, 235, 95, 0.45)';
+        ctx.beginPath();
+        ctx.ellipse(tx - 12 * scale, h * 0.38, 22 * scale, 48 * scale, 0, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.strokeStyle = 'rgba(120, 145, 160, 0.22)';
+      ctx.lineWidth = 2;
+      for (let x = 0; x < w; x += 128) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      }
+
+      const chars = ['彰', '濱', '秀', '傳', '健', '康', '園', '區'];
+      ctx.font = '900 106px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      chars.forEach((ch, i) => {
+        const cx = 300 + i * 206;
+        const cy = h * 0.53;
+        ctx.fillStyle = '#261810';
+        ctx.fillText(ch, cx + 6, cy + 6);
+        ctx.fillStyle = '#3d271a';
+        ctx.fillText(ch, cx + 3, cy + 3);
+        ctx.fillStyle = '#694732';
+        ctx.fillText(ch, cx, cy);
+        ctx.strokeStyle = '#b58d6d';
+        ctx.lineWidth = 2;
+        ctx.strokeText(ch, cx, cy);
+      });
+
+      ctx.font = '700 22px "Chakra Petch", sans-serif';
+      ctx.fillStyle = '#284726';
+      ctx.fillText('C h a n g   B i n g   S h o u   C h w a n   H e a l t h   P a r k', w / 2, h * 0.85);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createHazardCurbTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#f5c71a';
+      ctx.fillRect(0, 0, 256, 64);
+
+      ctx.fillStyle = '#1c2024';
+      for (let x = -64; x < 320; x += 64) {
+        ctx.beginPath();
+        ctx.moveTo(x, 64);
+        ctx.lineTo(x + 32, 64);
+        ctx.lineTo(x + 56, 0);
+        ctx.lineTo(x + 24, 0);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.repeat.set(18, 1);
+      return tex;
+    }
+
+    function createRoadTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#2c3138';
+      ctx.fillRect(0, 0, 512, 512);
+
+      for (let i = 0; i < 3500; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.08)';
+        ctx.fillRect(x, y, 2, 2);
+      }
+
+      ctx.fillStyle = '#e5e9f0';
+      ctx.fillRect(14, 0, 8, 512);
+      ctx.fillRect(490, 0, 8, 512);
+
+      ctx.fillStyle = '#f5b82e';
+      ctx.fillRect(248, 0, 6, 512);
+      ctx.fillRect(258, 0, 6, 512);
+
+      ctx.fillStyle = '#dce2eb';
+      for (let y = 20; y < 512; y += 96) {
+        ctx.fillRect(130, y, 6, 48);
+        ctx.fillRect(376, y, 6, 48);
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(1, 14);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createDrivewayLaneTexture(arrowDir = 'up') {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#30363f';
+      ctx.fillRect(0, 0, 256, 512);
+
+      for (let i = 0; i < 2000; i++) {
+        const x = Math.random() * 256;
+        const y = Math.random() * 512;
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.08)';
+        ctx.fillRect(x, y, 2, 2);
+      }
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(10, 0, 7, 512);
+      ctx.fillRect(239, 0, 7, 512);
+
+      ctx.fillStyle = 'rgba(226, 232, 240, 0.65)';
+      for (let y = 24; y < 512; y += 86) {
+        ctx.fillRect(125, y, 6, 42);
+      }
+
+      if (arrowDir !== 'none') {
+        ctx.save();
+        ctx.translate(128, 256);
+        if (arrowDir === 'down') ctx.rotate(Math.PI);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+        ctx.beginPath();
+        ctx.moveTo(0, -54);
+        ctx.lineTo(34, -12);
+        ctx.lineTo(14, -12);
+        ctx.lineTo(14, 52);
+        ctx.lineTo(-14, 52);
+        ctx.lineTo(-14, -12);
+        ctx.lineTo(-34, -12);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.ClampToEdgeWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(1, 3);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createDropOffZoneTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 256;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#2d333b';
+      ctx.fillRect(0, 0, 512, 256);
+
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(12, 16, 488, 224);
+
+      ctx.strokeStyle = 'rgba(250, 204, 21, 0.85)';
+      ctx.lineWidth = 5;
+      for (let i = -240; i < 520; i += 44) {
+        ctx.beginPath();
+        ctx.moveTo(i, 16);
+        ctx.lineTo(i + 224, 240);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(i + 224, 16);
+        ctx.lineTo(i, 240);
+        ctx.stroke();
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    // --------------------------------------------------------------------------
+    // 2. 輔助碰撞箱與通用圓弧膠囊幾何
+    // --------------------------------------------------------------------------
+    function addCollider(cx, cz, width, depth, maxY = 10, label = '') {
+      colliders.push({
+        minX: cx - width / 2,
+        maxX: cx + width / 2,
+        minZ: cz - depth / 2,
+        maxZ: cz + depth / 2,
+        maxY,
+        label
+      });
+    }
+
+    function createSmoothCapsuleGeometry(radius, cylinderLength, capSegments = 10, radialSegments = 20) {
+      const points = [];
+      const halfLen = cylinderLength / 2;
+
+      for (let i = 0; i <= capSegments; i++) {
+        const theta = -Math.PI / 2 + (i / capSegments) * (Math.PI / 2);
+        points.push(new THREE.Vector2(Math.cos(theta) * radius, -halfLen + Math.sin(theta) * radius));
+      }
+      for (let i = 0; i <= capSegments; i++) {
+        const theta = (i / capSegments) * (Math.PI / 2);
+        points.push(new THREE.Vector2(Math.cos(theta) * radius, halfLen + Math.sin(theta) * radius));
+      }
+
+      const geom = new THREE.LatheGeometry(points, radialSegments);
+      geom.computeVertexNormals();
+      return geom;
+    }
+
+    // --------------------------------------------------------------------------
+    // 3. 流線型 3D 汽車雕塑工廠
+    // --------------------------------------------------------------------------
+    function createSideExtrudedMesh(shape, width, bevelSize, bevelThickness, material) {
+      const innerDepth = Math.max(0.05, width - bevelSize * 2);
+      const geom = new THREE.ExtrudeGeometry(shape, {
+        depth: innerDepth,
+        bevelEnabled: true,
+        bevelThickness: bevelThickness,
+        bevelSize: bevelSize,
+        bevelSegments: 4,
+        curveSegments: 18
+      });
+      geom.translate(0, 0, -innerDepth / 2);
+      geom.rotateY(-Math.PI / 2);
+      geom.computeVertexNormals();
+      const mesh = new THREE.Mesh(geom, material);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      return mesh;
+    }
+
+    function createDetailedWheel(radius = 0.38, width = 0.26, rimColor = 0xdbe4ee) {
+      const steerPivot = new THREE.Group();
+      const spinGroup = new THREE.Group();
+
+      const tireMat = new THREE.MeshStandardMaterial({ color: 0x14181f, roughness: 0.85, metalness: 0.08 });
+      const rimMat = new THREE.MeshStandardMaterial({ color: rimColor, roughness: 0.22, metalness: 0.88 });
+      const brakeMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.4, metalness: 0.7 });
+      const caliperMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.35, metalness: 0.4 });
+
+      const tire = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, width, 24), tireMat);
+      tire.rotation.z = Math.PI / 2;
+      tire.castShadow = true;
+      spinGroup.add(tire);
+
+      [-width * 0.42, width * 0.42].forEach((offsetX) => {
+        const shoulder = new THREE.Mesh(new THREE.TorusGeometry(radius * 0.88, radius * 0.13, 10, 24), tireMat);
+        shoulder.rotation.y = Math.PI / 2;
+        shoulder.position.x = offsetX;
+        spinGroup.add(shoulder);
+      });
+
+      const rotor = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.56, radius * 0.56, width * 0.5, 18), brakeMat);
+      rotor.rotation.z = Math.PI / 2;
+      spinGroup.add(rotor);
+
+      const caliper = new THREE.Mesh(new THREE.BoxGeometry(width * 0.56, radius * 0.28, radius * 0.24), caliperMat);
+      caliper.position.set(0, radius * 0.34, radius * 0.24);
+      spinGroup.add(caliper);
+
+      const rimOuter = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.66, radius * 0.66, width * 1.02, 20), rimMat);
+      rimOuter.rotation.z = Math.PI / 2;
+      spinGroup.add(rimOuter);
+
+      const rimInnerDark = new THREE.Mesh(
+        new THREE.CylinderGeometry(radius * 0.58, radius * 0.58, width * 1.03, 18),
+        new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.6 })
+      );
+      rimInnerDark.rotation.z = Math.PI / 2;
+      spinGroup.add(rimInnerDark);
+
+      for (let i = 0; i < 5; i++) {
+        const ang = (i / 5) * Math.PI * 2;
+        const spoke = new THREE.Mesh(new THREE.BoxGeometry(width * 1.05, radius * 0.6, radius * 0.11), rimMat);
+        spoke.position.set(0, Math.cos(ang) * radius * 0.28, Math.sin(ang) * radius * 0.28);
+        spoke.rotation.x = ang;
+        spinGroup.add(spoke);
+      }
+
+      const hubCap = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.17, radius * 0.17, width * 1.08, 14), rimMat);
+      hubCap.rotation.z = Math.PI / 2;
+      spinGroup.add(hubCap);
+
+      steerPivot.add(spinGroup);
+      return { steerPivot, spinGroup };
+    }
+
+    function createSportsSedanMesh(colorHex = 0x38bdf8) {
+      const car = new THREE.Group();
+
+      const paintMat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.2, metalness: 0.68 });
+      const glassMat = new THREE.MeshStandardMaterial({ color: 0x132030, roughness: 0.08, metalness: 0.88 });
+      const trimMat = new THREE.MeshStandardMaterial({ color: 0x181c24, roughness: 0.55, metalness: 0.35 });
+      const chromeMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.18, metalness: 0.92 });
+      const headLightMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xe0f2fe, emissiveIntensity: 0.95, roughness: 0.1 });
+      const tailLightMat = new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0xff1e1e, emissiveIntensity: 0.9, roughness: 0.2 });
+
+      const bodyShape = new THREE.Shape();
+      bodyShape.moveTo(-2.22, 0.30);
+      bodyShape.quadraticCurveTo(-2.36, 0.48, -2.30, 0.78);
+      bodyShape.quadraticCurveTo(-2.26, 0.90, -2.12, 0.92);
+      bodyShape.lineTo(-1.62, 0.92);
+      bodyShape.quadraticCurveTo(-0.50, 0.90, 0.92, 0.84);
+      bodyShape.quadraticCurveTo(1.75, 0.78, 2.26, 0.58);
+      bodyShape.quadraticCurveTo(2.40, 0.44, 2.30, 0.26);
+      bodyShape.lineTo(1.86, 0.26);
+      bodyShape.absarc(1.42, 0.34, 0.44, 0.12, Math.PI - 0.12, false);
+      bodyShape.lineTo(0.98, 0.26);
+      bodyShape.lineTo(-0.98, 0.26);
+      bodyShape.absarc(-1.42, 0.34, 0.44, 0.12, Math.PI - 0.12, false);
+      bodyShape.lineTo(-1.86, 0.26);
+      bodyShape.closePath();
+
+      car.add(createSideExtrudedMesh(bodyShape, 1.98, 0.11, 0.13, paintMat));
+
+      const underTray = new THREE.Mesh(new THREE.BoxGeometry(1.72, 0.12, 4.15), trimMat);
+      underTray.position.set(0, 0.30, 0);
+      car.add(underTray);
+
+      [-1.42, 1.42].forEach((az) => {
+        const archLiner = new THREE.Mesh(new THREE.CylinderGeometry(0.43, 0.43, 1.84, 18, 1, false, 0, Math.PI), trimMat);
+        archLiner.rotation.z = Math.PI / 2;
+        archLiner.rotation.y = Math.PI / 2;
+        archLiner.position.set(0, 0.34, az);
+        car.add(archLiner);
+      });
+
+      const cabinShape = new THREE.Shape();
+      cabinShape.moveTo(-1.74, 0.85);
+      cabinShape.quadraticCurveTo(-1.26, 1.24, -0.78, 1.38);
+      cabinShape.quadraticCurveTo(-0.12, 1.45, 0.48, 1.36);
+      cabinShape.quadraticCurveTo(0.96, 1.15, 1.34, 0.81);
+      cabinShape.lineTo(-1.74, 0.85);
+      car.add(createSideExtrudedMesh(cabinShape, 1.54, 0.08, 0.10, glassMat));
+
+      const roofShape = new THREE.Shape();
+      roofShape.moveTo(-0.84, 1.34);
+      roofShape.quadraticCurveTo(-0.14, 1.47, 0.52, 1.34);
+      roofShape.lineTo(0.46, 1.30);
+      roofShape.quadraticCurveTo(-0.14, 1.41, -0.78, 1.30);
+      roofShape.closePath();
+      car.add(createSideExtrudedMesh(roofShape, 1.46, 0.05, 0.06, paintMat));
+
+      const fin = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.22, 6), paintMat);
+      fin.rotation.x = -0.55;
+      fin.position.set(0, 1.47, -0.52);
+      car.add(fin);
+
+      const grille = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.22, 0.12), trimMat);
+      grille.position.set(0, 0.44, 2.31);
+      car.add(grille);
+
+      const grilleFrame = new THREE.Mesh(new THREE.BoxGeometry(1.10, 0.25, 0.06), chromeMat);
+      grilleFrame.position.set(0, 0.44, 2.33);
+      car.add(grilleFrame);
+
+      const frontLip = new THREE.Mesh(new THREE.BoxGeometry(1.86, 0.07, 0.24), trimMat);
+      frontLip.position.set(0, 0.24, 2.26);
+      car.add(frontLip);
+
+      [-0.68, 0.68].forEach((hx) => {
+        const sign = Math.sign(hx);
+        const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.12, 0.24), headLightMat);
+        lamp.position.set(hx, 0.58, 2.22);
+        lamp.rotation.y = sign * 0.28;
+        lamp.rotation.z = -sign * 0.08;
+        car.add(lamp);
+      });
+
+      const tailBar = new THREE.Mesh(new THREE.BoxGeometry(1.66, 0.09, 0.10), tailLightMat);
+      tailBar.position.set(0, 0.78, -2.29);
+      car.add(tailBar);
+
+      [-0.72, 0.72].forEach((tx) => {
+        const cornerTail = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.14, 0.22), tailLightMat);
+        cornerTail.position.set(tx, 0.78, -2.23);
+        cornerTail.rotation.y = Math.sign(tx) * -0.25;
+        car.add(cornerTail);
+      });
+
+      const diffuser = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.14, 0.16), trimMat);
+      diffuser.position.set(0, 0.28, -2.26);
+      car.add(diffuser);
+
+      [-0.54, 0.54].forEach((ex) => {
+        const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.22, 12), chromeMat);
+        pipe.rotation.x = Math.PI / 2;
+        pipe.position.set(ex, 0.26, -2.28);
+        car.add(pipe);
+      });
+
+      const wingBlade = new THREE.Mesh(new THREE.BoxGeometry(1.76, 0.05, 0.24), trimMat);
+      wingBlade.position.set(0, 1.04, -2.06);
+      wingBlade.rotation.x = 0.12;
+      car.add(wingBlade);
+
+      [-0.58, 0.58].forEach((sx) => {
+        const strut = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.14, 0.16), trimMat);
+        strut.position.set(sx, 0.97, -2.05);
+        car.add(strut);
+      });
+
+      [-0.94, 0.94].forEach((mx) => {
+        const sign = Math.sign(mx);
+        const mirrorArm = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.04, 0.07), trimMat);
+        mirrorArm.position.set(mx, 0.92, 0.86);
+        const mirrorCap = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.11, 0.14), paintMat);
+        mirrorCap.position.set(mx + sign * 0.07, 0.94, 0.84);
+        mirrorCap.rotation.y = -sign * 0.2;
+        car.add(mirrorArm, mirrorCap);
+      });
+
+      const wheels = [];
+      const frontWheelPivots = [];
+      [
+        { x: -0.92, y: 0.37, z: 1.42, front: true },
+        { x: 0.92, y: 0.37, z: 1.42, front: true },
+        { x: -0.92, y: 0.37, z: -1.42, front: false },
+        { x: 0.92, y: 0.37, z: -1.42, front: false }
+      ].forEach((wc) => {
+        const { steerPivot, spinGroup } = createDetailedWheel(0.37, 0.26, 0xe2e8f0);
+        steerPivot.position.set(wc.x, wc.y, wc.z);
+        car.add(steerPivot);
+        wheels.push(spinGroup);
+        if (wc.front) frontWheelPivots.push(steerPivot);
+      });
+
+      return { group: car, wheels, frontWheelPivots };
+    }
+
+    function createAmbulanceMesh() {
+      const amb = new THREE.Group();
+
+      const whiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.26, metalness: 0.22 });
+      const redStripeMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.32, metalness: 0.15 });
+      const glassMat = new THREE.MeshStandardMaterial({ color: 0x132030, roughness: 0.08, metalness: 0.88 });
+      const trimMat = new THREE.MeshStandardMaterial({ color: 0x1e2530, roughness: 0.65, metalness: 0.25 });
+      const headLightMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff5cc, emissiveIntensity: 0.9 });
+      const tailLightMat = new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0xff1e1e, emissiveIntensity: 0.9 });
+
+      const vanShape = new THREE.Shape();
+      vanShape.moveTo(-2.55, 0.42);
+      vanShape.quadraticCurveTo(-2.64, 0.56, -2.60, 0.82);
+      vanShape.lineTo(-2.56, 2.26);
+      vanShape.quadraticCurveTo(-2.54, 2.46, -2.30, 2.48);
+      vanShape.lineTo(0.88, 2.48);
+      vanShape.quadraticCurveTo(1.26, 2.46, 1.46, 2.18);
+      vanShape.lineTo(1.96, 1.32);
+      vanShape.quadraticCurveTo(2.44, 1.18, 2.62, 0.86);
+      vanShape.quadraticCurveTo(2.70, 0.64, 2.58, 0.38);
+      vanShape.lineTo(2.16, 0.38);
+      vanShape.absarc(1.68, 0.44, 0.48, 0.08, Math.PI - 0.08, false);
+      vanShape.lineTo(1.20, 0.38);
+      vanShape.lineTo(-1.00, 0.38);
+      vanShape.absarc(-1.48, 0.44, 0.48, 0.08, Math.PI - 0.08, false);
+      vanShape.lineTo(-1.96, 0.38);
+      vanShape.closePath();
+
+      amb.add(createSideExtrudedMesh(vanShape, 2.18, 0.12, 0.14, whiteMat));
+
+      const chassisBase = new THREE.Mesh(new THREE.BoxGeometry(1.92, 0.14, 4.9), trimMat);
+      chassisBase.position.set(0, 0.40, 0);
+      amb.add(chassisBase);
+
+      [-1.48, 1.68].forEach((az) => {
+        const arch = new THREE.Mesh(new THREE.CylinderGeometry(0.47, 0.47, 2.04, 18, 1, false, 0, Math.PI), trimMat);
+        arch.rotation.z = Math.PI / 2;
+        arch.rotation.y = Math.PI / 2;
+        arch.position.set(0, 0.44, az);
+        amb.add(arch);
+      });
+
+      const windshield = new THREE.Mesh(new THREE.BoxGeometry(1.86, 0.86, 0.08), glassMat);
+      windshield.position.set(0, 1.74, 1.72);
+      windshield.rotation.x = -0.52;
+      amb.add(windshield);
+
+      [-1.08, 1.08].forEach((sx) => {
+        const sideWin = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.66, 0.92), glassMat);
+        sideWin.position.set(sx, 1.68, 1.38);
+        amb.add(sideWin);
+      });
+
+      [-1.095, 1.095].forEach((sx) => {
+        const sideStripe = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.28, 3.45), redStripeMat);
+        sideStripe.position.set(sx, 1.15, -0.78);
+        amb.add(sideStripe);
+
+        const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.64, 0.22), redStripeMat);
+        crossV.position.set(sx, 1.76, -0.82);
+        const crossH = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.22, 0.64), redStripeMat);
+        crossH.position.set(sx, 1.76, -0.82);
+        amb.add(crossV, crossH);
+
+        const rearSideWin = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.42, 0.95), glassMat);
+        rearSideWin.position.set(sx, 1.82, 0.18);
+        amb.add(rearSideWin);
+      });
+
+      const rearStripe = new THREE.Mesh(new THREE.BoxGeometry(2.04, 0.28, 0.04), redStripeMat);
+      rearStripe.position.set(0, 1.15, -2.59);
+      amb.add(rearStripe);
+
+      [-0.46, 0.46].forEach((rx) => {
+        const rearWin = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.52, 0.04), glassMat);
+        rearWin.position.set(rx, 1.82, -2.59);
+        const rearTail = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.46, 0.06), tailLightMat);
+        rearTail.position.set(rx * 2.02, 0.96, -2.59);
+        amb.add(rearWin, rearTail);
+      });
+
+      const rearStep = new THREE.Mesh(new THREE.BoxGeometry(1.96, 0.10, 0.24), trimMat);
+      rearStep.position.set(0, 0.42, -2.66);
+      amb.add(rearStep);
+
+      const frontGrille = new THREE.Mesh(new THREE.BoxGeometry(1.24, 0.34, 0.10), trimMat);
+      frontGrille.position.set(0, 0.74, 2.61);
+      amb.add(frontGrille);
+
+      const frontBumper = new THREE.Mesh(new THREE.BoxGeometry(2.08, 0.22, 0.18), trimMat);
+      frontBumper.position.set(0, 0.46, 2.58);
+      amb.add(frontBumper);
+
+      [-0.82, 0.82].forEach((hx) => {
+        const sign = Math.sign(hx);
+        const hl = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.20, 0.18), headLightMat);
+        hl.position.set(hx, 0.82, 2.54);
+        hl.rotation.y = sign * 0.25;
+        amb.add(hl);
+
+        const mirrorHousing = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.32, 0.16), trimMat);
+        mirrorHousing.position.set(hx + sign * 0.34, 1.56, 1.66);
+        const armTop = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.035, 0.04), trimMat);
+        armTop.position.set(hx + sign * 0.26, 1.68, 1.66);
+        const armBot = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.035, 0.04), trimMat);
+        armBot.position.set(hx + sign * 0.26, 1.44, 1.66);
+        amb.add(mirrorHousing, armTop, armBot);
+      });
+
+      const lightbarBase = new THREE.Mesh(
+        new THREE.BoxGeometry(1.56, 0.08, 0.32),
+        new THREE.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.7, roughness: 0.3 })
+      );
+      lightbarBase.position.set(0, 2.51, 0.82);
+      amb.add(lightbarBase);
+
+      const redBeaconMat = new THREE.MeshStandardMaterial({ color: 0xff1e1e, emissive: 0xff0000, emissiveIntensity: 1.5, roughness: 0.15 });
+      const blueBeaconMat = new THREE.MeshStandardMaterial({ color: 0x1e90ff, emissive: 0x0066ff, emissiveIntensity: 1.5, roughness: 0.15 });
+
+      const redBeacon = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.16, 0.28), redBeaconMat);
+      redBeacon.position.set(-0.46, 2.61, 0.82);
+      const blueBeacon = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.16, 0.28), blueBeaconMat);
+      blueBeacon.position.set(0.46, 2.61, 0.82);
+      const centerPod = new THREE.Mesh(
+        new THREE.BoxGeometry(0.32, 0.15, 0.26),
+        new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.2 })
+      );
+      centerPod.position.set(0, 2.60, 0.82);
+      amb.add(redBeacon, blueBeacon, centerPod);
+
+      const redSirenLight = new THREE.PointLight(0xff2222, 2.2, 16);
+      redSirenLight.position.set(-0.6, 2.85, 0.82);
+      const blueSirenLight = new THREE.PointLight(0x2277ff, 2.2, 16);
+      blueSirenLight.position.set(0.6, 2.85, 0.82);
+      amb.add(redSirenLight, blueSirenLight);
+
+      const wheels = [];
+      const frontWheelPivots = [];
+      [
+        { x: -0.98, y: 0.43, z: 1.68, front: true },
+        { x: 0.98, y: 0.43, z: 1.68, front: true },
+        { x: -0.98, y: 0.43, z: -1.48, front: false },
+        { x: 0.98, y: 0.43, z: -1.48, front: false }
+      ].forEach((wc) => {
+        const { steerPivot, spinGroup } = createDetailedWheel(0.43, 0.30, 0xcbd5e1);
+        steerPivot.position.set(wc.x, wc.y, wc.z);
+        amb.add(steerPivot);
+        wheels.push(spinGroup);
+        if (wc.front) frontWheelPivots.push(steerPivot);
+      });
+
+      return {
+        group: amb,
+        wheels,
+        frontWheelPivots,
+        redBeacon,
+        blueBeacon,
+        redSirenLight,
+        blueSirenLight
+      };
+    }
+
+    function createSimpleParkedVehicle(colorHex, type = 'sedan') {
+      if (type === 'sedan') {
+        return createSportsSedanMesh(colorHex).group;
+      }
+
+      const g = new THREE.Group();
+      const bodyMat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.32, metalness: 0.45 });
+      const glassMat = new THREE.MeshStandardMaterial({ color: 0x132030, roughness: 0.1, metalness: 0.85 });
+      const trimMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.65 });
+
+      if (type === 'bus') {
+        const busShape = new THREE.Shape();
+        busShape.moveTo(-4.10, 0.45);
+        busShape.quadraticCurveTo(-4.22, 0.65, -4.16, 1.00);
+        busShape.lineTo(-4.12, 2.65);
+        busShape.quadraticCurveTo(-4.08, 2.92, -3.75, 2.95);
+        busShape.lineTo(3.55, 2.95);
+        busShape.quadraticCurveTo(3.96, 2.92, 4.12, 2.48);
+        busShape.quadraticCurveTo(4.26, 1.65, 4.22, 0.85);
+        busShape.quadraticCurveTo(4.20, 0.55, 4.02, 0.45);
+        busShape.lineTo(3.06, 0.45);
+        busShape.absarc(2.55, 0.48, 0.52, 0.05, Math.PI - 0.05, false);
+        busShape.lineTo(2.04, 0.45);
+        busShape.lineTo(-1.94, 0.45);
+        busShape.absarc(-2.45, 0.48, 0.52, 0.05, Math.PI - 0.05, false);
+        busShape.lineTo(-2.96, 0.45);
+        busShape.closePath();
+
+        g.add(createSideExtrudedMesh(busShape, 2.38, 0.12, 0.14, bodyMat));
+
+        const greenBand = new THREE.Mesh(
+          new THREE.BoxGeometry(2.42, 0.30, 8.22),
+          new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.4 })
+        );
+        greenBand.position.set(0, 1.18, 0.02);
+        g.add(greenBand);
+
+        const frontGlass = new THREE.Mesh(new THREE.BoxGeometry(2.08, 1.15, 0.10), glassMat);
+        frontGlass.position.set(0, 2.02, 4.14);
+        frontGlass.rotation.x = -0.16;
+        g.add(frontGlass);
+
+        [-1.20, 1.20].forEach((sx) => {
+          const sideGlassStrip = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.82, 6.8), glassMat);
+          sideGlassStrip.position.set(sx, 2.05, -0.05);
+          g.add(sideGlassStrip);
+        });
+
+        const acPod = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.24, 2.4), trimMat);
+        acPod.position.set(0, 3.06, 0.3);
+        g.add(acPod);
+
+        [
+          [-1.08, 0.48, 2.55],
+          [1.08, 0.48, 2.55],
+          [-1.08, 0.48, -2.45],
+          [1.08, 0.48, -2.45]
+        ].forEach(([wx, wy, wz]) => {
+          const { steerPivot } = createDetailedWheel(0.48, 0.32, 0xdbe4ee);
+          steerPivot.position.set(wx, wy, wz);
+          g.add(steerPivot);
+        });
+      } else {
+        const truckShape = new THREE.Shape();
+        truckShape.moveTo(-2.15, 0.42);
+        truckShape.lineTo(-2.18, 1.05);
+        truckShape.lineTo(-0.48, 1.05);
+        truckShape.lineTo(-0.44, 1.62);
+        truckShape.quadraticCurveTo(-0.40, 1.76, -0.20, 1.78);
+        truckShape.lineTo(0.42, 1.78);
+        truckShape.quadraticCurveTo(0.66, 1.76, 0.82, 1.54);
+        truckShape.lineTo(1.26, 1.06);
+        truckShape.quadraticCurveTo(1.86, 0.98, 2.16, 0.76);
+        truckShape.quadraticCurveTo(2.24, 0.56, 2.12, 0.38);
+        truckShape.lineTo(1.74, 0.38);
+        truckShape.absarc(1.32, 0.42, 0.42, 0.1, Math.PI - 0.1, false);
+        truckShape.lineTo(0.90, 0.38);
+        truckShape.lineTo(-0.90, 0.38);
+        truckShape.absarc(-1.32, 0.42, 0.42, 0.1, Math.PI - 0.1, false);
+        truckShape.lineTo(-1.74, 0.38);
+        truckShape.closePath();
+
+        g.add(createSideExtrudedMesh(truckShape, 1.94, 0.10, 0.12, bodyMat));
+
+        const cabGlass = new THREE.Mesh(new THREE.BoxGeometry(1.62, 0.56, 0.08), glassMat);
+        cabGlass.position.set(0, 1.40, 1.04);
+        cabGlass.rotation.x = -0.58;
+        g.add(cabGlass);
+
+        const cargoBed = new THREE.Mesh(new THREE.BoxGeometry(1.66, 0.12, 1.55), trimMat);
+        cargoBed.position.set(0, 1.02, -1.32);
+        g.add(cargoBed);
+
+        [
+          [-0.90, 0.40, 1.32],
+          [0.90, 0.40, 1.32],
+          [-0.90, 0.40, -1.32],
+          [0.90, 0.40, -1.32]
+        ].forEach(([wx, wy, wz]) => {
+          const { steerPivot } = createDetailedWheel(0.40, 0.28, 0xcbd5e1);
+          steerPivot.position.set(wx, wy, wz);
+          g.add(steerPivot);
+        });
+      }
+
+      return g;
+    }
+
+    // --------------------------------------------------------------------------
+    // 4. 建構「彰濱秀傳健康園區」3D 醫療大樓建築群
+    // --------------------------------------------------------------------------
+    function buildMedicalComplex() {
+      const campusGroup = new THREE.Group();
+
+      const darkGreenMetalMat = new THREE.MeshStandardMaterial({ color: 0x184236, roughness: 0.45, metalness: 0.35 });
+      const creamStoneMat = new THREE.MeshStandardMaterial({ color: 0xe8dec8, roughness: 0.72, metalness: 0.05 });
+      const terracottaMat = new THREE.MeshStandardMaterial({ color: 0xc86d44, roughness: 0.78, metalness: 0.05 });
+
+      const parapetTex = createParapetScreenTexture();
+      const parapetMat = new THREE.MeshStandardMaterial({
+        map: parapetTex,
+        transparent: true,
+        opacity: 0.88,
+        roughness: 0.3,
+        metalness: 0.4,
+        side: THREE.DoubleSide
+      });
+
+      // A. 中央圓柱形玻璃帷幕塔樓
+      const rotundaTex = createRotundaCurtainWallTextures();
+      const rotundaMat = new THREE.MeshStandardMaterial({
+        map: rotundaTex.map,
+        emissive: new THREE.Color(0xffe299),
+        emissiveMap: rotundaTex.emissiveMap,
+        emissiveIntensity: 0.0,
+        roughness: 0.18,
+        metalness: 0.65
+      });
+      nightGlowMaterials.push(rotundaMat);
+
+      const rotundaX = 0;
+      const rotundaZ = -15;
+      const rotundaRadius = 10.5;
+      const rotundaHeight = 23.5;
+
+      const rotundaCyl = new THREE.Mesh(
+        new THREE.CylinderGeometry(rotundaRadius, rotundaRadius, rotundaHeight, 36),
+        rotundaMat
+      );
+      rotundaCyl.position.set(rotundaX, rotundaHeight / 2, rotundaZ);
+      rotundaCyl.castShadow = true;
+      rotundaCyl.receiveShadow = true;
+      campusGroup.add(rotundaCyl);
+      addCollider(rotundaX, rotundaZ, rotundaRadius * 1.82, rotundaRadius * 1.82, rotundaHeight, '中央圓弧玻璃塔樓');
+
+      const discRoof = new THREE.Mesh(new THREE.CylinderGeometry(12.6, 12.2, 1.3, 40), darkGreenMetalMat);
+      discRoof.position.set(rotundaX, rotundaHeight + 0.65, rotundaZ);
+      discRoof.castShadow = true;
+      campusGroup.add(discRoof);
+
+      const discCap = new THREE.Mesh(new THREE.CylinderGeometry(9.2, 10.2, 0.9, 36), darkGreenMetalMat);
+      discCap.position.set(rotundaX, rotundaHeight + 1.65, rotundaZ);
+      campusGroup.add(discCap);
+
+      const rotundaBelt = new THREE.Mesh(
+        new THREE.CylinderGeometry(rotundaRadius + 0.25, rotundaRadius + 0.25, 0.7, 36),
+        creamStoneMat
+      );
+      rotundaBelt.position.set(rotundaX, 13.5, rotundaZ);
+      campusGroup.add(rotundaBelt);
+
+      // A2. 正門 1F 大廳自動滑動玻璃門與地板感應區
+      const entranceGroup = new THREE.Group();
+      const doorZ = mainEntrance.z;
+
+      const portalFrameLeft = new THREE.Mesh(new THREE.BoxGeometry(0.45, 3.4, 0.65), darkGreenMetalMat);
+      portalFrameLeft.position.set(-2.35, 1.7, doorZ);
+      const portalFrameRight = new THREE.Mesh(new THREE.BoxGeometry(0.45, 3.4, 0.65), darkGreenMetalMat);
+      portalFrameRight.position.set(2.35, 1.7, doorZ);
+      const portalHeader = new THREE.Mesh(new THREE.BoxGeometry(5.15, 0.55, 0.75), darkGreenMetalMat);
+      portalHeader.position.set(0, 3.55, doorZ);
+      entranceGroup.add(portalFrameLeft, portalFrameRight, portalHeader);
+
+      const signTex = createEntranceSignTexture();
+      const signMat = new THREE.MeshStandardMaterial({
+        map: signTex,
+        emissive: new THREE.Color(0x6ee7b7),
+        emissiveMap: signTex,
+        emissiveIntensity: 0.45,
+        roughness: 0.3
+      });
+      const signBoard = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 0.85), signMat);
+      signBoard.position.set(0, 4.25, doorZ + 0.22);
+      entranceGroup.add(signBoard);
+
+      const lobbyGlowMat = new THREE.MeshBasicMaterial({ color: 0xfff3d1 });
+      const lobbyBackdrop = new THREE.Mesh(new THREE.PlaneGeometry(4.25, 3.25), lobbyGlowMat);
+      lobbyBackdrop.position.set(0, 1.65, doorZ - 0.12);
+      entranceGroup.add(lobbyBackdrop);
+
+      const slidingGlassMat = new THREE.MeshStandardMaterial({
+        color: 0x38bdf8,
+        transparent: true,
+        opacity: 0.62,
+        roughness: 0.1,
+        metalness: 0.75
+      });
+      const doorMullionMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.8, roughness: 0.2 });
+
+      function buildDoorLeaf(offsetX) {
+        const leaf = new THREE.Group();
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(2.05, 3.15, 0.08), slidingGlassMat);
+        pane.position.y = 1.60;
+        const topRail = new THREE.Mesh(new THREE.BoxGeometry(2.08, 0.12, 0.11), doorMullionMat);
+        topRail.position.y = 3.14;
+        const botRail = new THREE.Mesh(new THREE.BoxGeometry(2.08, 0.14, 0.11), doorMullionMat);
+        botRail.position.y = 0.08;
+        const sideRail = new THREE.Mesh(new THREE.BoxGeometry(0.10, 3.15, 0.11), doorMullionMat);
+        sideRail.position.set(offsetX > 0 ? -0.98 : 0.98, 1.60, 0);
+        leaf.add(pane, topRail, botRail, sideRail);
+        leaf.position.set(offsetX, 0, doorZ + 0.05);
+        return leaf;
+      }
+
+      const leftDoor = buildDoorLeaf(-1.04);
+      const rightDoor = buildDoorLeaf(1.04);
+      entranceGroup.add(leftDoor, rightDoor);
+      mainEntrance.leftDoor = leftDoor;
+      mainEntrance.rightDoor = rightDoor;
+
+      const welcomeMat = new THREE.Mesh(
+        new THREE.PlaneGeometry(4.8, 2.5),
+        new THREE.MeshStandardMaterial({ color: 0x0f3d2e, roughness: 0.9 })
+      );
+      welcomeMat.rotation.x = -Math.PI / 2;
+      welcomeMat.position.set(0, 0.028, -3.15);
+      entranceGroup.add(welcomeMat);
+
+      const sensorRingMat = new THREE.MeshBasicMaterial({
+        color: 0x10b981,
+        transparent: true,
+        opacity: 0.88,
+        side: THREE.DoubleSide
+      });
+      const sensorRing = new THREE.Mesh(new THREE.RingGeometry(1.75, 2.05, 32), sensorRingMat);
+      sensorRing.rotation.x = -Math.PI / 2;
+      sensorRing.position.set(0, 0.035, -2.75);
+      entranceGroup.add(sensorRing);
+      mainEntrance.sensorRing = sensorRing;
+
+      campusGroup.add(entranceGroup);
+
+      // B. 正門迎賓車道雨庇
+      const canopyW = 28;
+      const canopyD = 9.6;
+      const canopyH = 6.2;
+      const canopyZ = 1.2;
+
+      const mainCanopy = new THREE.Mesh(new THREE.BoxGeometry(canopyW, 1.4, canopyD), creamStoneMat);
+      mainCanopy.position.set(0, canopyH, canopyZ);
+      mainCanopy.castShadow = true;
+      mainCanopy.receiveShadow = true;
+      campusGroup.add(mainCanopy);
+
+      const canopyRoofTrim = new THREE.Mesh(new THREE.BoxGeometry(canopyW + 0.8, 0.45, canopyD + 0.8), darkGreenMetalMat);
+      canopyRoofTrim.position.set(0, canopyH + 0.85, canopyZ);
+      campusGroup.add(canopyRoofTrim);
+
+      const redFestiveMat = new THREE.MeshStandardMaterial({ color: 0xb81d18, roughness: 0.45 });
+      const goldTrimMat = new THREE.MeshStandardMaterial({ color: 0xe6b83a, roughness: 0.35, metalness: 0.6 });
+      const lanternMat = new THREE.MeshStandardMaterial({
+        color: 0xd9261c,
+        emissive: 0xff4518,
+        emissiveIntensity: 0.35,
+        roughness: 0.4
+      });
+      nightGlowMaterials.push(lanternMat);
+
+      const pillarXs = [-11.8, -5.2, 5.2, 11.8];
+      const pillarZs = [-2.15, 5.35];
+      pillarZs.forEach((pz, rowIdx) => {
+        pillarXs.forEach((px) => {
+          const base = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.8, 1.1), creamStoneMat);
+          base.position.set(px, 0.4, pz);
+          campusGroup.add(base);
+
+          const col = new THREE.Mesh(new THREE.BoxGeometry(0.85, canopyH - 0.7, 0.85), redFestiveMat);
+          col.position.set(px, (canopyH - 0.7) / 2 + 0.4, pz);
+          col.castShadow = true;
+          campusGroup.add(col);
+
+          const cap = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.45, 1.0), goldTrimMat);
+          cap.position.set(px, canopyH - 0.85, pz);
+          campusGroup.add(cap);
+
+          if (rowIdx === 1) {
+            for (let l = 0; l < 4; l++) {
+              const lantern = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 10), lanternMat);
+              lantern.scale.set(1, 1.25, 1);
+              lantern.position.set(px + 0.6, canopyH - 1.25 - l * 0.75, pz);
+              campusGroup.add(lantern);
+            }
+          }
+
+          addCollider(px, pz, 1.05, 1.05, canopyH, '迎賓車道廊柱');
+        });
+      });
+
+      [-25.5, 25.5].forEach((sideX) => {
+        const walkwayRoof = new THREE.Mesh(new THREE.BoxGeometry(20, 0.65, 4.2), creamStoneMat);
+        walkwayRoof.position.set(sideX, 4.4, -3.5);
+        walkwayRoof.castShadow = true;
+        campusGroup.add(walkwayRoof);
+
+        const walkwayGreenEdge = new THREE.Mesh(new THREE.BoxGeometry(20.2, 0.25, 4.4), darkGreenMetalMat);
+        walkwayGreenEdge.position.set(sideX, 4.82, -3.5);
+        campusGroup.add(walkwayGreenEdge);
+      });
+
+      // C. 左右對稱三層前翼大樓
+      const wingWallTex = createHospitalWallTextures(6, 3, false);
+      const wingWallMat = new THREE.MeshStandardMaterial({
+        map: wingWallTex.map,
+        emissive: new THREE.Color(0xffdfa0),
+        emissiveMap: wingWallTex.emissiveMap,
+        emissiveIntensity: 0.0,
+        roughness: 0.72
+      });
+      nightGlowMaterials.push(wingWallMat);
+
+      const frontWingConfigs = [
+        { x: -25.5, z: -15.5, w: 26, d: 20, h: 14.2 },
+        { x: 25.5, z: -15.5, w: 26, d: 20, h: 14.2 },
+        { x: -47.5, z: -19.5, w: 18, d: 18, h: 12.2 },
+        { x: 47.5, z: -19.5, w: 18, d: 18, h: 12.2 }
+      ];
+
+      frontWingConfigs.forEach((cfg) => {
+        const wingMesh = new THREE.Mesh(
+          new THREE.BoxGeometry(cfg.w, cfg.h, cfg.d),
+          [wingWallMat, wingWallMat, creamStoneMat, creamStoneMat, wingWallMat, wingWallMat]
+        );
+        wingMesh.position.set(cfg.x, cfg.h / 2, cfg.z);
+        wingMesh.castShadow = true;
+        wingMesh.receiveShadow = true;
+        campusGroup.add(wingMesh);
+        addCollider(cfg.x, cfg.z, cfg.w, cfg.d, cfg.h, '前翼醫療大樓');
+
+        const cornice = new THREE.Mesh(new THREE.BoxGeometry(cfg.w + 0.6, 0.55, cfg.d + 0.6), creamStoneMat);
+        cornice.position.set(cfg.x, cfg.h + 0.25, cfg.z);
+        campusGroup.add(cornice);
+
+        const pH = 2.3;
+        const pY = cfg.h + 0.5 + pH / 2;
+
+        const pFront = new THREE.Mesh(new THREE.PlaneGeometry(cfg.w + 0.4, pH), parapetMat);
+        pFront.position.set(cfg.x, pY, cfg.z + cfg.d / 2 + 0.2);
+        campusGroup.add(pFront);
+
+        const pBack = new THREE.Mesh(new THREE.PlaneGeometry(cfg.w + 0.4, pH), parapetMat);
+        pBack.position.set(cfg.x, pY, cfg.z - cfg.d / 2 - 0.2);
+        campusGroup.add(pBack);
+
+        const pLeft = new THREE.Mesh(new THREE.PlaneGeometry(cfg.d + 0.4, pH), parapetMat);
+        pLeft.rotation.y = Math.PI / 2;
+        pLeft.position.set(cfg.x - cfg.w / 2 - 0.2, pY, cfg.z);
+        campusGroup.add(pLeft);
+
+        const pRight = new THREE.Mesh(new THREE.PlaneGeometry(cfg.d + 0.4, pH), parapetMat);
+        pRight.rotation.y = Math.PI / 2;
+        pRight.position.set(cfg.x + cfg.w / 2 + 0.2, pY, cfg.z);
+        campusGroup.add(pRight);
+      });
+
+      // D. 後方八層主醫療大樓與「秀傳」皇冠塔樓
+      const towerTex = createHospitalWallTextures(10, 7, true);
+      const towerMat = new THREE.MeshStandardMaterial({
+        map: towerTex.map,
+        emissive: new THREE.Color(0xffdfa0),
+        emissiveMap: towerTex.emissiveMap,
+        emissiveIntensity: 0.0,
+        roughness: 0.72
+      });
+      nightGlowMaterials.push(towerMat);
+
+      const mainTowerW = 54;
+      const mainTowerD = 20;
+      const mainTowerH = 31.5;
+      const mainTowerX = 3;
+      const mainTowerZ = -33;
+
+      const mainTower = new THREE.Mesh(
+        new THREE.BoxGeometry(mainTowerW, mainTowerH, mainTowerD),
+        [towerMat, towerMat, creamStoneMat, creamStoneMat, towerMat, towerMat]
+      );
+      mainTower.position.set(mainTowerX, mainTowerH / 2, mainTowerZ);
+      mainTower.castShadow = true;
+      mainTower.receiveShadow = true;
+      campusGroup.add(mainTower);
+      addCollider(mainTowerX, mainTowerZ, mainTowerW, mainTowerD, mainTowerH, '八層主醫療大樓');
+
+      const towerCornice = new THREE.Mesh(new THREE.BoxGeometry(mainTowerW + 0.8, 0.7, mainTowerD + 0.8), creamStoneMat);
+      towerCornice.position.set(mainTowerX, mainTowerH + 0.35, mainTowerZ);
+      campusGroup.add(towerCornice);
+
+      const skylight = new THREE.Mesh(new THREE.BoxGeometry(15.5, 7.5, 9.5), rotundaMat);
+      skylight.position.set(-1, 24.5, -22.5);
+      skylight.rotation.x = 0.34;
+      campusGroup.add(skylight);
+
+      const crownTex = createShowChwanCrownTexture();
+      const crownSignMat = new THREE.MeshStandardMaterial({
+        map: crownTex,
+        emissive: new THREE.Color(0xffd23f),
+        emissiveMap: crownTex,
+        emissiveIntensity: 0.45,
+        roughness: 0.35,
+        metalness: 0.3
+      });
+      nightGlowMaterials.push(crownSignMat);
+
+      const crownX = -1.5;
+      const crownZ = -29.5;
+      const crownW = 21;
+      const crownD = 15;
+      const crownH = 5.4;
+      const crownBaseY = mainTowerH + 0.7;
+
+      const crownBottomEave = new THREE.Mesh(new THREE.BoxGeometry(crownW + 3.2, 0.65, crownD + 3.2), darkGreenMetalMat);
+      crownBottomEave.position.set(crownX, crownBaseY + 0.3, crownZ);
+      campusGroup.add(crownBottomEave);
+
+      const crownBox = new THREE.Mesh(
+        new THREE.BoxGeometry(crownW, crownH, crownD),
+        [crownSignMat, crownSignMat, darkGreenMetalMat, darkGreenMetalMat, crownSignMat, crownSignMat]
+      );
+      crownBox.position.set(crownX, crownBaseY + 0.65 + crownH / 2, crownZ);
+      crownBox.castShadow = true;
+      campusGroup.add(crownBox);
+
+      const crownTopEave = new THREE.Mesh(new THREE.BoxGeometry(crownW + 2.8, 0.75, crownD + 2.8), darkGreenMetalMat);
+      crownTopEave.position.set(crownX, crownBaseY + 0.65 + crownH + 0.35, crownZ);
+      campusGroup.add(crownTopEave);
+
+      // E. 右後方階梯狀圓柱磚紅塔樓
+      const rightTowerX = 33.5;
+      const rightTowerZ = -32.5;
+      const rightTowerH = 34.5;
+
+      const rightCylTower = new THREE.Mesh(new THREE.CylinderGeometry(5.6, 6.2, rightTowerH, 24), towerMat);
+      rightCylTower.position.set(rightTowerX, rightTowerH / 2, rightTowerZ);
+      rightCylTower.castShadow = true;
+      campusGroup.add(rightCylTower);
+      addCollider(rightTowerX, rightTowerZ, 11.5, 11.5, rightTowerH, '右後側圓柱塔樓');
+
+      for (let a = 0; a < 8; a++) {
+        const ang = (a / 8) * Math.PI * 2;
+        const rib = new THREE.Mesh(new THREE.BoxGeometry(1.1, rightTowerH - 2, 1.4), terracottaMat);
+        rib.position.set(rightTowerX + Math.cos(ang) * 5.7, (rightTowerH - 2) / 2, rightTowerZ + Math.sin(ang) * 5.7);
+        rib.rotation.y = -ang;
+        campusGroup.add(rib);
+      }
+
+      const rightTowerRoof = new THREE.Mesh(new THREE.CylinderGeometry(7.2, 6.6, 1.1, 32), darkGreenMetalMat);
+      rightTowerRoof.position.set(rightTowerX, rightTowerH + 0.8, rightTowerZ);
+      campusGroup.add(rightTowerRoof);
+
+      const rightTowerNeck = new THREE.Mesh(new THREE.CylinderGeometry(4.6, 4.8, 1.2, 24), creamStoneMat);
+      rightTowerNeck.position.set(rightTowerX, rightTowerH + 0.2, rightTowerZ);
+      campusGroup.add(rightTowerNeck);
+
+      // F. 大門口車道系統
+      const inboundLaneMat = new THREE.MeshStandardMaterial({ map: createDrivewayLaneTexture('up'), roughness: 0.85 });
+      const outboundLaneMat = new THREE.MeshStandardMaterial({ map: createDrivewayLaneTexture('down'), roughness: 0.85 });
+      const porteCochereMat = new THREE.MeshStandardMaterial({ map: createDrivewayLaneTexture('none'), roughness: 0.85 });
+      const dropOffGridMat = new THREE.MeshStandardMaterial({ map: createDropOffZoneTexture(), roughness: 0.82 });
+
+      const westDriveway = new THREE.Mesh(new THREE.PlaneGeometry(7.6, 36.5), inboundLaneMat);
+      westDriveway.rotation.x = -Math.PI / 2;
+      westDriveway.position.set(-21, 0.024, 17.5);
+      westDriveway.receiveShadow = true;
+      campusGroup.add(westDriveway);
+
+      const eastDriveway = new THREE.Mesh(new THREE.PlaneGeometry(7.6, 36.5), outboundLaneMat);
+      eastDriveway.rotation.x = -Math.PI / 2;
+      eastDriveway.position.set(21, 0.024, 17.5);
+      eastDriveway.receiveShadow = true;
+      campusGroup.add(eastDriveway);
+
+      const frontDropLane = new THREE.Mesh(new THREE.PlaneGeometry(49.6, 6.8), porteCochereMat);
+      frontDropLane.rotation.x = -Math.PI / 2;
+      frontDropLane.rotation.z = Math.PI / 2;
+      frontDropLane.position.set(0, 0.025, 1.6);
+      frontDropLane.receiveShadow = true;
+      campusGroup.add(frontDropLane);
+
+      const dropOffGrid = new THREE.Mesh(new THREE.PlaneGeometry(14.5, 6.2), dropOffGridMat);
+      dropOffGrid.rotation.x = -Math.PI / 2;
+      dropOffGrid.position.set(0, 0.029, 1.6);
+      campusGroup.add(dropOffGrid);
+
+      const crosswalkMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
+      for (let cx = -2.4; cx <= 2.4; cx += 0.96) {
+        const stripe = new THREE.Mesh(new THREE.PlaneGeometry(0.48, 6.4), crosswalkMat);
+        stripe.rotation.x = -Math.PI / 2;
+        stripe.position.set(cx, 0.032, 1.6);
+        campusGroup.add(stripe);
+      }
+
+      const hazardCurbTex = createHazardCurbTexture();
+      const hazardCurbMat = new THREE.MeshStandardMaterial({ map: hazardCurbTex, roughness: 0.6 });
+
+      [-16.9, 16.9].forEach((curbX) => {
+        const sideCurb = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.18, 28), hazardCurbMat);
+        sideCurb.position.set(curbX, 0.09, 20.5);
+        campusGroup.add(sideCurb);
+      });
+
+      // G. 中央安全島「彰濱秀傳健康園區」彩繪紀念牆
+      const monumentTex = createMonumentWallTexture();
+      const monumentFrontMat = new THREE.MeshStandardMaterial({ map: monumentTex, roughness: 0.55, metalness: 0.08 });
+
+      const monW = 29;
+      const monH = 4.2;
+      const monD = 1.3;
+      const monZ = 15.0;
+
+      const monBase = new THREE.Mesh(
+        new THREE.BoxGeometry(monW + 0.6, 0.5, monD + 0.5),
+        new THREE.MeshStandardMaterial({ color: 0x5c636a, roughness: 0.85 })
+      );
+      monBase.position.set(0, 0.25, monZ);
+      campusGroup.add(monBase);
+
+      const monWall = new THREE.Mesh(
+        new THREE.BoxGeometry(monW, monH, monD),
+        [creamStoneMat, creamStoneMat, creamStoneMat, creamStoneMat, monumentFrontMat, creamStoneMat]
+      );
+      monWall.position.set(0, 0.5 + monH / 2, monZ);
+      monWall.castShadow = true;
+      monWall.receiveShadow = true;
+      campusGroup.add(monWall);
+      addCollider(0, monZ, monW + 0.4, monD + 0.4, monH + 0.6, '彰濱秀傳健康園區紀念牆');
+
+      // H. 園區現代亮綠色波浪「大樹」公共藝術雕塑
+      const sculptureSpecs = [
+        { x: 27.5, z: 3.5, h: 6.2, color: 0x52c41a },
+        { x: 30.8, z: 6.2, h: 5.4, color: 0x8ce02c },
+        { x: 33.5, z: 3.2, h: 4.8, color: 0x73d13d },
+        { x: 36.5, z: 5.5, h: 6.6, color: 0x389e0d },
+        { x: 39.2, z: 8.5, h: 4.4, color: 0xa0d911 }
+      ];
+
+      sculptureSpecs.forEach((sc, idx) => {
+        const treeArt = new THREE.Group();
+        const artMat = new THREE.MeshStandardMaterial({ color: sc.color, roughness: 0.35, metalness: 0.2 });
+
+        const dir = idx % 2 === 0 ? 1 : -1;
+        const curve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(0, 0, 0),
+          new THREE.Vector3(0.35 * dir, sc.h * 0.32, 0.15),
+          new THREE.Vector3(-0.3 * dir, sc.h * 0.66, -0.15),
+          new THREE.Vector3(0.1 * dir, sc.h, 0)
+        ]);
+        const trunk = new THREE.Mesh(new THREE.TubeGeometry(curve, 16, 0.16, 8, false), artMat);
+        trunk.castShadow = true;
+        treeArt.add(trunk);
+
+        const crownRadius = sc.h * 0.24;
+        const outerCrown = new THREE.Mesh(
+          new THREE.IcosahedronGeometry(crownRadius, 1),
+          new THREE.MeshStandardMaterial({ color: sc.color, wireframe: true, emissive: sc.color, emissiveIntensity: 0.12 })
+        );
+        outerCrown.position.set(0.1 * dir, sc.h + crownRadius * 0.65, 0);
+        treeArt.add(outerCrown);
+
+        const innerCrown = new THREE.Mesh(new THREE.DodecahedronGeometry(crownRadius * 0.65, 0), artMat);
+        innerCrown.position.copy(outerCrown.position);
+        innerCrown.castShadow = true;
+        treeArt.add(innerCrown);
+
+        treeArt.position.set(sc.x, 0, sc.z);
+        campusGroup.add(treeArt);
+        addCollider(sc.x, sc.z, 0.7, 0.7, sc.h, '綠色藝術樹雕塑');
+      });
+
+      // I. 綠籬與停車場
+      const hedgeMat = new THREE.MeshStandardMaterial({ color: 0x2b6e32, roughness: 0.88 });
+      const frontHedge1 = new THREE.Mesh(new THREE.BoxGeometry(22, 1.0, 2.2), hedgeMat);
+      frontHedge1.position.set(0, 0.5, 29.5);
+      frontHedge1.castShadow = true;
+      campusGroup.add(frontHedge1);
+      addCollider(0, 29.5, 22, 2.2, 1.1, '中央安全島綠籬');
+
+      const stallLineMat = new THREE.MeshBasicMaterial({ color: 0xe2e8f0 });
+      for (let sx = -44; sx <= 44; sx += 3.5) {
+        if (Math.abs(sx) < 26) continue;
+        const line = new THREE.Mesh(new THREE.PlaneGeometry(0.14, 4.8), stallLineMat);
+        line.rotation.x = -Math.PI / 2;
+        line.position.set(sx, 0.03, 24.5);
+        campusGroup.add(line);
+      }
+
+      const parkedCarSpecs = [
+        { x: -39.5, z: 24.5, color: 0x1e293b, type: 'sedan', yaw: 0 },
+        { x: -32.5, z: 24.5, color: 0x2563eb, type: 'truck', yaw: 0 },
+        { x: 29.5, z: 24.5, color: 0xdc2626, type: 'sedan', yaw: 0 },
+        { x: 36.5, z: 24.5, color: 0xf8fafc, type: 'sedan', yaw: 0 },
+        { x: -36.5, z: 6.5, color: 0xfef08a, type: 'bus', yaw: Math.PI / 2 }
+      ];
+      parkedCarSpecs.forEach((pc) => {
+        const staticMesh = createSimpleParkedVehicle(pc.color, pc.type);
+        staticMesh.position.set(pc.x, 0, pc.z);
+        staticMesh.rotation.y = pc.yaw;
+        campusGroup.add(staticMesh);
+        const bw = pc.type === 'bus' ? 8.5 : 2.1;
+        const bd = pc.type === 'bus' ? 2.5 : 4.5;
+        addCollider(pc.x, pc.z, bw, bd, 2.8, '停放車輛');
+      });
+
+      // J. 園區前方主幹道與外圍道路
+      const roadTex = createRoadTexture();
+      const roadMat = new THREE.MeshStandardMaterial({ map: roadTex, roughness: 0.85 });
+
+      const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(24, 340), roadMat);
+      mainRoad.rotation.x = -Math.PI / 2;
+      mainRoad.rotation.z = Math.PI / 2;
+      mainRoad.position.set(0, 0.02, 46);
+      mainRoad.receiveShadow = true;
+      campusGroup.add(mainRoad);
+
+      [-75, 75].forEach((rx) => {
+        const sideRoad = new THREE.Mesh(new THREE.PlaneGeometry(18, 260), roadMat);
+        sideRoad.rotation.x = -Math.PI / 2;
+        sideRoad.position.set(rx, 0.02, -10);
+        sideRoad.receiveShadow = true;
+        campusGroup.add(sideRoad);
+      });
+
+      [-44, 44].forEach((mx) => {
+        const medianIsland = new THREE.Mesh(new THREE.BoxGeometry(34, 0.32, 3.2), hazardCurbMat);
+        medianIsland.position.set(mx, 0.16, 46);
+        medianIsland.receiveShadow = true;
+        campusGroup.add(medianIsland);
+
+        const medianGrass = new THREE.Mesh(new THREE.BoxGeometry(33.2, 0.36, 2.4), hedgeMat);
+        medianGrass.position.set(mx, 0.19, 46);
+        campusGroup.add(medianGrass);
+      });
+
+      // K. 園區路燈與周邊城市街區剪影
+      const poleMat = new THREE.MeshStandardMaterial({ color: 0x1e3a34, metalness: 0.6, roughness: 0.4 });
+      const bulbMat = new THREE.MeshStandardMaterial({ color: 0xfff3c4, emissive: 0xffd166, emissiveIntensity: 0.0 });
+      nightGlowMaterials.push(bulbMat);
+
+      const lampCoords = [
+        [-26, 33], [-15, 33], [15, 33], [26, 33],
+        [-26, 12], [26, 12], [-58, 33], [58, 33]
+      ];
+      lampCoords.forEach(([lx, lz], idx) => {
+        const lamp = new THREE.Group();
+        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.16, 7.2, 8), poleMat);
+        pole.position.y = 3.6;
+        const arm = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 1.6), poleMat);
+        arm.position.set(0, 7.1, 0.7);
+        const bulb = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.14, 0.65), bulbMat);
+        bulb.position.set(0, 7.0, 1.35);
+        lamp.add(pole, arm, bulb);
+        lamp.position.set(lx, 0, lz);
+        campusGroup.add(lamp);
+        streetLampBulbs.push(bulb);
+
+        if (idx < 4) {
+          const pLight = new THREE.PointLight(0xffcf70, 0, 24, 1.6);
+          pLight.position.set(lx, 6.6, lz + 1.3);
+          campusGroup.add(pLight);
+          streetLampLights.push(pLight);
+        }
+      });
+
+      const bgBuildingColors = [0x94a3b8, 0xb8a99a, 0x7c8b99, 0xa89f91];
+      for (let i = 0; i < 24; i++) {
+        const angle = (i / 24) * Math.PI * 2;
+        const dist = 115 + (i % 4) * 22;
+        const bx = Math.cos(angle) * dist;
+        const bz = Math.sin(angle) * dist - 15;
+        if (Math.abs(bx) < 45 && bz > 35) continue;
+
+        const bw = 14 + (i % 3) * 8;
+        const bd = 14 + ((i + 1) % 3) * 7;
+        const bh = 10 + (i % 5) * 6;
+        const bMesh = new THREE.Mesh(
+          new THREE.BoxGeometry(bw, bh, bd),
+          new THREE.MeshStandardMaterial({ color: bgBuildingColors[i % bgBuildingColors.length], roughness: 0.85 })
+        );
+        bMesh.position.set(bx, bh / 2, bz);
+        campusGroup.add(bMesh);
+      }
+
+      scene.add(campusGroup);
+    }
+
+    // --------------------------------------------------------------------------
+    // 5. 建構圓弧有機 3D 可操控角色 (支援 8 種身分服裝與配件即時切換)
+    // --------------------------------------------------------------------------
+    function createPlayableCharacter() {
+      const charGroup = new THREE.Group();
+      const upperBodyGroup = new THREE.Group();
+      upperBodyGroup.position.set(0, 0.78, 0);
+      charGroup.add(upperBodyGroup);
+
+      const skinMat = new THREE.MeshStandardMaterial({ color: 0xf1c29b, roughness: 0.55 });
+      const hairMat = new THREE.MeshStandardMaterial({ color: 0x1e1b18, roughness: 0.72 });
+      const jacketMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.48 });
+      const teeMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.65 });
+      const pantsMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.68 });
+      const shoeMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.42 });
+      const soleMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.75 });
+      const beltMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4, metalness: 0.3 });
+      const buckleMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.2, metalness: 0.88 });
+      const shadesMat = new THREE.MeshStandardMaterial({ color: 0x090d16, metalness: 0.85, roughness: 0.08 });
+      const badgeMat = new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x10b981, emissiveIntensity: 0.35, roughness: 0.3 });
+
+      player.materials = { jacketMat, teeMat, pantsMat, badgeMat };
+
+      const torsoProfile = [
+        new THREE.Vector2(0.00, -0.07),
+        new THREE.Vector2(0.14, -0.06),
+        new THREE.Vector2(0.22, -0.01),
+        new THREE.Vector2(0.21, 0.08),
+        new THREE.Vector2(0.205, 0.18),
+        new THREE.Vector2(0.235, 0.36),
+        new THREE.Vector2(0.255, 0.52),
+        new THREE.Vector2(0.21, 0.61),
+        new THREE.Vector2(0.11, 0.65),
+        new THREE.Vector2(0.00, 0.66)
+      ];
+      const torsoGeom = new THREE.LatheGeometry(torsoProfile, 28);
+      torsoGeom.computeVertexNormals();
+      const torso = new THREE.Mesh(torsoGeom, jacketMat);
+      torso.scale.set(1.18, 1.0, 0.72);
+      torso.castShadow = true;
+      torso.receiveShadow = true;
+      upperBodyGroup.add(torso);
+
+      const innerTee = new THREE.Mesh(
+        new THREE.SphereGeometry(0.145, 20, 16, 0, Math.PI, 0, Math.PI * 0.65),
+        teeMat
+      );
+      innerTee.position.set(0, 0.52, 0.09);
+      innerTee.scale.set(0.88, 1.15, 0.68);
+      upperBodyGroup.add(innerTee);
+
+      const collarRing = new THREE.Mesh(new THREE.TorusGeometry(0.125, 0.032, 12, 24), jacketMat);
+      collarRing.rotation.x = Math.PI / 2 + 0.16;
+      collarRing.position.set(0, 0.63, 0.01);
+      collarRing.scale.set(1.1, 0.92, 1.0);
+      upperBodyGroup.add(collarRing);
+
+      const zipper = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.48, 8), buckleMat);
+      zipper.position.set(0, 0.24, 0.162);
+      zipper.rotation.x = -0.05;
+      upperBodyGroup.add(zipper);
+
+      // 胸前識別證吊牌
+      const idBadge = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.10, 0.015), badgeMat);
+      idBadge.position.set(0.11, 0.42, 0.178);
+      idBadge.rotation.y = 0.25;
+      upperBodyGroup.add(idBadge);
+
+      // 醫師 / 救護員專屬 3D 聽診器配件
+      const stethoscopeGroup = new THREE.Group();
+      const stethTube = new THREE.Mesh(
+        new THREE.TorusGeometry(0.145, 0.014, 8, 22, Math.PI * 1.15),
+        new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 })
+      );
+      stethTube.rotation.x = Math.PI * 0.45;
+      stethTube.rotation.z = -Math.PI * 0.08;
+      stethTube.position.set(0, 0.58, 0.04);
+      const stethHead = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.028, 0.028, 0.016, 14),
+        buckleMat
+      );
+      stethHead.rotation.x = Math.PI / 2;
+      stethHead.position.set(-0.08, 0.43, 0.185);
+      stethoscopeGroup.add(stethTube, stethHead);
+      stethoscopeGroup.visible = false;
+      upperBodyGroup.add(stethoscopeGroup);
+
+      const belt = new THREE.Mesh(new THREE.TorusGeometry(0.205, 0.022, 10, 28), beltMat);
+      belt.rotation.x = Math.PI / 2;
+      belt.position.set(0, 0.02, 0);
+      belt.scale.set(1.14, 0.74, 1.0);
+      upperBodyGroup.add(belt);
+
+      const buckle = new THREE.Mesh(new THREE.SphereGeometry(0.028, 12, 10), buckleMat);
+      buckle.scale.set(1.2, 0.85, 0.55);
+      buckle.position.set(0, 0.02, 0.158);
+      upperBodyGroup.add(buckle);
+
+      // 頭部群組
+      const headGroup = new THREE.Group();
+      headGroup.position.set(0, 0.69, 0.01);
+      upperBodyGroup.add(headGroup);
+
+      const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.078, 0.092, 0.16, 18), skinMat);
+      neck.position.set(0, 0.0, 0);
+      neck.castShadow = true;
+      headGroup.add(neck);
+
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.185, 26, 22), skinMat);
+      head.scale.set(0.92, 1.08, 0.98);
+      head.position.set(0, 0.20, 0);
+      head.castShadow = true;
+      headGroup.add(head);
+
+      const nose = new THREE.Mesh(new THREE.SphereGeometry(0.024, 12, 10), skinMat);
+      nose.scale.set(0.85, 1.15, 1.2);
+      nose.position.set(0, 0.18, 0.178);
+      headGroup.add(nose);
+
+      [-0.172, 0.172].forEach((ex) => {
+        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.036, 12, 10), skinMat);
+        ear.scale.set(0.55, 1.05, 0.82);
+        ear.position.set(ex, 0.19, -0.01);
+        headGroup.add(ear);
+      });
+
+      const hairDome = new THREE.Mesh(
+        new THREE.SphereGeometry(0.196, 26, 20, 0, Math.PI * 2, 0, Math.PI * 0.62),
+        hairMat
+      );
+      hairDome.scale.set(0.95, 1.08, 1.02);
+      hairDome.position.set(0, 0.215, -0.015);
+      hairDome.rotation.x = -0.24;
+      hairDome.castShadow = true;
+      headGroup.add(hairDome);
+
+      const hairQuiff = new THREE.Mesh(new THREE.SphereGeometry(0.088, 16, 14), hairMat);
+      hairQuiff.scale.set(1.45, 0.65, 1.15);
+      hairQuiff.position.set(0, 0.365, 0.065);
+      hairQuiff.rotation.x = 0.25;
+      headGroup.add(hairQuiff);
+
+      // 眼鏡 / 護目鏡群組
+      const glassesGroup = new THREE.Group();
+      [-0.068, 0.068].forEach((sx) => {
+        const sign = Math.sign(sx);
+        const lens = new THREE.Mesh(new THREE.SphereGeometry(0.056, 16, 14), shadesMat);
+        lens.scale.set(1.12, 0.78, 0.35);
+        lens.position.set(sx, 0.22, 0.162);
+        lens.rotation.y = sign * 0.22;
+        glassesGroup.add(lens);
+
+        const temple = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.16, 8), shadesMat);
+        temple.rotation.x = Math.PI / 2;
+        temple.rotation.y = -sign * 0.15;
+        temple.position.set(sx + sign * 0.068, 0.225, 0.085);
+        glassesGroup.add(temple);
+      });
+      const noseBridge = new THREE.Mesh(new THREE.TorusGeometry(0.024, 0.007, 8, 14, Math.PI), buckleMat);
+      noseBridge.position.set(0, 0.225, 0.174);
+      glassesGroup.add(noseBridge);
+      headGroup.add(glassesGroup);
+
+      const armCapsuleGeom = createSmoothCapsuleGeometry(0.076, 0.38, 10, 18);
+
+      function buildRoundedArm(sideSign) {
+        const armPivot = new THREE.Group();
+        armPivot.position.set(sideSign * 0.335, 0.55, 0);
+
+        const shoulderCap = new THREE.Mesh(new THREE.SphereGeometry(0.096, 16, 14), jacketMat);
+        shoulderCap.castShadow = true;
+        armPivot.add(shoulderCap);
+
+        const sleeve = new THREE.Mesh(armCapsuleGeom, jacketMat);
+        sleeve.position.y = -0.23;
+        sleeve.castShadow = true;
+        armPivot.add(sleeve);
+
+        const cuff = new THREE.Mesh(new THREE.TorusGeometry(0.076, 0.015, 10, 18), jacketMat);
+        cuff.rotation.x = Math.PI / 2;
+        cuff.position.y = -0.43;
+        armPivot.add(cuff);
+
+        const hand = new THREE.Mesh(new THREE.SphereGeometry(0.068, 16, 14), skinMat);
+        hand.scale.set(0.82, 1.18, 0.94);
+        hand.position.set(0, -0.51, 0.01);
+        hand.castShadow = true;
+        armPivot.add(hand);
+
+        return armPivot;
+      }
+
+      const leftArmPivot = buildRoundedArm(-1);
+      const rightArmPivot = buildRoundedArm(1);
+      upperBodyGroup.add(leftArmPivot, rightArmPivot);
+
+      // 資訊工程師 / 醫檢師專屬智慧筆電
+      const laptopGroup = new THREE.Group();
+      const laptopBase = new THREE.Mesh(
+        new THREE.BoxGeometry(0.04, 0.24, 0.32),
+        new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.7, roughness: 0.25 })
+      );
+      const laptopGlow = new THREE.Mesh(
+        new THREE.BoxGeometry(0.045, 0.03, 0.26),
+        new THREE.MeshBasicMaterial({ color: 0x38bdf8 })
+      );
+      laptopGlow.position.y = 0.08;
+      laptopGroup.add(laptopBase, laptopGlow);
+      laptopGroup.position.set(-0.07, -0.46, 0.05);
+      leftArmPivot.add(laptopGroup);
+
+      // 患者專屬住院識別手環
+      const wristband = new THREE.Mesh(
+        new THREE.TorusGeometry(0.072, 0.014, 8, 16),
+        new THREE.MeshStandardMaterial({ color: 0xf43f5e, emissive: 0xf43f5e, emissiveIntensity: 0.3 })
+      );
+      wristband.rotation.x = Math.PI / 2;
+      wristband.position.y = -0.45;
+      wristband.visible = false;
+      rightArmPivot.add(wristband);
+
+      player.accessories = {
+        glassesGroup,
+        stethoscopeGroup,
+        laptopGroup,
+        wristband,
+        idBadge
+      };
+
+      const legCapsuleGeom = createSmoothCapsuleGeometry(0.094, 0.46, 10, 18);
+      const shoeUpperGeom = createSmoothCapsuleGeometry(0.088, 0.14, 10, 16);
+      const shoeSoleGeom = createSmoothCapsuleGeometry(0.094, 0.15, 10, 16);
+
+      function buildRoundedLeg(sideSign) {
+        const legPivot = new THREE.Group();
+        legPivot.position.set(sideSign * 0.145, 0.74, 0);
+
+        const hipCap = new THREE.Mesh(new THREE.SphereGeometry(0.10, 16, 14), pantsMat);
+        hipCap.castShadow = true;
+        legPivot.add(hipCap);
+
+        const legMesh = new THREE.Mesh(legCapsuleGeom, pantsMat);
+        legMesh.position.y = -0.28;
+        legMesh.castShadow = true;
+        legPivot.add(legMesh);
+
+        const ankleCuff = new THREE.Mesh(new THREE.TorusGeometry(0.092, 0.015, 10, 18), pantsMat);
+        ankleCuff.rotation.x = Math.PI / 2;
+        ankleCuff.position.y = -0.53;
+        legPivot.add(ankleCuff);
+
+        const shoeUpper = new THREE.Mesh(shoeUpperGeom, shoeMat);
+        shoeUpper.rotation.x = Math.PI / 2;
+        shoeUpper.scale.set(1.02, 1.0, 0.72);
+        shoeUpper.position.set(0, -0.66, 0.045);
+        shoeUpper.castShadow = true;
+        legPivot.add(shoeUpper);
+
+        const shoeSole = new THREE.Mesh(shoeSoleGeom, soleMat);
+        shoeSole.rotation.x = Math.PI / 2;
+        shoeSole.scale.set(1.06, 1.04, 0.32);
+        shoeSole.position.set(0, -0.71, 0.045);
+        legPivot.add(shoeSole);
+
+        return legPivot;
+      }
+
+      const leftLegPivot = buildRoundedLeg(-1);
+      const rightLegPivot = buildRoundedLeg(1);
+      charGroup.add(leftLegPivot, rightLegPivot);
+
+      charGroup.position.copy(player.pos);
+      scene.add(charGroup);
+
+      player.mesh = charGroup;
+      player.headGroup = headGroup;
+      player.upperBodyGroup = upperBodyGroup;
+      player.leftArm = leftArmPivot;
+      player.rightArm = rightArmPivot;
+      player.leftLeg = leftLegPivot;
+      player.rightLeg = rightLegPivot;
+    }
+
+    // 即時套用選擇的角色身分外觀與數值
+    function applyCharacterRole(roleId) {
+      const role = CHARACTER_ROLES.find((r) => r.id === roleId) || CHARACTER_ROLES[0];
+      gameState.selectedRoleId = role.id;
+      gameState.cash = role.cash;
+      gameState.health = role.health;
+      gameState.armor = role.armor;
+
+      if (player.materials && player.materials.jacketMat) {
+        player.materials.jacketMat.color.setHex(role.jacketColor);
+        player.materials.teeMat.color.setHex(role.teeColor);
+        player.materials.pantsMat.color.setHex(role.pantsColor);
+        player.materials.badgeMat.color.setHex(role.badgeColor);
+        player.materials.badgeMat.emissive.setHex(role.badgeColor);
+      }
+
+      if (player.accessories) {
+        player.accessories.glassesGroup.visible = !!role.hasGlasses;
+        player.accessories.stethoscopeGroup.visible = !!role.hasStethoscope;
+        player.accessories.laptopGroup.visible = !!role.hasLaptop;
+        player.accessories.wristband.visible = !!role.hasWristband;
+        player.accessories.idBadge.visible = role.id !== 'patient';
+      }
+
+      // 更新左側開啟選單顯示
+      document.getElementById('selected-role-pill').textContent = `${role.icon} ${role.name}`;
+      document.getElementById('role-detail-title').textContent = `${role.icon} ${role.name} (${role.en})`;
+      document.getElementById('role-detail-cash').textContent = `$${String(role.cash).padStart(7, '0')}`;
+      document.getElementById('role-detail-desc').textContent = role.desc;
+      document.getElementById('role-detail-gear').textContent = role.gear;
+      document.getElementById('role-detail-armor').textContent = `${role.armor}%`;
+
+      // 更新遊戲中右上角 HUD 數值
+      document.getElementById('hud-cash').textContent = `$${String(role.cash).padStart(7, '0')}`;
+      document.getElementById('hud-health-bar').style.width = `${role.health}%`;
+      document.getElementById('hud-armor-bar').style.width = `${role.armor}%`;
+      document.getElementById('hud-role-badge').textContent = `${role.icon} ${role.name}`;
+
+      // 高亮選中的角色卡片
+      document.querySelectorAll('.role-card-btn').forEach((btn) => {
+        const active = btn.dataset.roleId === role.id;
+        btn.className = active
+          ? 'role-card-btn p-2.5 rounded-xl bg-emerald-600/35 border-2 border-emerald-400 text-left transition shadow-lg'
+          : 'role-card-btn p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition';
+      });
+
+      // 右下角狀態同步回饋
+      if (!gameState.started) {
+        setBottomRightLoader({
+          visible: true,
+          title: `已切換：${role.name}`,
+          subtitle: `3D 角色外觀與醫療大樓背景已同步`,
+          percent: 100,
+          spinning: false
+        });
+      }
+    }
+
+    function createDrivableVehicles() {
+      const ambBuilt = createAmbulanceMesh();
+      ambBuilt.group.position.set(-10.5, 0, 1.6);
+      ambBuilt.group.rotation.y = Math.PI / 2;
+      scene.add(ambBuilt.group);
+
+      vehicles.push({
+        name: '秀傳醫療救護車',
+        isAmbulance: true,
+        mesh: ambBuilt.group,
+        wheels: ambBuilt.wheels,
+        frontWheelPivots: ambBuilt.frontWheelPivots,
+        pos: ambBuilt.group.position,
+        yaw: Math.PI / 2,
+        speed: 0,
+        maxSpeed: 26,
+        accel: 18,
+        turnSpeed: 2.3,
+        halfW: 1.2,
+        halfD: 2.6,
+        redBeacon: ambBuilt.redBeacon,
+        blueBeacon: ambBuilt.blueBeacon,
+        redSirenLight: ambBuilt.redSirenLight,
+        blueSirenLight: ambBuilt.blueSirenLight
+      });
+
+      const sedanBuilt = createSportsSedanMesh(0x38bdf8);
+      sedanBuilt.group.position.set(21.0, 0, 22.0);
+      sedanBuilt.group.rotation.y = Math.PI;
+      scene.add(sedanBuilt.group);
+
+      vehicles.push({
+        name: '彰濱 GT 運動房車',
+        isAmbulance: false,
+        mesh: sedanBuilt.group,
+        wheels: sedanBuilt.wheels,
+        frontWheelPivots: sedanBuilt.frontWheelPivots,
+        pos: sedanBuilt.group.position,
+        yaw: Math.PI,
+        speed: 0,
+        maxSpeed: 34,
+        accel: 25,
+        turnSpeed: 2.7,
+        halfW: 1.05,
+        halfD: 2.35
+      });
+    }
+
+    // --------------------------------------------------------------------------
+    // 6. 碰撞檢測與大門口自動進入 1F.html
+    // --------------------------------------------------------------------------
+    function checkCollisionXZ(x, z, radius, yBottom = 0) {
+      for (let i = 0; i < colliders.length; i++) {
+        const box = colliders[i];
+        if (yBottom >= box.maxY) continue;
+        if (
+          x + radius > box.minX &&
+          x - radius < box.maxX &&
+          z + radius > box.minZ &&
+          z - radius < box.maxZ
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function triggerEnterLobby1F() {
+      if (mainEntrance.isTransitioning) return;
+      mainEntrance.isTransitioning = true;
+
+      if (document.pointerLockElement) {
+        document.exitPointerLock();
+      }
+
+      const overlay = document.getElementById('enter-lobby-overlay');
+      overlay.classList.remove('hidden');
+      overlay.classList.add('flex');
+      requestAnimationFrame(() => {
+        overlay.classList.remove('opacity-0');
+      });
+
+      setTimeout(() => {
+        window.location.href = '1F.html';
+      }, 360);
+    }
+
+    // --------------------------------------------------------------------------
+    // 7. 日夜環境與光影系統 (開啟畫面與遊戲中即時同步)
+    // --------------------------------------------------------------------------
+    function applyTimeOfDay(mode) {
+      gameState.timeOfDay = mode;
+
+      document.querySelectorAll('.time-btn').forEach((btn) => {
+        const active = btn.dataset.time === mode;
+        btn.className = active
+          ? 'time-btn flex-1 py-1 text-xs font-bold rounded-md bg-amber-500 text-slate-950 transition'
+          : 'time-btn flex-1 py-1 text-xs font-bold rounded-md text-slate-300 hover:bg-white/10 transition';
+      });
+
+      document.querySelectorAll('.lobby-time-btn').forEach((btn) => {
+        const active = btn.dataset.time === mode;
+        btn.className = active
+          ? 'lobby-time-btn flex-1 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 transition'
+          : 'lobby-time-btn flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-300 hover:bg-white/10 transition';
+      });
+
+      if (mode === 'day') {
+        scene.background = new THREE.Color(0x6db3eb);
+        scene.fog = new THREE.FogExp2(0x8ec5f0, 0.0028);
+        sunLight.color.setHex(0xfff6e5);
+        sunLight.intensity = 1.35;
+        sunLight.position.set(55, 85, 65);
+        hemiLight.color.setHex(0xbbe3ff);
+        hemiLight.groundColor.setHex(0x4d6b47);
+        hemiLight.intensity = 0.75;
+        nightGlowMaterials.forEach((m) => (m.emissiveIntensity = 0.08));
+        streetLampLights.forEach((l) => (l.intensity = 0));
+        gameState.clockMinutes = 14 * 60 + 30;
+      } else if (mode === 'dusk') {
+        scene.background = new THREE.Color(0xd9734e);
+        scene.fog = new THREE.FogExp2(0xc96b53, 0.0036);
+        sunLight.color.setHex(0xff944d);
+        sunLight.intensity = 1.05;
+        sunLight.position.set(-75, 28, 45);
+        hemiLight.color.setHex(0xffb380);
+        hemiLight.groundColor.setHex(0x2d3548);
+        hemiLight.intensity = 0.55;
+        nightGlowMaterials.forEach((m) => (m.emissiveIntensity = 0.65));
+        streetLampLights.forEach((l) => (l.intensity = 1.2));
+        gameState.clockMinutes = 17 * 60 + 50;
+      } else if (mode === 'night') {
+        scene.background = new THREE.Color(0x0b1526);
+        scene.fog = new THREE.FogExp2(0x0b1526, 0.0045);
+        sunLight.color.setHex(0x6b93d6);
+        sunLight.intensity = 0.32;
+        sunLight.position.set(-40, 65, -40);
+        hemiLight.color.setHex(0x2b4570);
+        hemiLight.groundColor.setHex(0x111827);
+        hemiLight.intensity = 0.42;
+        nightGlowMaterials.forEach((m) => (m.emissiveIntensity = 1.15));
+        streetLampLights.forEach((l) => (l.intensity = 2.2));
+        gameState.clockMinutes = 21 * 60 + 15;
+      }
+    }
+
+    // --------------------------------------------------------------------------
+    // 8. 提示訊息、出發位置與載具上下車互動
+    // --------------------------------------------------------------------------
+    let toastTimeout = null;
+    function showToast(msg) {
+      const el = document.getElementById('toast-banner');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        el.classList.add('hidden');
+      }, 2600);
+    }
+
+    function applySpawnLocation(spawnKey) {
+      gameState.selectedSpawn = spawnKey;
+
+      document.querySelectorAll('.spawn-btn').forEach((btn) => {
+        const active = btn.dataset.spawn === spawnKey;
+        btn.className = active
+          ? 'spawn-btn py-2 px-2 rounded-xl bg-emerald-600/80 border border-emerald-300/60 text-xs font-bold text-white text-center transition'
+          : 'spawn-btn py-2 px-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 text-center transition';
+      });
+
+      if (player.inVehicle) toggleVehicleEnterExit();
+
+      if (spawnKey === 'entrance') {
+        player.pos.set(gameState.started ? 0 : 2.2, 0, 9.2);
+        player.yaw = gameState.started ? Math.PI : 0.25;
+        camState.targetYaw = 0;
+        camState.targetPitch = 0.23;
+      } else if (spawnKey === 'ambulance') {
+        const amb = vehicles[0];
+        player.pos.set(amb.pos.x, 0, amb.pos.z + 3.4);
+        player.yaw = gameState.started ? Math.PI : 0.25;
+        camState.targetYaw = 0.22;
+        camState.targetPitch = 0.23;
+      } else if (spawnKey === 'monument') {
+        player.pos.set(gameState.started ? 0 : 2.2, 0, 21.5);
+        player.yaw = gameState.started ? Math.PI : 0.25;
+        camState.targetYaw = 0;
+        camState.targetPitch = 0.24;
+      }
+      player.mesh.position.copy(player.pos);
+      player.mesh.rotation.y = player.yaw;
+    }
+
+    function cycleCameraPreset() {
+      camState.presetIndex = (camState.presetIndex + 1) % camPresets.length;
+      const preset = camPresets[camState.presetIndex];
+      camState.targetDistance = preset.dist;
+      camState.targetShoulderOffset = preset.shoulder;
+      camState.targetPitch = preset.pitch;
+      showToast(`📷 切換第三人稱視角：${preset.name}`);
+    }
+
+    function toggleVehicleEnterExit() {
+      if (!gameState.started) return;
+
+      if (player.inVehicle) {
+        const v = player.inVehicle;
+        const sideSign = Math.cos(v.yaw) >= 0 ? -1 : 1;
+        const exitOffsetX = Math.cos(v.yaw) * 2.1 * sideSign;
+        const exitOffsetZ = -Math.sin(v.yaw) * 2.1 * sideSign;
+        player.pos.set(v.pos.x + exitOffsetX, 0, v.pos.z + exitOffsetZ);
+        player.yaw = v.yaw;
+        player.mesh.visible = true;
+        player.inVehicle = null;
+        const preset = camPresets[camState.presetIndex];
+        camState.targetDistance = preset.dist;
+        camState.targetShoulderOffset = preset.shoulder;
+
+        document.getElementById('hud-mode-badge').textContent = '步行探索中';
+        document.getElementById('hud-mode-badge').className =
+          'mt-1 px-2.5 py-1 rounded-full bg-black/70 border border-white/15 text-xs font-bold text-amber-300';
+        showToast(`已離開 ${v.name}`);
+        return;
+      }
+
+      let nearest = null;
+      let minDist = 4.8;
+      vehicles.forEach((v) => {
+        const d = player.pos.distanceTo(v.pos);
+        if (d < minDist) {
+          minDist = d;
+          nearest = v;
+        }
+      });
+
+      if (nearest) {
+        player.inVehicle = nearest;
+        player.mesh.visible = false;
+        camState.isRightAiming = false;
+        camState.targetDistance = 12.2;
+        camState.targetShoulderOffset = 0;
+        camState.mouseIdleTime = 2.0;
+        document.getElementById('hud-mode-badge').textContent = `駕駛中：${nearest.name}`;
+        document.getElementById('hud-mode-badge').className =
+          'mt-1 px-2.5 py-1 rounded-full bg-emerald-950/85 border border-emerald-400/40 text-xs font-bold text-emerald-300';
+        showToast(`正在駕駛 ${nearest.name}${nearest.isAmbulance ? '（按 Q 切換警燈）' : ''}`);
+      }
+    }
+
+    function normalizeAngle(rad) {
+      while (rad > Math.PI) rad -= Math.PI * 2;
+      while (rad < -Math.PI) rad += Math.PI * 2;
+      return rad;
+    }
+
+    // --------------------------------------------------------------------------
+    // 9. 每幀物理與開啟畫面同步醫療大樓背景鏡頭更新
+    // --------------------------------------------------------------------------
+    function updateSimulation(dt) {
+      gameState.clockMinutes = (gameState.clockMinutes + dt * 2) % (24 * 60);
+      const hh = String(Math.floor(gameState.clockMinutes / 60)).padStart(2, '0');
+      const mm = String(Math.floor(gameState.clockMinutes % 60)).padStart(2, '0');
+      document.getElementById('hud-clock').textContent = `${hh}:${mm}`;
+
+      sirenTimer += dt * 10;
+      vehicles.forEach((v) => {
+        if (!v.isAmbulance) return;
+        if (ambulanceSirenOn) {
+          const redFlash = Math.sin(sirenTimer) > 0;
+          v.redBeacon.material.emissiveIntensity = redFlash ? 2.5 : 0.15;
+          v.blueBeacon.material.emissiveIntensity = !redFlash ? 2.5 : 0.15;
+          v.redSirenLight.intensity = redFlash ? 2.8 : 0;
+          v.blueSirenLight.intensity = !redFlash ? 2.8 : 0;
+        } else {
+          v.redBeacon.material.emissiveIntensity = 0.1;
+          v.blueBeacon.material.emissiveIntensity = 0.1;
+          v.redSirenLight.intensity = 0;
+          v.blueSirenLight.intensity = 0;
+        }
+      });
+
+      if (mainEntrance.sensorRing) {
+        const pulse = 1 + Math.sin(sirenTimer * 0.45) * 0.08;
+        mainEntrance.sensorRing.scale.set(pulse, pulse, 1);
+      }
+
+      // ----------------------------------------------------------------------
+      // 開啟畫面模式：左手邊為統一選單，右側畫面同步展示 3D 角色與背後醫療大樓
+      // ----------------------------------------------------------------------
+      if (!gameState.started) {
+        gameState.previewOrbitAngle += dt * 0.22;
+        const swayX = Math.sin(gameState.previewOrbitAngle) * 2.2;
+
+        player.mesh.visible = true;
+        player.mesh.position.set(player.pos.x, 0, player.pos.z);
+        player.mesh.rotation.y = 0.34 + Math.sin(gameState.previewOrbitAngle * 0.9) * 0.14;
+
+        const breathe = Math.sin(sirenTimer * 0.25) * 0.03;
+        player.leftArm.rotation.x = breathe;
+        player.rightArm.rotation.x = -breathe;
+        player.leftLeg.rotation.x = 0;
+        player.rightLeg.rotation.x = 0;
+
+        if (gameState.previewCamMode === 'character') {
+          // 構圖偏移讓左側 430px 選單不遮擋角色，同時完整帶出背後「秀傳」醫療大樓
+          const desiredCamPos = new THREE.Vector3(player.pos.x - 1.75 + swayX * 0.35, 2.25, player.pos.z + 5.1);
+          const desiredLookAt = new THREE.Vector3(player.pos.x - 1.55, 3.4, -18.0);
+          camera.position.lerp(desiredCamPos, Math.min(1, dt * 4));
+          camState.targetPos.lerp(desiredLookAt, Math.min(1, dt * 4));
+          camera.lookAt(camState.targetPos);
+        } else {
+          // 醫療大樓全景環繞模式
+          const desiredCamPos = new THREE.Vector3(-6.0 + swayX * 4.5, 9.5 + Math.cos(gameState.previewOrbitAngle) * 1.2, 31.0);
+          const desiredLookAt = new THREE.Vector3(-4.5, 11.0, -18.0);
+          camera.position.lerp(desiredCamPos, Math.min(1, dt * 3));
+          camState.targetPos.lerp(desiredLookAt, Math.min(1, dt * 3));
+          camera.lookAt(camState.targetPos);
+        }
+        return;
+      }
+
+      // ----------------------------------------------------------------------
+      // 正式遊玩模式
+      // ----------------------------------------------------------------------
+      const distToDoor = Math.hypot(player.pos.x - mainEntrance.x, player.pos.z - mainEntrance.z);
+      const shouldOpenDoors = (!player.inVehicle && distToDoor < 8.0) || mainEntrance.isTransitioning;
+      const targetOpen = shouldOpenDoors ? 1 : 0;
+      mainEntrance.doorOpenRatio += (targetOpen - mainEntrance.doorOpenRatio) * Math.min(1, dt * 8);
+      if (mainEntrance.leftDoor && mainEntrance.rightDoor) {
+        mainEntrance.leftDoor.position.x = -1.04 - mainEntrance.doorOpenRatio * 1.18;
+        mainEntrance.rightDoor.position.x = 1.04 + mainEntrance.doorOpenRatio * 1.18;
+      }
+
+      const promptEl = document.getElementById('interaction-prompt');
+      const crosshairEl = document.getElementById('crosshair-dot');
+      const crosshairRing = document.getElementById('crosshair-ring');
+      camState.mouseIdleTime += dt;
+
+      if (!player.inVehicle) {
+        let forwardInput = 0;
+        let rightInput = 0;
+        if (keys['KeyW'] || keys['ArrowUp']) forwardInput += 1;
+        if (keys['KeyS'] || keys['ArrowDown']) forwardInput -= 1;
+        if (keys['KeyD'] || keys['ArrowRight']) rightInput += 1;
+        if (keys['KeyA'] || keys['ArrowLeft']) rightInput -= 1;
+
+        const isSprinting = (keys['ShiftLeft'] || keys['ShiftRight']) && !camState.isRightAiming;
+        const moveSpeed = camState.isRightAiming ? 5.2 : isSprinting ? 11.8 : 6.8;
+
+        const camForwardX = -Math.sin(camState.yaw);
+        const camForwardZ = -Math.cos(camState.yaw);
+        const camRightX = Math.cos(camState.yaw);
+        const camRightZ = -Math.sin(camState.yaw);
+
+        let moveX = camForwardX * forwardInput + camRightX * rightInput;
+        let moveZ = camForwardZ * forwardInput + camRightZ * rightInput;
+        const moveLen = Math.hypot(moveX, moveZ);
+
+        const cameraLookYaw = normalizeAngle(camState.yaw + Math.PI);
+
+        if (camState.isRightAiming) {
+          crosshairEl.classList.remove('hidden');
+          crosshairRing.style.transform = 'scale(1.25)';
+          const diff = normalizeAngle(cameraLookYaw - player.yaw);
+          player.yaw = normalizeAngle(player.yaw + diff * Math.min(1, dt * 22));
+        } else {
+          crosshairRing.style.transform = 'scale(1.0)';
+          if (!camState.isPointerLocked) crosshairEl.classList.add('hidden');
+        }
+
+        if (moveLen > 0.001 && !mainEntrance.isTransitioning) {
+          moveX /= moveLen;
+          moveZ /= moveLen;
+
+          if (!camState.isRightAiming) {
+            const targetYaw = Math.atan2(moveX, moveZ);
+            const diff = normalizeAngle(targetYaw - player.yaw);
+            player.yaw = normalizeAngle(player.yaw + diff * Math.min(1, dt * 20));
+
+            if (forwardInput > 0 && rightInput !== 0 && camState.mouseIdleTime > 0.45 && !camState.isDragging) {
+              camState.targetYaw -= rightInput * dt * 0.65;
+            }
+          }
+
+          const nextX = player.pos.x + moveX * moveSpeed * dt;
+          const nextZ = player.pos.z + moveZ * moveSpeed * dt;
+
+          if (!checkCollisionXZ(nextX, player.pos.z, player.radius, player.pos.y)) {
+            player.pos.x = nextX;
+          }
+          if (!checkCollisionXZ(player.pos.x, nextZ, player.radius, player.pos.y)) {
+            player.pos.z = nextZ;
+          }
+
+          player.walkCycle += dt * (isSprinting ? 15.5 : 10.5);
+          const swing = Math.sin(player.walkCycle) * (isSprinting ? 0.85 : 0.55);
+          player.leftLeg.rotation.x = swing;
+          player.rightLeg.rotation.x = -swing;
+          player.leftArm.rotation.x = -swing * 0.8;
+          player.rightArm.rotation.x = swing * 0.8;
+        } else {
+          player.leftLeg.rotation.x *= 0.82;
+          player.rightLeg.rotation.x *= 0.82;
+          player.leftArm.rotation.x *= 0.82;
+          player.rightArm.rotation.x *= 0.82;
+        }
+
+        if (player.headGroup && player.upperBodyGroup) {
+          const lookDelta = normalizeAngle(cameraLookYaw - player.yaw);
+          const clampedHeadYaw = THREE.MathUtils.clamp(lookDelta, -1.05, 1.05);
+          const targetHeadPitch = THREE.MathUtils.clamp((camState.pitch - 0.24) * 0.75, -0.35, 0.42);
+          player.headGroup.rotation.y += (clampedHeadYaw * 0.72 - player.headGroup.rotation.y) * Math.min(1, dt * 14);
+          player.headGroup.rotation.x += (targetHeadPitch - player.headGroup.rotation.x) * Math.min(1, dt * 14);
+          player.upperBodyGroup.rotation.y += (clampedHeadYaw * 0.28 - player.upperBodyGroup.rotation.y) * Math.min(1, dt * 12);
+        }
+
+        if (keys['Space'] && player.onGround && !mainEntrance.isTransitioning) {
+          player.vel.y = 7.6;
+          player.onGround = false;
+        }
+        player.vel.y -= 20 * dt;
+        player.pos.y += player.vel.y * dt;
+        if (player.pos.y <= 0) {
+          player.pos.y = 0;
+          player.vel.y = 0;
+          player.onGround = true;
+        }
+
+        player.pos.x = THREE.MathUtils.clamp(player.pos.x, -110, 110);
+        player.pos.z = THREE.MathUtils.clamp(player.pos.z, -65, 85);
+
+        player.mesh.position.copy(player.pos);
+        player.mesh.rotation.y = player.yaw;
+
+        if (
+          Math.abs(player.pos.x - mainEntrance.x) <= mainEntrance.halfWidth &&
+          player.pos.z <= mainEntrance.triggerZ &&
+          player.pos.z >= -6.5
+        ) {
+          triggerEnterLobby1F();
+        }
+
+        let nearVehicle = null;
+        vehicles.forEach((v) => {
+          if (player.pos.distanceTo(v.pos) < 4.8) nearVehicle = v;
+        });
+
+        if (nearVehicle) {
+          promptEl.innerHTML = `按 <span class="px-2 py-0.5 mx-1 rounded bg-amber-400 text-slate-950 font-black">F</span> 駕駛 ${nearVehicle.name}`;
+          promptEl.classList.remove('hidden');
+        } else if (distToDoor < 8.5 && !mainEntrance.isTransitioning) {
+          promptEl.innerHTML = `🏥 向前走入 <span class="text-emerald-300">1F 醫療大樓大門口</span> 自動進入大廳`;
+          promptEl.classList.remove('hidden');
+        } else {
+          promptEl.classList.add('hidden');
+        }
+
+        const desiredTarget = new THREE.Vector3(player.pos.x, player.pos.y + 1.52, player.pos.z);
+        camState.targetPos.lerp(desiredTarget, Math.min(1, dt * 16));
+      } else {
+        const v = player.inVehicle;
+        let throttle = 0;
+        let steer = 0;
+        if (keys['KeyW'] || keys['ArrowUp']) throttle += 1;
+        if (keys['KeyS'] || keys['ArrowDown']) throttle -= 1;
+        if (keys['KeyA'] || keys['ArrowLeft']) steer += 1;
+        if (keys['KeyD'] || keys['ArrowRight']) steer -= 1;
+
+        const handbrake = keys['Space'];
+
+        if (handbrake) {
+          v.speed *= Math.max(0, 1 - dt * 5.5);
+        } else if (throttle !== 0) {
+          v.speed += throttle * v.accel * dt;
+          v.speed = THREE.MathUtils.clamp(v.speed, -v.maxSpeed * 0.45, v.maxSpeed);
+        } else {
+          v.speed *= Math.max(0, 1 - dt * 1.8);
+          if (Math.abs(v.speed) < 0.08) v.speed = 0;
+        }
+
+        if (Math.abs(v.speed) > 0.35) {
+          const dirSign = v.speed >= 0 ? 1 : -1;
+          const speedFactor = Math.min(1, Math.abs(v.speed) / 8);
+          v.yaw += steer * v.turnSpeed * speedFactor * dirSign * dt;
+        }
+
+        const vx = Math.sin(v.yaw) * v.speed * dt;
+        const vz = Math.cos(v.yaw) * v.speed * dt;
+        const nextX = v.pos.x + vx;
+        const nextZ = v.pos.z + vz;
+
+        const colRadius = 1.65;
+        if (!checkCollisionXZ(nextX, nextZ, colRadius, 0)) {
+          v.pos.x = THREE.MathUtils.clamp(nextX, -108, 108);
+          v.pos.z = THREE.MathUtils.clamp(nextZ, -62, 82);
+        } else {
+          v.speed *= -0.35;
+        }
+
+        v.mesh.rotation.y = v.yaw;
+        player.pos.copy(v.pos);
+
+        if (v.frontWheelPivots) {
+          const targetSteerAngle = steer * 0.38;
+          v.frontWheelPivots.forEach((pivot) => {
+            pivot.rotation.y += (targetSteerAngle - pivot.rotation.y) * Math.min(1, dt * 12);
+          });
+        }
+        v.wheels.forEach((w) => {
+          w.rotation.x += v.speed * dt * 2.2;
+        });
+
+        if (Math.abs(v.speed) > 1.2 && camState.mouseIdleTime > 1.2 && !camState.isDragging) {
+          const followYaw = v.yaw + Math.PI;
+          const yawDiff = normalizeAngle(followYaw - camState.targetYaw);
+          camState.targetYaw += yawDiff * Math.min(1, dt * 3.0);
+        }
+
+        const nearEntranceInCar = Math.hypot(v.pos.x - mainEntrance.x, v.pos.z - mainEntrance.z) < 8.5;
+        promptEl.innerHTML = nearEntranceInCar
+          ? `已抵達大門口車道！按 <span class="px-2 py-0.5 mx-1 rounded bg-emerald-400 text-slate-950 font-black">F</span> 下車走入 1F 大廳`
+          : `按 <span class="px-2 py-0.5 mx-1 rounded bg-emerald-400 text-slate-950 font-black">F</span> 離開載具${v.isAmbulance ? ' ｜ 按 <span class="px-1.5 py-0.5 mx-0.5 rounded bg-rose-500 text-white font-black">Q</span> 切換警燈' : ''}`;
+        promptEl.classList.remove('hidden');
+
+        const desiredTarget = new THREE.Vector3(v.pos.x, v.pos.y + 1.85, v.pos.z);
+        camState.targetPos.lerp(desiredTarget, Math.min(1, dt * 14));
+      }
+
+      const activePreset = camPresets[camState.presetIndex];
+      const goalDist = player.inVehicle
+        ? camState.targetDistance
+        : camState.isRightAiming
+        ? 4.1
+        : camState.targetDistance;
+      const goalShoulder = player.inVehicle
+        ? 0
+        : camState.isRightAiming
+        ? 0.88
+        : activePreset.shoulder;
+
+      const camLerp = Math.min(1, dt * 20);
+      camState.yaw += (camState.targetYaw - camState.yaw) * camLerp;
+      camState.pitch += (camState.targetPitch - camState.pitch) * camLerp;
+      camState.distance += (goalDist - camState.distance) * Math.min(1, dt * 12);
+      camState.shoulderOffset += (goalShoulder - camState.shoulderOffset) * Math.min(1, dt * 12);
+
+      const cosPitch = Math.cos(camState.pitch);
+      const sinPitch = Math.sin(camState.pitch);
+      const sinYaw = Math.sin(camState.yaw);
+      const cosYaw = Math.cos(camState.yaw);
+
+      const rightVecX = cosYaw;
+      const rightVecZ = -sinYaw;
+      const pivotX = camState.targetPos.x + rightVecX * camState.shoulderOffset;
+      const pivotY = camState.targetPos.y;
+      const pivotZ = camState.targetPos.z + rightVecZ * camState.shoulderOffset;
+
+      let safeDistance = camState.distance;
+      const stepSize = 0.55;
+      for (let d = 1.4; d <= camState.distance; d += stepSize) {
+        const testX = pivotX + sinYaw * cosPitch * d;
+        const testY = pivotY + sinPitch * d;
+        const testZ = pivotZ + cosYaw * cosPitch * d;
+        if (checkCollisionXZ(testX, testZ, 0.48, testY)) {
+          safeDistance = Math.max(1.6, d - stepSize);
+          break;
+        }
+      }
+
+      const horizDist = cosPitch * safeDistance;
+      const vertDist = sinPitch * safeDistance;
+      camera.position.set(
+        pivotX + sinYaw * horizDist,
+        Math.max(0.85, pivotY + vertDist),
+        pivotZ + cosYaw * horizDist
+      );
+      camera.lookAt(pivotX, pivotY, pivotZ);
+    }
+
+    // --------------------------------------------------------------------------
+    // 10. 即時 GTA 圓形 2D 雷達小地圖渲染
+    // --------------------------------------------------------------------------
+    const minimapCanvas = document.getElementById('minimap-canvas');
+    const mctx = minimapCanvas.getContext('2d');
+
+    function renderMinimap() {
+      if (!gameState.started) return;
+
+      const size = minimapCanvas.width;
+      const half = size / 2;
+      const scale = 1.65;
+
+      mctx.clearRect(0, 0, size, size);
+
+      mctx.fillStyle = '#182430';
+      mctx.fillRect(0, 0, size, size);
+
+      mctx.save();
+      mctx.translate(half, half);
+
+      const px = player.pos.x;
+      const pz = player.pos.z;
+
+      function drawWorldRect(wx, wz, ww, wd, color) {
+        const rx = (wx - ww / 2 - px) * scale;
+        const rz = (wz - wd / 2 - pz) * scale;
+        mctx.fillStyle = color;
+        mctx.fillRect(rx, rz, ww * scale, wd * scale);
+      }
+
+      drawWorldRect(0, 46, 300, 24, '#3b4452');
+      drawWorldRect(-75, -10, 18, 240, '#3b4452');
+      drawWorldRect(75, -10, 18, 240, '#3b4452');
+
+      drawWorldRect(-21, 17.5, 7.6, 36.5, '#475569');
+      drawWorldRect(21, 17.5, 7.6, 36.5, '#475569');
+      drawWorldRect(0, 1.6, 49.6, 6.8, '#475569');
+
+      drawWorldRect(3, -33, 54, 20, '#b85c38');
+      drawWorldRect(-25.5, -15.5, 26, 20, '#c86d44');
+      drawWorldRect(25.5, -15.5, 26, 20, '#c86d44');
+      drawWorldRect(-47.5, -19.5, 18, 18, '#c86d44');
+      drawWorldRect(47.5, -19.5, 18, 18, '#c86d44');
+      drawWorldRect(0, 1.2, 28, 9.6, 'rgba(226, 214, 190, 0.55)');
+      drawWorldRect(0, 15.0, 29, 2.0, '#4ade80');
+
+      mctx.fillStyle = '#38bdf8';
+      mctx.beginPath();
+      mctx.arc((0 - px) * scale, (-15 - pz) * scale, 10.5 * scale, 0, Math.PI * 2);
+      mctx.fill();
+
+      mctx.fillStyle = '#10b981';
+      mctx.strokeStyle = '#ffffff';
+      mctx.lineWidth = 1.5;
+      mctx.beginPath();
+      mctx.arc((mainEntrance.x - px) * scale, (mainEntrance.triggerZ - pz) * scale, 4.5, 0, Math.PI * 2);
+      mctx.fill();
+      mctx.stroke();
+
+      vehicles.forEach((v) => {
+        const vx = (v.pos.x - px) * scale;
+        const vz = (v.pos.z - pz) * scale;
+        mctx.fillStyle = v.isAmbulance ? '#f43f5e' : '#38bdf8';
+        mctx.strokeStyle = '#ffffff';
+        mctx.lineWidth = 1.5;
+        mctx.beginPath();
+        mctx.arc(vx, vz, 4.5, 0, Math.PI * 2);
+        mctx.fill();
+        mctx.stroke();
+      });
+
+      const heading = player.inVehicle ? player.inVehicle.yaw : player.yaw;
+      mctx.save();
+      mctx.rotate(-heading + Math.PI);
+      mctx.fillStyle = '#fbbf24';
+      mctx.strokeStyle = '#000000';
+      mctx.lineWidth = 1.5;
+      mctx.beginPath();
+      mctx.moveTo(0, -8);
+      mctx.lineTo(6, 7);
+      mctx.lineTo(0, 4);
+      mctx.lineTo(-6, 7);
+      mctx.closePath();
+      mctx.fill();
+      mctx.stroke();
+      mctx.restore();
+
+      mctx.restore();
+    }
+
+    // --------------------------------------------------------------------------
+    // 11. 開啟畫面統一左手邊選單互動邏輯
+    // --------------------------------------------------------------------------
+    function initStartScreenUI() {
+      const roleGrid = document.getElementById('role-grid');
+      roleGrid.innerHTML = '';
+
+      CHARACTER_ROLES.forEach((role) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.roleId = role.id;
+        btn.className = 'role-card-btn p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition';
+        btn.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-base">${role.icon}</span>
+            <span class="gta-font text-[10px] font-bold text-emerald-300">$${role.cash}</span>
+          </div>
+          <div class="font-black text-xs text-white mt-1">${role.name}</div>
+          <div class="text-[10px] text-slate-400 truncate">${role.en}</div>
+        `;
+        btn.addEventListener('click', () => {
+          applyCharacterRole(role.id);
+        });
+        roleGrid.appendChild(btn);
+      });
+
+      applyCharacterRole('it_engineer');
+
+      // 出發位置切換
+      document.querySelectorAll('.spawn-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          applySpawnLocation(btn.dataset.spawn);
+        });
+      });
+
+      // 背景時段切換
+      document.querySelectorAll('.lobby-time-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          applyTimeOfDay(btn.dataset.time);
+        });
+      });
+
+      // 背景鏡頭運鏡模式切換
+      document.querySelectorAll('.preview-cam-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          gameState.previewCamMode = btn.dataset.previewCam;
+          document.querySelectorAll('.preview-cam-btn').forEach((b) => {
+            const active = b.dataset.previewCam === gameState.previewCamMode;
+            b.className = active
+              ? 'preview-cam-btn py-1.5 px-2.5 rounded-xl bg-sky-600/75 border border-sky-300/60 text-xs font-bold text-white transition'
+              : 'preview-cam-btn py-1.5 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 transition';
+          });
+        });
+      });
+
+      // 按下「進入健康園區開始遊玩」：右下角載入進度跑完後進入遊玩
+      document.getElementById('btn-start-game').addEventListener('click', () => {
+        const startBtn = document.getElementById('btn-start-game');
+        startBtn.disabled = true;
+        startBtn.classList.add('opacity-70');
+
+        let deployProgress = 18;
+        setBottomRightLoader({
+          visible: true,
+          title: '正在部署角色進入園區',
+          subtitle: '同步 3D 人物裝備與大門導航系統...',
+          percent: deployProgress,
+          spinning: true
+        });
+
+        const deployTimer = setInterval(() => {
+          deployProgress += 28;
+          if (deployProgress >= 100) {
+            clearInterval(deployTimer);
+            setBottomRightLoader({
+              visible: true,
+              title: '園區連線完成',
+              subtitle: '歡迎進入彰濱秀傳健康園區！',
+              percent: 100,
+              spinning: false
+            });
+
+            setTimeout(() => {
+              document.getElementById('start-overlay').classList.add('hidden');
+              document.getElementById('gameplay-hud').classList.remove('hidden');
+              setBottomRightLoader({ visible: false });
+
+              startBtn.disabled = false;
+              startBtn.classList.remove('opacity-70');
+
+              gameState.started = true;
+              applySpawnLocation(gameState.selectedSpawn);
+              applyCharacterRole(gameState.selectedRoleId);
+
+              const role = CHARACTER_ROLES.find((r) => r.id === gameState.selectedRoleId);
+              showToast(`已以「${role.name}」身分進入園區（靠近大門自動連接 1F.html）`);
+            }, 260);
+          } else {
+            setBottomRightLoader({
+              visible: true,
+              title: '正在部署角色進入園區',
+              subtitle: '同步 3D 人物裝備與大門導航系統...',
+              percent: deployProgress,
+              spinning: true
+            });
+          }
+        }, 85);
+      });
+
+      // 遊戲中左上角「開啟選單」按鈕，可隨時回到開啟畫面切換角色與設定
+      document.getElementById('btn-back-lobby').addEventListener('click', () => {
+        if (document.pointerLockElement) {
+          document.exitPointerLock();
+        }
+        if (player.inVehicle) {
+          toggleVehicleEnterExit();
+        }
+        gameState.started = false;
+        applySpawnLocation(gameState.selectedSpawn);
+        document.getElementById('gameplay-hud').classList.add('hidden');
+        document.getElementById('crosshair-dot').classList.add('hidden');
+        document.getElementById('start-overlay').classList.remove('hidden');
+
+        const role = CHARACTER_ROLES.find((r) => r.id === gameState.selectedRoleId);
+        setBottomRightLoader({
+          visible: true,
+          title: `當前身分：${role.name}`,
+          subtitle: '醫療大樓背景即時同步中',
+          percent: 100,
+          spinning: false
+        });
+      });
+    }
+
+    // --------------------------------------------------------------------------
+    // 12. 場景初始化、事件監聽與主迴圈
+    // --------------------------------------------------------------------------
+    function initScene() {
+      const canvas = document.getElementById('game-canvas');
+
+      setBottomRightLoader({
+        visible: true,
+        title: '園區 3D 場景載入中',
+        subtitle: '初始化渲染引擎與天光系統...',
+        percent: 22,
+        spinning: true
+      });
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x6db3eb);
+      scene.fog = new THREE.FogExp2(0x8ec5f0, 0.0028);
+
+      camera = new THREE.PerspectiveCamera(56, window.innerWidth / window.innerHeight, 0.2, 450);
+      camera.position.set(0.45, 2.25, 14.3);
+
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      hemiLight = new THREE.HemisphereLight(0xbbe3ff, 0x4d6b47, 0.75);
+      scene.add(hemiLight);
+
+      sunLight = new THREE.DirectionalLight(0xfff6e5, 1.35);
+      sunLight.position.set(55, 85, 65);
+      sunLight.castShadow = true;
+      sunLight.shadow.mapSize.width = 2048;
+      sunLight.shadow.mapSize.height = 2048;
+      sunLight.shadow.camera.near = 10;
+      sunLight.shadow.camera.far = 230;
+      const shadowBound = 75;
+      sunLight.shadow.camera.left = -shadowBound;
+      sunLight.shadow.camera.right = shadowBound;
+      sunLight.shadow.camera.top = shadowBound;
+      sunLight.shadow.camera.bottom = -shadowBound;
+      sunLight.shadow.bias = -0.0005;
+      scene.add(sunLight);
+
+      const groundMat = new THREE.MeshStandardMaterial({ color: 0x4b7a3e, roughness: 0.92 });
+      const ground = new THREE.Mesh(new THREE.PlaneGeometry(420, 420), groundMat);
+      ground.rotation.x = -Math.PI / 2;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      const plazaMat = new THREE.MeshStandardMaterial({ color: 0xbec5cc, roughness: 0.78 });
+      const plaza = new THREE.Mesh(new THREE.PlaneGeometry(118, 56), plazaMat);
+      plaza.rotation.x = -Math.PI / 2;
+      plaza.position.set(0, 0.015, 6);
+      plaza.receiveShadow = true;
+      scene.add(plaza);
+
+      setBottomRightLoader({
+        visible: true,
+        title: '園區 3D 場景載入中',
+        subtitle: '建構彰濱秀傳醫療大樓與迎賓車道...',
+        percent: 62,
+        spinning: true
+      });
+
+      buildMedicalComplex();
+
+      setBottomRightLoader({
+        visible: true,
+        title: '園區 3D 場景載入中',
+        subtitle: '載入多職業 3D 角色與救護車載具...',
+        percent: 88,
+        spinning: true
+      });
+
+      createPlayableCharacter();
+      createDrivableVehicles();
+      initStartScreenUI();
+      bindEvents();
+
+      setTimeout(() => {
+        setBottomRightLoader({
+          visible: true,
+          title: '醫療大樓背景已同步',
+          subtitle: '請於左側選單選擇角色與出發設定',
+          percent: 100,
+          spinning: false
+        });
+      }, 320);
+    }
+
+    function bindEvents() {
+      const canvas = document.getElementById('game-canvas');
+      const camBadge = document.getElementById('hud-cam-badge');
+      const crosshair = document.getElementById('crosshair-dot');
+
+      window.addEventListener('keydown', (e) => {
+        if (!gameState.started) return;
+
+        keys[e.code] = true;
+
+        if (e.code === 'KeyF') {
+          toggleVehicleEnterExit();
+        } else if (e.code === 'KeyC') {
+          if (!player.inVehicle) cycleCameraPreset();
+        } else if (e.code === 'KeyQ') {
+          ambulanceSirenOn = !ambulanceSirenOn;
+          showToast(ambulanceSirenOn ? '🚨 救護車紅藍警示燈：開啟' : '救護車紅藍警示燈：關閉');
+        } else if (e.code === 'KeyR') {
+          if (player.inVehicle) toggleVehicleEnterExit();
+          player.pos.set(0, 0, 9.2);
+          player.vel.set(0, 0, 0);
+          camState.targetYaw = 0;
+          camState.targetPitch = 0.23;
+          camState.presetIndex = 1;
+          camState.targetDistance = camPresets[1].dist;
+          showToast('已重置角色至大門口車道前方');
+        }
+      });
+
+      window.addEventListener('keyup', (e) => {
+        keys[e.code] = false;
+      });
+
+      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+      document.addEventListener('pointerlockchange', () => {
+        camState.isPointerLocked = document.pointerLockElement === canvas;
+        if (camState.isPointerLocked) {
+          camBadge.textContent = '🎯 自由視角已鎖定 (ESC 釋放 ｜ 右鍵越肩)';
+          camBadge.className = 'mt-1 px-2.5 py-0.5 rounded-full bg-emerald-950/85 border border-emerald-400/40 text-[11px] font-medium text-emerald-200';
+          crosshair.classList.remove('hidden');
+        } else {
+          camBadge.textContent = '🖱️ 點擊畫面 360° 自由視角 ｜ 右鍵越肩';
+          camBadge.className = 'mt-1 px-2.5 py-0.5 rounded-full bg-sky-950/80 border border-sky-400/30 text-[11px] font-medium text-sky-200';
+          if (!camState.isRightAiming) crosshair.classList.add('hidden');
+        }
+      });
+
+      let downX = 0;
+      let downY = 0;
+
+      canvas.addEventListener('mousedown', (e) => {
+        if (!gameState.started) return;
+
+        camState.isDragging = true;
+        camState.lastMouseX = e.clientX;
+        camState.lastMouseY = e.clientY;
+        downX = e.clientX;
+        downY = e.clientY;
+
+        if (e.button === 2 && !player.inVehicle) {
+          camState.isRightAiming = true;
+        }
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!gameState.started) return;
+
+        if (camState.isPointerLocked) {
+          const mx = e.movementX || 0;
+          const my = e.movementY || 0;
+          const sens = camState.isRightAiming ? 0.0022 : 0.0031;
+          camState.targetYaw -= mx * sens;
+          camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + my * 0.0025, 0.04, 1.25);
+          camState.mouseIdleTime = 0;
+          return;
+        }
+
+        if (!camState.isDragging) return;
+        const dx = e.clientX - camState.lastMouseX;
+        const dy = e.clientY - camState.lastMouseY;
+        camState.lastMouseX = e.clientX;
+        camState.lastMouseY = e.clientY;
+
+        camState.targetYaw -= dx * 0.0072;
+        camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * 0.006, 0.04, 1.25);
+        camState.mouseIdleTime = 0;
+      });
+
+      window.addEventListener('mouseup', (e) => {
+        const moveDist = Math.hypot(e.clientX - downX, e.clientY - downY);
+        camState.isDragging = false;
+
+        if (e.button === 2) {
+          camState.isRightAiming = false;
+        }
+
+        if (!gameState.started) return;
+
+        if (e.target === canvas && e.button === 0 && moveDist < 5 && !camState.isPointerLocked) {
+          if (canvas.requestPointerLock) {
+            try {
+              const promise = canvas.requestPointerLock();
+              if (promise && typeof promise.catch === 'function') {
+                promise.catch(() => {});
+              }
+            } catch (err) {}
+          }
+        }
+      });
+
+      canvas.addEventListener(
+        'wheel',
+        (e) => {
+          if (!gameState.started) return;
+          e.preventDefault();
+          camState.targetDistance = THREE.MathUtils.clamp(camState.targetDistance + e.deltaY * 0.01, 3.6, 48);
+        },
+        { passive: false }
+      );
+
+      canvas.addEventListener(
+        'touchstart',
+        (e) => {
+          if (!gameState.started) return;
+          if (e.touches.length === 1) {
+            camState.isDragging = true;
+            camState.lastMouseX = e.touches[0].clientX;
+            camState.lastMouseY = e.touches[0].clientY;
+          }
+        },
+        { passive: true }
+      );
+
+      canvas.addEventListener(
+        'touchmove',
+        (e) => {
+          if (!gameState.started) return;
+          if (camState.isDragging && e.touches.length === 1) {
+            const dx = e.touches[0].clientX - camState.lastMouseX;
+            const dy = e.touches[0].clientY - camState.lastMouseY;
+            camState.lastMouseX = e.touches[0].clientX;
+            camState.lastMouseY = e.touches[0].clientY;
+            camState.targetYaw -= dx * 0.0072;
+            camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * 0.006, 0.04, 1.25);
+            camState.mouseIdleTime = 0;
+          }
+        },
+        { passive: true }
+      );
+
+      canvas.addEventListener('touchend', () => {
+        camState.isDragging = false;
+      });
+
+      document.querySelectorAll('.time-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          applyTimeOfDay(btn.dataset.time);
+        });
+      });
+
+      const helpBtn = document.getElementById('toggle-help-btn');
+      const helpContent = document.getElementById('help-content');
+      helpBtn.addEventListener('click', () => {
+        const hidden = helpContent.classList.toggle('hidden');
+        helpBtn.textContent = hidden ? '展開' : '收合';
+      });
+
+      document.getElementById('tp-plaza').addEventListener('click', () => {
+        if (player.inVehicle) toggleVehicleEnterExit();
+        player.pos.set(0, 0, 9.2);
+        camState.targetYaw = 0;
+        camState.targetPitch = 0.22;
+        camState.targetDistance = 8.8;
+        showToast('視角切換：1F 大門口迎賓車道前方');
+      });
+
+      document.getElementById('tp-ambulance').addEventListener('click', () => {
+        if (player.inVehicle) toggleVehicleEnterExit();
+        const amb = vehicles[0];
+        player.pos.set(amb.pos.x, 0, amb.pos.z + 3.2);
+        camState.targetYaw = 0.25;
+        camState.targetPitch = 0.25;
+        camState.targetDistance = 10.2;
+        showToast('已傳送至秀傳醫療救護車旁（按 F 上車）');
+      });
+
+      document.getElementById('tp-aerial').addEventListener('click', () => {
+        if (player.inVehicle) toggleVehicleEnterExit();
+        player.pos.set(26, 0, 32);
+        camState.targetYaw = 0.45;
+        camState.targetPitch = 0.48;
+        camState.targetDistance = 44;
+        showToast('視角切換：園區 3/4 鳥瞰建築全貌');
+      });
+
+      document.querySelectorAll('.touch-dir').forEach((btn) => {
+        const code = btn.dataset.key;
+        btn.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          keys[code] = true;
+        });
+        btn.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          keys[code] = false;
+        });
+      });
+
+      document.getElementById('btn-touch-jump').addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys['Space'] = true;
+      });
+      document.getElementById('btn-touch-jump').addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys['Space'] = false;
+      });
+      document.getElementById('btn-touch-enter').addEventListener('click', toggleVehicleEnterExit);
+      document.getElementById('btn-touch-siren').addEventListener('click', () => {
+        ambulanceSirenOn = !ambulanceSirenOn;
+        showToast(ambulanceSirenOn ? '🚨 救護車警示燈：開啟' : '救護車警示燈：關閉');
+      });
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05);
+      updateSimulation(dt);
+      renderer.render(scene, camera);
+      renderMinimap();
+    }
+
+    window.onload = function () {
+      initScene();
+      animate();
+    };
+  </script>
+</body>
+</html>

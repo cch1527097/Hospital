@@ -1,0 +1,3761 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>彰濱秀傳紀念醫院 7F VIP 尊榮病房空間 3D 實境 (GTA 3D 實景建築版)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Three.js r128 CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Google Fonts: 繁體中文思源黑體 & GTA 風格數字字體 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0b131e;
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+    #game-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+      touch-action: none;
+    }
+    .gta-font {
+      font-family: 'Chakra Petch', 'Noto Sans TC', sans-serif;
+      letter-spacing: 0.04em;
+    }
+    .gta-shadow {
+      text-shadow: 2px 2px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000;
+    }
+    .hud-glass {
+      background: rgba(11, 18, 28, 0.82);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+    #minimap-shell {
+      box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.92), 0 0 0 6px rgba(45, 212, 191, 0.45), 0 12px 30px rgba(0, 0, 0, 0.7);
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes floatPrompt {
+      0%, 100% { transform: translate(-50%, 0px); }
+      50% { transform: translate(-50%, -4px); }
+    }
+    .prompt-float {
+      animation: floatPrompt 1.6s infinite ease-in-out;
+    }
+    #damage-vignette {
+      background: radial-gradient(circle, rgba(220, 38, 38, 0) 48%, rgba(220, 38, 38, 0.65) 100%);
+      transition: opacity 0.18s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <!-- 主 3D 渲染畫布 -->
+  <canvas id="game-canvas"></canvas>
+
+  <!-- 受擊螢幕邊緣紅光閃爍遮罩 -->
+  <div id="damage-vignette" class="fixed inset-0 z-10 pointer-events-none opacity-0"></div>
+
+  <!-- 視角鎖定中央準心 -->
+  <div id="center-crosshair" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
+    <div class="relative w-7 h-7 flex items-center justify-center">
+      <span class="w-1.5 h-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_#2dd4bf]"></span>
+      <span class="absolute top-0 w-0.5 h-2 bg-white/85"></span>
+      <span class="absolute bottom-0 w-0.5 h-2 bg-white/85"></span>
+      <span class="absolute left-0 h-0.5 w-2 bg-white/85"></span>
+      <span class="absolute right-0 h-0.5 w-2 bg-white/85"></span>
+    </div>
+  </div>
+
+  <!-- 樓層 HTML 自動跳轉轉場遮罩 -->
+  <div id="floor-transfer-overlay" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-md text-white text-center px-6">
+    <div class="w-14 h-14 border-4 border-teal-400 border-t-amber-300 rounded-full animate-spin mb-4"></div>
+    <div class="px-3.5 py-1 rounded-full bg-teal-500/25 border border-teal-400/50 text-teal-200 text-xs font-bold tracking-widest mb-2">
+      ELEVATOR &amp; ESCALATOR TRANSFER
+    </div>
+    <h2 id="transfer-title" class="text-2xl sm:text-4xl font-black text-amber-300 gta-shadow mb-1.5">
+      正在前往目標樓層...
+    </h2>
+    <p id="transfer-sub" class="text-xs sm:text-sm text-slate-300">
+      即將自動連結至對應樓層頁面
+    </p>
+  </div>
+
+  <!-- GTA 風格急診室緊急救護復活遮罩 -->
+  <div id="ko-overlay" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/85 backdrop-blur-sm text-center px-6">
+    <div class="px-4 py-1 rounded-full bg-rose-600/30 border border-rose-400/50 text-rose-300 text-xs font-bold tracking-widest mb-3">
+      EMERGENCY RESCUE・體力耗盡
+    </div>
+    <h2 class="text-3xl sm:text-5xl font-black text-rose-500 gta-shadow tracking-wider mb-2">
+      秀傳急診室緊急救護
+    </h2>
+    <p class="text-sm sm:text-base text-slate-200 max-w-md">
+      您已在院內衝突中失去意識，急診救護團隊正將您送往一樓急診室進行緊急處置...
+    </p>
+  </div>
+
+  <!-- 載入遮罩 -->
+  <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 text-white transition-opacity duration-500">
+    <div class="w-16 h-16 border-4 border-teal-400 border-t-amber-400 rounded-full animate-spin mb-4"></div>
+    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">彰濱秀傳紀念醫院 7F VIP 尊榮病房 3D 實境</h1>
+    <p class="text-xs sm:text-sm text-slate-300">正在載入實景建築材質・VIP 感應電動門・醫護與患者巡房陣容...</p>
+  </div>
+
+  <!-- 頂部橫向：7F 區域傳送 + B1 ~ 8F 全院樓層 HTML 直達列 -->
+  <div class="fixed top-2.5 left-1/2 -translate-x-1/2 z-20 w-[97vw] max-w-6xl">
+    <div class="hud-glass rounded-full px-2.5 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-xl">
+      <span class="shrink-0 px-2 py-0.5 rounded-full bg-purple-500/30 border border-purple-400/60 text-[11px] font-black text-purple-200">
+        👑 7F 導覽
+      </span>
+      <button data-zone="f7_here" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-purple-400/95 hover:bg-purple-300 text-slate-950 transition">📍 733 VIP 電動門</button>
+      <button data-zone="f7_escalator" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-teal-500/30 hover:bg-teal-400 hover:text-slate-950 text-teal-200 border border-teal-400/40 transition">🛗 手扶梯/電梯口</button>
+      <button data-zone="f7_lounge" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-sky-500 hover:text-slate-950 text-sky-200 transition">🛋️ 交誼廳/商務中心</button>
+      <button data-zone="f7_east" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-500 hover:text-slate-950 text-teal-200 transition">🏥 東翼病房/護理站</button>
+
+      <span class="shrink-0 px-2 py-0.5 rounded-full bg-amber-500/25 border border-amber-400/50 text-[11px] font-bold text-amber-300 ml-1">
+        樓層直連
+      </span>
+      <button data-href="B1.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-slate-200 transition">B1</button>
+      <button data-href="1F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-sky-400 hover:text-slate-950 text-sky-200 transition">1F</button>
+      <button data-href="2F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-200 transition">2F</button>
+      <button data-href="3F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-pink-400 hover:text-slate-950 text-pink-200 transition">3F</button>
+      <button data-href="5F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-emerald-400 hover:text-slate-950 text-emerald-200 transition">5F</button>
+      <button data-href="6F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-400 hover:text-slate-950 text-teal-200 transition">6F</button>
+      <button data-href="7F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-purple-500/40 border border-purple-300/60 text-purple-100 transition">7F</button>
+      <button data-href="8F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-indigo-400 hover:text-slate-950 text-indigo-200 transition">8F</button>
+    </div>
+  </div>
+
+  <!-- 操作提示膠囊 -->
+  <div class="fixed top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-max max-w-[95vw]">
+    <div id="control-hint-pill" class="hud-glass px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-teal-200 border border-teal-400/35 shadow-lg text-center">
+      🚪 走近 VIP 病房自動感應電動門 ｜ 🖱️ 點擊鎖定準心（或右鍵拖曳環視）｜ E 鍵與護理師/患者交談
+    </div>
+  </div>
+
+  <!-- 左上角：功能開關、滑鼠靈敏度與操作說明面板 -->
+  <div class="fixed top-20 left-3 sm:left-4 z-20 flex flex-col gap-2 max-w-[305px]">
+    <div class="hud-glass rounded-xl p-3 text-white shadow-xl">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-teal-400 shadow-[0_0_8px_#2dd4bf]"></span>
+          <span class="font-bold text-xs sm:text-sm text-teal-200">彰濱秀傳 7F VIP 實境</span>
+        </div>
+        <button id="btn-toggle-help" class="px-2 py-0.5 text-[11px] rounded bg-white/10 hover:bg-white/20 text-slate-200">
+          收合
+        </button>
+      </div>
+
+      <!-- 核心互動功能按鈕列 -->
+      <div class="mt-2.5 grid grid-cols-1 gap-1.5">
+        <div class="grid grid-cols-2 gap-1.5">
+          <button id="btn-toggle-pov" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-sky-700/80 hover:bg-sky-600 border border-sky-400/30 text-white transition">
+            👁️ 第三人稱 (V)
+          </button>
+          <button id="btn-toggle-labels" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-emerald-700/80 hover:bg-emerald-600 border border-emerald-400/30 text-white transition">
+            🏷️ NPC 標籤: 開
+          </button>
+        </div>
+
+        <button id="btn-open-elevator" class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-teal-700/85 hover:bg-teal-600 border border-teal-300/40 text-white transition">
+          <span>🛗 手扶梯 / 電梯 (B1 ~ 8F)</span>
+          <span class="px-1.5 py-0.5 rounded bg-black/30 text-[10px]">E 鍵</span>
+        </button>
+
+        <button id="btn-clear-wanted" class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-amber-600/85 hover:bg-amber-500 border border-amber-300/40 text-white transition">
+          <span>🕊️ 消除通緝 / 急救治療</span>
+          <span class="px-1.5 py-0.5 rounded bg-black/30 text-[10px]">C 鍵</span>
+        </button>
+
+        <!-- 滑鼠靈敏度即時調節 -->
+        <div class="px-2.5 py-1.5 rounded-lg bg-slate-900/70 border border-white/10">
+          <div class="flex items-center justify-between text-[11px] mb-1">
+            <span class="text-teal-200 font-bold">🖱️ 滑鼠轉向靈敏度</span>
+            <span id="mouse-sens-val" class="font-black text-amber-300 gta-font">1.0x</span>
+          </div>
+          <input id="mouse-sens-slider" type="range" min="0.4" max="2.2" step="0.1" value="1.0" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-teal-400" />
+        </div>
+      </div>
+
+      <!-- 按鍵操作表 -->
+      <div id="help-body" class="mt-2.5 pt-2 border-t border-white/10 text-[11px] text-slate-200 space-y-1">
+        <div class="flex justify-between"><span class="text-slate-400">行走 / 衝刺閃避</span><span class="font-bold text-amber-300">WASD / 方向鍵 / Shift</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">跳躍</span><span class="font-bold text-amber-300">Space 空白鍵</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">VIP 病房感應電動門</span><span class="font-bold text-purple-300">走近自動感應滑開</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">鏡頭快速回正背後</span><span class="font-bold text-sky-300">滑鼠中鍵 / R 鍵</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">近戰三連擊 / 昇龍重擊</span><span class="font-bold text-rose-300">左鍵(J) / 右鍵(K)</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">手扶梯 / 電梯樓層切換</span><span class="font-bold text-emerald-300">走近接觸自動詢問 / E 鍵</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右上角：GTA 風格狀態欄 -->
+  <div class="fixed top-20 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
+    <div id="hud-clock" class="gta-font gta-shadow text-xl sm:text-2xl font-bold text-white leading-none">
+      14:20
+    </div>
+    <div id="hud-combo-badge" class="gta-font gta-shadow text-sm sm:text-base font-bold text-emerald-400 leading-tight mt-0.5">
+      健保卡已連線・8護理師 / 8患者巡房中
+    </div>
+
+    <!-- 生命值 & 護甲狀態條 -->
+    <div class="mt-1.5 w-40 sm:w-48 space-y-1">
+      <div class="flex items-center justify-between text-[11px] font-black gta-font gta-shadow text-white px-0.5">
+        <span class="text-rose-300">生命值 HP</span>
+        <span id="hud-health-text">100 / 100</span>
+      </div>
+      <div class="w-full h-3.5 bg-black/80 rounded-sm p-0.5 border border-black">
+        <div id="hud-health-bar" class="h-full bg-gradient-to-r from-red-600 to-rose-400 transition-all duration-150" style="width: 100%;"></div>
+      </div>
+      <div class="w-full h-2.5 bg-black/75 rounded-sm p-0.5 border border-black">
+        <div id="hud-armor-bar" class="h-full bg-gradient-to-r from-sky-600 to-cyan-400 transition-all duration-150" style="width: 90%;"></div>
+      </div>
+    </div>
+
+    <!-- 五星通緝等級 (Wanted Stars) -->
+    <div id="hud-wanted-stars" class="mt-1.5 flex items-center gap-1 text-base sm:text-lg gta-shadow">
+      <span class="text-slate-500">★</span>
+      <span class="text-slate-500">★</span>
+      <span class="text-slate-500">★</span>
+      <span class="text-slate-500">★</span>
+      <span class="text-slate-500">★</span>
+    </div>
+
+    <!-- 目前所在空間徽章 -->
+    <div class="mt-1.5 px-3 py-1 rounded-xl hud-glass border-l-4 border-pink-500 text-right shadow-lg">
+      <div class="text-[10px] text-slate-400 font-medium">現在位置 You Are Here</div>
+      <div id="current-zone-label" class="text-xs sm:text-sm font-black text-white">7F 733 / 732 VIP 尊榮病房電動門前</div>
+    </div>
+  </div>
+
+  <!-- 浮動傷害數字與 NPC 血條覆蓋層 -->
+  <div id="floating-fx-layer" class="fixed inset-0 z-10 pointer-events-none overflow-hidden"></div>
+
+  <!-- 中央下方：靠近 NPC 或手扶梯/電梯時的互動提示 -->
+  <button id="npc-talk-prompt" class="hidden fixed bottom-36 sm:bottom-12 left-1/2 z-20 px-5 py-2.5 rounded-xl hud-glass border border-emerald-400/50 text-white font-bold text-xs sm:text-sm shadow-2xl prompt-float cursor-pointer">
+    按 <span class="px-2 py-0.5 mx-1 rounded bg-emerald-400 text-slate-950 font-black">E</span> 與 <span id="prompt-npc-name" class="text-amber-300">護理長</span> 交談
+  </button>
+
+  <!-- NPC 對話 / 手扶梯・電梯樓層選擇視窗 Modal (B1 1F 2F 3F 5F 6F 7F 8F) -->
+  <div id="dialogue-modal" class="hidden fixed inset-0 z-40 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div class="hud-glass w-full max-w-xl rounded-2xl p-5 text-white border border-teal-400/45 shadow-2xl">
+      <div class="flex items-center justify-between gap-3 pb-3 border-b border-white/15">
+        <div class="flex items-center gap-3">
+          <div id="dlg-avatar" class="w-11 h-11 rounded-full bg-teal-500/25 border border-teal-300/40 flex items-center justify-center text-2xl">
+            🛗
+          </div>
+          <div>
+            <h3 id="dlg-name" class="font-black text-base sm:text-lg text-amber-300">彰濱秀傳手扶梯 / 電梯搭乘系統</h3>
+            <p id="dlg-role" class="text-xs text-teal-300 font-medium">目前所在樓層：7F VIP 尊榮病房樓層</p>
+          </div>
+        </div>
+        <button id="dlg-close-btn" class="px-3 py-1 rounded-lg bg-white/10 hover:bg-rose-500/80 text-xs font-bold text-slate-200 hover:text-white transition">
+          關閉 (ESC)
+        </button>
+      </div>
+      <p id="dlg-text" class="mt-3 text-sm sm:text-base leading-relaxed text-slate-100 bg-slate-900/70 p-3 rounded-xl border border-white/10">
+        請問您要前往哪一個樓層？（點擊或按對應數字鍵將自動連結該樓層 HTML）
+      </p>
+      <div id="dlg-options" class="mt-3 flex flex-col gap-2 max-h-[52vh] overflow-y-auto pr-0.5"></div>
+    </div>
+  </div>
+
+  <!-- 左下角：緊急疏散平面圖同色系圓形雷達小地圖 -->
+  <div id="minimap-shell" class="fixed bottom-4 left-4 z-20 w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden bg-amber-50">
+    <canvas id="minimap-canvas" width="220" height="220" class="w-full h-full block"></canvas>
+    <div class="absolute top-1 left-1/2 -translate-x-1/2 px-1.5 rounded bg-slate-900/85 text-[10px] font-black text-teal-300 pointer-events-none">
+      N
+    </div>
+    <div id="minimap-floor-label" class="absolute bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-slate-900/85 text-[9px] font-bold text-white pointer-events-none">
+      7F VIP 電動門雷達
+    </div>
+  </div>
+
+  <!-- 右下角：桌面與行動裝置皆可點擊的近戰攻擊按鈕組 -->
+  <div class="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 z-20 flex flex-col items-end gap-2">
+    <div class="flex items-center gap-2">
+      <button id="btn-action-heavy" class="px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-xs sm:text-sm shadow-[0_6px_20px_rgba(245,158,11,0.5)] border border-amber-200/60 active:scale-95 transition">
+        💥 重擊 (右鍵/K)
+      </button>
+      <button id="btn-action-attack" class="px-4 py-2.5 sm:px-5 sm:py-3 rounded-2xl bg-gradient-to-br from-rose-500 to-red-700 hover:from-rose-400 hover:to-red-600 text-white font-black text-xs sm:text-sm shadow-[0_6px_20px_rgba(225,29,72,0.55)] border border-rose-300/60 active:scale-95 transition">
+        👊 攻擊 (左鍵/J)
+      </button>
+    </div>
+
+    <!-- 行動裝置虛擬方向鍵與跳躍/對話 -->
+    <div class="md:hidden flex flex-col items-end gap-1.5">
+      <div class="flex gap-1.5">
+        <button id="btn-touch-talk" class="px-3 h-10 rounded-full hud-glass text-emerald-300 font-bold text-xs active:scale-95">對話/電梯 E</button>
+        <button id="btn-touch-jump" class="px-3 h-10 rounded-full hud-glass text-amber-300 font-bold text-xs active:scale-95">跳躍</button>
+      </div>
+      <div class="grid grid-cols-3 gap-1 w-32 h-32">
+        <div></div>
+        <button data-key="KeyW" class="touch-pad rounded-xl hud-glass text-white font-bold text-base active:bg-teal-500/50">▲</button>
+        <div></div>
+        <button data-key="KeyA" class="touch-pad rounded-xl hud-glass text-white font-bold text-base active:bg-teal-500/50">◀</button>
+        <button data-key="KeyS" class="touch-pad rounded-xl hud-glass text-white font-bold text-base active:bg-teal-500/50">▼</button>
+        <button data-key="KeyD" class="touch-pad rounded-xl hud-glass text-white font-bold text-base active:bg-teal-500/50">▶</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * 彰濱秀傳紀念醫院 7F VIP 尊榮病房空間 3D 實境（GTA 3D 實景建築版）
+     * ============================================================================
+     * 升級特色：
+     * 1. 實景建築材質：拋光石紋石英磚地坪、VIP 區大理石拼花與人字紋木石地坪、
+     *    胡桃木紋護牆板＋香檳金飾條壁布牆面、石英石圓弧護理站台面、走廊防撞扶手與 LED 格柵燈盤。
+     * 2. VIP 病房門口自動感應電動門：16 間 VIP 尊榮病房（含可走入玄關的 733 / 732 套房）
+     *    與 2 座 VIP 區域門禁電動玻璃雙開門，靠近自動亮燈並平順滑開。
+     * 3. 擴編醫護與患者陣容：8 位不同職別護理師與 8 位住院/健檢/輪椅復健患者巡房互動。
+     */
+
+    // --------------------------------------------------------------------------
+    // 1. 全域變數、樓層連結對照表與音效引擎
+    // --------------------------------------------------------------------------
+    let scene, camera, renderer;
+    const clock = new THREE.Clock();
+    let gameClockMinutes = 14 * 60 + 20;
+
+    // 樓層 HTML 自動連結清單 (B1, 1F, 2F, 3F, 5F, 6F, 7F, 8F)
+    const FLOOR_LINKS = [
+      { id: 'B1', file: 'B1.html', name: 'B1 地下一樓', desc: '美食街・停車場・放射腫瘤科・核子醫學科', keyCode: 'KeyB', keyLabel: 'B' },
+      { id: '1F', file: '1F.html', name: '1F 一樓大廳', desc: '入口門廳・批價掛號・門診區・急診室・放射科', keyCode: 'Digit1', keyLabel: '1' },
+      { id: '2F', file: '2F.html', name: '2F 二樓醫療層', desc: '2F 洗腎室 (腎臟科 李文清醫師)・開刀房・ICU・牙科', keyCode: 'Digit2', keyLabel: '2' },
+      { id: '3F', file: '3F.html', name: '3F 三樓醫療層', desc: '睡眠中心・婦產科 VIP 病房・班廷俱樂部・眼科', keyCode: 'Digit3', keyLabel: '3' },
+      { id: '5F', file: '5F.html', name: '5F 五樓病房層', desc: '517~563 住院病房・537 正壓病房・祈禱室 / 神明廳', keyCode: 'Digit5', keyLabel: '5' },
+      { id: '6F', file: '6F.html', name: '6F 六樓病房層', desc: '610~663 住院病房・雙圓弧護理站島・半圓弧展望廳', keyCode: 'Digit6', keyLabel: '6' },
+      { id: '7F', file: '7F.html', name: '7F 七樓尊榮層 (目前樓層)', desc: '732/733/735~755 VIP 尊榮病房・商務中心・交誼廳', keyCode: 'Digit7', keyLabel: '7' },
+      { id: '8F', file: '8F.html', name: '8F 八樓醫療層', desc: '8F 尊榮病房・健康管理中心・空中花園', keyCode: 'Digit8', keyLabel: '8' }
+    ];
+
+    // 樓層渲染群組
+    const floorGroups = {
+      1: new THREE.Group(),
+      2: new THREE.Group(),
+      3: new THREE.Group(),
+      5: new THREE.Group(),
+      6: new THREE.Group(),
+      7: new THREE.Group()
+    };
+    let activeBuildGroup = null;
+
+    // 碰撞箱清單：{ minX, maxX, minZ, maxZ, floor, label }
+    const colliders = [];
+
+    // 手扶梯 / 電梯接觸感應區清單
+    const transportZones = [];
+
+    // VIP 病房門口感應電動門清單
+    const automaticDoors = [];
+
+    // 鍵盤輸入狀態
+    const keys = {};
+
+    // 全院 NPC 清單與互動狀態
+    const npcs = [];
+    let showNpcLabels = true;
+    let activeTalkNpc = null;
+    let nearestNpc = null;
+    let currentTransportZone = null;
+
+    // 戰鬥視覺特效與螢幕震動
+    const slashEffects = [];
+    const impactParticles = [];
+    let camShake = 0;
+
+    // 樓層高程對照表
+    const FLOOR_Y = {
+      1: 0.0,
+      2: 4.6,
+      3: 9.2,
+      5: 13.8,
+      6: 18.4,
+      7: 23.0
+    };
+
+    function getFloorNumber(y) {
+      if (y >= 21.4) return 7;
+      if (y >= 16.8) return 6;
+      if (y >= 12.2) return 5;
+      if (y >= 7.8) return 3;
+      if (y >= 3.2) return 2;
+      return 1;
+    }
+
+    // 玩家角色狀態 (初始出生於 7F「現在位置 You Are Here」：西側 733 / 732 VIP 尊榮病房電動門前)
+    const player = {
+      mesh: null,
+      bodyRoot: null,
+      leftShoulder: null,
+      rightShoulder: null,
+      leftElbow: null,
+      rightElbow: null,
+      leftHip: null,
+      rightHip: null,
+      leftKnee: null,
+      rightKnee: null,
+      rightFistAura: null,
+      leftFistAura: null,
+      rightFootAura: null,
+      pos: new THREE.Vector3(-33.5, 23.0, 1.5),
+      vel: new THREE.Vector3(0, 0, 0),
+      yaw: -Math.PI * 0.5,
+      radius: 0.44,
+      onGround: true,
+      walkCycle: 0,
+      firstPerson: false,
+      hp: 100,
+      maxHp: 100,
+      armor: 90,
+      isDead: false,
+      respawnTimer: 0,
+      knockVel: new THREE.Vector3(0, 0, 0),
+      isAttacking: false,
+      attackTimer: 0,
+      attackDuration: 0.32,
+      attackType: 1,
+      comboStep: 0,
+      comboResetTimer: 0,
+      hitApplied: false,
+      wantedStars: 0,
+      totalHitsLanded: 0,
+      lastTriggeredTransportId: null
+    };
+
+    // 強化版滑鼠與相機軌道參數
+    const camState = {
+      yaw: Math.PI * 0.5,
+      pitch: 0.22,
+      distance: 5.2,
+      targetYaw: Math.PI * 0.5,
+      targetPitch: 0.22,
+      targetDistance: 5.2,
+      sensitivity: 1.0,
+      targetPos: new THREE.Vector3(-33.5, 24.48, 1.5),
+      isPointerLocked: false,
+      rightMouseDragging: false,
+      dragMovedDist: 0,
+      lastMouseX: null,
+      lastMouseY: null,
+      touchDragging: false,
+      lastTouchX: 0,
+      lastTouchY: 0
+    };
+
+    // 7F 內部快速傳送座標表
+    const ZONES = {
+      f7_here:      { label: '7F 現在位置・733 / 732 VIP 尊榮病房電動門前', pos: new THREE.Vector3(-33.5, 23.0, 1.5), yaw: -Math.PI * 0.5 },
+      f7_escalator: { label: '7F 中央手扶梯 / 四座電梯廳 (往 B1 ~ 8F)', pos: new THREE.Vector3(-1.5, 23.0, -7.2), yaw: 0 },
+      f7_lounge:    { label: '7F 全景交誼廳 / 商務中心 / 會議室', pos: new THREE.Vector3(2.0, 23.0, 11.5), yaw: 0 },
+      f7_east:      { label: '7F 東側護理站 B・C・D / 一般病房 (701~727)', pos: new THREE.Vector3(25.0, 23.0, -18.5), yaw: Math.PI }
+    };
+
+    // Web Audio 合成音效
+    const SoundFX = (() => {
+      let ctx = null;
+      function getCtx() {
+        if (!ctx && (window.AudioContext || window.webkitAudioContext)) {
+          ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (ctx && ctx.state === 'suspended') ctx.resume();
+        return ctx;
+      }
+      return {
+        playDoorSlide() {
+          try {
+            const c = getCtx();
+            if (!c) return;
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(145, c.currentTime);
+            osc.frequency.linearRampToValueAtTime(215, c.currentTime + 0.24);
+            gain.gain.setValueAtTime(0.045, c.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.26);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start();
+            osc.stop(c.currentTime + 0.27);
+          } catch (e) {}
+        },
+        playWhoosh(isHeavy = false) {
+          try {
+            const c = getCtx();
+            if (!c) return;
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(isHeavy ? 240 : 320, c.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(55, c.currentTime + 0.16);
+            gain.gain.setValueAtTime(0.18, c.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.16);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start();
+            osc.stop(c.currentTime + 0.17);
+          } catch (e) {}
+        },
+        playHit(isHeavy = false) {
+          try {
+            const c = getCtx();
+            if (!c) return;
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            osc.type = isHeavy ? 'sawtooth' : 'square';
+            osc.frequency.setValueAtTime(isHeavy ? 150 : 195, c.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(36, c.currentTime + 0.22);
+            gain.gain.setValueAtTime(isHeavy ? 0.32 : 0.22, c.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.22);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start();
+            osc.stop(c.currentTime + 0.23);
+          } catch (e) {}
+        },
+        playEnemyHit() {
+          try {
+            const c = getCtx();
+            if (!c) return;
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(125, c.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(32, c.currentTime + 0.24);
+            gain.gain.setValueAtTime(0.28, c.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.24);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start();
+            osc.stop(c.currentTime + 0.25);
+          } catch (e) {}
+        },
+        playAlert() {
+          try {
+            const c = getCtx();
+            if (!c) return;
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(660, c.currentTime);
+            osc.frequency.setValueAtTime(880, c.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.14, c.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.22);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start();
+            osc.stop(c.currentTime + 0.23);
+          } catch (e) {}
+        }
+      };
+    })();
+
+    // --------------------------------------------------------------------------
+    // 2. 全圓弧平滑幾何體生成器
+    // --------------------------------------------------------------------------
+    function createSmoothCapsuleGeometry(radius, cylinderHeight, radialSegs = 20, capSegs = 10) {
+      const halfH = Math.max(0.001, cylinderHeight * 0.5);
+      const pts = [];
+      for (let i = 0; i <= capSegs; i++) {
+        const theta = -Math.PI * 0.5 + (i / capSegs) * (Math.PI * 0.5);
+        pts.push(new THREE.Vector2(Math.cos(theta) * radius, -halfH + Math.sin(theta) * radius));
+      }
+      for (let i = 0; i <= capSegs; i++) {
+        const theta = (i / capSegs) * (Math.PI * 0.5);
+        pts.push(new THREE.Vector2(Math.cos(theta) * radius, halfH + Math.sin(theta) * radius));
+      }
+      const geom = new THREE.LatheGeometry(pts, radialSegs);
+      geom.computeVertexNormals();
+      return geom;
+    }
+
+    // --------------------------------------------------------------------------
+    // 3. 實景建築材質程序化貼圖庫 (大理石、拋光石英磚、胡桃木護牆板、人造石)
+    // --------------------------------------------------------------------------
+    function createPolishedFloorTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      // 暖象牙白拋光石英磚基底
+      ctx.fillStyle = '#f2ede2';
+      ctx.fillRect(0, 0, 512, 512);
+
+      // 天然雲母石材微晶紋理
+      for (let i = 0; i < 4800; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.28)' : 'rgba(176,164,145,0.13)';
+        ctx.fillRect(x, y, 4, 2);
+      }
+
+      // 柔和石材流紋
+      ctx.strokeStyle = 'rgba(185, 174, 158, 0.18)';
+      ctx.lineWidth = 1.5;
+      for (let v = 0; v < 14; v++) {
+        ctx.beginPath();
+        let vx = Math.random() * 512;
+        let vy = Math.random() * 512;
+        ctx.moveTo(vx, vy);
+        for (let s = 0; s < 6; s++) {
+          vx += (Math.random() - 0.3) * 45;
+          vy += (Math.random() - 0.3) * 45;
+          ctx.lineTo(vx, vy);
+        }
+        ctx.stroke();
+      }
+
+      // 60x60cm 拋光石英磚精細勾縫線
+      ctx.strokeStyle = 'rgba(148, 138, 124, 0.38)';
+      ctx.lineWidth = 2;
+      for (let p = 0; p <= 512; p += 128) {
+        ctx.beginPath();
+        ctx.moveTo(p, 0);
+        ctx.lineTo(p, 512);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, p);
+        ctx.lineTo(512, p);
+        ctx.stroke();
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(36, 32);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createVipMarbleFloorTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      // 尊榮暖香檳大理石基底
+      const grad = ctx.createLinearGradient(0, 0, 512, 512);
+      grad.addColorStop(0, '#f6efe4');
+      grad.addColorStop(0.5, '#ede2d0');
+      grad.addColorStop(1, '#f4ece0');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 512, 512);
+
+      // 卡拉拉金絲大理石脈紋
+      for (let i = 0; i < 18; i++) {
+        ctx.strokeStyle = i % 3 === 0 ? 'rgba(180, 145, 95, 0.24)' : 'rgba(135, 118, 102, 0.16)';
+        ctx.lineWidth = i % 3 === 0 ? 2.2 : 1.1;
+        ctx.beginPath();
+        let x = Math.random() * 512;
+        let y = 0;
+        ctx.moveTo(x, y);
+        while (y < 512) {
+          y += 32;
+          x += Math.sin(y * 0.03 + i) * 22 + (Math.random() - 0.5) * 14;
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      // 大尺度石材拼花與香檳金嵌條框線
+      ctx.strokeStyle = 'rgba(168, 132, 78, 0.42)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(6, 6, 500, 500);
+      ctx.strokeStyle = 'rgba(140, 120, 98, 0.28)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(24, 24, 464, 464);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(16, 16);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createArchitecturalWallTexture(upperHex, lowerHex, trimHex, isWoodWainscot = true) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      // 上半部實景建築壁布/塗料質感 (y: 0 ~ 340)
+      ctx.fillStyle = upperHex;
+      ctx.fillRect(0, 0, 512, 340);
+
+      // 細膩織布與建築塗料肌理
+      for (let y = 0; y < 340; y += 4) {
+        ctx.fillStyle = y % 8 === 0 ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.025)';
+        ctx.fillRect(0, y, 512, 2);
+      }
+
+      // 中段香檳金 / 拉絲不鏽鋼建築腰線飾條 (y: 334 ~ 352)
+      ctx.fillStyle = trimHex;
+      ctx.fillRect(0, 334, 512, 18);
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.fillRect(0, 336, 512, 4);
+
+      // 下半部護牆板 (y: 352 ~ 490)
+      ctx.fillStyle = lowerHex;
+      ctx.fillRect(0, 352, 512, 138);
+
+      if (isWoodWainscot) {
+        // 實木胡桃木紋與垂直木格柵線條
+        for (let x = 0; x < 512; x += 24) {
+          ctx.fillStyle = x % 48 === 0 ? 'rgba(0,0,0,0.11)' : 'rgba(255,255,255,0.05)';
+          ctx.fillRect(x, 352, 3, 138);
+        }
+        for (let g = 0; g < 600; g++) {
+          const gx = Math.random() * 512;
+          const gy = 354 + Math.random() * 134;
+          ctx.fillStyle = 'rgba(38, 20, 10, 0.12)';
+          ctx.fillRect(gx, gy, 2, 14);
+        }
+      } else {
+        // 醫院抗菌抗撞護牆板線條
+        for (let x = 0; x < 512; x += 128) {
+          ctx.fillStyle = 'rgba(0,0,0,0.08)';
+          ctx.fillRect(x, 352, 2, 138);
+        }
+      }
+
+      // 底部深色石材/金屬踢腳板 (y: 490 ~ 512)
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, 490, 512, 22);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.repeat.set(4, 1);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createQuartzCounterTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      // 暖白人造石英石台面與木質立面
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 512, 220);
+      for (let i = 0; i < 2400; i++) {
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(148,163,184,0.22)' : 'rgba(203,213,225,0.3)';
+        ctx.fillRect(Math.random() * 512, Math.random() * 220, 2, 2);
+      }
+
+      // 下部實木格柵櫃體
+      ctx.fillStyle = '#92400e';
+      ctx.fillRect(0, 220, 512, 292);
+      for (let x = 0; x < 512; x += 16) {
+        ctx.fillStyle = 'rgba(28, 12, 4, 0.32)';
+        ctx.fillRect(x, 220, 4, 292);
+        ctx.fillStyle = 'rgba(253, 230, 138, 0.14)';
+        ctx.fillRect(x + 4, 220, 2, 292);
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.repeat.set(3, 1);
+      return tex;
+    }
+
+    function createSignTexture(title, subtitle = '', bgHex = '#0f4c5c', accentHex = '#2dd4bf') {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 256;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = bgHex;
+      ctx.fillRect(0, 0, 1024, 256);
+
+      ctx.fillStyle = accentHex;
+      ctx.fillRect(0, 0, 26, 256);
+      ctx.fillRect(998, 0, 26, 256);
+      ctx.fillRect(0, 240, 1024, 16);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = subtitle ? '900 70px "Noto Sans TC", sans-serif' : '900 88px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(title, 512, subtitle ? 102 : 128);
+
+      if (subtitle) {
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = '700 32px "Noto Sans TC", sans-serif';
+        ctx.fillText(subtitle, 512, 188);
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function addHangingSign(x, y, z, w, h, title, subtitle = '', bgHex = '#0f4c5c', accentHex = '#2dd4bf', rotY = 0) {
+      const tex = createSignTexture(title, subtitle, bgHex, accentHex);
+      const signMat = new THREE.MeshStandardMaterial({
+        map: tex,
+        emissive: new THREE.Color(0xffffff),
+        emissiveMap: tex,
+        emissiveIntensity: 0.35,
+        roughness: 0.3
+      });
+      const frameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.65, roughness: 0.28 });
+
+      const group = new THREE.Group();
+      const box = new THREE.Mesh(
+        new THREE.BoxGeometry(w, h, 0.14),
+        [frameMat, frameMat, frameMat, frameMat, signMat, signMat]
+      );
+      group.add(box);
+
+      [-w * 0.38, w * 0.38].forEach((rx) => {
+        const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.85, 8), frameMat);
+        rod.position.set(rx, h / 2 + 0.4, 0);
+        group.add(rod);
+      });
+
+      group.position.set(x, y, z);
+      group.rotation.y = rotY;
+      (activeBuildGroup || scene).add(group);
+      return group;
+    }
+
+    function addWall(cx, cz, w, d, h = 4.4, mat = null, label = '牆面', floor = 7, baseY = 0) {
+      const material = mat || new THREE.MeshStandardMaterial({ color: 0xf5f2eb, roughness: 0.72 });
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+      mesh.position.set(cx, baseY + h / 2, cz);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      (activeBuildGroup || scene).add(mesh);
+
+      colliders.push({
+        minX: cx - w / 2,
+        maxX: cx + w / 2,
+        minZ: cz - d / 2,
+        maxZ: cz + d / 2,
+        floor,
+        label
+      });
+      return mesh;
+    }
+
+    // 醫院實景走廊防撞扶手欄杆
+    function addCorridorHandrail(x1, z1, x2, z2, baseY, isVip = false) {
+      const target = activeBuildGroup || scene;
+      const dx = x2 - x1;
+      const dz = z2 - z1;
+      const len = Math.hypot(dx, dz);
+      if (len < 0.5) return;
+
+      const railMat = new THREE.MeshStandardMaterial({
+        color: isVip ? 0xd4af37 : 0x0f766e,
+        metalness: isVip ? 0.78 : 0.35,
+        roughness: 0.28
+      });
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(len, 0.09, 0.07), railMat);
+      rail.position.set((x1 + x2) / 2, baseY + 0.92, (z1 + z2) / 2);
+      rail.rotation.y = -Math.atan2(dz, dx);
+      target.add(rail);
+    }
+
+    // 天花板實景嵌入式 LED 格柵照明燈盤
+    function addCeilingLightPanel(x, z, w, d, baseY, warmTone = false) {
+      const target = activeBuildGroup || scene;
+      const frameMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.6, roughness: 0.3 });
+      const diffuserMat = new THREE.MeshStandardMaterial({
+        color: warmTone ? 0xfef3c7 : 0xf8fafc,
+        emissive: warmTone ? 0xfde68a : 0xe0f2fe,
+        emissiveIntensity: 0.85,
+        roughness: 0.2
+      });
+      const frame = new THREE.Mesh(new THREE.BoxGeometry(w + 0.14, 0.06, d + 0.14), frameMat);
+      frame.position.set(x, baseY + 4.46, z);
+      const panel = new THREE.Mesh(new THREE.BoxGeometry(w, 0.07, d), diffuserMat);
+      panel.position.set(x, baseY + 4.45, z);
+      target.add(frame, panel);
+    }
+
+    function addFireHydrantCabinet(x, z, rotY = 0, baseY = 0) {
+      const group = new THREE.Group();
+      const redMat = new THREE.MeshStandardMaterial({
+        color: 0xdc2626,
+        emissive: 0x7f1d1d,
+        emissiveIntensity: 0.25,
+        roughness: 0.35
+      });
+      const cab = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.35, 0.18), redMat);
+      cab.position.y = 1.05;
+      const glass = new THREE.Mesh(
+        new THREE.BoxGeometry(0.55, 0.72, 0.2),
+        new THREE.MeshStandardMaterial({ color: 0xfef2f2, roughness: 0.2 })
+      );
+      glass.position.y = 1.22;
+      group.add(cab, glass);
+      group.position.set(x, baseY, z);
+      group.rotation.y = rotY;
+      (activeBuildGroup || scene).add(group);
+    }
+
+    /**
+     * 建構 VIP 病房門口紅外線感應電動滑門組 (支援套房門口電動門與 VIP 區門禁雙開玻璃電動門)
+     */
+    function buildVipAutomaticDoor(opts) {
+      const {
+        x,
+        z,
+        baseY,
+        rotY = 0,
+        totalWidth = 2.6,
+        openingWidth = 1.72,
+        roomCode = '735 VIP',
+        subLabel = 'AUTO SLIDING DOOR・紅外線感應電動門',
+        isPortal = false,
+        triggerRadius = 3.5
+      } = opts;
+
+      const target = activeBuildGroup || scene;
+      const g = new THREE.Group();
+
+      const goldFrameMat = new THREE.MeshStandardMaterial({
+        color: 0xd4af37,
+        metalness: 0.82,
+        roughness: 0.22
+      });
+      const darkBronzeMat = new THREE.MeshStandardMaterial({
+        color: 0x292524,
+        metalness: 0.65,
+        roughness: 0.3
+      });
+      const frostedGlassMat = new THREE.MeshStandardMaterial({
+        color: isPortal ? 0xbae6fd : 0xf3e8ff,
+        transparent: true,
+        opacity: isPortal ? 0.42 : 0.62,
+        roughness: 0.14,
+        metalness: 0.2
+      });
+      const walnutLeafMat = new THREE.MeshStandardMaterial({
+        color: 0x5c3a21,
+        roughness: 0.45,
+        metalness: 0.1
+      });
+      const sensorLedMat = new THREE.MeshStandardMaterial({
+        color: 0x10b981,
+        emissive: 0x10b981,
+        emissiveIntensity: 0.9
+      });
+
+      const doorH = 2.42;
+      const sideW = Math.max(0.18, (totalWidth - openingWidth) / 2);
+
+      // 左右固定側玻璃屏風與香檳金立柱
+      [-1, 1].forEach((side) => {
+        const postX = side * (openingWidth / 2 + 0.05);
+        const post = new THREE.Mesh(new THREE.BoxGeometry(0.1, doorH, 0.22), goldFrameMat);
+        post.position.set(postX, doorH / 2, 0);
+        g.add(post);
+
+        if (sideW > 0.25) {
+          const sideGlass = new THREE.Mesh(new THREE.BoxGeometry(sideW - 0.1, doorH - 0.08, 0.06), frostedGlassMat);
+          sideGlass.position.set(side * (openingWidth / 2 + sideW / 2), doorH / 2, 0);
+          const sideBase = new THREE.Mesh(new THREE.BoxGeometry(sideW, 0.14, 0.16), darkBronzeMat);
+          sideBase.position.set(side * (openingWidth / 2 + sideW / 2), 0.07, 0);
+          g.add(sideGlass, sideBase);
+        }
+      });
+
+      // 頂部電動門滑軌機箱與紅外線感應器
+      const headerBeam = new THREE.Mesh(new THREE.BoxGeometry(totalWidth, 0.26, 0.26), darkBronzeMat);
+      headerBeam.position.set(0, doorH + 0.13, 0);
+      const goldTrimBar = new THREE.Mesh(new THREE.BoxGeometry(totalWidth + 0.04, 0.04, 0.28), goldFrameMat);
+      goldTrimBar.position.set(0, doorH + 0.02, 0);
+
+      // 雙面紅外線感應盒與 LED 狀態指示燈
+      const sensorBox = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.11, 0.32), darkBronzeMat);
+      sensorBox.position.set(0, doorH + 0.16, 0);
+      const sensorLed = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.035, 0.34), sensorLedMat);
+      sensorLed.position.set(0, doorH + 0.13, 0);
+      g.add(headerBeam, goldTrimBar, sensorBox, sensorLed);
+
+      // 地面不鏽鋼導軌門檻條
+      const threshold = new THREE.Mesh(new THREE.BoxGeometry(openingWidth + 0.2, 0.022, 0.22), goldFrameMat);
+      threshold.position.set(0, 0.011, 0);
+      g.add(threshold);
+
+      // 雙開電動滑門門扇 (左門扇 & 右門扇)
+      const leafW = openingWidth * 0.5;
+      function buildSlidingLeaf(sideSign) {
+        const leafGroup = new THREE.Group();
+        const outerFrame = new THREE.Mesh(new THREE.BoxGeometry(leafW, doorH - 0.04, 0.07), goldFrameMat);
+        outerFrame.position.y = (doorH - 0.04) / 2;
+
+        const glassPane = new THREE.Mesh(new THREE.BoxGeometry(leafW - 0.12, doorH - 0.24, 0.08), frostedGlassMat);
+        glassPane.position.y = (doorH - 0.04) / 2;
+
+        leafGroup.add(outerFrame, glassPane);
+
+        // 非區域大門的套房電動門加上下半部胡桃木實木飾板與直立拉絲把手
+        if (!isPortal) {
+          const woodKick = new THREE.Mesh(new THREE.BoxGeometry(leafW - 0.1, 0.78, 0.088), walnutLeafMat);
+          woodKick.position.y = 0.42;
+          const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.52, 10), goldFrameMat);
+          handle.position.set(-sideSign * (leafW * 0.36), 1.15, 0.055);
+          const handleBack = handle.clone();
+          handleBack.position.z = -0.055;
+          leafGroup.add(woodKick, handle, handleBack);
+        }
+
+        leafGroup.position.set(sideSign * (leafW * 0.5), 0.01, 0);
+        return leafGroup;
+      }
+
+      const leftLeaf = buildSlidingLeaf(-1);
+      const rightLeaf = buildSlidingLeaf(1);
+      g.add(leftLeaf, rightLeaf);
+
+      // 頂部發光 VIP 房號與電動門標示牌
+      const plaqueTex = createSignTexture(
+        `${roomCode} 電動門`,
+        subLabel,
+        isPortal ? '#4c1d95' : '#581c87',
+        '#fde047'
+      );
+      const plaqueMat = new THREE.MeshStandardMaterial({
+        map: plaqueTex,
+        emissive: 0xffffff,
+        emissiveMap: plaqueTex,
+        emissiveIntensity: 0.38,
+        roughness: 0.28
+      });
+      const plaque = new THREE.Mesh(new THREE.BoxGeometry(isPortal ? 3.2 : 1.55, isPortal ? 0.56 : 0.44, 0.08), plaqueMat);
+      plaque.position.set(0, doorH + 0.56, 0);
+      g.add(plaque);
+
+      g.position.set(x, baseY, z);
+      g.rotation.y = rotY;
+      target.add(g);
+
+      automaticDoors.push({
+        x,
+        z,
+        floor: 7,
+        leftLeaf,
+        rightLeaf,
+        closedOffset: leafW * 0.5,
+        slideDistance: leafW * 0.88,
+        openProgress: 0,
+        targetOpen: 0,
+        holdTimer: 0,
+        triggerRadius,
+        sensorLedMat,
+        soundCooldown: 0
+      });
+    }
+
+    function updateAutomaticDoors(dt) {
+      const pFloor = getFloorNumber(player.pos.y);
+
+      for (let i = 0; i < automaticDoors.length; i++) {
+        const door = automaticDoors[i];
+        if (door.soundCooldown > 0) door.soundCooldown -= dt;
+
+        let someoneNear = false;
+        if (pFloor === door.floor && !player.isDead) {
+          const dPlayer = Math.hypot(player.pos.x - door.x, player.pos.z - door.z);
+          if (dPlayer <= door.triggerRadius) someoneNear = true;
+        }
+
+        if (!someoneNear) {
+          for (let j = 0; j < npcs.length; j++) {
+            const npc = npcs[j];
+            if (npc.floor !== door.floor || npc.knockedTimer > 0) continue;
+            const dNpc = Math.hypot(npc.pos.x - door.x, npc.pos.z - door.z);
+            if (dNpc <= door.triggerRadius) {
+              someoneNear = true;
+              break;
+            }
+          }
+        }
+
+        if (someoneNear) {
+          door.targetOpen = 1.0;
+          door.holdTimer = 1.15;
+        } else if (door.holdTimer > 0) {
+          door.holdTimer -= dt;
+          door.targetOpen = 1.0;
+        } else {
+          door.targetOpen = 0.0;
+        }
+
+        if (door.targetOpen > 0.5 && door.openProgress < 0.08 && door.soundCooldown <= 0) {
+          door.soundCooldown = 2.6;
+          SoundFX.playDoorSlide();
+        }
+
+        door.openProgress += (door.targetOpen - door.openProgress) * Math.min(1, dt * 6.5);
+        const shift = door.closedOffset + door.openProgress * door.slideDistance;
+        door.leftLeaf.position.x = -shift;
+        door.rightLeaf.position.x = shift;
+
+        // 感應指示燈顏色切換：開啟時為亮青藍光，待機時為翠綠光
+        if (door.openProgress > 0.15) {
+          door.sensorLedMat.color.setHex(0x38bdf8);
+          door.sensorLedMat.emissive.setHex(0x38bdf8);
+        } else {
+          door.sensorLedMat.color.setHex(0x10b981);
+          door.sensorLedMat.emissive.setHex(0x10b981);
+        }
+      }
+    }
+
+    /**
+     * 建構 3D 雙向自動手扶梯模型與接觸感應區 (接觸時自動詢問前往 B1 ~ 8F)
+     */
+    function buildEscalatorUnit(cx, cz, floorNum, baseY, rotY = 0, zoneId = 'esc_7f') {
+      const target = activeBuildGroup || scene;
+      const g = new THREE.Group();
+
+      const steelMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.78, roughness: 0.25 });
+      const stepMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.6, roughness: 0.45 });
+      const railMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35 });
+      const glassRailMat = new THREE.MeshStandardMaterial({
+        color: 0x5eead4,
+        transparent: true,
+        opacity: 0.42,
+        roughness: 0.12
+      });
+      const sensorMat = new THREE.MeshStandardMaterial({
+        color: 0x2dd4bf,
+        emissive: 0x0d9488,
+        emissiveIntensity: 0.65,
+        roughness: 0.3
+      });
+
+      const width = 2.6;
+      const length = 5.4;
+
+      [-width / 2, width / 2].forEach((sideX) => {
+        const baseSide = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.95, length), steelMat);
+        baseSide.position.set(sideX, 0.48, 0);
+        const glassPanel = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.78, length - 0.3), glassRailMat);
+        glassPanel.position.set(sideX, 1.22, 0);
+        const rubberTop = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.1, length + 0.25), railMat);
+        rubberTop.position.set(sideX, 1.64, 0);
+        g.add(baseSide, glassPanel, rubberTop);
+      });
+
+      const numSteps = 12;
+      for (let i = 0; i < numSteps; i++) {
+        const t = i / (numSteps - 1);
+        const stepY = 0.08 + t * 2.15;
+        const stepZ = (length * 0.42) - t * (length * 0.84);
+        const step = new THREE.Mesh(new THREE.BoxGeometry(width - 0.24, 0.14, 0.44), stepMat);
+        step.position.set(0, stepY, stepZ);
+        g.add(step);
+      }
+
+      const frontPad = new THREE.Mesh(new THREE.BoxGeometry(width - 0.1, 0.04, 1.25), sensorMat);
+      frontPad.position.set(0, 0.02, length / 2 + 0.55);
+      const backPad = new THREE.Mesh(new THREE.BoxGeometry(width - 0.1, 0.04, 1.25), sensorMat);
+      backPad.position.set(0, 0.02, -(length / 2 + 0.55));
+      g.add(frontPad, backPad);
+
+      g.position.set(cx, baseY, cz);
+      g.rotation.y = rotY;
+      target.add(g);
+
+      const halfW = rotY === 0 || Math.abs(rotY - Math.PI) < 0.01 ? width / 2 : length * 0.36;
+      const halfD = rotY === 0 || Math.abs(rotY - Math.PI) < 0.01 ? length * 0.36 : width / 2;
+      colliders.push({
+        minX: cx - halfW,
+        maxX: cx + halfW,
+        minZ: cz - halfD,
+        maxZ: cz + halfD,
+        floor: floorNum,
+        label: `${floorNum}F 手扶梯`
+      });
+
+      const trigW = rotY === 0 || Math.abs(rotY - Math.PI) < 0.01 ? width / 2 + 0.65 : length / 2 + 1.35;
+      const trigD = rotY === 0 || Math.abs(rotY - Math.PI) < 0.01 ? length / 2 + 1.35 : width / 2 + 0.65;
+      transportZones.push({
+        id: zoneId,
+        floor: floorNum,
+        transportType: '手扶梯',
+        minX: cx - trigW,
+        maxX: cx + trigW,
+        minZ: cz - trigD,
+        maxZ: cz + trigD
+      });
+
+      addHangingSign(
+        cx,
+        baseY + 3.55,
+        cz,
+        4.6,
+        0.78,
+        '自動手扶梯 ESCALATOR',
+        '接觸手扶梯自動選擇 B1 ~ 8F 樓層',
+        '#0f766e',
+        '#5eead4',
+        rotY
+      );
+    }
+
+    // --------------------------------------------------------------------------
+    // 4. 醫療儀器、圓弧實木石英石護理站島與病房立面模組
+    // --------------------------------------------------------------------------
+    function buildDentalChairUnit(x, z, baseY = 4.6, floorNum = 2) {
+      const target = activeBuildGroup || scene;
+      const g = new THREE.Group();
+      const chairMat = new THREE.MeshStandardMaterial({ color: 0xec4899, roughness: 0.45 });
+      const whiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
+
+      const base = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.35, 1.1), whiteMat);
+      base.position.y = 0.18;
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.14, 1.35), chairMat);
+      seat.position.set(0, 0.52, 0.1);
+      const back = new THREE.Mesh(new THREE.BoxGeometry(0.54, 0.72, 0.14), chairMat);
+      back.position.set(0, 0.85, -0.52);
+      back.rotation.x = -0.35;
+      g.add(base, seat, back);
+      g.position.set(x, baseY, z);
+      target.add(g);
+      colliders.push({ minX: x - 0.5, maxX: x + 0.5, minZ: z - 0.85, maxZ: z + 0.85, floor: floorNum, label: 'VIP 洗髮美療椅' });
+    }
+
+    function buildRoundedNursingIsland(cx, cz, floorNum, baseY, isEast = true) {
+      const target = activeBuildGroup || scene;
+      const islandW = 14.5;
+      const islandD = 4.8;
+      const radius = islandD / 2;
+
+      const quartzCounterTex = createQuartzCounterTexture();
+      const counterMat = new THREE.MeshStandardMaterial({ map: quartzCounterTex, roughness: 0.42 });
+      const topMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.08 });
+      const coreMat = new THREE.MeshStandardMaterial({
+        map: createArchitecturalWallTexture('#e6f4ea', '#b7e4c7', '#0f766e', false),
+        roughness: 0.65
+      });
+      const screenMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x38bdf8, emissiveIntensity: 0.45 });
+
+      const g = new THREE.Group();
+
+      const rectCounter = new THREE.Mesh(new THREE.BoxGeometry(islandW, 1.12, islandD), counterMat);
+      rectCounter.position.y = 0.56;
+      const rectTop = new THREE.Mesh(new THREE.BoxGeometry(islandW + 0.1, 0.1, islandD + 0.15), topMat);
+      rectTop.position.y = 1.15;
+      g.add(rectCounter, rectTop);
+
+      [-islandW / 2, islandW / 2].forEach((endX) => {
+        const cap = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 1.12, 24), counterMat);
+        cap.position.set(endX, 0.56, 0);
+        const capTop = new THREE.Mesh(new THREE.CylinderGeometry(radius + 0.08, radius + 0.08, 0.1, 24), topMat);
+        capTop.position.set(endX, 1.15, 0);
+        g.add(cap, capTop);
+      });
+
+      const innerCore = new THREE.Mesh(new THREE.BoxGeometry(islandW - 2.6, 2.85, islandD - 1.8), coreMat);
+      innerCore.position.y = 1.425;
+      g.add(innerCore);
+
+      [-4.2, 0, 4.2].forEach((mx) => {
+        const mon = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.36, 0.08), screenMat);
+        mon.position.set(mx, 1.42, -islandD / 2 + 0.35);
+        const monS = mon.clone();
+        monS.position.set(mx, 1.42, islandD / 2 - 0.35);
+        g.add(mon, monS);
+      });
+
+      g.position.set(cx, baseY, cz);
+      target.add(g);
+
+      colliders.push({
+        minX: cx - (islandW / 2 + radius),
+        maxX: cx + (islandW / 2 + radius),
+        minZ: cz - radius,
+        maxZ: cz + radius,
+        floor: floorNum,
+        label: isEast ? '東側圓弧護理站島' : '西側圓弧護理站島'
+      });
+
+      const northTitle = isEast
+        ? '東側護理站 B・護理站 C・醫材供應・討論室'
+        : '西側護理站 C・討論室・護理站 B・醫材供應';
+      const southTitle = isEast
+        ? '書記室・護理長室・治療室・護理站 D・值班室'
+        : '值班室・護理站 D・治療室・護理長室・書記室';
+
+      addHangingSign(cx, baseY + 3.55, cz - radius - 0.1, 8.6, 0.85, northTitle, `${floorNum}F NURSING STATION ISLAND`, '#0f766e', '#5eead4', 0);
+      addHangingSign(cx, baseY + 3.55, cz + radius + 0.1, 8.6, 0.85, southTitle, `${floorNum}F STAFF & TREATMENT ROOMS`, '#0369a1', '#7dd3fc', Math.PI);
+    }
+
+    function addWardDoorFacade(x, z, roomCode, baseY, isNorthRow = true, isVip = false) {
+      if (isVip) {
+        // VIP 尊榮病房門口配備完整紅外線感應雙開電動門
+        buildVipAutomaticDoor({
+          x,
+          z: isNorthRow ? z + 0.05 : z - 0.05,
+          baseY,
+          rotY: isNorthRow ? 0 : Math.PI,
+          totalWidth: 2.55,
+          openingWidth: 1.65,
+          roomCode,
+          subLabel: 'VIP SUITE・感應電動門',
+          isPortal: false,
+          triggerRadius: 3.4
+        });
+        return;
+      }
+
+      const target = activeBuildGroup || scene;
+      const g = new THREE.Group();
+      const doorWoodMat = new THREE.MeshStandardMaterial({
+        color: 0x9a5b2b,
+        roughness: 0.48
+      });
+      const glassMat = new THREE.MeshStandardMaterial({
+        color: 0xbae6fd,
+        transparent: true,
+        opacity: 0.45,
+        roughness: 0.15
+      });
+
+      const door = new THREE.Mesh(new THREE.BoxGeometry(1.15, 2.25, 0.12), doorWoodMat);
+      door.position.set(0, 1.125, 0);
+      const win = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.95, 0.14), glassMat);
+      win.position.set(0, 1.45, 0);
+
+      const plaqueTex = createSignTexture(
+        roomCode,
+        'INPATIENT WARD',
+        '#0f4c5c',
+        '#2dd4bf'
+      );
+      const plaque = new THREE.Mesh(
+        new THREE.BoxGeometry(1.35, 0.42, 0.08),
+        new THREE.MeshStandardMaterial({
+          map: plaqueTex,
+          emissive: 0xffffff,
+          emissiveMap: plaqueTex,
+          emissiveIntensity: 0.35
+        })
+      );
+      plaque.position.set(0, 2.55, isNorthRow ? 0.06 : -0.06);
+      if (!isNorthRow) plaque.rotation.y = Math.PI;
+
+      g.add(door, win, plaque);
+      g.position.set(x, baseY, z);
+      target.add(g);
+    }
+
+    // VIP 套房玄關內裝擺設 (733 / 732 電動門開啟後可見內部迎賓廳)
+    function buildVipFoyerDecor(x, z, baseY) {
+      const target = activeBuildGroup || scene;
+      const g = new THREE.Group();
+      const woodMat = new THREE.MeshStandardMaterial({ color: 0x5c3a21, roughness: 0.45 });
+      const goldMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.8, roughness: 0.25 });
+      const velvetMat = new THREE.MeshStandardMaterial({ color: 0x7e22ce, roughness: 0.55 });
+      const lampGlowMat = new THREE.MeshStandardMaterial({ color: 0xfef3c7, emissive: 0xfde68a, emissiveIntensity: 0.9 });
+
+      // 玄關迎賓邊桌與蘭花盆栽
+      const consoleTable = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.82, 1.15), woodMat);
+      consoleTable.position.set(-0.6, 0.41, 0);
+      const vase = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.08, 0.28, 14), goldMat);
+      vase.position.set(-0.6, 0.96, 0);
+      const blossom = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 10), new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.4 }));
+      blossom.position.set(-0.6, 1.18, 0);
+
+      // 尊榮單人絲絨迎賓沙發椅
+      const chairSeat = new THREE.Mesh(createSmoothCapsuleGeometry(0.28, 0.35, 14, 6), velvetMat);
+      chairSeat.rotation.z = Math.PI / 2;
+      chairSeat.position.set(-0.2, 0.42, -1.15);
+
+      // 暖光壁燈
+      const sconce = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.35, 0.18), lampGlowMat);
+      sconce.position.set(-0.88, 1.85, 0);
+
+      g.add(consoleTable, vase, blossom, chairSeat, sconce);
+      g.position.set(x, baseY, z);
+      target.add(g);
+    }
+
+    // --------------------------------------------------------------------------
+    // 5. 建構 7F 實景建築材質與 VIP 尊榮空間
+    // --------------------------------------------------------------------------
+    function buildAllHospitalFloors() {
+      const floorTex = createPolishedFloorTexture();
+      const floorMat = new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.28, metalness: 0.12 });
+      const ceilingMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.82 });
+
+      // 實景建築牆面材質：胡桃木護牆板 + 香檳金飾條 + 暖白織紋壁布
+      const vipWallMat = new THREE.MeshStandardMaterial({
+        map: createArchitecturalWallTexture('#f7f1f8', '#5c3a21', '#d4af37', true),
+        roughness: 0.58
+      });
+      const wallCreamMat = new THREE.MeshStandardMaterial({
+        map: createArchitecturalWallTexture('#f5f0e6', '#d6cbb8', '#94a3b8', false),
+        roughness: 0.65
+      });
+      const wallMintMat = new THREE.MeshStandardMaterial({
+        map: createArchitecturalWallTexture('#e6f4ea', '#a7d7b8', '#0f766e', false),
+        roughness: 0.62
+      });
+      const wallBlueMat = new THREE.MeshStandardMaterial({
+        map: createArchitecturalWallTexture('#e0f2fe', '#93c5fd', '#0369a1', false),
+        roughness: 0.62
+      });
+      const wardBeigeMat = new THREE.MeshStandardMaterial({
+        map: createArchitecturalWallTexture('#f4ede1', '#8c5a32', '#cbd5e1', true),
+        roughness: 0.6
+      });
+      const glassMat = new THREE.MeshStandardMaterial({
+        color: 0x99f6e4,
+        transparent: true,
+        opacity: 0.36,
+        roughness: 0.1,
+        metalness: 0.68
+      });
+      const darkFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e3a34, metalness: 0.6, roughness: 0.32 });
+
+      Object.values(floorGroups).forEach((grp) => scene.add(grp));
+
+      buildFloor7(floorMat, ceilingMat, wallCreamMat, wallMintMat, wallBlueMat, wardBeigeMat, vipWallMat, glassMat, darkFrameMat);
+
+      activeBuildGroup = null;
+    }
+
+    // ==================== 7F VIP 尊榮病房・感應電動門・實景材質空間 ====================
+    function buildFloor7(floorMat, ceilingMat, wallCreamMat, wallMintMat, wallBlueMat, wardBeigeMat, vipWallMat, glassMat, darkFrameMat) {
+      activeBuildGroup = floorGroups[7];
+      const f7Y = FLOOR_Y[7];
+
+      const loungeBlueMat = new THREE.MeshStandardMaterial({
+        map: createArchitecturalWallTexture('#e0f2fe', '#7dd3fc', '#0284c7', false),
+        roughness: 0.58
+      });
+      const sensorPadMat = new THREE.MeshStandardMaterial({
+        color: 0x38bdf8,
+        emissive: 0x0284c7,
+        emissiveIntensity: 0.55,
+        roughness: 0.35
+      });
+
+      // 1. 7F 主樓板（拋光石紋石英磚）與天花板
+      const mainSlab = new THREE.Mesh(new THREE.BoxGeometry(107, 0.24, 92), floorMat);
+      mainSlab.position.set(0, f7Y - 0.12, -1.5);
+      mainSlab.receiveShadow = true;
+      activeBuildGroup.add(mainSlab);
+
+      // VIP 尊榮病房區專屬大理石拼花地坪（覆蓋西側 733/732 與北西 735~755 VIP 走廊）
+      const vipMarbleMat = new THREE.MeshStandardMaterial({
+        map: createVipMarbleFloorTexture(),
+        roughness: 0.22,
+        metalness: 0.16
+      });
+      const vipWestFloor = new THREE.Mesh(new THREE.PlaneGeometry(33.5, 42.0), vipMarbleMat);
+      vipWestFloor.rotation.x = -Math.PI / 2;
+      vipWestFloor.position.set(-23.5, f7Y + 0.008, -7.5);
+      vipWestFloor.receiveShadow = true;
+      activeBuildGroup.add(vipWestFloor);
+
+      const ceil7F = new THREE.Mesh(new THREE.PlaneGeometry(108, 93), ceilingMat);
+      ceil7F.rotation.x = Math.PI / 2;
+      ceil7F.position.set(0, f7Y + 4.5, -1.5);
+      activeBuildGroup.add(ceil7F);
+
+      // 天花板嵌入式 LED 格柵照明燈盤（VIP 區暖香檳光、一般區日白光）
+      [-34.0, -24.0, -14.0, -4.0].forEach((lx) => {
+        addCeilingLightPanel(lx, -19.8, 2.4, 0.85, f7Y, true);
+        addCeilingLightPanel(lx, -3.2, 2.4, 0.85, f7Y, true);
+      });
+      [6.0, 16.0, 26.0, 36.0].forEach((lx) => {
+        addCeilingLightPanel(lx, -19.8, 2.4, 0.85, f7Y, false);
+        addCeilingLightPanel(lx, -3.2, 2.4, 0.85, f7Y, false);
+      });
+
+      // 2. 7F 外圍建築牆與南側落地玻璃帷幕立柱
+      addWall(0, -47.5, 108, 0.8, 4.5, wallCreamMat, '7F 北側外牆', 7, f7Y);
+      addWall(-53.5, -1.5, 0.8, 93, 4.5, wallCreamMat, '7F 西側外牆', 7, f7Y);
+      addWall(53.5, -1.5, 0.8, 93, 4.5, wallCreamMat, '7F 東側外牆', 7, f7Y);
+      addWall(0, 22.4, 108, 0.8, 4.5, glassMat, '7F 南側全景玻璃帷幕外牆', 7, f7Y);
+
+      for (let mx = -48; mx <= 48; mx += 6) {
+        const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.18, 4.5, 0.86), darkFrameMat);
+        mullion.position.set(mx, f7Y + 2.25, 22.4);
+        activeBuildGroup.add(mullion);
+      }
+
+      // 3. 西北角安全梯/洗衣間/無障礙廁所/西北電梯廳
+      addWall(-47.5, -39.5, 11.5, 14.5, 4.4, wallMintMat, '7F 西北安全梯・洗衣間・無障礙廁所', 7, f7Y);
+      addWall(-47.5, -29.5, 11.5, 5.0, 4.4, wallBlueMat, '7F 西北電梯廳', 7, f7Y);
+
+      const nwElevDoor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.18, 2.4, 2.2),
+        new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.78, roughness: 0.25 })
+      );
+      nwElevDoor.position.set(-41.7, f7Y + 1.2, -29.5);
+      const nwElevPad = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.03, 3.4), sensorPadMat);
+      nwElevPad.position.set(-40.8, f7Y + 0.015, -29.5);
+      activeBuildGroup.add(nwElevDoor, nwElevPad);
+
+      transportZones.push({
+        id: 'elev_7f_nw',
+        floor: 7,
+        transportType: '西北電梯',
+        minX: -42.5,
+        maxX: -39.2,
+        minZ: -32.2,
+        maxZ: -26.8
+      });
+      addHangingSign(-40.8, f7Y + 3.55, -29.5, 5.2, 0.82, '7F 西北電梯廳 (接觸自動選樓層)', 'NW ELEVATOR・往 B1 ~ 8F', '#065f46', '#6ee7b7', Math.PI / 2);
+
+      // 極西側兩大豪華 VIP 套房（733 VIP & 732 VIP）：配置紅外線感應電動滑門 + 可走入式 VIP 玄關門廳
+      // 733 VIP 尊榮病房牆體與門口玄關開孔 (開口 Z: -8.3 ~ -4.7)
+      addWall(-48.25, -14.5, 9.7, 21.5, 4.4, vipWallMat, '733 VIP 尊榮病房', 7, f7Y);
+      addWall(-41.7, -16.775, 3.4, 16.95, 4.4, vipWallMat, '733 VIP 尊榮病房北側牆', 7, f7Y);
+      addWall(-41.7, -4.225, 3.4, 0.95, 4.4, vipWallMat, '733 VIP 尊榮病房南側牆', 7, f7Y);
+      buildVipFoyerDecor(-42.2, -6.5, f7Y);
+      buildVipAutomaticDoor({
+        x: -40.05,
+        z: -6.5,
+        baseY: f7Y,
+        rotY: Math.PI / 2,
+        totalWidth: 3.55,
+        openingWidth: 2.1,
+        roomCode: '733 VIP 尊榮病房',
+        subLabel: 'LUXURY VIP SUITE・紅外線感應電動門',
+        isPortal: false,
+        triggerRadius: 3.8
+      });
+
+      // 733 與 732 之間隔間牆
+      addWall(-46.5, -3.25, 13.0, 1.0, 4.4, vipWallMat, '733/732 VIP 隔間牆', 7, f7Y);
+
+      // 732 VIP 尊榮病房牆體與門口玄關開孔 (開口 Z: 3.7 ~ 7.3)
+      addWall(-48.25, 6.5, 9.7, 18.5, 4.4, vipWallMat, '732 VIP 尊榮病房', 7, f7Y);
+      addWall(-41.7, 0.475, 3.4, 6.45, 4.4, vipWallMat, '732 VIP 尊榮病房北側牆', 7, f7Y);
+      addWall(-41.7, 11.525, 3.4, 8.45, 4.4, vipWallMat, '732 VIP 尊榮病房南側牆', 7, f7Y);
+      buildVipFoyerDecor(-42.2, 5.5, f7Y);
+      buildVipAutomaticDoor({
+        x: -40.05,
+        z: 5.5,
+        baseY: f7Y,
+        rotY: Math.PI / 2,
+        totalWidth: 3.55,
+        openingWidth: 2.1,
+        roomCode: '732 VIP 尊榮病房',
+        subLabel: 'LUXURY VIP SUITE・紅外線感應電動門',
+        isPortal: false,
+        triggerRadius: 3.8
+      });
+
+      // 「現在位置 You Are Here」地面銘牌
+      const herePadTex = createSignTexture('7F 現在位置 YOU ARE HERE', '733 / 732 VIP 尊榮病房電動門前', '#6b21a8', '#fde047');
+      const herePad = new THREE.Mesh(
+        new THREE.PlaneGeometry(3.8, 1.15),
+        new THREE.MeshStandardMaterial({ map: herePadTex, roughness: 0.35 })
+      );
+      herePad.rotation.x = -Math.PI / 2;
+      herePad.position.set(-33.5, f7Y + 0.015, 1.5);
+      activeBuildGroup.add(herePad);
+
+      addHangingSign(-33.5, f7Y + 3.65, -4.5, 6.4, 0.88, '7F VIP 尊榮病房區 (感應式電動門)', 'EXECUTIVE VIP SUITES WING・走近自動開門', '#581c87', '#fde047', -Math.PI / 2);
+
+      // VIP 尊榮病房管制區主入口雙開感應電動玻璃門（北西廊道與南西廊道各一座）
+      buildVipAutomaticDoor({
+        x: -7.2,
+        z: -19.9,
+        baseY: f7Y,
+        rotY: Math.PI / 2,
+        totalWidth: 9.4,
+        openingWidth: 3.2,
+        roomCode: '7F VIP 尊榮區主入口',
+        subLabel: 'VIP EXECUTIVE ZONE・感應式電動玻璃門',
+        isPortal: true,
+        triggerRadius: 4.4
+      });
+      buildVipAutomaticDoor({
+        x: -14.2,
+        z: -3.1,
+        baseY: f7Y,
+        rotY: Math.PI / 2,
+        totalWidth: 13.4,
+        openingWidth: 3.4,
+        roomCode: '7F VIP 尊榮服務區',
+        subLabel: 'VIP LOUNGE & SUITES・感應式電動玻璃門',
+        isPortal: true,
+        triggerRadius: 4.4
+      });
+
+      // 4. 北排 20 間病房：北西側 10 間 VIP 尊榮套房 (735~755，全數配備電動門) + 北東側 10 間一般病房 (727~717)
+      const nwVipRooms = ['735', '736', '737', '738', '739', '750', '751', '752', '753', '755'];
+      const neGenRooms = ['727', '726', '725', '723', '722', '721', '720', '719', '718', '717'];
+
+      addWall(-11.5, -29.0, 35.0, 8.5, 4.4, vipWallMat, '7F 北西 VIP 尊榮病房群 (735~755)', 7, f7Y);
+      nwVipRooms.forEach((rm, idx) => {
+        const rx = -29.0 + (idx + 0.5) * 3.5;
+        addWardDoorFacade(rx, -24.7, `${rm} VIP`, f7Y, true, true);
+      });
+      addHangingSign(-11.5, f7Y + 3.65, -23.6, 7.4, 0.88, '7F 北西 VIP 尊榮病房 (735 ~ 755)', 'VIP PRIVATE SUITES・獨立電動門套房', '#6b21a8', '#fde047');
+
+      addWall(23.5, -29.0, 35.0, 8.5, 4.4, wardBeigeMat, '7F 北東一般病房群 (727~717)', 7, f7Y);
+      neGenRooms.forEach((rm, idx) => {
+        const rx = 6.0 + (idx + 0.5) * 3.5;
+        addWardDoorFacade(rx, -24.7, `${rm} 病房`, f7Y, true, false);
+      });
+      addHangingSign(23.5, f7Y + 3.65, -23.6, 7.2, 0.88, '7F 東北翼一般病房 (727 ~ 717 病房)', 'GENERAL INPATIENT WARDS', '#0f4c5c', '#2dd4bf');
+
+      // 5. 極東翼 5 間病房 (716~711) 與東北安全梯/電梯/洗衣間
+      addWall(47.5, -39.5, 11.0, 14.5, 4.4, wallMintMat, '7F 東北安全梯・電梯・洗衣間', 7, f7Y);
+      const neElevDoor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.18, 2.4, 2.2),
+        new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.78, roughness: 0.25 })
+      );
+      neElevDoor.position.set(41.95, f7Y + 1.2, -35.5);
+      const neElevPad = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.03, 3.4), sensorPadMat);
+      neElevPad.position.set(41.0, f7Y + 0.015, -35.5);
+      activeBuildGroup.add(neElevDoor, neElevPad);
+
+      transportZones.push({
+        id: 'elev_7f_ne',
+        floor: 7,
+        transportType: '東北電梯',
+        minX: 39.2,
+        maxX: 42.6,
+        minZ: -38.0,
+        maxZ: -33.0
+      });
+
+      const farEastRooms = ['716', '715', '713', '712', '711'];
+      addWall(47.5, -16.5, 11.0, 22.0, 4.4, wardBeigeMat, '7F 極東翼一般病房 (716~711)', 7, f7Y);
+      addCorridorHandrail(41.95, -26.5, 41.95, -6.5, f7Y, false);
+      farEastRooms.forEach((rm, idx) => {
+        const rz = -24.5 + idx * 4.0;
+        const plaqueTex = createSignTexture(`${rm} 病房`, 'EAST WING', '#0f4c5c', '#2dd4bf');
+        const plaque = new THREE.Mesh(
+          new THREE.BoxGeometry(0.1, 0.42, 1.35),
+          new THREE.MeshStandardMaterial({ map: plaqueTex, emissive: 0xffffff, emissiveMap: plaqueTex, emissiveIntensity: 0.35 })
+        );
+        plaque.position.set(41.95, f7Y + 2.55, rz);
+        activeBuildGroup.add(plaque);
+      });
+
+      // 6. 中央核心區：護理站 A、中央四座電梯門立面與接觸感應區
+      addWall(0.5, -12.5, 13.5, 4.8, 4.4, wallMintMat, '7F 中央護理站 A 與四座電梯核心', 7, f7Y);
+      addCorridorHandrail(-5.8, -14.95, 6.8, -14.95, f7Y, false);
+      addHangingSign(0.5, f7Y + 3.65, -15.4, 7.0, 0.88, '7F 護理站 A・中央四座電梯廳', 'CENTRAL ELEVATORS・接觸電梯門自動選擇樓層', '#065f46', '#6ee7b7');
+
+      [-4.2, -1.4, 1.4, 4.2].forEach((elX, idx) => {
+        const frame = new THREE.Mesh(new THREE.BoxGeometry(2.05, 2.45, 0.14), darkFrameMat);
+        frame.position.set(elX, f7Y + 1.225, -10.06);
+        const leaf = new THREE.Mesh(
+          new THREE.BoxGeometry(1.78, 2.32, 0.16),
+          new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.78, roughness: 0.25 })
+        );
+        leaf.position.set(elX, f7Y + 1.16, -10.05);
+        activeBuildGroup.add(frame, leaf);
+        addHangingSign(elX, f7Y + 2.75, -9.95, 1.45, 0.36, `電梯 ${idx + 1}`, '', '#0f172a', '#38bdf8', Math.PI);
+      });
+
+      const centralElevPad = new THREE.Mesh(new THREE.BoxGeometry(11.6, 0.03, 1.65), sensorPadMat);
+      centralElevPad.position.set(0.0, f7Y + 0.015, -9.15);
+      activeBuildGroup.add(centralElevPad);
+
+      transportZones.push({
+        id: 'elev_7f_central_south',
+        floor: 7,
+        transportType: '中央電梯',
+        minX: -6.4,
+        maxX: 6.4,
+        minZ: -10.2,
+        maxZ: -8.0
+      });
+      transportZones.push({
+        id: 'elev_7f_central_north',
+        floor: 7,
+        transportType: '中央電梯',
+        minX: -6.4,
+        maxX: 6.4,
+        minZ: -16.8,
+        maxZ: -14.8
+      });
+
+      // 7. 7F 雙向自動手扶梯
+      buildEscalatorUnit(-5.2, -2.5, 7, f7Y, 0, 'esc_7f_west');
+      buildEscalatorUnit(8.2, -2.5, 7, f7Y, Math.PI, 'esc_7f_east');
+
+      // 8. 西側 VIP 服務與行政島
+      addWall(-19.5, -12.5, 18.0, 5.2, 4.4, vipWallMat, '7F 西側 VIP 服務與行政島', 7, f7Y);
+      addCorridorHandrail(-28.0, -15.15, -11.0, -15.15, f7Y, true);
+      addCorridorHandrail(-28.0, -9.85, -11.0, -9.85, f7Y, true);
+      addHangingSign(-19.5, f7Y + 3.65, -15.4, 8.2, 0.88, '懇談室・醫師值班・主任辦公室・會議室', 'VIP FAMILY LOUNGE & CONFERENCE ROOM', '#0369a1', '#7dd3fc');
+      addHangingSign(-19.5, f7Y + 3.65, -9.6, 8.2, 0.88, '懇談室・VIP 洗髮室・庫房・VIP 護理站・辦公室', 'VIP HAIR SALON & NURSING STATION', '#6b21a8', '#f0abfc', Math.PI);
+      buildDentalChairUnit(-22.8, -8.8, f7Y, 7);
+
+      // 9. 東側圓弧實木石英石護理站島
+      buildRoundedNursingIsland(25.0, -12.5, 7, f7Y, true);
+
+      // 10. 南西排 4 間 VIP 尊榮套房 (731~728，全數配備電動門) + 商務中心
+      const swVipRooms = ['731', '730', '729', '728'];
+      addWall(-22.0, 6.8, 14.0, 6.2, 4.4, vipWallMat, '7F 南西 VIP 尊榮病房 (731~728)', 7, f7Y);
+      swVipRooms.forEach((rm, idx) => {
+        const rx = -29.0 + (idx + 0.5) * 3.5;
+        addWardDoorFacade(rx, 3.68, `${rm} VIP`, f7Y, false, true);
+      });
+
+      addWall(-11.0, 6.8, 7.6, 6.2, 4.4, loungeBlueMat, '7F 商務中心 (Business Center)', 7, f7Y);
+      addHangingSign(-11.0, f7Y + 3.55, 3.4, 5.2, 0.82, '7F 商務中心', 'BUSINESS CENTER・商務辦公與電腦查詢區', '#0369a1', '#7dd3fc', Math.PI);
+
+      // 11. 中央安全梯、儲藏室與南側淺藍色全景「交誼廳」
+      addWall(-1.2, 5.2, 3.6, 4.2, 4.4, wallMintMat, '7F 中央緊急安全梯', 7, f7Y);
+      addWall(11.8, 5.2, 3.2, 4.2, 4.4, wallCreamMat, '7F 儲藏室', 7, f7Y);
+
+      const loungeFloor = new THREE.Mesh(
+        new THREE.PlaneGeometry(18.0, 13.0),
+        new THREE.MeshStandardMaterial({ map: createVipMarbleFloorTexture(), roughness: 0.25 })
+      );
+      loungeFloor.rotation.x = -Math.PI / 2;
+      loungeFloor.position.set(2.5, f7Y + 0.015, 15.2);
+      activeBuildGroup.add(loungeFloor);
+
+      [-2.2, 7.2].forEach((sx) => {
+        const sofa = new THREE.Mesh(
+          createSmoothCapsuleGeometry(0.45, 1.6, 16, 8),
+          new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.5 })
+        );
+        sofa.rotation.z = Math.PI / 2;
+        sofa.position.set(sx, f7Y + 0.45, 15.5);
+        activeBuildGroup.add(sofa);
+        colliders.push({ minX: sx - 1.25, maxX: sx + 1.25, minZ: 14.95, maxZ: 16.05, floor: 7, label: '7F 交誼廳沙發' });
+
+        const table = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.65, 0.65, 0.45, 18),
+          new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25 })
+        );
+        table.position.set(sx, f7Y + 0.225, 17.2);
+        activeBuildGroup.add(table);
+        colliders.push({ minX: sx - 0.65, maxX: sx + 0.65, minZ: 16.55, maxZ: 17.85, floor: 7, label: '7F 交誼廳茶几' });
+      });
+
+      addHangingSign(2.5, f7Y + 3.65, 9.2, 7.6, 0.92, '7F 全景交誼廳・貴賓休憩區', '7F SKY SOCIAL LOUNGE・落地景觀窗', '#0369a1', '#38bdf8', Math.PI);
+
+      // 12. 南東排 9 間一般病房 (701~710)
+      const seGenRooms = ['701', '702', '703', '725', '726', '727', '708', '709', '710'];
+      addWall(29.5, 6.8, 31.5, 6.2, 4.4, wardBeigeMat, '7F 南東一般病房群 (701~710)', 7, f7Y);
+      seGenRooms.forEach((rm, idx) => {
+        const rx = 13.75 + (idx + 0.5) * 3.5;
+        addWardDoorFacade(rx, 3.68, `${rm} 病房`, f7Y, false, false);
+      });
+      addHangingSign(29.5, f7Y + 3.65, 3.4, 7.2, 0.88, '7F 南東一般病房 (701 ~ 710 病房)', 'SOUTH-EAST INPATIENT WARDS', '#0f4c5c', '#2dd4bf', Math.PI);
+
+      addFireHydrantCabinet(-36.5, 3.65, Math.PI, f7Y);
+      addFireHydrantCabinet(46.5, 3.65, Math.PI, f7Y);
+    }
+
+    // --------------------------------------------------------------------------
+    // 6. 全圓弧平滑立體角色與 7F 擴編醫護・患者 NPC 生成器
+    // --------------------------------------------------------------------------
+    function createHumanoidMesh(opts = {}) {
+      const {
+        coatColor = 0xffffff,
+        pantsColor = 0x1e293b,
+        skinColor = 0xf1c29b,
+        hairColor = 0x1e1b18,
+        isDoctor = false,
+        isNurse = false,
+        isSecurity = false,
+        isPlayer = false,
+        isSeated = false
+      } = opts;
+
+      const root = new THREE.Group();
+      const bodyRoot = new THREE.Group();
+      root.add(bodyRoot);
+
+      const coatMat = new THREE.MeshStandardMaterial({ color: coatColor, roughness: 0.52 });
+      const pantsMat = new THREE.MeshStandardMaterial({ color: pantsColor, roughness: 0.65 });
+      const skinMat = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.55 });
+      const hairMat = new THREE.MeshStandardMaterial({ color: hairColor, roughness: 0.8 });
+      const darkMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.45 });
+      const shoeMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.4 });
+
+      const torso = new THREE.Mesh(createSmoothCapsuleGeometry(0.24, 0.36, 20, 8), coatMat);
+      torso.scale.set(1.06, 1.0, 0.72);
+      torso.position.y = 1.12;
+      torso.castShadow = true;
+
+      const pelvis = new THREE.Mesh(new THREE.SphereGeometry(0.21, 18, 14), pantsMat);
+      pelvis.scale.set(1.04, 0.85, 0.74);
+      pelvis.position.y = 0.80;
+      bodyRoot.add(torso, pelvis);
+
+      const headGroup = new THREE.Group();
+      headGroup.position.set(0, 1.64, 0);
+
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.185, 22, 18), skinMat);
+      head.scale.set(0.96, 1.06, 0.98);
+      head.castShadow = true;
+      headGroup.add(head);
+
+      if (isNurse) {
+        const cap = new THREE.Mesh(
+          createSmoothCapsuleGeometry(0.09, 0.14, 14, 6),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 })
+        );
+        cap.rotation.z = Math.PI / 2;
+        cap.position.set(0, 0.19, -0.02);
+        headGroup.add(cap);
+      } else if (isSecurity) {
+        const secCap = new THREE.Mesh(
+          new THREE.SphereGeometry(0.195, 18, 12, 0, Math.PI * 2, 0, Math.PI * 0.55),
+          darkMat
+        );
+        secCap.position.y = 0.02;
+        headGroup.add(secCap);
+      } else {
+        const hair = new THREE.Mesh(
+          new THREE.SphereGeometry(0.192, 18, 14, 0, Math.PI * 2, 0, Math.PI * 0.6),
+          hairMat
+        );
+        hair.position.set(0, 0.02, -0.015);
+        headGroup.add(hair);
+      }
+
+      bodyRoot.add(headGroup);
+
+      if (isDoctor) {
+        const steth = new THREE.Mesh(
+          new THREE.TorusGeometry(0.15, 0.018, 10, 22, Math.PI * 1.35),
+          darkMat
+        );
+        steth.rotation.x = Math.PI * 0.42;
+        steth.rotation.z = -Math.PI * 0.18;
+        steth.position.set(0, 1.36, 0.12);
+        bodyRoot.add(steth);
+      }
+
+      function buildArm(sideSign) {
+        const shoulderPivot = new THREE.Group();
+        shoulderPivot.position.set(sideSign * 0.30, 1.36, 0);
+
+        const shoulderJoint = new THREE.Mesh(new THREE.SphereGeometry(0.095, 14, 12), coatMat);
+        const upperArm = new THREE.Mesh(createSmoothCapsuleGeometry(0.075, 0.22, 14, 6), coatMat);
+        upperArm.position.y = -0.14;
+        upperArm.castShadow = true;
+
+        const elbowPivot = new THREE.Group();
+        elbowPivot.position.set(0, -0.28, 0);
+        const elbowJoint = new THREE.Mesh(new THREE.SphereGeometry(0.072, 12, 10), coatMat);
+        const forearm = new THREE.Mesh(createSmoothCapsuleGeometry(0.065, 0.20, 14, 6), isDoctor || isPlayer || isSecurity ? coatMat : skinMat);
+        forearm.position.y = -0.13;
+
+        const handMesh = new THREE.Mesh(new THREE.SphereGeometry(0.075, 14, 12), skinMat);
+        handMesh.position.y = -0.26;
+
+        const fistAura = new THREE.Mesh(
+          new THREE.SphereGeometry(0.13, 14, 12),
+          new THREE.MeshBasicMaterial({ color: 0xf43f5e, transparent: true, opacity: 0.0 })
+        );
+        fistAura.position.y = -0.26;
+
+        elbowPivot.add(elbowJoint, forearm, handMesh, fistAura);
+        shoulderPivot.add(shoulderJoint, upperArm, elbowPivot);
+        return { shoulderPivot, elbowPivot, fistAura };
+      }
+
+      const leftArm = buildArm(-1);
+      const rightArm = buildArm(1);
+      bodyRoot.add(leftArm.shoulderPivot, rightArm.shoulderPivot);
+
+      function buildLeg(sideSign) {
+        const hipPivot = new THREE.Group();
+        hipPivot.position.set(sideSign * 0.12, 0.78, 0);
+
+        const thigh = new THREE.Mesh(createSmoothCapsuleGeometry(0.095, 0.26, 16, 8), pantsMat);
+        thigh.position.y = -0.17;
+        thigh.castShadow = true;
+
+        const kneePivot = new THREE.Group();
+        kneePivot.position.set(0, -0.35, 0);
+        const kneeJoint = new THREE.Mesh(new THREE.SphereGeometry(0.088, 14, 10), pantsMat);
+        const shin = new THREE.Mesh(createSmoothCapsuleGeometry(0.082, 0.26, 16, 8), pantsMat);
+        shin.position.y = -0.17;
+
+        const shoe = new THREE.Mesh(createSmoothCapsuleGeometry(0.075, 0.14, 14, 8), shoeMat);
+        shoe.rotation.x = Math.PI / 2;
+        shoe.position.set(0, -0.34, 0.05);
+
+        const footAura = new THREE.Mesh(
+          new THREE.SphereGeometry(0.16, 14, 12),
+          new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.0 })
+        );
+        footAura.position.set(0, -0.34, 0.08);
+
+        kneePivot.add(kneeJoint, shin, shoe, footAura);
+        hipPivot.add(thigh, kneePivot);
+        return { hipPivot, kneePivot, footAura };
+      }
+
+      const leftLeg = buildLeg(-1);
+      const rightLeg = buildLeg(1);
+      bodyRoot.add(leftLeg.hipPivot, rightLeg.hipPivot);
+
+      if (isSeated) {
+        bodyRoot.position.y = -0.22;
+        leftLeg.hipPivot.rotation.x = -Math.PI * 0.45;
+        rightLeg.hipPivot.rotation.x = -Math.PI * 0.45;
+        leftLeg.kneePivot.rotation.x = Math.PI * 0.45;
+        rightLeg.kneePivot.rotation.x = Math.PI * 0.45;
+
+        const chairMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.65, roughness: 0.3 });
+        const seatPad = new THREE.Mesh(createSmoothCapsuleGeometry(0.24, 0.12, 16, 6), darkMat);
+        seatPad.position.set(0, 0.52, 0.04);
+        const backRest = new THREE.Mesh(createSmoothCapsuleGeometry(0.22, 0.35, 16, 6), darkMat);
+        backRest.position.set(0, 0.88, -0.22);
+        root.add(seatPad, backRest);
+
+        [-0.30, 0.30].forEach((wx) => {
+          const bigWheel = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.032, 10, 24), chairMat);
+          bigWheel.rotation.y = Math.PI / 2;
+          bigWheel.position.set(wx, 0.34, -0.06);
+          root.add(bigWheel);
+        });
+      }
+
+      return {
+        group: root,
+        bodyRoot,
+        leftShoulder: leftArm.shoulderPivot,
+        rightShoulder: rightArm.shoulderPivot,
+        leftElbow: leftArm.elbowPivot,
+        rightElbow: rightArm.elbowPivot,
+        leftHip: leftLeg.hipPivot,
+        rightHip: rightLeg.hipPivot,
+        leftKnee: leftLeg.kneePivot,
+        rightKnee: rightLeg.kneePivot,
+        rightFistAura: rightArm.fistAura,
+        leftFistAura: leftArm.fistAura,
+        rightFootAura: rightLeg.footAura
+      };
+    }
+
+    function createNameBadgeSprite(nameText, roleText, accentHex = '#2dd4bf') {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = 'rgba(10, 18, 30, 0.84)';
+      ctx.beginPath();
+      ctx.roundRect(16, 14, 480, 100, 26);
+      ctx.fill();
+
+      ctx.strokeStyle = accentHex;
+      ctx.lineWidth = 5;
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 34px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(nameText, 256, 56);
+
+      ctx.fillStyle = accentHex;
+      ctx.font = '700 22px "Noto Sans TC", sans-serif';
+      ctx.fillText(roleText, 256, 94);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+      const sprite = new THREE.Sprite(spriteMat);
+      sprite.scale.set(2.35, 0.58, 1);
+      return sprite;
+    }
+
+    function spawnAllNpcs() {
+      const pRig = createHumanoidMesh({
+        coatColor: 0x0284c7,
+        pantsColor: 0x0f172a,
+        isPlayer: true
+      });
+      pRig.group.position.copy(player.pos);
+      pRig.group.rotation.y = player.yaw;
+      scene.add(pRig.group);
+
+      player.mesh = pRig.group;
+      player.bodyRoot = pRig.bodyRoot;
+      player.leftShoulder = pRig.leftShoulder;
+      player.rightShoulder = pRig.rightShoulder;
+      player.leftElbow = pRig.leftElbow;
+      player.rightElbow = pRig.rightElbow;
+      player.leftHip = pRig.leftHip;
+      player.rightHip = pRig.rightHip;
+      player.leftKnee = pRig.leftKnee;
+      player.rightKnee = pRig.rightKnee;
+      player.rightFistAura = pRig.rightFistAura;
+      player.leftFistAura = pRig.leftFistAura;
+      player.rightFootAura = pRig.rightFootAura;
+
+      const floatingLayer = document.getElementById('floating-fx-layer');
+
+      const npcDefinitions = [
+        // ==================== 醫師、專員與志工 ====================
+        {
+          name: '吳政宏 7F VIP 病房主任醫師',
+          role: '7F VIP 尊榮病房・主任辦公室 / 733 套房',
+          avatar: '🩺',
+          type: 'staff',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#e879f9',
+          appearance: { coatColor: 0xffffff, pantsColor: 0x1e293b, isDoctor: true },
+          waypoints: [new THREE.Vector3(-33.5, FLOOR_Y[7], -4.2)],
+          speed: 0,
+          yaw: Math.PI * 0.5,
+          dialogue: '您好！歡迎蒞臨彰濱秀傳紀念醫院 7F VIP 尊榮病房區！所有 VIP 病房門口均已升級為紅外線感應電動滑門，走近即可自動感應開啟喔！',
+          options: [
+            { label: '請問 VIP 病房電動門如何操作？', reply: '全區 16 間 VIP 尊榮套房與 VIP 門禁大門皆採用無障礙紅外線自動感應滑門，走近約 3.5 公尺內便會自動亮燈滑開！' },
+            { label: '請問 7F VIP 尊榮病房有哪些專屬設施？', reply: '我們設有家屬專屬「懇談室」、病患「VIP 洗髮室」、「商務中心」，以及「全景交誼廳」!' }
+          ]
+        },
+        {
+          name: '周子涵 7F 住院醫師',
+          role: '7F 東翼一般病房 (701~727)・住院醫師',
+          avatar: '📋',
+          type: 'staff',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#60a5fa',
+          appearance: { coatColor: 0xffffff, pantsColor: 0x334155, isDoctor: true },
+          waypoints: [
+            new THREE.Vector3(16.0, FLOOR_Y[7], -20.5),
+            new THREE.Vector3(34.0, FLOOR_Y[7], -20.5)
+          ],
+          speed: 1.25,
+          dialogue: '我正在東翼病房區與護理師團隊一起進行早晨查房與出院衛教說明！',
+          options: []
+        },
+        {
+          name: '陳柏宇 國際醫療中心專員',
+          role: '7F 商務中心 (Business Center)',
+          avatar: '💼',
+          type: 'staff',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#38bdf8',
+          appearance: { coatColor: 0x0f172a, pantsColor: 0x1e293b },
+          waypoints: [new THREE.Vector3(-11.0, FLOOR_Y[7], 1.8)],
+          speed: 0,
+          yaw: Math.PI,
+          dialogue: '您好！這裡是 7F 商務中心，提供高速光纖網路、事務機與國際醫療貴賓禮賓翻譯服務！',
+          options: []
+        },
+        {
+          name: '張淑娟 交誼廳關懷志工',
+          role: '7F 全景交誼廳 (Sky Social Lounge)',
+          avatar: '☕',
+          type: 'staff',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#38bdf8',
+          appearance: { coatColor: 0xf59e0b, pantsColor: 0x1e293b },
+          waypoints: [
+            new THREE.Vector3(0.5, FLOOR_Y[7], 12.5),
+            new THREE.Vector3(5.5, FLOOR_Y[7], 12.5)
+          ],
+          speed: 1.0,
+          dialogue: '歡迎來到 7F 全景交誼廳！很多貴賓與家屬喜歡在落地窗邊喝杯花草茶休息呢。',
+          options: []
+        },
+        {
+          name: '王美玲 VIP 病房美髮師',
+          role: '7F VIP 洗髮室 (VIP Hair Salon)',
+          avatar: '💇‍♀️',
+          type: 'staff',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#f472b6',
+          appearance: { coatColor: 0xc084fc, pantsColor: 0x581c87 },
+          waypoints: [new THREE.Vector3(-22.8, FLOOR_Y[7], -4.5)],
+          speed: 0,
+          yaw: Math.PI,
+          dialogue: '您好！我是 7F VIP 洗髮室專屬美髮師，提供臥式洗髮與頭皮舒壓服務！',
+          options: []
+        },
+        {
+          name: '鄭國華 7F 駐衛警',
+          role: '7F 中央電梯廳・VIP 樓層安全維護',
+          avatar: '👮',
+          type: 'security',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#3b82f6',
+          appearance: { coatColor: 0x1e3a8a, pantsColor: 0x0f172a, isSecurity: true },
+          waypoints: [
+            new THREE.Vector3(-12.0, FLOOR_Y[7], -18.5),
+            new THREE.Vector3(12.0, FLOOR_Y[7], -18.5)
+          ],
+          speed: 1.35,
+          dialogue: '您好！我是 7F VIP 與住院病房樓層駐衛警，走近中央電梯或手扶梯就會自動詢問您要前往 B1 ~ 8F！',
+          options: []
+        },
+
+        // ==================== 8 位專業護理師陣容 ====================
+        {
+          name: '林佳穎 7F 護理長',
+          role: '7F 中央護理站 A / 東側護理站 B 總督導',
+          avatar: '👩‍⚕️',
+          type: 'staff',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#2dd4bf',
+          appearance: { coatColor: 0xf472b6, pantsColor: 0xbe185d, isNurse: true },
+          waypoints: [
+            new THREE.Vector3(6.5, FLOOR_Y[7], -16.2),
+            new THREE.Vector3(18.5, FLOOR_Y[7], -16.2)
+          ],
+          speed: 1.15,
+          dialogue: '早安！我是 7F 護理長林佳穎，目前全層 8 位護理師分別於護理站 A～D 與 VIP 專責區輪值照護！',
+          options: []
+        },
+        {
+          name: '許雅雯 VIP 專責護理師',
+          role: '7F 733 / 732 VIP 尊榮病房・一對一護理師',
+          avatar: '👩‍⚕️',
+          type: 'staff',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#e879f9',
+          appearance: { coatColor: 0xe879f9, pantsColor: 0x86198f, isNurse: true },
+          waypoints: [
+            new THREE.Vector3(-34.8, FLOOR_Y[7], -8.0),
+            new THREE.Vector3(-25.0, FLOOR_Y[7], -21.2)
+          ],
+          speed: 1.1,
+          dialogue: '您好！我是 VIP 尊榮病房專責護理師許雅雯，剛為 733 與 735 套房的貴賓完成生理監測，電動門感應非常靈敏呢！',
+          options: []
+        },
+        {
+          name: '黃雅婷 護理站 B 資深護理師',
+          role: '7F 東側圓弧護理站島 (護理站 B)',
+          avatar: '💉',
+          type: 'staff',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#34d399',
+          appearance: { coatColor: 0x38bdf8, pantsColor: 0x0284c7, isNurse: true },
+          waypoints: [new THREE.Vector3(24.5, FLOOR_Y[7], -16.2)],
+          speed: 0,
+          yaw: Math.PI,
+          dialogue: '您好！這裡是 7F 東側護理站 B，隨時為 717～727 病房區提供即時醫療支援！',
+          options: []
+        },
+        {
+          name: '陳思妤 護理站 C 臨床護理師',
+          role: '7F 東側圓弧護理站島 (護理站 C)',
+          avatar: '🩺',
+          type: 'staff',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#2dd4bf',
+          appearance: { coatColor: 0x2dd4bf, pantsColor: 0x0f766e, isNurse: true },
+          waypoints: [
+            new THREE.Vector3(31.5, FLOOR_Y[7], -16.2),
+            new THREE.Vector3(37.5, FLOOR_Y[7], -16.2)
+          ],
+          speed: 1.05,
+          dialogue: '您好！我是護理站 C 護理師陳思妤，正在核對東翼 711～716 病房的點滴與檢驗報告。',
+          options: []
+        },
+        {
+          name: '謝佩珊 護理站 D 傷口照護護理師',
+          role: '7F 東側護理站 D / 治療室專科護理師',
+          avatar: '🩹',
+          type: 'staff',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#38bdf8',
+          appearance: { coatColor: 0x7dd3fc, pantsColor: 0x0369a1, isNurse: true },
+          waypoints: [
+            new THREE.Vector3(20.5, FLOOR_Y[7], -8.8),
+            new THREE.Vector3(31.5, FLOOR_Y[7], -8.8)
+          ],
+          speed: 1.12,
+          dialogue: '您好！我是傷口與術後換藥專科護理師謝佩珊，剛從治療室準備好無菌換藥車要去巡房。',
+          options: []
+        },
+        {
+          name: '張家瑜 國際醫療禮賓護理師',
+          role: '7F VIP 護理站 / 商務中心禮賓護理',
+          avatar: '🌸',
+          type: 'staff',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#fb7185',
+          appearance: { coatColor: 0xfb7185, pantsColor: 0x9f1239, isNurse: true },
+          waypoints: [
+            new THREE.Vector3(-18.5, FLOOR_Y[7], -8.8),
+            new THREE.Vector3(-12.5, FLOOR_Y[7], -1.8)
+          ],
+          speed: 1.08,
+          dialogue: '您好！我是國際醫療禮賓護理師張家瑜，協助海外與企業高階健檢貴賓安排精密檢查與醫師會診。',
+          options: []
+        },
+        {
+          name: '李欣怡 出院準備與衛教護理師',
+          role: '7F 中央護理站 A・出院衛教諮詢台',
+          avatar: '📑',
+          type: 'staff',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#34d399',
+          appearance: { coatColor: 0x34d399, pantsColor: 0x047857, isNurse: true },
+          waypoints: [new THREE.Vector3(-3.5, FLOOR_Y[7], -16.2)],
+          speed: 0,
+          yaw: Math.PI,
+          dialogue: '您好！出院用藥指導、居家照護手冊與回診預約都可以來中央護理站 A 找我辦理喔！',
+          options: []
+        },
+        {
+          name: '曾郁婷 巡房給藥護理師',
+          role: '7F 南東一般病房 (701~710) 責任護理師',
+          avatar: '💊',
+          type: 'staff',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#f472b6',
+          appearance: { coatColor: 0xf472b6, pantsColor: 0xbe185d, isNurse: true },
+          waypoints: [
+            new THREE.Vector3(16.0, FLOOR_Y[7], 1.6),
+            new THREE.Vector3(36.0, FLOOR_Y[7], 1.6)
+          ],
+          speed: 1.18,
+          dialogue: '您好！我是負責 701～710 病房的曾郁婷護理師，正在進行午間三讀五對給藥與體溫量測。',
+          options: []
+        },
+
+        // ==================== 8 位住院與 VIP 健檢患者陣容 ====================
+        {
+          name: '劉董事長 (733 VIP 尊榮病房貴賓)',
+          role: '7F 733 VIP 尊榮病房・健康管理貴賓',
+          avatar: '🤵',
+          type: 'patient',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#fde047',
+          appearance: { coatColor: 0x6b21a8, pantsColor: 0x1e293b },
+          waypoints: [
+            new THREE.Vector3(-36.5, FLOOR_Y[7], -6.5),
+            new THREE.Vector3(-27.5, FLOOR_Y[7], -21.0)
+          ],
+          speed: 1.0,
+          dialogue: '733 VIP 套房的電動門一走近就自動打開，裡面玄關安靜又氣派，住起來跟五星級飯店一樣！',
+          options: []
+        },
+        {
+          name: '王女士 (732 VIP 尊榮病房健檢患者)',
+          role: '7F 732 VIP 尊榮病房・精密健檢貴賓',
+          avatar: '👩',
+          type: 'patient',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#e879f9',
+          appearance: { coatColor: 0xd8b4fe, pantsColor: 0xa855f7 },
+          waypoints: [
+            new THREE.Vector3(-36.8, FLOOR_Y[7], 5.5),
+            new THREE.Vector3(-32.0, FLOOR_Y[7], 2.5)
+          ],
+          speed: 0.92,
+          dialogue: '剛在 732 VIP 套房休息完，護理師馬上就來帶我去交誼廳喝營養飲品，服務非常貼心。',
+          options: []
+        },
+        {
+          name: '林先生 (735 VIP 病房術後康復患者)',
+          role: '7F 735 VIP 尊榮病房・微創術後休養',
+          avatar: '🧑',
+          type: 'patient',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#38bdf8',
+          appearance: { coatColor: 0x93c5fd, pantsColor: 0x60a5fa },
+          waypoints: [
+            new THREE.Vector3(-26.5, FLOOR_Y[7], -22.2),
+            new THREE.Vector3(-13.5, FLOOR_Y[7], -22.2)
+          ],
+          speed: 0.95,
+          dialogue: '醫師鼓勵我多在 VIP 走廊走動幫助恢復，走廊寬敞又有木質扶手，走起來很安心。',
+          options: []
+        },
+        {
+          name: '黃小姐 (729 VIP 病房產後休養貴賓)',
+          role: '7F 全景交誼廳・VIP 休養貴賓',
+          avatar: '🤱',
+          type: 'patient',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#fb923c',
+          appearance: { coatColor: 0xfdba74, pantsColor: 0xf97316 },
+          waypoints: [
+            new THREE.Vector3(3.8, FLOOR_Y[7], 13.8),
+            new THREE.Vector3(6.5, FLOOR_Y[7], 11.2)
+          ],
+          speed: 0.85,
+          dialogue: '交誼廳整面落地窗採光真好，從 729 VIP 電動門走出來散步心情特別放鬆！',
+          options: []
+        },
+        {
+          name: '蔡阿嬤 (720 病房住院長輩)',
+          role: '7F 720 病房・復健休養病患',
+          avatar: '👵',
+          type: 'patient',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#f59e0b',
+          appearance: { coatColor: 0x7dd3fc, pantsColor: 0x38bdf8, isSeated: true },
+          waypoints: [new THREE.Vector3(28.5, FLOOR_Y[7], -19.5)],
+          speed: 0,
+          yaw: Math.PI,
+          dialogue: '護理站 B 的黃護理師每天都推我出來活動，7 樓環境乾淨又明亮！',
+          options: []
+        },
+        {
+          name: '陳伯伯 (718 病房骨科復健患者)',
+          role: '7F 718 病房・輪椅復健散步患者',
+          avatar: '👴',
+          type: 'patient',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#fbbf24',
+          appearance: { coatColor: 0xbae6fd, pantsColor: 0x38bdf8, isSeated: true },
+          waypoints: [new THREE.Vector3(19.5, FLOOR_Y[7], -22.2)],
+          speed: 0,
+          yaw: 0,
+          dialogue: '我住在 718 病房做膝關節復健，護理師們都很細心照顧我！',
+          options: []
+        },
+        {
+          name: '張先生 (703 病房內科住院患者)',
+          role: '7F 703 病房・內科調養患者',
+          avatar: '🧔',
+          type: 'patient',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#38bdf8',
+          appearance: { coatColor: 0x7dd3fc, pantsColor: 0x0284c7 },
+          waypoints: [
+            new THREE.Vector3(18.0, FLOOR_Y[7], -3.6),
+            new THREE.Vector3(28.5, FLOOR_Y[7], -3.6)
+          ],
+          speed: 0.9,
+          dialogue: '剛量完血壓出來走廊走一走，待會準備搭電梯到樓下商店街買點水果。',
+          options: []
+        },
+        {
+          name: '吳奶奶 (712 病房銀髮休養患者)',
+          role: '7F 712 病房・極東翼散步患者',
+          avatar: '👵',
+          type: 'patient',
+          floor: 7,
+          baseY: FLOOR_Y[7],
+          badgeColor: '#34d399',
+          appearance: { coatColor: 0x6ee7b7, pantsColor: 0x10b981 },
+          waypoints: [
+            new THREE.Vector3(39.8, FLOOR_Y[7], -22.0),
+            new THREE.Vector3(39.8, FLOOR_Y[7], -11.0)
+          ],
+          speed: 0.82,
+          dialogue: '東翼走廊這邊很安靜，扶著牆邊的防撞扶手散步剛剛好。',
+          options: []
+        }
+      ];
+
+      npcDefinitions.forEach((def) => {
+        const npcFloor = def.floor || 7;
+        const npcBaseY = def.baseY !== undefined ? def.baseY : FLOOR_Y[7];
+        const rig = createHumanoidMesh(def.appearance);
+        const startPos = def.waypoints[0].clone();
+        startPos.y = npcBaseY;
+        rig.group.position.copy(startPos);
+        if (def.yaw !== undefined) rig.group.rotation.y = def.yaw;
+        floorGroups[npcFloor].add(rig.group);
+
+        const badge = createNameBadgeSprite(def.name, def.role, def.badgeColor);
+        badge.position.set(0, 2.28, 0);
+        rig.group.add(badge);
+
+        const alertRing = new THREE.Mesh(
+          new THREE.RingGeometry(0.45, 0.58, 28),
+          new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
+        );
+        alertRing.rotation.x = -Math.PI / 2;
+        alertRing.position.y = 0.03;
+        alertRing.visible = false;
+        rig.group.add(alertRing);
+
+        const dizzyGroup = new THREE.Group();
+        dizzyGroup.position.set(0, 0.95, 0.85);
+        dizzyGroup.visible = false;
+        for (let s = 0; s < 3; s++) {
+          const star = new THREE.Mesh(
+            new THREE.OctahedronGeometry(0.08, 0),
+            new THREE.MeshBasicMaterial({ color: 0xfacc15 })
+          );
+          const ang = (s / 3) * Math.PI * 2;
+          star.position.set(Math.cos(ang) * 0.25, 0, Math.sin(ang) * 0.25);
+          dizzyGroup.add(star);
+        }
+        rig.group.add(dizzyGroup);
+
+        const hpBarWrap = document.createElement('div');
+        hpBarWrap.className = 'hidden absolute -translate-x-1/2 -translate-y-full flex flex-col items-center gap-0.5';
+        hpBarWrap.innerHTML = `
+          <div class="bark-bubble hidden px-2 py-0.5 rounded-full bg-rose-600/95 border border-rose-200 text-white text-[10px] font-black whitespace-nowrap shadow-lg"></div>
+          <div class="w-16 h-2 bg-black/85 rounded-full p-0.5 border border-white/25 overflow-hidden">
+            <div class="hp-fill h-full bg-gradient-to-r from-rose-500 to-amber-400 rounded-full transition-all duration-150" style="width: 100%;"></div>
+          </div>
+        `;
+        floatingLayer.appendChild(hpBarWrap);
+
+        const maxHp = def.type === 'security' ? 160 : 100;
+        npcs.push({
+          ...def,
+          floor: npcFloor,
+          baseY: npcBaseY,
+          rig,
+          badge,
+          alertRing,
+          dizzyGroup,
+          hpBarWrap,
+          hpFillEl: hpBarWrap.querySelector('.hp-fill'),
+          barkEl: hpBarWrap.querySelector('.bark-bubble'),
+          barkTimer: 0,
+          pos: startPos,
+          yaw: def.yaw !== undefined ? def.yaw : 0,
+          radius: 0.44,
+          wpIndex: 0,
+          walkCycle: Math.random() * Math.PI * 2,
+          isStationaryGuard: def.speed === 0,
+          hp: maxHp,
+          maxHp,
+          knockedTimer: 0,
+          knockVel: new THREE.Vector3(0, 0, 0),
+          isHostile: false,
+          windupTimer: 0,
+          swingAnimTimer: 0,
+          attackCooldown: 0
+        });
+      });
+    }
+
+    // --------------------------------------------------------------------------
+    // 7. 實體防穿透碰撞求解器 & 手扶梯/電梯接觸偵測
+    // --------------------------------------------------------------------------
+    function separateCircles(posA, radA, posB, radB, weightA = 0.85) {
+      const dx = posA.x - posB.x;
+      const dz = posA.z - posB.z;
+      const minDist = radA + radB;
+      const distSq = dx * dx + dz * dz;
+      if (distSq >= minDist * minDist) return false;
+
+      const dist = Math.sqrt(distSq);
+      let nx = 0;
+      let nz = 1;
+      if (dist > 0.0001) {
+        nx = dx / dist;
+        nz = dz / dist;
+      }
+      const overlap = minDist - dist;
+      const weightB = 1.0 - weightA;
+      posA.x += nx * overlap * weightA;
+      posA.z += nz * overlap * weightA;
+      posB.x -= nx * overlap * weightB;
+      posB.z -= nz * overlap * weightB;
+      return true;
+    }
+
+    function resolveCircleSingleAABB(pos, radius, box) {
+      const closestX = THREE.MathUtils.clamp(pos.x, box.minX, box.maxX);
+      const closestZ = THREE.MathUtils.clamp(pos.z, box.minZ, box.maxZ);
+      const dx = pos.x - closestX;
+      const dz = pos.z - closestZ;
+      const distSq = dx * dx + dz * dz;
+      if (distSq >= radius * radius) return;
+
+      const dist = Math.sqrt(distSq);
+      if (dist > 0.0001) {
+        const push = radius - dist;
+        pos.x += (dx / dist) * push;
+        pos.z += (dz / dist) * push;
+      } else {
+        pos.z += radius;
+      }
+    }
+
+    function resolveCircleAllAABBs(pos, radius, entityFloor = 7) {
+      for (let i = 0; i < colliders.length; i++) {
+        const c = colliders[i];
+        if (c.floor !== 0 && c.floor !== entityFloor) continue;
+        resolveCircleSingleAABB(pos, radius, c);
+      }
+    }
+
+    function checkWallCollision(x, z, r, entityFloor = 7) {
+      for (let i = 0; i < colliders.length; i++) {
+        const b = colliders[i];
+        if (b.floor !== 0 && b.floor !== entityFloor) continue;
+        const cx = THREE.MathUtils.clamp(x, b.minX, b.maxX);
+        const cz = THREE.MathUtils.clamp(z, b.minZ, b.maxZ);
+        const dx = x - cx;
+        const dz = z - cz;
+        if (dx * dx + dz * dz < r * r) return true;
+      }
+      return false;
+    }
+
+    function getSurfaceHeightAt(x, z, currentY) {
+      return FLOOR_Y[7];
+    }
+
+    function updateFloorVisibility(curFloor) {
+      floorGroups[7].visible = true;
+    }
+
+    function findContactedTransportZone(px, pz, pRadius, curFloor) {
+      for (let i = 0; i < transportZones.length; i++) {
+        const zBox = transportZones[i];
+        if (zBox.floor !== curFloor) continue;
+        if (
+          px + pRadius >= zBox.minX &&
+          px - pRadius <= zBox.maxX &&
+          pz + pRadius >= zBox.minZ &&
+          pz - pRadius <= zBox.maxZ
+        ) {
+          return zBox;
+        }
+      }
+      return null;
+    }
+
+    // --------------------------------------------------------------------------
+    // 8. 雙向近戰格鬥系統
+    // --------------------------------------------------------------------------
+    function performPlayerAttack(isHeavy = false) {
+      if (player.isDead || activeTalkNpc || player.isAttacking) return;
+
+      const aimYaw = camState.yaw + Math.PI;
+      player.yaw = aimYaw;
+
+      player.isAttacking = true;
+      player.attackTimer = 0;
+      player.hitApplied = false;
+
+      if (isHeavy) {
+        player.attackType = 4;
+        player.attackDuration = 0.44;
+        player.comboStep = 0;
+      } else {
+        player.comboStep = (player.comboStep % 3) + 1;
+        player.attackType = player.comboStep;
+        player.attackDuration = player.comboStep === 3 ? 0.38 : 0.28;
+        player.comboResetTimer = 1.15;
+      }
+
+      const lungeSpeed = isHeavy ? 4.0 : 2.6;
+      const pFloor = getFloorNumber(player.pos.y);
+      player.pos.x += Math.sin(player.yaw) * lungeSpeed * 0.08;
+      player.pos.z += Math.cos(player.yaw) * lungeSpeed * 0.08;
+      for (let i = 0; i < npcs.length; i++) {
+        if (npcs[i].floor !== pFloor) continue;
+        separateCircles(player.pos, player.radius, npcs[i].pos, npcs[i].radius, 1.0);
+      }
+      resolveCircleAllAABBs(player.pos, player.radius, pFloor);
+
+      SoundFX.playWhoosh(isHeavy || player.attackType === 3);
+      spawnSlashArc(player.pos, player.yaw, isHeavy || player.attackType === 3 ? 0xf59e0b : 0xf43f5e);
+    }
+
+    function applyPlayerHitbox() {
+      const isHeavy = player.attackType === 4;
+      const isSpinKick = player.attackType === 3;
+      const reach = isHeavy ? 2.15 : isSpinKick ? 2.0 : 1.75;
+      const baseDmg = isHeavy ? 46 : isSpinKick ? 34 : 24;
+      const pFloor = getFloorNumber(player.pos.y);
+
+      const fwdX = Math.sin(player.yaw);
+      const fwdZ = Math.cos(player.yaw);
+      let hitCount = 0;
+
+      npcs.forEach((npc) => {
+        if (npc.knockedTimer > 0 || npc.floor !== pFloor) return;
+
+        const dx = npc.pos.x - player.pos.x;
+        const dz = npc.pos.z - player.pos.z;
+        const dist = Math.hypot(dx, dz);
+        if (dist > reach) return;
+
+        if (!isSpinKick && dist > 0.05) {
+          const dot = (dx / dist) * fwdX + (dz / dist) * fwdZ;
+          if (dot < 0.25) return;
+        }
+
+        hitCount++;
+        player.totalHitsLanded++;
+        npc.hp = Math.max(0, npc.hp - baseDmg);
+        npc.isHostile = true;
+        npc.barkEl.textContent = npc.type === 'security' ? '⚠️ 院區保全反擊中！' : '💢 竟敢動手！反擊！';
+        npc.barkEl.classList.remove('hidden');
+        npc.barkTimer = 2.6;
+
+        const pushDirX = dist > 0.01 ? dx / dist : fwdX;
+        const pushDirZ = dist > 0.01 ? dz / dist : fwdZ;
+        const knockPower = isHeavy ? 9.5 : 5.8;
+        npc.knockVel.set(pushDirX * knockPower, 0, pushDirZ * knockPower);
+
+        const hitPos = new THREE.Vector3(npc.pos.x, npc.pos.y + 1.35, npc.pos.z);
+        spawnHitSpark(hitPos, isHeavy ? 0xfbbf24 : 0xf43f5e);
+        spawnFloatingText(hitPos, isHeavy ? `💥 -${baseDmg} 重擊!` : `-${baseDmg}`, isHeavy ? '#fbbf24' : '#fb7185');
+
+        if (npc.hp <= 0) {
+          npc.knockedTimer = 5.5;
+          npc.windupTimer = 0;
+          npc.dizzyGroup.visible = true;
+          npc.rig.bodyRoot.rotation.x = -Math.PI * 0.45;
+          npc.rig.bodyRoot.position.y = 0.32;
+        }
+      });
+
+      if (hitCount > 0) {
+        SoundFX.playHit(isHeavy);
+        camShake = isHeavy ? 0.34 : 0.18;
+        player.wantedStars = Math.min(5, Math.max(1, Math.ceil(player.totalHitsLanded / 2)));
+
+        npcs.forEach((witness) => {
+          if (witness.isHostile || witness.knockedTimer > 0 || witness.floor !== pFloor) return;
+          if (witness.type === 'security' || witness.type === 'staff') {
+            if (witness.pos.distanceTo(player.pos) < 16.0) {
+              witness.isHostile = true;
+              witness.barkEl.textContent = witness.type === 'security' ? '🚨 駐衛警支援壓制！' : '⚠️ 醫護防衛反擊！';
+              witness.barkEl.classList.remove('hidden');
+              witness.barkTimer = 2.6;
+            }
+          }
+        });
+        updateCombatHUD();
+      }
+    }
+
+    function triggerNpcCounterAttack(npc) {
+      if (player.isDead) return;
+      const dmg = npc.type === 'security' ? 16 : npc.type === 'staff' ? 12 : 8;
+
+      if (player.armor > 0) {
+        const absorbed = Math.min(player.armor, Math.ceil(dmg * 0.5));
+        player.armor -= absorbed;
+        player.hp = Math.max(0, player.hp - (dmg - absorbed));
+      } else {
+        player.hp = Math.max(0, player.hp - dmg);
+      }
+
+      const dx = player.pos.x - npc.pos.x;
+      const dz = player.pos.z - npc.pos.z;
+      const d = Math.max(0.01, Math.hypot(dx, dz));
+      player.knockVel.set((dx / d) * 5.2, 0, (dz / d) * 5.2);
+
+      SoundFX.playEnemyHit();
+      camShake = 0.25;
+      flashDamageVignette();
+      spawnSlashArc(npc.pos, npc.yaw, 0xef4444);
+      spawnHitSpark(new THREE.Vector3(player.pos.x, player.pos.y + 1.3, player.pos.z), 0xef4444);
+      spawnFloatingText(new THREE.Vector3(player.pos.x, player.pos.y + 2.1, player.pos.z), `-${dmg} HP`, '#ef4444');
+      updateCombatHUD();
+
+      if (player.hp <= 0) {
+        triggerPlayerKO();
+      }
+    }
+
+    function triggerPlayerKO() {
+      player.isDead = true;
+      player.respawnTimer = 3.0;
+      if (document.pointerLockElement) document.exitPointerLock();
+      document.getElementById('ko-overlay').classList.remove('hidden');
+    }
+
+    function spawnSlashArc(originPos, yaw, colorHex) {
+      const arc = new THREE.Mesh(
+        new THREE.RingGeometry(0.75, 1.35, 24, 1, -Math.PI * 0.45, Math.PI * 0.9),
+        new THREE.MeshBasicMaterial({ color: colorHex, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
+      );
+      arc.rotation.x = -Math.PI / 2;
+      arc.rotation.z = -yaw + Math.PI * 0.5;
+      arc.position.set(originPos.x + Math.sin(yaw) * 0.65, originPos.y + 1.15, originPos.z + Math.cos(yaw) * 0.65);
+      scene.add(arc);
+      slashEffects.push({ mesh: arc, life: 0.22, maxLife: 0.22 });
+    }
+
+    function spawnHitSpark(pos, colorHex) {
+      for (let i = 0; i < 8; i++) {
+        const spark = new THREE.Mesh(
+          new THREE.SphereGeometry(0.06, 8, 8),
+          new THREE.MeshBasicMaterial({ color: colorHex })
+        );
+        spark.position.copy(pos);
+        const ang = (i / 8) * Math.PI * 2 + Math.random() * 0.4;
+        const spd = 2.5 + Math.random() * 3.5;
+        scene.add(spark);
+        impactParticles.push({
+          mesh: spark,
+          vel: new THREE.Vector3(Math.cos(ang) * spd, 1.8 + Math.random() * 2.5, Math.sin(ang) * spd),
+          life: 0.35
+        });
+      }
+    }
+
+    function spawnFloatingText(worldPos, text, colorCss) {
+      const proj = worldPos.clone().project(camera);
+      if (proj.z > 1) return;
+      const sx = (proj.x * 0.5 + 0.5) * window.innerWidth;
+      const sy = (-proj.y * 0.5 + 0.5) * window.innerHeight;
+
+      const el = document.createElement('div');
+      el.className = 'absolute -translate-x-1/2 font-black text-sm sm:text-base gta-font gta-shadow pointer-events-none transition-all duration-500';
+      el.style.left = `${sx}px`;
+      el.style.top = `${sy}px`;
+      el.style.color = colorCss;
+      el.textContent = text;
+      document.getElementById('floating-fx-layer').appendChild(el);
+
+      requestAnimationFrame(() => {
+        el.style.transform = 'translate(-50%, -36px) scale(1.12)';
+        el.style.opacity = '0';
+      });
+      setTimeout(() => el.remove(), 550);
+    }
+
+    function flashDamageVignette() {
+      const vig = document.getElementById('damage-vignette');
+      vig.style.opacity = '1';
+      setTimeout(() => {
+        vig.style.opacity = '0';
+      }, 220);
+    }
+
+    function updateCombatHUD() {
+      document.getElementById('hud-health-text').textContent = `${Math.ceil(player.hp)} / ${player.maxHp}`;
+      document.getElementById('hud-health-bar').style.width = `${(player.hp / player.maxHp) * 100}%`;
+      document.getElementById('hud-armor-bar').style.width = `${player.armor}%`;
+
+      const starsContainer = document.getElementById('hud-wanted-stars');
+      const starSpans = starsContainer.querySelectorAll('span');
+      starSpans.forEach((sp, idx) => {
+        sp.className = idx < player.wantedStars ? 'text-amber-400 animate-pulse' : 'text-slate-500';
+      });
+
+      const pFloor = getFloorNumber(player.pos.y);
+      const hostileCount = npcs.filter(
+        (n) => n.knockedTimer <= 0 && n.floor === pFloor && (n.isHostile || (n.type === 'security' && player.wantedStars > 0))
+      ).length;
+
+      const badge = document.getElementById('hud-combo-badge');
+      if (player.wantedStars > 0 || hostileCount > 0) {
+        badge.textContent = `🚨 遭反擊警戒中 (${hostileCount}人追擊)`;
+        badge.className = 'gta-font gta-shadow text-sm sm:text-base font-bold text-rose-400 leading-tight mt-0.5';
+      } else {
+        badge.textContent = '健保卡已連線・8護理師 / 8患者巡房中';
+        badge.className = 'gta-font gta-shadow text-sm sm:text-base font-bold text-emerald-400 leading-tight mt-0.5';
+      }
+    }
+
+    function clearWantedAndHeal() {
+      player.wantedStars = 0;
+      player.totalHitsLanded = 0;
+      player.hp = player.maxHp;
+      player.armor = 90;
+      npcs.forEach((npc) => {
+        npc.isHostile = false;
+        npc.windupTimer = 0;
+        npc.swingAnimTimer = 0;
+        npc.hp = npc.maxHp;
+        npc.knockedTimer = 0;
+        npc.dizzyGroup.visible = false;
+        npc.alertRing.visible = false;
+        npc.rig.bodyRoot.rotation.x = 0;
+        npc.rig.bodyRoot.position.y = 0;
+        npc.pos.y = npc.baseY || FLOOR_Y[7];
+      });
+      updateCombatHUD();
+    }
+
+    // --------------------------------------------------------------------------
+    // 9. 手扶梯 / 電梯自動詢問與 B1 ~ 8F HTML 連結系統
+    // --------------------------------------------------------------------------
+    function navigateToFloorHtml(floorItem) {
+      closeDialogue();
+      if (document.pointerLockElement) document.exitPointerLock();
+
+      const overlay = document.getElementById('floor-transfer-overlay');
+      document.getElementById('transfer-title').textContent = `正在前往 ${floorItem.name}...`;
+      document.getElementById('transfer-sub').textContent = `自動連結至 ${floorItem.file}（${floorItem.desc}）`;
+      overlay.classList.remove('hidden');
+
+      setTimeout(() => {
+        window.location.href = floorItem.file;
+      }, 280);
+    }
+
+    function openTransportModal(transportLabel = '手扶梯 / 電梯') {
+      activeTalkNpc = { isTransportModal: true };
+      if (document.pointerLockElement) document.exitPointerLock();
+
+      document.getElementById('dlg-avatar').textContent = '🛗';
+      document.getElementById('dlg-name').textContent = `彰濱秀傳 ${transportLabel}・樓層選擇`;
+      document.getElementById('dlg-role').textContent = '目前所在樓層：7F VIP 尊榮病房樓層';
+      document.getElementById('dlg-text').textContent = `您已接觸到${transportLabel}！請問要去哪一個樓層？（點擊按鈕或按對應數字鍵，將自動連結 B1 ~ 8F 的 HTML 頁面）`;
+
+      const optContainer = document.getElementById('dlg-options');
+      optContainer.innerHTML = '';
+
+      FLOOR_LINKS.forEach((item) => {
+        const isCurrent = item.id === '7F';
+        const btn = document.createElement('button');
+        btn.className = isCurrent
+          ? 'w-full text-left px-3.5 py-2 rounded-xl bg-purple-500/30 hover:bg-purple-500/45 border border-purple-400 text-xs sm:text-sm font-black text-purple-100 flex items-center justify-between gap-2 transition'
+          : 'w-full text-left px-3.5 py-2 rounded-xl bg-teal-500/20 hover:bg-teal-500/40 border border-teal-400/40 text-xs sm:text-sm font-bold text-teal-100 flex items-center justify-between gap-2 transition';
+
+        btn.innerHTML = `
+          <div>
+            <span class="inline-block px-2 py-0.5 mr-1.5 rounded bg-slate-900/90 text-amber-300 font-black gta-font">${item.id}</span>
+            <span>${item.name}</span>
+            <span class="block sm:inline sm:ml-2 text-[11px] text-slate-300 font-normal">${item.desc}</span>
+          </div>
+          <span class="shrink-0 px-2 py-0.5 rounded bg-black/40 border border-white/15 text-[11px] text-teal-200 font-mono">
+            ${item.file} (${item.keyLabel})
+          </span>
+        `;
+
+        btn.addEventListener('click', () => {
+          navigateToFloorHtml(item);
+        });
+        optContainer.appendChild(btn);
+      });
+
+      document.getElementById('dialogue-modal').classList.remove('hidden');
+    }
+
+    function openDialogue(npc) {
+      if (!npc || npc.isHostile || npc.knockedTimer > 0) return;
+      activeTalkNpc = npc;
+      if (document.pointerLockElement) document.exitPointerLock();
+
+      document.getElementById('dlg-avatar').textContent = npc.avatar || '🩺';
+      document.getElementById('dlg-name').textContent = npc.name;
+      document.getElementById('dlg-role').textContent = npc.role;
+      document.getElementById('dlg-text').textContent = npc.dialogue;
+
+      const optContainer = document.getElementById('dlg-options');
+      optContainer.innerHTML = '';
+
+      if (npc.options && npc.options.length > 0) {
+        npc.options.forEach((opt) => {
+          const btn = document.createElement('button');
+          btn.className = 'w-full text-left px-3.5 py-2 rounded-xl bg-teal-500/20 hover:bg-teal-500/35 border border-teal-400/40 text-xs sm:text-sm font-bold text-teal-200 transition';
+          btn.textContent = `💬 ${opt.label}`;
+          btn.addEventListener('click', () => {
+            document.getElementById('dlg-text').textContent = opt.reply;
+          });
+          optContainer.appendChild(btn);
+        });
+      }
+
+      document.getElementById('dialogue-modal').classList.remove('hidden');
+    }
+
+    function closeDialogue() {
+      activeTalkNpc = null;
+      document.getElementById('dialogue-modal').classList.add('hidden');
+    }
+
+    // --------------------------------------------------------------------------
+    // 10. 每幀物理、VIP 電動門感應、NPC 巡房與阻尼滑鼠相機更新
+    // --------------------------------------------------------------------------
+    function updateSimulation(dt) {
+      gameClockMinutes = (gameClockMinutes + dt * 1.5) % (24 * 60);
+      const hh = String(Math.floor(gameClockMinutes / 60)).padStart(2, '0');
+      const mm = String(Math.floor(gameClockMinutes % 60)).padStart(2, '0');
+      document.getElementById('hud-clock').textContent = `${hh}:${mm}`;
+
+      const curFloor = getFloorNumber(player.pos.y);
+      updateFloorVisibility(curFloor);
+
+      // 更新 VIP 病房門口感應電動門
+      updateAutomaticDoors(dt);
+
+      // 更新揮擊光軌與擊中粒子特效
+      for (let i = slashEffects.length - 1; i >= 0; i--) {
+        const fx = slashEffects[i];
+        fx.life -= dt;
+        fx.mesh.material.opacity = Math.max(0, (fx.life / fx.maxLife) * 0.85);
+        fx.mesh.scale.addScalar(dt * 2.2);
+        if (fx.life <= 0) {
+          scene.remove(fx.mesh);
+          slashEffects.splice(i, 1);
+        }
+      }
+      for (let i = impactParticles.length - 1; i >= 0; i--) {
+        const pt = impactParticles[i];
+        pt.life -= dt;
+        pt.vel.y -= 9.8 * dt;
+        pt.mesh.position.addScaledVector(pt.vel, dt);
+        if (pt.life <= 0) {
+          scene.remove(pt.mesh);
+          impactParticles.splice(i, 1);
+        }
+      }
+
+      if (player.isDead) {
+        player.respawnTimer -= dt;
+        if (player.respawnTimer <= 0) {
+          player.isDead = false;
+          document.getElementById('ko-overlay').classList.add('hidden');
+          player.pos.set(-33.5, FLOOR_Y[7], 1.5);
+          player.yaw = -Math.PI * 0.5;
+          camState.yaw = camState.targetYaw = Math.PI * 0.5;
+          clearWantedAndHeal();
+        }
+        return;
+      }
+
+      let forwardIn = 0;
+      let rightIn = 0;
+      if (!activeTalkNpc) {
+        if (keys['KeyW'] || keys['ArrowUp']) forwardIn += 1;
+        if (keys['KeyS'] || keys['ArrowDown']) forwardIn -= 1;
+        if (keys['KeyD'] || keys['ArrowRight']) rightIn += 1;
+        if (keys['KeyA'] || keys['ArrowLeft']) rightIn -= 1;
+      }
+
+      const isSprint = keys['ShiftLeft'] || keys['ShiftRight'];
+      const speed = isSprint ? 8.2 : 5.0;
+
+      const camFwdX = -Math.sin(camState.yaw);
+      const camFwdZ = -Math.cos(camState.yaw);
+      const camRightX = Math.cos(camState.yaw);
+      const camRightZ = -Math.sin(camState.yaw);
+
+      let moveX = camFwdX * forwardIn + camRightX * rightIn;
+      let moveZ = camFwdZ * forwardIn + camRightZ * rightIn;
+      const moveLen = Math.hypot(moveX, moveZ);
+      if (moveLen > 0.001) {
+        moveX = (moveX / moveLen) * speed;
+        moveZ = (moveZ / moveLen) * speed;
+        const targetYaw = Math.atan2(moveX, moveZ);
+        let diff = targetYaw - player.yaw;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        player.yaw += diff * Math.min(1, dt * 16);
+      }
+
+      const surfaceY = getSurfaceHeightAt(player.pos.x, player.pos.z, player.pos.y);
+      player.vel.y -= 19.6 * dt;
+      player.pos.y += player.vel.y * dt;
+      if (player.pos.y <= surfaceY) {
+        player.pos.y = surfaceY;
+        player.vel.y = 0;
+        player.onGround = true;
+      }
+
+      const substeps = 4;
+      const subDt = dt / substeps;
+      for (let s = 0; s < substeps; s++) {
+        player.pos.x += (moveX + player.knockVel.x) * subDt;
+        player.pos.z += (moveZ + player.knockVel.z) * subDt;
+        player.pos.y = Math.max(player.pos.y, getSurfaceHeightAt(player.pos.x, player.pos.z, player.pos.y));
+
+        for (let i = 0; i < npcs.length; i++) {
+          const npc = npcs[i];
+          if (npc.floor !== curFloor) continue;
+          const weight = npc.isStationaryGuard || npc.knockedTimer > 0 ? 1.0 : 0.85;
+          separateCircles(player.pos, player.radius, npc.pos, npc.radius, weight);
+        }
+
+        resolveCircleAllAABBs(player.pos, player.radius, curFloor);
+      }
+      player.knockVel.multiplyScalar(Math.max(0, 1 - dt * 9.0));
+
+      if (player.comboResetTimer > 0) {
+        player.comboResetTimer -= dt;
+        if (player.comboResetTimer <= 0) player.comboStep = 0;
+      }
+
+      if (player.isAttacking) {
+        player.attackTimer += dt;
+        const p = Math.min(1, player.attackTimer / player.attackDuration);
+        const punchCurve = Math.sin(p * Math.PI);
+
+        if (!player.hitApplied && p >= 0.35) {
+          player.hitApplied = true;
+          applyPlayerHitbox();
+        }
+
+        if (player.attackType === 1) {
+          player.rightShoulder.rotation.x = -punchCurve * 1.65;
+          player.rightElbow.rotation.x = -0.3 + punchCurve * 0.25;
+          player.rightFistAura.material.opacity = punchCurve * 0.75;
+        } else if (player.attackType === 2) {
+          player.leftShoulder.rotation.x = -punchCurve * 1.65;
+          player.leftElbow.rotation.x = -0.3 + punchCurve * 0.25;
+          player.leftFistAura.material.opacity = punchCurve * 0.75;
+        } else if (player.attackType === 3) {
+          player.bodyRoot.rotation.y = p * Math.PI * 2;
+          player.rightHip.rotation.x = -punchCurve * 1.45;
+          player.rightFootAura.material.opacity = punchCurve * 0.85;
+        } else {
+          player.rightShoulder.rotation.x = -punchCurve * 2.1;
+          player.bodyRoot.position.y = punchCurve * 0.35;
+          player.rightFistAura.material.opacity = punchCurve * 0.95;
+        }
+
+        if (p >= 1) {
+          player.isAttacking = false;
+          player.bodyRoot.rotation.y = 0;
+          player.bodyRoot.position.y = 0;
+          player.rightFistAura.material.opacity = 0;
+          player.leftFistAura.material.opacity = 0;
+          player.rightFootAura.material.opacity = 0;
+        }
+      } else {
+        if (moveLen > 0.1) {
+          player.walkCycle += dt * (isSprint ? 15 : 10);
+          const swing = Math.sin(player.walkCycle) * (isSprint ? 0.8 : 0.52);
+          player.leftHip.rotation.x = swing;
+          player.rightHip.rotation.x = -swing;
+          player.leftKnee.rotation.x = Math.max(0, -swing * 0.75);
+          player.rightKnee.rotation.x = Math.max(0, swing * 0.75);
+          player.leftShoulder.rotation.x = -swing * 0.7;
+          player.rightShoulder.rotation.x = swing * 0.7;
+          player.leftElbow.rotation.x = -0.25;
+          player.rightElbow.rotation.x = -0.25;
+        } else {
+          player.leftHip.rotation.x *= 0.82;
+          player.rightHip.rotation.x *= 0.82;
+          player.leftKnee.rotation.x *= 0.82;
+          player.rightKnee.rotation.x *= 0.82;
+          player.leftShoulder.rotation.x *= 0.82;
+          player.rightShoulder.rotation.x *= 0.82;
+        }
+      }
+
+      player.mesh.position.copy(player.pos);
+      player.mesh.rotation.y = player.yaw;
+
+      nearestNpc = null;
+      let minNpcDist = 3.0;
+
+      for (let i = 0; i < npcs.length; i++) {
+        const npc = npcs[i];
+        if (npc.floor !== curFloor) {
+          npc.hpBarWrap.classList.add('hidden');
+          continue;
+        }
+
+        npc.badge.visible = showNpcLabels && npc.knockedTimer <= 0;
+        npc.alertRing.visible = npc.isHostile && npc.knockedTimer <= 0;
+        if (npc.alertRing.visible) {
+          const pulse = 1 + Math.sin(Date.now() * 0.012) * 0.12;
+          npc.alertRing.scale.set(pulse, pulse, 1);
+        }
+
+        if (npc.barkTimer > 0) {
+          npc.barkTimer -= dt;
+          if (npc.barkTimer <= 0) npc.barkEl.classList.add('hidden');
+        }
+
+        if (npc.knockVel.lengthSq() > 0.01) {
+          npc.pos.x += npc.knockVel.x * dt;
+          npc.pos.z += npc.knockVel.z * dt;
+          npc.knockVel.multiplyScalar(Math.max(0, 1 - dt * 7.5));
+          resolveCircleAllAABBs(npc.pos, npc.radius, npc.floor);
+        }
+
+        if (npc.knockedTimer > 0) {
+          npc.knockedTimer -= dt;
+          npc.dizzyGroup.rotation.y += dt * 5;
+          if (npc.knockedTimer <= 0) {
+            npc.hp = npc.maxHp;
+            npc.dizzyGroup.visible = false;
+            npc.rig.bodyRoot.rotation.x = 0;
+            npc.rig.bodyRoot.position.y = 0;
+            npc.isHostile = true;
+          }
+          npc.rig.group.position.copy(npc.pos);
+          updateNpcFloatingUI(npc);
+          continue;
+        }
+
+        const isHostile = npc.isHostile || (npc.type === 'security' && player.wantedStars > 0);
+        if (isHostile) {
+          const toPx = player.pos.x - npc.pos.x;
+          const toPz = player.pos.z - npc.pos.z;
+          const distP = Math.hypot(toPx, toPz);
+          npc.yaw = Math.atan2(toPx, toPz);
+
+          if (npc.attackCooldown > 0) npc.attackCooldown -= dt;
+
+          if (npc.windupTimer > 0) {
+            npc.windupTimer -= dt;
+            npc.rig.rightShoulder.rotation.x = -2.15;
+            if (npc.windupTimer <= 0) {
+              npc.rig.rightShoulder.rotation.x = 0.25;
+              npc.swingAnimTimer = 0.22;
+              npc.attackCooldown = 1.05;
+              if (distP <= 1.75) {
+                triggerNpcCounterAttack(npc);
+              }
+            }
+          } else if (npc.swingAnimTimer > 0) {
+            npc.swingAnimTimer -= dt;
+            if (npc.swingAnimTimer <= 0) npc.rig.rightShoulder.rotation.x = 0;
+          } else if (distP <= 1.38) {
+            if (npc.attackCooldown <= 0) {
+              npc.windupTimer = 0.4;
+              SoundFX.playAlert();
+            }
+          } else {
+            const chaseSpeed = npc.type === 'security' ? 4.3 : 3.4;
+            const moveDirX = toPx / Math.max(0.01, distP);
+            const moveDirZ = toPz / Math.max(0.01, distP);
+            npc.pos.x += moveDirX * chaseSpeed * dt;
+            npc.pos.z += moveDirZ * chaseSpeed * dt;
+            resolveCircleAllAABBs(npc.pos, npc.radius, npc.floor);
+
+            npc.walkCycle += dt * 12;
+            const swing = Math.sin(npc.walkCycle) * 0.65;
+            npc.rig.leftHip.rotation.x = swing;
+            npc.rig.rightHip.rotation.x = -swing;
+            npc.rig.leftShoulder.rotation.x = -swing * 0.7;
+            npc.rig.rightShoulder.rotation.x = swing * 0.7;
+          }
+        } else if (npc.waypoints.length > 1 && npc.speed > 0 && activeTalkNpc !== npc) {
+          const targetWp = npc.waypoints[npc.wpIndex];
+          const dx = targetWp.x - npc.pos.x;
+          const dz = targetWp.z - npc.pos.z;
+          const dist = Math.hypot(dx, dz);
+          if (dist < 0.35) {
+            npc.wpIndex = (npc.wpIndex + 1) % npc.waypoints.length;
+          } else {
+            npc.yaw = Math.atan2(dx, dz);
+            npc.pos.x += (dx / dist) * npc.speed * dt;
+            npc.pos.z += (dz / dist) * npc.speed * dt;
+            npc.walkCycle += dt * 8;
+            const swing = Math.sin(npc.walkCycle) * 0.42;
+            npc.rig.leftHip.rotation.x = swing;
+            npc.rig.rightHip.rotation.x = -swing;
+            npc.rig.leftShoulder.rotation.x = -swing * 0.6;
+            npc.rig.rightShoulder.rotation.x = swing * 0.6;
+          }
+        }
+
+        for (let j = i + 1; j < npcs.length; j++) {
+          if (npcs[j].floor !== npc.floor) continue;
+          separateCircles(npc.pos, npc.radius, npcs[j].pos, npcs[j].radius, 0.5);
+        }
+        separateCircles(player.pos, player.radius, npc.pos, npc.radius, 0.85);
+        resolveCircleAllAABBs(npc.pos, npc.radius, npc.floor);
+        resolveCircleAllAABBs(player.pos, player.radius, curFloor);
+
+        npc.rig.group.position.copy(npc.pos);
+        npc.rig.group.rotation.y = npc.yaw;
+
+        if (!isHostile && npc.knockedTimer <= 0) {
+          const dPlayer = player.pos.distanceTo(npc.pos);
+          if (dPlayer < minNpcDist) {
+            minNpcDist = dPlayer;
+            nearestNpc = npc;
+          }
+        }
+
+        updateNpcFloatingUI(npc);
+      }
+
+      currentTransportZone = findContactedTransportZone(player.pos.x, player.pos.z, player.radius, curFloor);
+
+      if (currentTransportZone) {
+        if (!activeTalkNpc && player.lastTriggeredTransportId !== currentTransportZone.id) {
+          player.lastTriggeredTransportId = currentTransportZone.id;
+          SoundFX.playAlert();
+          openTransportModal(currentTransportZone.transportType);
+        }
+      } else {
+        player.lastTriggeredTransportId = null;
+      }
+
+      const talkPrompt = document.getElementById('npc-talk-prompt');
+      if (nearestNpc && !activeTalkNpc) {
+        talkPrompt.innerHTML = `按 <span class="px-2 py-0.5 mx-1 rounded bg-emerald-400 text-slate-950 font-black">E</span> 與 <span class="text-amber-300">${nearestNpc.name}</span> 交談`;
+        talkPrompt.classList.remove('hidden');
+      } else if (currentTransportZone && !activeTalkNpc) {
+        talkPrompt.innerHTML = `按 <span class="px-2 py-0.5 mx-1 rounded bg-sky-400 text-slate-950 font-black">E</span> 選擇 <span class="text-amber-300">${currentTransportZone.transportType}前往樓層 (B1 ~ 8F)</span>`;
+        talkPrompt.classList.remove('hidden');
+      } else {
+        talkPrompt.classList.add('hidden');
+      }
+
+      updateCurrentZoneHUD();
+      updateCombatHUD();
+
+      const rotLerp = Math.min(1, dt * 22);
+      camState.yaw += (camState.targetYaw - camState.yaw) * rotLerp;
+      camState.pitch += (camState.targetPitch - camState.pitch) * rotLerp;
+      camState.distance += (camState.targetDistance - camState.distance) * Math.min(1, dt * 14);
+
+      if (camShake > 0) camShake = Math.max(0, camShake - dt * 1.8);
+      const shakeX = (Math.random() - 0.5) * camShake;
+      const shakeY = (Math.random() - 0.5) * camShake;
+
+      if (player.firstPerson) {
+        player.mesh.visible = false;
+        camera.position.set(player.pos.x + shakeX, player.pos.y + 1.66 + shakeY, player.pos.z);
+        const lookX = player.pos.x - Math.sin(camState.yaw) * Math.cos(camState.pitch);
+        const lookY = player.pos.y + 1.66 - Math.sin(camState.pitch);
+        const lookZ = player.pos.z - Math.cos(camState.yaw) * Math.cos(camState.pitch);
+        camera.lookAt(lookX, lookY, lookZ);
+      } else {
+        player.mesh.visible = true;
+        const desiredTarget = new THREE.Vector3(player.pos.x, player.pos.y + 1.48, player.pos.z);
+        camState.targetPos.lerp(desiredTarget, Math.min(1, dt * 16));
+
+        let safeDist = camState.distance;
+        const dirX = Math.sin(camState.yaw) * Math.cos(camState.pitch);
+        const dirY = Math.sin(camState.pitch);
+        const dirZ = Math.cos(camState.yaw) * Math.cos(camState.pitch);
+
+        for (let step = 0.8; step <= camState.distance; step += 0.35) {
+          const testX = camState.targetPos.x + dirX * step;
+          const testZ = camState.targetPos.z + dirZ * step;
+          if (checkWallCollision(testX, testZ, 0.25, curFloor)) {
+            safeDist = Math.max(1.1, step - 0.35);
+            break;
+          }
+        }
+
+        const baseFloorY = FLOOR_Y[curFloor] || 0;
+        const maxCeilingY = baseFloorY + 4.35;
+        const minFloorY = baseFloorY + 0.85;
+        const camY = Math.min(maxCeilingY, Math.max(minFloorY, camState.targetPos.y + dirY * safeDist));
+        camera.position.set(
+          camState.targetPos.x + dirX * safeDist + shakeX,
+          camY + shakeY,
+          camState.targetPos.z + dirZ * safeDist
+        );
+        camera.lookAt(camState.targetPos);
+      }
+    }
+
+    function updateNpcFloatingUI(npc) {
+      const showUI = npc.hp < npc.maxHp || npc.barkTimer > 0 || (npc.isHostile && npc.knockedTimer <= 0);
+      if (!showUI) {
+        npc.hpBarWrap.classList.add('hidden');
+        return;
+      }
+
+      const headWorld = new THREE.Vector3(npc.pos.x, npc.pos.y + (npc.knockedTimer > 0 ? 1.15 : 2.38), npc.pos.z);
+      const proj = headWorld.project(camera);
+      if (proj.z > 1) {
+        npc.hpBarWrap.classList.add('hidden');
+        return;
+      }
+
+      const sx = (proj.x * 0.5 + 0.5) * window.innerWidth;
+      const sy = (-proj.y * 0.5 + 0.5) * window.innerHeight;
+      npc.hpBarWrap.style.left = `${sx}px`;
+      npc.hpBarWrap.style.top = `${sy}px`;
+      npc.hpFillEl.style.width = `${Math.max(0, (npc.hp / npc.maxHp) * 100)}%`;
+      npc.hpBarWrap.classList.remove('hidden');
+    }
+
+    function updateCurrentZoneHUD() {
+      const x = player.pos.x;
+      const z = player.pos.z;
+      let label = '彰濱秀傳 7F VIP 尊榮病房走廊';
+
+      if (currentTransportZone) {
+        label = `7F ${currentTransportZone.transportType}感應區（可前往 B1 ~ 8F）`;
+      } else if (x <= -40.0 && z >= -8.5 && z <= -4.5) {
+        label = '7F 733 VIP 尊榮病房玄關（電動門已感應開啟）';
+      } else if (x <= -40.0 && z >= 3.5 && z <= 7.5) {
+        label = '7F 732 VIP 尊榮病房玄關（電動門已感應開啟）';
+      } else if (z > 6.5 && x >= -7.0 && x <= 12.0) {
+        label = '7F 全景交誼廳 (Sky Social Lounge)';
+      } else if (z >= 1.5 && x >= -15.0 && x < -7.0) {
+        label = '7F 商務中心 (Business Center)';
+      } else if (z >= 1.5 && x < -15.0) {
+        label = '7F 南西 VIP 尊榮病房 (728~732・電動門區)';
+      } else if (z >= 1.5 && x >= 12.0) {
+        label = '7F 南東一般病房 (701~710)・儲藏室';
+      } else if (x <= -29.0) {
+        label = '7F 733 / 732 VIP 尊榮病房電動門前走廊';
+      } else if (z >= -17.5 && z <= -6.5 && x < -9.0) {
+        label = '7F VIP 服務島 (懇談室・洗髮室・主任辦公室・會議室)';
+      } else if (z >= -17.5 && z <= -6.5 && Math.abs(x) <= 9.0) {
+        label = '7F 中央護理站 A・四座電梯廳';
+      } else if (z >= -17.5 && z <= -6.5 && x > 9.0) {
+        label = '7F 東側圓弧護理站島 (護理站 B・C・D / 醫材供應)';
+      } else if (x < 6.0) {
+        label = '7F 北西 VIP 尊榮病房走廊 (735~755・電動門區)';
+      } else {
+        label = '7F 東翼一般病房走廊 (711~727)';
+      }
+
+      document.getElementById('current-zone-label').textContent = label;
+    }
+
+    // --------------------------------------------------------------------------
+    // 11. 7F 緊急疏散平面圖同色系即時雷達小地圖 (標示 VIP 電動門與全體醫護/患者)
+    // --------------------------------------------------------------------------
+    const minimapCanvas = document.getElementById('minimap-canvas');
+    const mctx = minimapCanvas.getContext('2d');
+
+    function renderEvacuationMinimap() {
+      const size = minimapCanvas.width;
+      const half = size / 2;
+      const scale = 2.05;
+
+      mctx.clearRect(0, 0, size, size);
+      mctx.fillStyle = '#fefce8';
+      mctx.fillRect(0, 0, size, size);
+
+      mctx.save();
+      mctx.translate(half, half);
+
+      const px = player.pos.x;
+      const pz = player.pos.z;
+
+      function drawZoneBlock(wx, wz, ww, wd, fill, stroke = '#15803d') {
+        const rx = (wx - ww / 2 - px) * scale;
+        const rz = (wz - wd / 2 - pz) * scale;
+        mctx.fillStyle = fill;
+        mctx.fillRect(rx, rz, ww * scale, wd * scale);
+        if (stroke) {
+          mctx.strokeStyle = stroke;
+          mctx.lineWidth = 1.2;
+          mctx.strokeRect(rx, rz, ww * scale, wd * scale);
+        }
+      }
+
+      drawZoneBlock(0, -12.5, 107, 70, '#fefce8', '#15803d');
+      drawZoneBlock(-47.5, -39.5, 11.5, 14.5, '#d9f99d');
+      drawZoneBlock(47.5, -39.5, 11.0, 14.5, '#d9f99d');
+      drawZoneBlock(-46.5, -14.5, 13.0, 21.5, '#b583b8');
+      drawZoneBlock(-46.5, 6.5, 13.0, 18.5, '#b583b8');
+      drawZoneBlock(-11.5, -29.0, 35.0, 8.5, '#b583b8');
+      drawZoneBlock(23.5, -29.0, 35.0, 8.5, '#f3ead8');
+      drawZoneBlock(47.5, -16.5, 11.0, 22.0, '#f3ead8');
+      drawZoneBlock(-19.5, -12.5, 18.0, 5.2, '#bae6fd');
+      drawZoneBlock(0.5, -12.5, 13.5, 4.8, '#2dd4bf');
+      drawZoneBlock(-5.2, -2.5, 2.8, 5.4, '#38bdf8');
+      drawZoneBlock(8.2, -2.5, 2.8, 5.4, '#38bdf8');
+      drawZoneBlock(25.0, -12.5, 14.5, 4.8, '#bae6fd');
+      drawZoneBlock(-22.0, 6.8, 14.0, 6.2, '#b583b8');
+      drawZoneBlock(-11.0, 6.8, 7.6, 6.2, '#bae6fd');
+      drawZoneBlock(2.5, 15.2, 18.0, 13.0, '#bae6fd');
+      drawZoneBlock(29.5, 6.8, 31.5, 6.2, '#f3ead8');
+
+      // 標示 VIP 感應電動門位置（亮金/青光感應點）
+      automaticDoors.forEach((door) => {
+        const dx = (door.x - px) * scale;
+        const dz = (door.z - pz) * scale;
+        mctx.fillStyle = door.openProgress > 0.2 ? '#38bdf8' : '#facc15';
+        mctx.fillRect(dx - 2.5, dz - 2.5, 5, 5);
+      });
+
+      npcs.forEach((npc) => {
+        if (npc.knockedTimer > 0) return;
+        const nx = (npc.pos.x - px) * scale;
+        const nz = (npc.pos.z - pz) * scale;
+        if (npc.isHostile || (npc.type === 'security' && player.wantedStars > 0)) {
+          mctx.fillStyle = Math.sin(Date.now() * 0.015) > 0 ? '#ef4444' : '#fca5a5';
+        } else {
+          mctx.fillStyle = npc.type === 'staff' ? '#0284c7' : npc.type === 'security' ? '#1d4ed8' : '#f59e0b';
+        }
+        mctx.beginPath();
+        mctx.arc(nx, nz, 3.5, 0, Math.PI * 2);
+        mctx.fill();
+      });
+
+      mctx.fillStyle = '#ec4899';
+      mctx.beginPath();
+      mctx.arc(0, 0, 5.5, 0, Math.PI * 2);
+      mctx.fill();
+
+      mctx.save();
+      mctx.rotate(-player.yaw + Math.PI);
+      mctx.fillStyle = '#be185d';
+      mctx.beginPath();
+      mctx.moveTo(0, -10);
+      mctx.lineTo(4.5, -3);
+      mctx.lineTo(-4.5, -3);
+      mctx.closePath();
+      mctx.fill();
+      mctx.restore();
+
+      mctx.restore();
+    }
+
+    // --------------------------------------------------------------------------
+    // 12. 場景初始化、靈活滑鼠事件監聽與主渲染迴圈
+    // --------------------------------------------------------------------------
+    function initScene() {
+      const canvas = document.getElementById('game-canvas');
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0f172a);
+      scene.fog = new THREE.FogExp2(0xe2e8f0, 0.0036);
+
+      camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.15, 220);
+
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      const hemiLight = new THREE.HemisphereLight(0xffffff, 0xd6cfc2, 0.94);
+      scene.add(hemiLight);
+
+      const dirLight = new THREE.DirectionalLight(0xfffbeb, 0.65);
+      dirLight.position.set(35, 65, 45);
+      dirLight.castShadow = true;
+      dirLight.shadow.mapSize.width = 2048;
+      dirLight.shadow.mapSize.height = 2048;
+      dirLight.shadow.camera.near = 5;
+      dirLight.shadow.camera.far = 160;
+      const b = 60;
+      dirLight.shadow.camera.left = -b;
+      dirLight.shadow.camera.right = b;
+      dirLight.shadow.camera.top = b;
+      dirLight.shadow.camera.bottom = -b;
+      scene.add(dirLight);
+
+      const fillLight7F = new THREE.PointLight(0xfef3c7, 0.48, 95);
+      fillLight7F.position.set(-22, 26.8, -6);
+      const fillLightCenter = new THREE.PointLight(0xe0f2fe, 0.45, 85);
+      fillLightCenter.position.set(4, 26.8, -4);
+      scene.add(fillLight7F, fillLightCenter);
+
+      buildAllHospitalFloors();
+      spawnAllNpcs();
+      updateFloorVisibility(7);
+      bindEvents();
+      updateCombatHUD();
+
+      setTimeout(() => {
+        const loader = document.getElementById('loading-overlay');
+        loader.style.opacity = '0';
+        setTimeout(() => loader.remove(), 500);
+      }, 350);
+    }
+
+    function bindEvents() {
+      const canvas = document.getElementById('game-canvas');
+
+      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+      canvas.addEventListener('mousedown', (e) => {
+        if (activeTalkNpc || player.isDead) return;
+
+        if (e.button === 0) {
+          if (!camState.isPointerLocked && canvas.requestPointerLock) {
+            try {
+              canvas.requestPointerLock();
+            } catch (err) {
+              performPlayerAttack(false);
+            }
+          } else {
+            performPlayerAttack(false);
+          }
+        } else if (e.button === 2) {
+          camState.rightMouseDragging = true;
+          camState.dragMovedDist = 0;
+          camState.lastMouseX = e.clientX;
+          camState.lastMouseY = e.clientY;
+          if (camState.isPointerLocked) {
+            performPlayerAttack(true);
+          }
+        } else if (e.button === 1) {
+          e.preventDefault();
+          camState.targetYaw = player.yaw + Math.PI;
+          camState.targetPitch = 0.22;
+        }
+      });
+
+      window.addEventListener('mouseup', (e) => {
+        if (e.button === 2 && camState.rightMouseDragging) {
+          camState.rightMouseDragging = false;
+          if (!camState.isPointerLocked && camState.dragMovedDist < 8) {
+            performPlayerAttack(true);
+          }
+        }
+      });
+
+      document.addEventListener('pointerlockchange', () => {
+        camState.isPointerLocked = document.pointerLockElement === canvas;
+        const crosshair = document.getElementById('center-crosshair');
+        if (camState.isPointerLocked) {
+          crosshair.classList.remove('hidden');
+        } else {
+          crosshair.classList.add('hidden');
+          camState.lastMouseX = null;
+          camState.lastMouseY = null;
+        }
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (activeTalkNpc) return;
+        const sens = camState.sensitivity;
+
+        if (camState.isPointerLocked) {
+          camState.targetYaw -= e.movementX * 0.0028 * sens;
+          camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + e.movementY * 0.0024 * sens, -0.38, 1.08);
+        } else {
+          if (camState.lastMouseX !== null) {
+            const dx = e.clientX - camState.lastMouseX;
+            const dy = e.clientY - camState.lastMouseY;
+            camState.dragMovedDist += Math.hypot(dx, dy);
+
+            const mult = camState.rightMouseDragging ? 0.0065 * sens : 0.0036 * sens;
+            camState.targetYaw -= dx * mult;
+            camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * mult * 0.85, -0.38, 1.08);
+          }
+          camState.lastMouseX = e.clientX;
+          camState.lastMouseY = e.clientY;
+        }
+      });
+
+      canvas.addEventListener(
+        'wheel',
+        (e) => {
+          e.preventDefault();
+          const nextDist = camState.targetDistance + e.deltaY * 0.0055;
+          if (nextDist < 2.0 && !player.firstPerson) {
+            player.firstPerson = true;
+            document.getElementById('btn-toggle-pov').textContent = '👁️ 第一人稱 (V)';
+          } else if (nextDist >= 2.2 && player.firstPerson && e.deltaY > 0) {
+            player.firstPerson = false;
+            document.getElementById('btn-toggle-pov').textContent = '👁️ 第三人稱 (V)';
+          }
+          camState.targetDistance = THREE.MathUtils.clamp(nextDist, 2.2, 11.5);
+        },
+        { passive: false }
+      );
+
+      const sensSlider = document.getElementById('mouse-sens-slider');
+      const sensLabel = document.getElementById('mouse-sens-val');
+      sensSlider.addEventListener('input', (e) => {
+        camState.sensitivity = parseFloat(e.target.value);
+        sensLabel.textContent = `${camState.sensitivity.toFixed(1)}x`;
+      });
+
+      canvas.addEventListener(
+        'touchstart',
+        (e) => {
+          if (e.touches.length === 1) {
+            camState.touchDragging = true;
+            camState.lastTouchX = e.touches[0].clientX;
+            camState.lastTouchY = e.touches[0].clientY;
+          }
+        },
+        { passive: true }
+      );
+
+      canvas.addEventListener(
+        'touchmove',
+        (e) => {
+          if (!camState.touchDragging || e.touches.length !== 1) return;
+          const dx = e.touches[0].clientX - camState.lastTouchX;
+          const dy = e.touches[0].clientY - camState.lastTouchY;
+          camState.lastTouchX = e.touches[0].clientX;
+          camState.lastTouchY = e.touches[0].clientY;
+          camState.targetYaw -= dx * 0.0065 * camState.sensitivity;
+          camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * 0.0055 * camState.sensitivity, -0.38, 1.08);
+        },
+        { passive: true }
+      );
+
+      canvas.addEventListener('touchend', () => {
+        camState.touchDragging = false;
+      });
+
+      window.addEventListener('keydown', (e) => {
+        keys[e.code] = true;
+
+        if (activeTalkNpc && activeTalkNpc.isTransportModal) {
+          const matchedFloor = FLOOR_LINKS.find((f) => f.keyCode === e.code);
+          if (matchedFloor) {
+            e.preventDefault();
+            navigateToFloorHtml(matchedFloor);
+            return;
+          }
+        }
+
+        if (e.code === 'Space') {
+          if (!activeTalkNpc && !player.isDead && player.onGround) {
+            player.vel.y = 7.4;
+            player.onGround = false;
+          }
+        } else if (e.code === 'KeyJ') {
+          performPlayerAttack(false);
+        } else if (e.code === 'KeyK') {
+          performPlayerAttack(true);
+        } else if (e.code === 'KeyR') {
+          camState.targetYaw = player.yaw + Math.PI;
+          camState.targetPitch = 0.22;
+        } else if (e.code === 'KeyV') {
+          player.firstPerson = !player.firstPerson;
+          document.getElementById('btn-toggle-pov').textContent = player.firstPerson ? '👁️ 第一人稱 (V)' : '👁️ 第三人稱 (V)';
+        } else if (e.code === 'KeyC') {
+          clearWantedAndHeal();
+        } else if (e.code === 'KeyE') {
+          if (activeTalkNpc) {
+            closeDialogue();
+          } else if (nearestNpc) {
+            openDialogue(nearestNpc);
+          } else if (currentTransportZone) {
+            openTransportModal(currentTransportZone.transportType);
+          } else {
+            openTransportModal('手扶梯 / 電梯');
+          }
+        } else if (e.code === 'Escape') {
+          if (activeTalkNpc) closeDialogue();
+        }
+      });
+
+      window.addEventListener('keyup', (e) => {
+        keys[e.code] = false;
+      });
+
+      document.querySelectorAll('.tp-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const zKey = btn.getAttribute('data-zone');
+          const zone = ZONES[zKey];
+          if (!zone) return;
+          closeDialogue();
+          player.pos.copy(zone.pos);
+          player.yaw = zone.yaw;
+          player.vel.set(0, 0, 0);
+          player.onGround = true;
+          camState.yaw = camState.targetYaw = zone.yaw + Math.PI;
+          updateCombatHUD();
+        });
+      });
+
+      document.querySelectorAll('.floor-link-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const href = btn.getAttribute('data-href');
+          const item = FLOOR_LINKS.find((f) => f.file === href);
+          if (item) navigateToFloorHtml(item);
+        });
+      });
+
+      document.getElementById('btn-action-attack').addEventListener('click', () => performPlayerAttack(false));
+      document.getElementById('btn-action-heavy').addEventListener('click', () => performPlayerAttack(true));
+
+      document.getElementById('btn-toggle-pov').addEventListener('click', () => {
+        player.firstPerson = !player.firstPerson;
+        document.getElementById('btn-toggle-pov').textContent = player.firstPerson ? '👁️ 第一人稱 (V)' : '👁️ 第三人稱 (V)';
+      });
+
+      document.getElementById('btn-toggle-labels').addEventListener('click', (e) => {
+        showNpcLabels = !showNpcLabels;
+        e.currentTarget.textContent = showNpcLabels ? '🏷️ NPC 標籤: 開' : '🏷️ NPC 標籤: 關';
+      });
+
+      document.getElementById('btn-open-elevator').addEventListener('click', () => openTransportModal('手扶梯 / 電梯'));
+      document.getElementById('btn-clear-wanted').addEventListener('click', clearWantedAndHeal);
+
+      document.getElementById('btn-toggle-help').addEventListener('click', (e) => {
+        const body = document.getElementById('help-body');
+        const isHidden = body.classList.toggle('hidden');
+        e.currentTarget.textContent = isHidden ? '展開' : '收合';
+      });
+
+      document.getElementById('npc-talk-prompt').addEventListener('click', () => {
+        if (nearestNpc) openDialogue(nearestNpc);
+        else if (currentTransportZone) openTransportModal(currentTransportZone.transportType);
+      });
+
+      document.getElementById('dlg-close-btn').addEventListener('click', closeDialogue);
+
+      document.querySelectorAll('.touch-pad').forEach((pad) => {
+        const code = pad.getAttribute('data-key');
+        pad.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          keys[code] = true;
+        });
+        pad.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          keys[code] = false;
+        });
+      });
+
+      document.getElementById('btn-touch-jump').addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (player.onGround) {
+          player.vel.y = 7.4;
+          player.onGround = false;
+        }
+      });
+
+      document.getElementById('btn-touch-talk').addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (activeTalkNpc) closeDialogue();
+        else if (nearestNpc) openDialogue(nearestNpc);
+        else openTransportModal(currentTransportZone ? currentTransportZone.transportType : '手扶梯 / 電梯');
+      });
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }
+
+    function animateLoop() {
+      requestAnimationFrame(animateLoop);
+      const dt = Math.min(clock.getDelta(), 0.05);
+      updateSimulation(dt);
+      renderEvacuationMinimap();
+      renderer.render(scene, camera);
+    }
+
+    window.onload = function () {
+      initScene();
+      animateLoop();
+    };
+  </script>
+</body>
+</html>
