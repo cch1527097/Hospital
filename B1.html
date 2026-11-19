@@ -170,7 +170,7 @@
         </button>
       </div>
 
-      <!-- 💡 燈光情境切換器 (3 種建築級燈光氛圍即時切換) -->
+      <!-- 💡 燈光情境切換器 -->
       <div class="mt-2.5 p-2 rounded-lg bg-slate-900/80 border border-amber-400/30">
         <div class="flex items-center justify-between text-[11px] mb-1.5">
           <span class="font-black text-amber-300">💡 燈光情境切換 (L 鍵)</span>
@@ -212,7 +212,6 @@
           <span class="px-1.5 py-0.5 rounded bg-black/30 text-[10px]">C 鍵</span>
         </button>
 
-        <!-- 滑鼠靈敏度即時調節 -->
         <div class="px-2.5 py-1.5 rounded-lg bg-slate-900/70 border border-white/10">
           <div class="flex items-center justify-between text-[11px] mb-1">
             <span class="text-teal-200 font-bold">🖱️ 滑鼠轉向靈敏度</span>
@@ -222,7 +221,6 @@
         </div>
       </div>
 
-      <!-- 按鍵操作表 -->
       <div id="help-body" class="mt-2 pt-2 border-t border-white/10 text-[11px] text-slate-200 space-y-1">
         <div class="flex justify-between"><span class="text-slate-400">行走 / 衝刺閃避</span><span class="font-bold text-amber-300">WASD / 方向鍵 / Shift</span></div>
         <div class="flex justify-between"><span class="text-slate-400">跳躍</span><span class="font-bold text-amber-300">Space 空白鍵</span></div>
@@ -243,12 +241,10 @@
       🔥 門診尖峰時段・B1 候診區大爆滿
     </div>
 
-    <!-- B1 門診人潮即時狀態膠囊 -->
     <div class="mt-1 px-2.5 py-0.5 rounded-full bg-rose-600/85 border border-rose-300/60 text-[11px] font-black text-white shadow">
       👥 B1 現場人數：<span id="hud-crowd-count">68</span> 人（門診候診大爆滿）
     </div>
 
-    <!-- 生命值 & 護甲狀態條 -->
     <div class="mt-1.5 w-40 sm:w-48 space-y-1">
       <div class="flex items-center justify-between text-[11px] font-black gta-font gta-shadow text-white px-0.5">
         <span class="text-rose-300">生命值 HP</span>
@@ -262,7 +258,6 @@
       </div>
     </div>
 
-    <!-- 五星通緝等級 -->
     <div id="hud-wanted-stars" class="mt-1.5 flex items-center gap-1 text-base sm:text-lg gta-shadow">
       <span class="text-slate-500">★</span>
       <span class="text-slate-500">★</span>
@@ -271,7 +266,6 @@
       <span class="text-slate-500">★</span>
     </div>
 
-    <!-- 目前所在空間徽章 -->
     <div class="mt-1.5 px-3 py-1 rounded-xl hud-glass border-l-4 border-rose-500 text-right shadow-lg max-w-[260px] sm:max-w-[340px]">
       <div class="text-[10px] text-slate-400 font-medium">現在位置 You Are Here</div>
       <div id="current-zone-label" class="text-xs sm:text-sm font-black text-white">B1 免疫/中醫科門診大廳・中庭共食區</div>
@@ -286,7 +280,7 @@
     按 <span class="px-2 py-0.5 mx-1 rounded bg-emerald-400 text-slate-950 font-black">E</span> 與 <span id="prompt-npc-name" class="text-amber-300">候診民眾</span> 交談
   </button>
 
-  <!-- NPC 對話 / 手扶梯・電梯樓層選擇視窗 Modal (B1 1F 2F 3F 5F 6F 7F 8F) -->
+  <!-- NPC 對話 / 手扶梯・電梯樓層選擇視窗 Modal -->
   <div id="dialogue-modal" class="hidden fixed inset-0 z-40 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
     <div class="hud-glass w-full max-w-xl rounded-2xl p-5 text-white border border-teal-400/45 shadow-2xl">
       <div class="flex items-center justify-between gap-3 pb-3 border-b border-white/15">
@@ -336,7 +330,6 @@
       </button>
     </div>
 
-    <!-- 行動裝置虛擬方向鍵與跳躍/對話 -->
     <div class="md:hidden flex flex-col items-end gap-1.5">
       <div class="flex gap-1.5">
         <button id="btn-touch-talk" class="px-3 h-10 rounded-full hud-glass text-emerald-300 font-bold text-xs active:scale-95">對話/電梯 E</button>
@@ -354,31 +347,6 @@
   </div>
 
   <script>
-    /**
-     * ============================================================================
-     * 彰濱秀傳紀念醫院 B1 地下一樓醫療與美食空間 3D 實境（牆壁與燈光系統重製版）
-     * ============================================================================
-     * 牆壁與燈光深度重製架構：
-     * 1. 建築級分區牆面貼圖 (`createArchitecturalWallTexture`)：
-     *    - 上段微肌理乳膠漆 + 天花板陰影線板 + 垂直立面分格縫
-     *    - 中段木紋 / 刷紋金屬防撞腰帶（含立體高低光倒角）
-     *    - 下段醫院級防刮抗菌護牆板（或大理石紋腰牆）+ 深色防潮踢腳板
-     * 2. 五大專屬空間牆面材質：
-     *    - 主走廊象牙暖木牆、胸腔科/消化器醫療藍灰牆、維納斯醫美/耳鼻喉香檳粉白牆、
-     *      高壓氧/供應室潔淨湖水綠牆、美食街/員工餐廳「立體胡桃木格柵＋天然大理石腰牆」
-     * 3. 立體建築構造：
-     *    - 實木＋不鏽鋼雙層防撞扶手 (`addCorridorHandrail`)
-     *    - 診間立面連續「隱藏式暖白 LED 洗牆燈槽」、立體金屬門框與木格柵柱飾
-     *    - 美食街攤位「大理石櫃檯暖金 LED 踢腳燈帶」、發光燈箱與背後菜單牆洗牆燈
-     *    - 中庭共食區「現代暖金飛碟吊燈 (`buildModernUfoPendantLight`)」
-     * 4. 多層次 ACES 電影級燈光系統 (`lightingSystem`)：
-     *    - 門診候診區 4500K 自然白、高壓氧/供應室 5500K 潔淨白、美食街/共食區 3000K 暖金光、
-     *      手扶梯/電梯湖水青導引光暈 + 格柵嵌燈陣列 + 上下雙向壁燈 + 3 種燈光情境即時切換！
-     */
-
-    // --------------------------------------------------------------------------
-    // 1. 全域變數、樓層連結對照表、燈光系統登錄器與音效引擎
-    // --------------------------------------------------------------------------
     let scene, camera, renderer;
     const clock = new THREE.Clock();
     let gameClockMinutes = 10 * 60 + 35;
@@ -398,24 +366,20 @@
     const floorGroups = { B1: new THREE.Group() };
     let activeBuildGroup = null;
 
-    // 碰撞箱清單
     const colliders = [];
-    // 手扶梯 / 電梯接觸感應區清單
     const transportZones = [];
-    // 小地圖繪製用的排椅與櫃位紀錄
     const minimapFurnitures = [];
 
-    // 多層次燈光系統登錄器（支援日間全亮 / 暖金質感 / 夜間巡檢即時切換）
     const lightingSystem = {
       currentMode: 'day',
       hemiLight: null,
       dirLight: null,
-      zoneLights: [],       // { light, zoneType: 'clinic'|'clean'|'food'|'transport', baseIntensity }
-      ceilingDiffusers: [], // 天花板格柵嵌燈擴散板材質
-      ceilingHalos: [],     // 天花板嵌燈柔和光暈網格
-      coveMaterials: [],    // 診間洗牆燈槽 & 美食街暖金 LED 踢腳燈帶材質
-      sconceHalos: [],      // 上下雙向壁燈牆面洗光光暈
-      pendantMaterials: []  // 中庭共食區飛碟吊燈發光盤材質
+      zoneLights: [],
+      ceilingDiffusers: [],
+      ceilingHalos: [],
+      coveMaterials: [],
+      sconceHalos: [],
+      pendantMaterials: []
     };
 
     const keys = {};
@@ -428,12 +392,12 @@
 
     const slashEffects = [];
     const hitParticles = [];
+    const escalatorSteps = [];
 
     function getFloorKey() {
       return 'B1';
     }
 
-    // 玩家初始位置：位於免疫/中醫門診大廳與中央手扶梯交會主通道
     const player = {
       mesh: null,
       headGroup: null,
@@ -483,7 +447,6 @@
       lastClientY: null
     };
 
-    // B1 內部各科區域快速傳送座標表（精準避開排椅與櫃位碰撞箱）
     const ZONES = {
       b1_atrium:    { label: 'B1 免疫/中醫科門診大廳・中庭共食區', pos: new THREE.Vector3(-8.5, -4.6, -2.5), yaw: Math.PI },
       b1_transport: { label: 'B1 中央手扶梯 / 中央電梯廳 (往 B1 ~ 8F)', pos: new THREE.Vector3(-4.5, -4.6, -9.5), yaw: Math.PI },
@@ -494,7 +457,6 @@
       b1_food:      { label: 'B1 實景美食街 (湯陽食堂・九龍廣東粥・龍山赤肉羹・弘爺漢堡)', pos: new THREE.Vector3(10.5, -4.6, -13.5), yaw: Math.PI }
     };
 
-    // Web Audio API 音效合成器
     const SoundFX = (() => {
       let ctx = null;
       function ensureCtx() {
@@ -583,9 +545,6 @@
       return { playSwing, playImpact, playPlayerHurt, playAlert, playSwitchClick };
     })();
 
-    // --------------------------------------------------------------------------
-    // 2. 平滑全圓弧幾何體工廠
-    // --------------------------------------------------------------------------
     function createSmoothCapsuleGeometry(radius, length, capSegments = 10, radialSegments = 16) {
       const halfLen = Math.max(0.001, length * 0.5);
       const points = [];
@@ -602,17 +561,6 @@
       return geom;
     }
 
-    // --------------------------------------------------------------------------
-    // 3. 建築級高解析程序化牆面、地磚、大理石、叫號螢幕貼圖工廠
-    // --------------------------------------------------------------------------
-
-    /**
-     * 打造建築級多段式牆面貼圖 (1024x1024)：
-     * - 上段 (0 ~ 560px)：微肌理建築乳膠漆 (或立體胡桃木格柵) + 頂部線板陰影 + 垂直立面分格縫
-     * - 中段 (560 ~ 640px)：木紋 / 刷紋金屬防撞腰帶（含上下立體倒角高光與陰影）
-     * - 下段 (640 ~ 968px)：醫院級防刮護牆板 (或天然大理石紋腰牆) + 垂直護牆板接縫
-     * - 底部 (968 ~ 1024px)：深色防潮踢腳板 + 金屬收邊條
-     */
     function createArchitecturalWallTexture(opts = {}) {
       const canvas = document.createElement('canvas');
       canvas.width = 1024;
@@ -629,9 +577,7 @@
       const isMarbleLower = !!opts.isMarbleLower;
       const isWoodBand = opts.isWoodBand !== false;
 
-      // 1. 上段牆面 (Y: 0 -> 560)
       if (isWoodSlatUpper) {
-        // 美食街 / 員工餐廳：深胡桃木立體格柵牆
         ctx.fillStyle = '#2c1e16';
         ctx.fillRect(0, 0, 1024, 560);
         const slatStep = 32;
@@ -645,7 +591,6 @@
           ctx.fillStyle = grad;
           ctx.fillRect(sx, 0, slatStep - 2, 560);
 
-          // 細緻木紋纖維線
           ctx.strokeStyle = 'rgba(255, 224, 185, 0.08)';
           ctx.lineWidth = 1;
           ctx.beginPath();
@@ -654,11 +599,9 @@
           ctx.stroke();
         }
       } else {
-        // 醫院微肌理霧面乳膠漆
         ctx.fillStyle = upperColor;
         ctx.fillRect(0, 0, 1024, 560);
 
-        // 微細建築塗料顆粒肌理
         for (let i = 0; i < 3600; i++) {
           const gx = (i * 197) % 1024;
           const gy = (i * 313) % 560;
@@ -666,7 +609,6 @@
           ctx.fillRect(gx, gy, 2, 2);
         }
 
-        // 上段立面建築分格縫 (每 256px 一道雙線陰影槽)
         for (let x = 0; x <= 1024; x += 256) {
           ctx.fillStyle = seamColor;
           ctx.fillRect(x, 0, 2, 560);
@@ -675,7 +617,6 @@
         }
       }
 
-      // 天花板交界處柔和陰影與頂部收邊線板 (Y: 0 -> 28)
       const topShadow = ctx.createLinearGradient(0, 0, 0, 34);
       topShadow.addColorStop(0, 'rgba(15, 23, 42, 0.34)');
       topShadow.addColorStop(0.45, 'rgba(15, 23, 42, 0.12)');
@@ -683,7 +624,6 @@
       ctx.fillStyle = topShadow;
       ctx.fillRect(0, 0, 1024, 34);
 
-      // 2. 中段防撞腰帶 / 裝飾線板 (Y: 560 -> 642)
       ctx.fillStyle = bandTrimColor;
       ctx.fillRect(0, 558, 1024, 6);
 
@@ -696,7 +636,6 @@
       ctx.fillRect(0, 564, 1024, 72);
 
       if (isWoodBand) {
-        // 橫向實木紋理線條
         ctx.strokeStyle = 'rgba(255, 237, 213, 0.22)';
         ctx.lineWidth = 2;
         for (let wy = 572; wy < 632; wy += 9) {
@@ -706,7 +645,6 @@
           ctx.stroke();
         }
       } else {
-        // 刷紋不鏽鋼金屬拉絲肌理
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
         ctx.lineWidth = 1.5;
         for (let wy = 570; wy < 634; wy += 6) {
@@ -717,14 +655,12 @@
         }
       }
 
-      // 腰帶下方投射陰影
       const midShadow = ctx.createLinearGradient(0, 636, 0, 658);
       midShadow.addColorStop(0, 'rgba(15, 23, 42, 0.36)');
       midShadow.addColorStop(1, 'rgba(15, 23, 42, 0)');
       ctx.fillStyle = midShadow;
       ctx.fillRect(0, 636, 1024, 22);
 
-      // 3. 下段防刮護牆板 / 天然大理石腰牆 (Y: 642 -> 968)
       if (isMarbleLower) {
         ctx.fillStyle = '#f8fafc';
         ctx.fillRect(0, 642, 1024, 326);
@@ -742,7 +678,6 @@
           }
           ctx.stroke();
         }
-        // 大理石拼接縫
         for (let x = 0; x <= 1024; x += 256) {
           ctx.fillStyle = 'rgba(71, 85, 105, 0.45)';
           ctx.fillRect(x, 642, 3, 326);
@@ -751,12 +686,10 @@
         ctx.fillStyle = lowerColor;
         ctx.fillRect(0, 642, 1024, 326);
 
-        // 防刮壓紋細網格
         ctx.fillStyle = 'rgba(15, 23, 42, 0.03)';
         for (let py = 646; py < 964; py += 8) {
           ctx.fillRect(0, py, 1024, 2);
         }
-        // 護牆板垂直伸縮縫 (每 128px 一道細縫)
         for (let x = 0; x <= 1024; x += 128) {
           ctx.fillStyle = seamColor;
           ctx.fillRect(x, 642, 2, 326);
@@ -765,7 +698,6 @@
         }
       }
 
-      // 4. 底部防潮踢腳板 (Y: 968 -> 1024)
       ctx.fillStyle = bandTrimColor;
       ctx.fillRect(0, 966, 1024, 4);
       ctx.fillStyle = baseColor;
@@ -779,9 +711,6 @@
       return tex;
     }
 
-    /**
-     * 建立指定分區的牆面材質（自動依牆寬調整水平貼圖重複比例，避免拉伸變形）
-     */
     function createScaledWallMaterial(baseTex, width, repeatY = 1) {
       const tex = baseTex.clone();
       tex.needsUpdate = true;
@@ -802,11 +731,9 @@
       canvas.height = 1024;
       const ctx = canvas.getContext('2d');
 
-      // 基底暖米白色醫院地磚
       ctx.fillStyle = '#efe9dc';
       ctx.fillRect(0, 0, 1024, 1024);
 
-      // 還原實景照片中的湖水藍 (Turquoise/Aqua) 與暖杏色區塊拼接
       ctx.fillStyle = '#8ad3d6';
       ctx.fillRect(0, 0, 260, 1024);
       ctx.fillRect(580, 220, 220, 560);
@@ -814,12 +741,10 @@
       ctx.fillStyle = '#f3dfc1';
       ctx.fillRect(280, 120, 280, 780);
 
-      // 白色地面動線雙線條
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(256, 0, 14, 1024);
       ctx.fillRect(566, 0, 10, 1024);
 
-      // 細緻拋光磚接縫
       ctx.strokeStyle = 'rgba(130, 125, 115, 0.28)';
       ctx.lineWidth = 2;
       for (let x = 0; x <= 1024; x += 128) {
@@ -853,7 +778,6 @@
       ctx.fillStyle = '#f8fafc';
       ctx.fillRect(0, 0, 512, 512);
 
-      // 灰色天然大理石紋理線條
       for (let i = 0; i < 28; i++) {
         ctx.strokeStyle = i % 2 === 0 ? 'rgba(100, 116, 139, 0.26)' : 'rgba(148, 163, 184, 0.18)';
         ctx.lineWidth = 1.5 + Math.random() * 2.5;
@@ -1028,7 +952,6 @@
       ctx.fillStyle = themeBg;
       ctx.fillRect(0, 0, 512, 384);
 
-      // 暖色洗牆燈光暈效果
       const grad = ctx.createRadialGradient(340, 110, 20, 340, 140, 260);
       grad.addColorStop(0, 'rgba(251, 191, 36, 0.45)');
       grad.addColorStop(1, 'rgba(255, 251, 235, 0)');
@@ -1080,9 +1003,6 @@
       return signMesh;
     }
 
-    /**
-     * 建構建築級分區牆體（自動支援多段貼圖比例縮放與實體碰撞箱）
-     */
     function addWall(cx, cz, w, d, h = 4.4, wallTexOrMat = null, label = '牆面', floor = 'B1', baseY = -4.6) {
       let material;
       if (wallTexOrMat && wallTexOrMat.isTexture) {
@@ -1117,15 +1037,6 @@
       return slab;
     }
 
-    // --------------------------------------------------------------------------
-    // 4. 立體防撞扶手、壁燈、格柵嵌燈、飛碟吊燈與實景診間/美食街建構工廠
-    // --------------------------------------------------------------------------
-
-    /**
-     * 加裝立體「實木＋不鏽鋼雙層防撞扶手 (`addCorridorHandrail`)」
-     * - 上層：人體工學圓弧實木扶手 (Y = baseY + 0.94m) + 圓弧防勾撞端頭
-     * - 下層：刷紋不鏽鋼寬版防撞護腰帶 (Y = baseY + 0.68m) + 牆面金屬固定座
-     */
     function addCorridorHandrail(x1, z1, x2, z2, baseY = -4.6, woodColor = 0x8d5b3c) {
       const dx = x2 - x1;
       const dz = z2 - z1;
@@ -1140,25 +1051,21 @@
       const woodMat = new THREE.MeshStandardMaterial({ color: woodColor, roughness: 0.38, metalness: 0.08 });
       const steelMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, roughness: 0.25, metalness: 0.85 });
 
-      // 上層實木圓扶手
       const upperRail = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, len, 12), woodMat);
       upperRail.rotation.x = Math.PI / 2;
       upperRail.position.set(0, 0.94, 0);
       g.add(upperRail);
 
-      // 兩端圓球防勾撞端頭
       [-len / 2, len / 2].forEach((ez) => {
         const cap = new THREE.Mesh(new THREE.SphereGeometry(0.028, 10, 8), steelMat);
         cap.position.set(0, 0.94, ez);
         g.add(cap);
       });
 
-      // 下層不鏽鋼防撞護腰帶
       const lowerBumper = new THREE.Mesh(new THREE.BoxGeometry(0.032, 0.11, len), steelMat);
       lowerBumper.position.set(0, 0.68, 0);
       g.add(lowerBumper);
 
-      // 每隔 1.8m 配置不鏽鋼牆面支架
       const bracketCount = Math.max(2, Math.floor(len / 1.8) + 1);
       for (let i = 0; i < bracketCount; i++) {
         const bz = -len / 2 + (len * i) / (bracketCount - 1);
@@ -1173,9 +1080,6 @@
       (activeBuildGroup || scene).add(g);
     }
 
-    /**
-     * 建構現代建築「上下雙向壁燈 (`buildWallSconce`)」+ 牆面上下洗光光暈
-     */
     function buildWallSconce(x, y, z, rotY = 0, tintHex = 0xffedd5) {
       const g = new THREE.Group();
       const bodyMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35, metalness: 0.8 });
@@ -1187,11 +1091,9 @@
       });
       lightingSystem.coveMaterials.push(lensMat);
 
-      // 壁燈金屬燈體
       const housing = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.34, 0.11), bodyMat);
       g.add(housing);
 
-      // 上下發光透鏡
       const topLens = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 0.08), lensMat);
       topLens.rotation.x = -Math.PI / 2;
       topLens.position.set(0, 0.172, 0.01);
@@ -1200,7 +1102,6 @@
       botLens.position.set(0, -0.172, 0.01);
       g.add(topLens, botLens);
 
-      // 牆面上下投射光暈貼片 (Wall-Wash Halo Cone)
       const haloCanvas = document.createElement('canvas');
       haloCanvas.width = 128;
       haloCanvas.height = 256;
@@ -1232,15 +1133,10 @@
       (activeBuildGroup || scene).add(g);
     }
 
-    /**
-     * 升級天花板嵌燈陣列 (`buildRecessedCeilingLights`)：
-     * 金屬外框 + 導光擴散板 + 格柵條 + 柔和 ceiling halo 光暈
-     */
     function buildRecessedCeilingLights(baseY = -4.6) {
       const ceilY = baseY + 4.44;
       const frameMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.75, roughness: 0.3 });
 
-      // 預先建立柔和光暈貼圖
       const haloCanvas = document.createElement('canvas');
       haloCanvas.width = 128;
       haloCanvas.height = 128;
@@ -1255,18 +1151,15 @@
 
       for (let lx = -36; lx <= 36; lx += 12) {
         for (let lz = -30; lz <= 30; lz += 12) {
-          // 判斷所屬空間色溫：美食街暖金 (3000K)、高壓氧/供應室潔淨白 (5500K)、門診區自然白 (4500K)
-          let tintHex = 0xf8fafc; // 4500K 自然白
-          if (lx >= 0 && lx <= 26 && lz <= -2) tintHex = 0xffedd5; // 3000K 美食街與共食區暖金
-          else if ((lx <= -34 && lz >= 4) || (lx >= 0 && lz <= -24)) tintHex = 0xe0f7fa; // 5500K 潔淨白
+          let tintHex = 0xf8fafc;
+          if (lx >= 0 && lx <= 26 && lz <= -2) tintHex = 0xffedd5;
+          else if ((lx <= -34 && lz >= 4) || (lx >= 0 && lz <= -24)) tintHex = 0xe0f7fa;
 
           const fixture = new THREE.Group();
 
-          // 金屬外框
           const bezel = new THREE.Mesh(new THREE.BoxGeometry(1.56, 0.05, 0.82), frameMat);
           fixture.add(bezel);
 
-          // 導光擴散板
           const diffMat = new THREE.MeshStandardMaterial({
             color: tintHex,
             emissive: new THREE.Color(tintHex),
@@ -1280,14 +1173,12 @@
           diffuser.position.y = -0.028;
           fixture.add(diffuser);
 
-          // 建築格柵防眩橫條
           [-0.48, 0, 0.48].forEach((gx) => {
             const louver = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.035, 0.7), frameMat);
             louver.position.set(gx, -0.032, 0);
             fixture.add(louver);
           });
 
-          // 柔和天花板擴散光暈
           const haloMat = new THREE.MeshBasicMaterial({
             map: haloTex,
             color: tintHex,
@@ -1308,9 +1199,6 @@
       }
     }
 
-    /**
-     * 建構中庭共食區上方懸吊「現代暖金飛碟吊燈 (`buildModernUfoPendantLight`)」
-     */
     function buildModernUfoPendantLight(x, z, baseY = -4.6) {
       const g = new THREE.Group();
       const brassMat = new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.85, roughness: 0.22 });
@@ -1323,21 +1211,18 @@
       });
       lightingSystem.pendantMaterials.push(opalMat);
 
-      // 天花板吸頂盤與吊桿
       const canopy = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.05, 16), darkCordMat);
       canopy.position.y = 4.42;
       const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 1.55, 8), darkCordMat);
       rod.position.y = 3.65;
       g.add(canopy, rod);
 
-      // 雙層暖金飛碟外罩 (Double-Tier Spun-Brass Saucer Shade)
       const upperDome = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.68, 0.16, 28), brassMat);
       upperDome.position.y = 2.86;
       const lowerRing = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.52, 0.07, 28), brassMat);
       lowerRing.position.y = 2.75;
       g.add(upperDome, lowerRing);
 
-      // 底部暖光乳白擴散盤
       const diffuser = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.42, 0.04, 24), opalMat);
       diffuser.position.y = 2.71;
       g.add(diffuser);
@@ -1346,9 +1231,6 @@
       (activeBuildGroup || scene).add(g);
     }
 
-    /**
-     * 建構照片同款「金屬框黑色皮墊四連排候診椅」(Hospital 4-Seater Waiting Bench)
-     */
     function buildHospitalWaitingBench(x, z, rotY = 0, baseY = -4.6, seatColor = 0x1e293b) {
       const g = new THREE.Group();
       const chromeMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.82, roughness: 0.22 });
@@ -1414,12 +1296,6 @@
       });
     }
 
-    /**
-     * 【重製升級】建構建築級實景診間立面 (`buildClinicWallFacade`)：
-     * - 門楣上方連續「隱藏式暖白 LED 洗牆燈槽 (Recessed Cove Light)」
-     * - 立體金屬門框 (`3D Brushed Metal Door Frame`) + 採光毛玻璃窗
-     * - 診間牆柱「立體木格柵柱飾 (`3D Vertical Wood Slat Pilasters`)」+ 數位叫號燈
-     */
     function buildClinicWallFacade(centerX, wallZ, rooms, facingSign = 1, baseY = -4.6) {
       const upperWallMat = new THREE.MeshStandardMaterial({ color: 0xe8ecf1, roughness: 0.58 });
       const midBandMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.45, metalness: 0.25 });
@@ -1436,10 +1312,8 @@
       const totalWidth = rooms.length * slotWidth;
       const startX = centerX - totalWidth / 2 + slotWidth / 2;
 
-      // 整排後方診療室隔間牆
       addWall(centerX, wallZ - facingSign * 1.6, totalWidth + 0.8, 3.0, 4.4, upperWallMat, '診間診療室', 'B1', baseY);
 
-      // 門楣上方連續「隱藏式暖白 LED 洗牆燈槽 (Recessed Cove Light)」
       const soffitBox = new THREE.Mesh(
         new THREE.BoxGeometry(totalWidth + 0.4, 0.22, 0.36),
         new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.5 })
@@ -1455,7 +1329,6 @@
       });
       lightingSystem.coveMaterials.push(coveStripMat);
 
-      // 上洗光與下洗光雙向 LED 燈條
       const coveUp = new THREE.Mesh(new THREE.PlaneGeometry(totalWidth + 0.2, 0.12), coveStripMat);
       coveUp.rotation.x = -Math.PI / 2;
       coveUp.position.set(centerX, baseY + 3.195, wallZ + facingSign * 0.16);
@@ -1468,7 +1341,6 @@
         const rx = startX + idx * slotWidth;
         const frontZ = wallZ;
 
-        // 1. 立體刷紋金屬門框 (左右門柱 + 門楣橫框)
         const doorCenterX = rx - 0.85;
         const leftJamb = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.42, 0.22), metalFrameMat);
         leftJamb.position.set(doorCenterX - 0.65, baseY + 1.21, frontZ + facingSign * 0.04);
@@ -1478,7 +1350,6 @@
         topHeader.position.set(doorCenterX, baseY + 2.42, frontZ + facingSign * 0.04);
         (activeBuildGroup || scene).add(leftJamb, rightJamb, topHeader);
 
-        // 深灰色診間門（帶門牌與公告單貼圖）
         const doorTex = createClinicDoorTexture(rm.code, rm.dept, rm.doctor);
         const doorMesh = new THREE.Mesh(
           new THREE.BoxGeometry(1.24, 2.36, 0.12),
@@ -1488,12 +1359,10 @@
         if (facingSign < 0) doorMesh.rotation.y = Math.PI;
         (activeBuildGroup || scene).add(doorMesh);
 
-        // 2. 門旁採光毛玻璃窗 + 金屬窗框
         const sidelight = new THREE.Mesh(new THREE.BoxGeometry(0.65, 2.36, 0.08), glassMat);
         sidelight.position.set(rx + 0.15, baseY + 1.18, frontZ);
         (activeBuildGroup || scene).add(sidelight);
 
-        // 3. 兩段式建築牆面 + 立體木格柵柱飾 (Vertical Wood Slat Pilasters)
         const panelLower = new THREE.Mesh(new THREE.BoxGeometry(1.85, 1.1, 0.14), upperWallMat);
         panelLower.position.set(rx + 1.42, baseY + 0.55, frontZ);
         const panelMid = new THREE.Mesh(new THREE.BoxGeometry(1.85, 0.75, 0.15), midBandMat);
@@ -1502,14 +1371,12 @@
         panelUpper.position.set(rx + 1.42, baseY + 3.12, frontZ);
         (activeBuildGroup || scene).add(panelLower, panelMid, panelUpper);
 
-        // 叫號螢幕兩側配置立體木格柵裝飾條
         [-0.68, -0.56, 0.56, 0.68].forEach((sx) => {
           const slat = new THREE.Mesh(new THREE.BoxGeometry(0.055, 2.85, 0.07), woodSlatMat);
           slat.position.set(rx + 1.42 + sx, baseY + 1.45, frontZ + facingSign * 0.08);
           (activeBuildGroup || scene).add(slat);
         });
 
-        // 4. 壁掛式數位叫號螢幕
         const monTex = createQueueMonitorTexture(rm.queueNum, rm.code);
         const monitor = new THREE.Mesh(
           new THREE.BoxGeometry(0.62, 1.05, 0.09),
@@ -1527,10 +1394,6 @@
       });
     }
 
-    /**
-     * 【重製升級】建構建築級裝飾支柱 (`buildHospitalPillarWithTV`)：
-     * - 結構柱木紋/石材飾面與不鏽鋼防撞護角 + 柱身垂直導光燈條 + 叫號電視 + 蘭花造景
-     */
     function buildHospitalPillarWithTV(x, z, baseY = -4.6, withOrchid = false) {
       const upperMat = new THREE.MeshStandardMaterial({ color: 0xe8ecf1, roughness: 0.58 });
       const woodBandMat = new THREE.MeshStandardMaterial({ color: 0x8d5b3c, roughness: 0.45 });
@@ -1549,7 +1412,6 @@
 
       (activeBuildGroup || scene).add(pillar, band, plinth);
 
-      // 四角不鏽鋼防撞護角條
       [
         [-0.48, -0.48],
         [0.48, -0.48],
@@ -1561,7 +1423,6 @@
         (activeBuildGroup || scene).add(guard);
       });
 
-      // 懸掛式多診叫號總覽電視
       const tvBox = new THREE.Mesh(
         new THREE.BoxGeometry(0.78, 0.5, 0.12),
         new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x0284c7, emissiveIntensity: 0.55 })
@@ -1569,7 +1430,6 @@
       tvBox.position.set(x, baseY + 2.85, z + 0.54);
       tvBox.rotation.x = 0.18;
 
-      // 柱旁酒精乾洗手液
       const sanitizer = new THREE.Mesh(
         new THREE.BoxGeometry(0.14, 0.24, 0.12),
         new THREE.MeshStandardMaterial({ color: 0xffffff })
@@ -1594,12 +1454,6 @@
       }
     }
 
-    /**
-     * 【重製升級】建構實景美食街餐飲櫃位 (`buildRealFoodCourtStall`)：
-     * - 大理石櫃檯底部加裝發光「暖金 LED 踢腳燈帶 (`Warm Gold LED Toe-Kick`)」
-     * - 攤位上方配置發光燈箱招牌與吧檯下照光帶
-     * - 背後菜單牆配置暖色洗牆燈罩 (`Backwall Cove Light`)
-     */
     function buildRealFoodCourtStall(x, z, width, stallData, marbleMat, baseY = -4.6) {
       const g = new THREE.Group();
       const woodMat = new THREE.MeshStandardMaterial({ color: 0x9c6b43, roughness: 0.48 });
@@ -1617,7 +1471,6 @@
       const depth = 3.6;
       const frontZ = depth / 2;
 
-      // 1. 後方廚房背牆（帶書法標語與發光價目表貼圖）+ 頂部暖色洗牆燈槽
       const backTex = createFoodMenuBackwallTexture(
         stallData.name,
         stallData.mottos || ['好吃', '好好吃', '好好吃飯'],
@@ -1636,7 +1489,6 @@
       backCove.position.set(0, 3.35, -depth / 2 + 0.34);
       g.add(backCove);
 
-      // 2. 兩側大理石隔間牆 + 左側深胡桃木直條格柵柱
       const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.24, 3.6, depth), marbleMat);
       leftWall.position.set(-width / 2 + 0.12, 1.8, 0);
       const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.24, 3.6, depth), marbleMat);
@@ -1649,7 +1501,6 @@
         g.add(slat);
       }
 
-      // 3. 大理石紋前點餐吧檯 + 暖木斜切飾板 + 底部「暖金 LED 踢腳燈帶」
       const counterMarble = new THREE.Mesh(new THREE.BoxGeometry(width - 0.2, 1.04, 0.55), marbleMat);
       counterMarble.position.set(0, 0.6, frontZ - 0.28);
       counterMarble.castShadow = true;
@@ -1659,7 +1510,6 @@
       woodTrim.position.set(-width * 0.14, 0.27, frontZ - 0.28);
       g.add(woodTrim);
 
-      // 櫃檯底部內縮踢腳槽 + 發光暖金 LED 燈帶
       const toeKickBase = new THREE.Mesh(
         new THREE.BoxGeometry(width - 0.28, 0.08, 0.44),
         new THREE.MeshStandardMaterial({ color: 0x1e293b })
@@ -1669,19 +1519,16 @@
       toeKickLed.position.set(0, 0.055, frontZ - 0.07);
       g.add(toeKickBase, toeKickLed);
 
-      // 不鏽鋼備餐工作檯與保溫餐台
       const prepTable = new THREE.Mesh(new THREE.BoxGeometry(width - 0.8, 0.88, 0.85), stainlessMat);
       prepTable.position.set(0, 0.44, -0.35);
       g.add(prepTable);
 
-      // 4. 突出式大理石紋點餐排隊矮隔牆
       const dividerL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 1.38, 1.15), marbleMat);
       dividerL.position.set(-width / 2 + 0.18, 0.69, frontZ + 0.55);
       const dividerR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 1.38, 1.15), marbleMat);
       dividerR.position.set(width / 2 - 0.18, 0.69, frontZ + 0.55);
       g.add(dividerL, dividerR);
 
-      // 5. 櫃位上方發光燈箱招牌 + 底部下照吧檯燈帶
       const headerBeam = new THREE.Mesh(
         new THREE.BoxGeometry(width, 0.88, 0.44),
         new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35, metalness: 0.5 })
@@ -1797,7 +1644,6 @@
       colliders.push({ minX: x - 1.15, maxX: x + 1.15, minZ: z - 1.15, maxZ: z + 1.15, floor: 'B1', label: '共食區餐桌椅' });
       minimapFurnitures.push({ x, z, w: 2.1, d: 2.1, color: '#fb923c' });
 
-      // 每張餐桌上方懸吊一盞「現代暖金飛碟吊燈」
       buildModernUfoPendantLight(x, z, baseY);
 
       return seatAngles.map((ang) => ({
@@ -1807,23 +1653,18 @@
       }));
     }
 
-    // --------------------------------------------------------------------------
-    // 5. 建構「彰濱秀傳紀念醫院 B1 地下一樓」建築級牆壁與燈光重製空間 (baseY = -4.6m)
-    // --------------------------------------------------------------------------
     const allWaitingSeats = [];
     const allDiningSeats = [];
 
     function buildHospitalB1Interior() {
       activeBuildGroup = floorGroups.B1;
-      const b1Y = FLOOR_Y.B1; // -4.6m
+      const b1Y = FLOOR_Y.B1;
 
       const floorTex = createHospitalRealFloorTexture();
       const floorMat = new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.36, metalness: 0.08 });
       const marbleMat = new THREE.MeshStandardMaterial({ map: createMarbleTexture(), roughness: 0.26, metalness: 0.06 });
       const ceilMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.85 });
 
-      // 五大專屬空間建築級多段牆面貼圖
-      // 1. 主走廊象牙暖木牆
       const texIvoryWoodWall = createArchitecturalWallTexture({
         upperColor: '#f6f1e7',
         bandColor: '#9c6b43',
@@ -1832,7 +1673,6 @@
         baseColor: '#292524',
         isWoodBand: true
       });
-      // 2. 胸腔科 / 消化器醫療藍灰牆
       const texMedBlueGrayWall = createArchitecturalWallTexture({
         upperColor: '#eef2f6',
         bandColor: '#475569',
@@ -1841,7 +1681,6 @@
         baseColor: '#1e293b',
         isWoodBand: false
       });
-      // 3. 維納斯醫美 / 耳鼻喉香檳粉白牆
       const texAestheticPinkWall = createArchitecturalWallTexture({
         upperColor: '#fdf8f6',
         bandColor: '#be185d',
@@ -1850,7 +1689,6 @@
         baseColor: '#3f2e3e',
         isWoodBand: false
       });
-      // 4. 高壓氧 / 中央供應室潔淨湖水綠牆
       const texCleanTealWall = createArchitecturalWallTexture({
         upperColor: '#f0fdfa',
         bandColor: '#0d9488',
@@ -1859,7 +1697,6 @@
         baseColor: '#134e4a',
         isWoodBand: false
       });
-      // 5. 美食街與員工餐廳「立體胡桃木格柵＋天然大理石腰牆」
       const texFoodWalnutMarbleWall = createArchitecturalWallTexture({
         bandColor: '#b45309',
         bandTrimColor: '#fde68a',
@@ -1890,32 +1727,26 @@
       });
       const darkFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.6 });
 
-      // B1 完整實景地坪與天花板
       addFloorSlab(0, -1.5, 108, 93, b1Y, floorMat);
       const ceilB1 = new THREE.Mesh(new THREE.PlaneGeometry(108, 94), ceilMat);
       ceilB1.rotation.x = Math.PI / 2;
       ceilB1.position.set(0, b1Y + 4.48, -1.5);
       activeBuildGroup.add(ceilB1);
 
-      // 升級立體金屬格柵天花板嵌燈陣列
       buildRecessedCeilingLights(b1Y);
 
-      // B1 四周地下室外牆（主走廊象牙暖木牆 + 雙層防撞扶手 + 上下雙向壁燈）
       addWall(0, -47.5, 108, 0.8, 4.6, texIvoryWoodWall, 'B1 北側外牆', 'B1', b1Y);
       addWall(0, 44.5, 108, 0.8, 4.6, texIvoryWoodWall, 'B1 南側外牆', 'B1', b1Y);
       addWall(-53.5, -1.5, 0.8, 93, 4.6, texIvoryWoodWall, 'B1 西側外牆', 'B1', b1Y);
       addWall(53.5, -1.5, 0.8, 93, 4.6, texIvoryWoodWall, 'B1 東側外牆', 'B1', b1Y);
 
-      // 沿東西向主走廊與南北向通道加裝立體實木＋不鏽鋼雙層防撞扶手與壁燈
       addCorridorHandrail(-52.8, -12.0, -52.8, 6.0, b1Y);
       addCorridorHandrail(52.8, -12.0, 52.8, 6.0, b1Y);
       buildWallSconce(-52.95, b1Y + 2.25, -8.0, Math.PI / 2, 0xffedd5);
       buildWallSconce(-52.95, b1Y + 2.25, 2.0, Math.PI / 2, 0xffedd5);
       buildWallSconce(52.95, b1Y + 2.25, -6.0, -Math.PI / 2, 0xffedd5);
 
-      // ------------------------------------------------------------------------
-      // A. 中央電梯核心 & B1 中央手扶梯 (湖水青導引光暈 + 接觸自動選樓層)
-      // ------------------------------------------------------------------------
+      // A. 中央電梯核心 & 橫向雙向平行手扶梯（東西向，一上一下動態運作，無懸掛招牌）
       addWall(-6.5, -19.5, 8.5, 4.8, 4.4, texCleanTealWall, 'B1 中央電梯核心', 'B1', b1Y);
       addCorridorHandrail(-10.5, -17.0, -2.5, -17.0, b1Y);
       buildWallSconce(-10.2, b1Y + 2.25, -17.02, 0, 0x99f6e4);
@@ -1947,44 +1778,134 @@
         maxZ: -14.8
       });
 
-      const escLength = Math.hypot(9.0, 4.6);
-      const escAngle = Math.atan2(4.6, 9.0);
-      const escRamp = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.35, escLength), darkFrameMat);
-      escRamp.position.set(0, b1Y + 2.3, 0);
-      escRamp.rotation.x = escAngle;
-      activeBuildGroup.add(escRamp);
+      // 橫向雙向平行手扶梯（東西向，同個方向一上一下：北側上行 UP、南側下行 DOWN，無懸掛招牌）
+      const escSpanX = 9.0;
+      const escRiseY = 4.6;
+      const escLength = Math.hypot(escSpanX, escRiseY);
+      const escAngle = Math.atan2(escRiseY, escSpanX);
 
-      [-2.35, 0, 2.35].forEach((rx) => {
-        const rail = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.05, escLength), glassMat);
-        rail.position.set(rx, b1Y + 2.85, 0);
-        rail.rotation.x = escAngle;
-        activeBuildGroup.add(rail);
+      const stepMetalMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.72, roughness: 0.32 });
+      const stepTrimMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xd97706, emissiveIntensity: 0.35, roughness: 0.4 });
+      const rubberRailMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35, metalness: 0.15 });
+
+      const escLanes = [
+        { laneZ: -1.15, dir: 1, indicatorColor: 0x10b981 },  // 北側車道：同向往上 (West -> East 上行)
+        { laneZ: 1.15,  dir: -1, indicatorColor: 0xf59e0b }  // 南側車道：同向往下 (East -> West 下行)
+      ];
+
+      escLanes.forEach((lane) => {
+        const escRamp = new THREE.Mesh(new THREE.BoxGeometry(escLength, 0.34, 2.04), darkFrameMat);
+        escRamp.position.set(0, b1Y + 2.3, lane.laneZ);
+        escRamp.rotation.z = escAngle;
+        activeBuildGroup.add(escRamp);
+
+        const stepCount = 22;
+        for (let i = 0; i < stepCount; i++) {
+          const t = i / stepCount;
+          const stepGroup = new THREE.Group();
+          const tread = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.14, 1.88), stepMetalMat);
+          const safetyEdge = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.145, 1.89), stepTrimMat);
+          safetyEdge.position.x = 0.16;
+          stepGroup.add(tread, safetyEdge);
+          stepGroup.position.set(-escSpanX / 2 + t * escSpanX, b1Y + 0.16 + t * escRiseY, lane.laneZ);
+          activeBuildGroup.add(stepGroup);
+          escalatorSteps.push({
+            mesh: stepGroup,
+            t,
+            dir: lane.dir,
+            baseY: b1Y,
+            spanX: escSpanX,
+            riseY: escRiseY
+          });
+        }
+
+        const landingPlate = new THREE.Mesh(
+          new THREE.BoxGeometry(0.75, 0.05, 2.02),
+          new THREE.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.8, roughness: 0.25 })
+        );
+        landingPlate.position.set(-escSpanX / 2 - 0.15, b1Y + 0.025, lane.laneZ);
+        activeBuildGroup.add(landingPlate);
+
+        const arrowCanvas = document.createElement('canvas');
+        arrowCanvas.width = 128;
+        arrowCanvas.height = 128;
+        const actx = arrowCanvas.getContext('2d');
+        actx.fillStyle = '#0f172a';
+        actx.fillRect(0, 0, 128, 128);
+        actx.fillStyle = lane.dir > 0 ? '#34d399' : '#fbbf24';
+        actx.beginPath();
+        if (lane.dir > 0) {
+          actx.moveTo(24, 96);
+          actx.lineTo(96, 32);
+          actx.lineTo(54, 32);
+          actx.lineTo(54, 18);
+          actx.lineTo(112, 18);
+          actx.lineTo(112, 76);
+          actx.lineTo(98, 76);
+          actx.lineTo(98, 44);
+          actx.lineTo(36, 108);
+        } else {
+          actx.moveTo(104, 32);
+          actx.lineTo(32, 96);
+          actx.lineTo(74, 96);
+          actx.lineTo(74, 110);
+          actx.lineTo(16, 110);
+          actx.lineTo(16, 52);
+          actx.lineTo(30, 52);
+          actx.lineTo(30, 84);
+          actx.lineTo(92, 20);
+        }
+        actx.closePath();
+        actx.fill();
+        const arrowTex = new THREE.CanvasTexture(arrowCanvas);
+        arrowTex.encoding = THREE.sRGBEncoding;
+
+        const arrowBadge = new THREE.Mesh(
+          new THREE.PlaneGeometry(0.46, 0.46),
+          new THREE.MeshStandardMaterial({
+            map: arrowTex,
+            emissive: new THREE.Color(lane.indicatorColor),
+            emissiveMap: arrowTex,
+            emissiveIntensity: 0.85
+          })
+        );
+        arrowBadge.rotation.x = -Math.PI / 2;
+        arrowBadge.position.set(-escSpanX / 2 - 0.18, b1Y + 0.055, lane.laneZ);
+        activeBuildGroup.add(arrowBadge);
       });
-      addWall(-2.5, 0, 0.25, 9.2, 4.6, glassMat, 'B1手扶梯西護欄', 'B1', b1Y);
-      addWall(2.5, 0, 0.25, 9.2, 4.6, glassMat, 'B1手扶梯東護欄', 'B1', b1Y);
 
-      const escSouthPad = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.03, 1.4), sensorPadMat);
-      escSouthPad.position.set(0, b1Y + 0.015, 5.1);
-      const escNorthPad = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.03, 1.4), sensorPadMat);
-      escNorthPad.position.set(0, b1Y + 0.015, -5.1);
-      activeBuildGroup.add(escSouthPad, escNorthPad);
+      [-2.25, 0, 2.25].forEach((rz) => {
+        const rail = new THREE.Mesh(new THREE.BoxGeometry(escLength, 1.02, 0.12), glassMat);
+        rail.position.set(0, b1Y + 2.82, rz);
+        rail.rotation.z = escAngle;
+        activeBuildGroup.add(rail);
+
+        const handrailBelt = new THREE.Mesh(new THREE.BoxGeometry(escLength + 0.35, 0.08, 0.16), rubberRailMat);
+        handrailBelt.position.set(0, b1Y + 3.35, rz);
+        handrailBelt.rotation.z = escAngle;
+        activeBuildGroup.add(handrailBelt);
+      });
+
+      addWall(0, -2.45, 9.2, 0.25, 4.6, glassMat, 'B1手扶梯北護欄', 'B1', b1Y);
+      addWall(0, 2.45, 9.2, 0.25, 4.6, glassMat, 'B1手扶梯南護欄', 'B1', b1Y);
+
+      const escWestPad = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.03, 4.6), sensorPadMat);
+      escWestPad.position.set(-5.1, b1Y + 0.015, 0);
+      const escEastPad = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.03, 4.6), sensorPadMat);
+      escEastPad.position.set(5.1, b1Y + 0.015, 0);
+      activeBuildGroup.add(escWestPad, escEastPad);
 
       transportZones.push({
         id: 'esc_b1_central',
         floor: 'B1',
         transportType: '中央手扶梯',
-        minX: -2.8,
-        maxX: 2.8,
-        minZ: -5.8,
-        maxZ: 5.8
+        minX: -5.8,
+        maxX: 5.8,
+        minZ: -2.8,
+        maxZ: 2.8
       });
 
-      addHangingSign(0, b1Y + 3.65, 5.4, 6.8, 0.88, 'B1 中央自動手扶梯 (接觸自動選樓層)', 'ESCALATOR・往 B1 ~ 8F 各樓層', '#0f4c5c', '#2dd4bf', Math.PI);
-      addHangingSign(0, b1Y + 3.65, -5.4, 6.8, 0.88, 'B1 中央自動手扶梯 (接觸自動選樓層)', 'ESCALATOR・往 B1 ~ 8F 各樓層', '#0f4c5c', '#2dd4bf', 0);
-
-      // ------------------------------------------------------------------------
-      // B. 北西翼：實景胸腔科門診候診大廳（101~104診・金屬排椅爆滿區 + 醫療藍灰牆）
-      // ------------------------------------------------------------------------
+      // B. 北西翼：實景胸腔科門診候診大廳
       addWall(-29.5, -39.5, 24.0, 10.5, 4.4, texMedBlueGrayWall, 'B1 藥庫 (Pharmacy Warehouse)', 'B1', b1Y);
       addCorridorHandrail(-41.0, -34.15, -18.0, -34.15, b1Y);
       addHangingSign(-29.5, b1Y + 3.55, -33.8, 6.4, 0.85, '藥庫・藥品倉儲中心', 'PHARMACY WAREHOUSE', '#1d4ed8', '#93c5fd');
@@ -1995,7 +1916,6 @@
       buildWallSconce(-43.5, b1Y + 2.25, -19.15, 0, 0xfef3c7);
       addHangingSign(-39.5, b1Y + 3.55, -18.8, 6.8, 0.85, '小兒科・預防注射・護理長辦公室', 'PEDIATRICS & VACCINATION', '#0f766e', '#5eead4');
 
-      // ★ 胸腔科門診實景立面（含門楣連續暖白 LED 洗牆燈槽、金屬門框與木格柵柱飾）
       buildClinicWallFacade(-24.5, -23.5, [
         { code: '胸腔 101診', dept: '胸腔內科', doctor: '林俊傑 醫師', queueNum: '0048' },
         { code: '胸腔 102診', dept: '胸腔內科', doctor: '王志明 醫師', queueNum: '0052' },
@@ -2021,25 +1941,19 @@
       addWall(-13.8, -21.5, 4.2, 6.5, 4.4, texIvoryWoodWall, '佐綺軒精品醫療生活館', 'B1', b1Y);
       addHangingSign(-13.8, b1Y + 3.45, -17.8, 3.8, 0.75, '佐綺軒', 'MEDICAL BOUTIQUE', '#b45309', '#fde047');
 
-      // ------------------------------------------------------------------------
       // C. 免疫/中醫科門診候診區
-      // ------------------------------------------------------------------------
       addHangingSign(-13.5, b1Y + 3.65, -5.5, 7.6, 0.92, '免疫風濕科・中醫科門診候診區 (爆滿)', 'IMMUNOLOGY & TRADITIONAL CHINESE MEDICINE', '#be123c', '#fde047');
       allWaitingSeats.push(...buildHospitalWaitingBench(-15.5, -8.8, 0, b1Y));
       allWaitingSeats.push(...buildHospitalWaitingBench(-11.5, -8.8, 0, b1Y));
 
-      // ------------------------------------------------------------------------
-      // D. 北中翼：中央供應室 (潔淨湖水綠牆 + 5500K 潔淨白光)
-      // ------------------------------------------------------------------------
+      // D. 北中翼：中央供應室
       addWall(11.5, -36.5, 22.0, 16.5, 4.4, texCleanTealWall, 'B1 中央供應室 (滅菌品/耗材/無菌區/清潔區)', 'B1', b1Y);
       addCorridorHandrail(1.0, -28.15, 22.0, -28.15, b1Y);
       buildWallSconce(4.5, b1Y + 2.25, -28.15, 0, 0x99f6e4);
       buildWallSconce(18.5, b1Y + 2.25, -28.15, 0, 0x99f6e4);
       addHangingSign(11.5, b1Y + 3.65, -27.8, 8.6, 0.9, '滅菌品存放室・耗材存放室・無菌區・清潔區', 'CENTRAL STERILE SUPPLY DEPARTMENT (CSSD)', '#0369a1', '#7dd3fc');
 
-      // ------------------------------------------------------------------------
-      // E. 北東翼：實景美食街（胡桃木格柵＋天然大理石腰牆 + 暖金 LED 踢腳燈帶 + 飛碟吊燈）
-      // ------------------------------------------------------------------------
+      // E. 北東翼：實景美食街
       const foodBlueSlab = new THREE.Mesh(
         new THREE.BoxGeometry(26.5, 0.02, 8.5),
         new THREE.MeshStandardMaterial({ color: 0x7dd3fc, roughness: 0.25, metalness: 0.1 })
@@ -2092,13 +2006,11 @@
 
       addHangingSign(11.5, b1Y + 3.85, -16.8, 9.2, 0.85, 'B1 地下美食街・湯陽食堂 / 九龍廣東粥 / 龍山赤肉羹 / 弘爺漢堡', 'FOOD COURT・大理石吧檯點餐區', '#7c2d12', '#fde047');
 
-      // 員工餐廳採用「立體胡桃木格柵＋天然大理石腰牆」+ 暖金壁燈
       addWall(31.5, -31.5, 15.5, 24.0, 4.4, texFoodWalnutMarbleWall, 'B1 員工餐廳 (Staff Cafeteria)', 'B1', b1Y);
       buildWallSconce(26.5, b1Y + 2.25, -19.4, 0, 0xfde68a);
       buildWallSconce(36.5, b1Y + 2.25, -19.4, 0, 0xfde68a);
       addHangingSign(31.5, b1Y + 3.65, -19.2, 7.2, 0.92, '員工餐廳・職員膳食中心', 'STAFF CAFETERIA & DINING HALL', '#991b1b', '#fde047');
 
-      // 中庭共食區餐桌椅（每張上方皆懸吊現代暖金飛碟吊燈）
       allDiningSeats.push(...buildDiningTableSet(6.5, -10.8, b1Y));
       allDiningSeats.push(...buildDiningTableSet(12.2, -10.8, b1Y));
       allDiningSeats.push(...buildDiningTableSet(17.8, -10.8, b1Y));
@@ -2106,9 +2018,7 @@
       allDiningSeats.push(...buildDiningTableSet(12.2, -4.2, b1Y));
       allDiningSeats.push(...buildDiningTableSet(17.8, -4.2, b1Y));
 
-      // ------------------------------------------------------------------------
-      // F. 南西翼：神內/神外/中醫實景門診大廳 + 6+2人高壓氧艙 + 維納斯醫美 + 核子醫學部
-      // ------------------------------------------------------------------------
+      // F. 南西翼
       addWall(-43.5, 11.5, 14.5, 9.5, 4.4, texCleanTealWall, 'B1 6+2人高壓氧艙中心', 'B1', b1Y);
       addCorridorHandrail(-50.2, 6.65, -36.8, 6.65, b1Y);
       buildWallSconce(-42.5, b1Y + 2.25, 6.65, 0, 0x99f6e4);
@@ -2119,14 +2029,12 @@
       addCorridorHandrail(-37.65, 24.0, -37.65, 39.0, b1Y);
       addHangingSign(-37.4, b1Y + 3.55, 31.5, 6.4, 0.85, '核子醫學部・外傷處理區・服務台', 'NUCLEAR MEDICINE & TRAUMA CARE', '#1d4ed8', '#93c5fd', Math.PI / 2);
 
-      // 維納斯醫美採用「香檳粉白牆」+ 暖金玫瑰壁燈
       addWall(-24.5, 12.5, 17.5, 9.5, 4.4, texAestheticPinkWall, 'B1 維納斯醫學美容中心', 'B1', b1Y);
       addCorridorHandrail(-32.8, 7.65, -16.2, 7.65, b1Y, 0xb45309);
       buildWallSconce(-29.5, b1Y + 2.25, 7.65, 0, 0xfbcfe8);
       buildWallSconce(-19.5, b1Y + 2.25, 7.65, 0, 0xfbcfe8);
       addHangingSign(-24.5, b1Y + 3.65, 7.5, 8.2, 0.9, '維納斯醫學美容中心・護膚室・雷射脈衝光室', 'VENUS AESTHETIC MEDICINE & LASER CENTER', '#be185d', '#f9a8d4');
 
-      // ★ 南西翼神內/神外/中醫實景診間立面（含門楣連續暖白 LED 洗牆燈槽、金屬門框與木格柵柱飾）
       buildClinicWallFacade(-22.5, 33.5, [
         { code: '神內 201診', dept: '神經內科', doctor: '黃柏翰 醫師', queueNum: '0064' },
         { code: '神外 202診', dept: '神經外科', doctor: '林志豪 醫師', queueNum: '0041' },
@@ -2151,9 +2059,7 @@
 
       buildNeuroDiagnosticUnit(-32.5, 21.5, b1Y);
 
-      // ------------------------------------------------------------------------
-      // G. 南中翼：耳鼻喉科 & 消化器中心（實景候診排椅區 + 雙層防撞扶手）
-      // ------------------------------------------------------------------------
+      // G. 南中翼
       addWall(-4.5, 18.5, 13.5, 11.5, 4.4, texAestheticPinkWall, 'B1 耳鼻喉科與眼鏡配選/驗光眼壓/眩暈檢查', 'B1', b1Y);
       addCorridorHandrail(-10.8, 12.65, 1.8, 12.65, b1Y);
       buildWallSconce(-4.5, b1Y + 2.25, 12.65, 0, 0xfbcfe8);
@@ -2172,9 +2078,7 @@
       allWaitingSeats.push(...buildHospitalWaitingBench(12.5, 12.2, Math.PI, b1Y));
       allWaitingSeats.push(...buildHospitalWaitingBench(16.5, 12.2, Math.PI, b1Y));
 
-      // ------------------------------------------------------------------------
-      // H. 南東翼：內視鏡中心、停車卸貨區、會議室與書庫
-      // ------------------------------------------------------------------------
+      // H. 南東翼
       addWall(26.5, 20.5, 7.5, 12.5, 4.4, texCleanTealWall, 'B1 內視鏡中心 (胃鏡/大腸鏡1&2/膽道鏡/恢復室)', 'B1', b1Y);
       addHangingSign(26.5, b1Y + 3.65, 13.8, 7.2, 0.9, '胃鏡 / 內視鏡・大腸鏡 1 & 2・膽道鏡・恢復室', 'GASTROSCOPY・COLONOSCOPY・ENDOSCOPY SUITE', '#065f46', '#6ee7b7');
 
@@ -2189,9 +2093,6 @@
       activeBuildGroup = null;
     }
 
-    // --------------------------------------------------------------------------
-    // 6. 全圓弧立體 3D 角色與 68+ 位爆滿人潮生成
-    // --------------------------------------------------------------------------
     function createRoundedCharacterRig(opts = {}) {
       const group = new THREE.Group();
       const skinMat = new THREE.MeshStandardMaterial({ color: opts.skinColor || 0xf1c29b, roughness: 0.55 });
@@ -2773,18 +2674,13 @@
       if (countEl) countEl.textContent = String(npcs.length);
     }
 
-    // --------------------------------------------------------------------------
-    // 7. 多層次電影級燈光與色溫系統 (Zonal PointLight Network + 3 種情境切換)
-    // --------------------------------------------------------------------------
     function setupZonalLightingSystem() {
       const b1Y = FLOOR_Y.B1;
 
-      // 1. 基礎天頂與地坪反射環境光
       const hemiLight = new THREE.HemisphereLight(0xf8fafc, 0xd6cfc2, 0.72);
       scene.add(hemiLight);
       lightingSystem.hemiLight = hemiLight;
 
-      // 2. 主建築方向光（提供柔和立體陰影）
       const dirLight = new THREE.DirectionalLight(0xfffbeb, 0.52);
       dirLight.position.set(25, 55, 30);
       dirLight.castShadow = true;
@@ -2797,7 +2693,6 @@
       scene.add(dirLight);
       lightingSystem.dirLight = dirLight;
 
-      // Helper: 註冊分區點光源
       function addZonePointLight(x, y, z, colorHex, intensity, distance, zoneType) {
         const pt = new THREE.PointLight(colorHex, intensity, distance, 1.6);
         pt.position.set(x, y, z);
@@ -2811,33 +2706,23 @@
         return pt;
       }
 
-      // A. 門診候診區：4500K 自然白明亮照明 (0xf8fafc)
-      addZonePointLight(-24.5, b1Y + 3.65, -18.5, 0xf8fafc, 0.92, 34, 'clinic'); // 胸腔科候診大廳
-      addZonePointLight(-14.0, b1Y + 3.65, -6.5,  0xf8fafc, 0.82, 28, 'clinic'); // 免疫/中醫候診區
-      addZonePointLight(-22.5, b1Y + 3.65, 27.5,  0xf8fafc, 0.92, 34, 'clinic'); // 神內/神外/中醫候診大廳
-      addZonePointLight(-4.5,  b1Y + 3.65, 11.5,  0xf8fafc, 0.75, 26, 'clinic'); // 耳鼻喉候診區
-      addZonePointLight(14.5,  b1Y + 3.65, 12.5,  0xf8fafc, 0.78, 28, 'clinic'); // 消化器中心候診區
+      addZonePointLight(-24.5, b1Y + 3.65, -18.5, 0xf8fafc, 0.92, 34, 'clinic');
+      addZonePointLight(-14.0, b1Y + 3.65, -6.5,  0xf8fafc, 0.82, 28, 'clinic');
+      addZonePointLight(-22.5, b1Y + 3.65, 27.5,  0xf8fafc, 0.92, 34, 'clinic');
+      addZonePointLight(-4.5,  b1Y + 3.65, 11.5,  0xf8fafc, 0.75, 26, 'clinic');
+      addZonePointLight(14.5,  b1Y + 3.65, 12.5,  0xf8fafc, 0.78, 28, 'clinic');
 
-      // B. 高壓氧與中央供應室：5500K 潔淨白光 (0xe0f7fa)
-      addZonePointLight(-42.5, b1Y + 3.65, 16.5,  0xe0f7fa, 0.88, 28, 'clean');  // 6+2人高壓氧艙中心
-      addZonePointLight(11.5,  b1Y + 3.65, -26.5, 0xe0f7fa, 0.82, 28, 'clean');  // 中央供應室 (CSSD)
+      addZonePointLight(-42.5, b1Y + 3.65, 16.5,  0xe0f7fa, 0.88, 28, 'clean');
+      addZonePointLight(11.5,  b1Y + 3.65, -26.5, 0xe0f7fa, 0.82, 28, 'clean');
 
-      // C. 美食街與共食區：3000K 溫馨暖金光 (0xffedd5 / 0xfde68a)
-      addZonePointLight(6.5,   b1Y + 3.55, -17.5, 0xfde68a, 0.98, 28, 'food');   // 湯陽食堂・九龍廣東粥・祥順素食
-      addZonePointLight(17.5,  b1Y + 3.55, -17.5, 0xfde68a, 0.98, 28, 'food');   // 龍山赤肉羹・東坡居・弘爺漢堡
-      addZonePointLight(12.2,  b1Y + 3.35, -7.5,  0xffedd5, 0.95, 30, 'food');   // 中庭共食區（暖金飛碟吊燈群）
+      addZonePointLight(6.5,   b1Y + 3.55, -17.5, 0xfde68a, 0.98, 28, 'food');
+      addZonePointLight(17.5,  b1Y + 3.55, -17.5, 0xfde68a, 0.98, 28, 'food');
+      addZonePointLight(12.2,  b1Y + 3.35, -7.5,  0xffedd5, 0.95, 30, 'food');
 
-      // D. 手扶梯與電梯核心：湖水青導引光暈 (0x2dd4bf)
-      addZonePointLight(-6.5,  b1Y + 3.45, -15.5, 0x2dd4bf, 0.85, 20, 'transport'); // 中央電梯廳
-      addZonePointLight(0.0,   b1Y + 3.45, 0.0,   0x5eead4, 0.85, 22, 'transport'); // 中央手扶梯感應區
+      addZonePointLight(-6.5,  b1Y + 3.45, -15.5, 0x2dd4bf, 0.85, 20, 'transport');
+      addZonePointLight(0.0,   b1Y + 3.45, 0.0,   0x5eead4, 0.85, 22, 'transport');
     }
 
-    /**
-     * 即時切換三種建築級燈光情境：
-     * - 'day'   : ☀️ 日間門診全亮（標準醫療 + 暖金美食街 + 湖水青導引）
-     * - 'warm'  : ✨ 暖金質感氛圍（美術館/精品飯店級暖洗牆與飛碟吊燈氛圍）
-     * - 'night' : 🌙 夜間巡檢模式（主嵌燈調暗，壁燈、洗牆燈槽、踢腳燈帶與電梯青光凸顯）
-     */
     function applyLightingPreset(mode, silent = false) {
       lightingSystem.currentMode = mode;
 
@@ -2927,7 +2812,6 @@
         p.emissiveIntensity = cfg.pendantEmissive;
       });
 
-      // 更新左上角按鈕樣式與標籤
       const badgeEl = document.getElementById('lighting-mode-badge');
       if (badgeEl) badgeEl.textContent = cfg.label;
 
@@ -2944,9 +2828,6 @@
       }
     }
 
-    // --------------------------------------------------------------------------
-    // 8. 4 子步實體防穿透碰撞求解器 & 手扶梯/電梯接觸偵測
-    // --------------------------------------------------------------------------
     function resolveCircleAllAABBs(pos, radius, floorKey) {
       for (let i = 0; i < colliders.length; i++) {
         const b = colliders[i];
@@ -3020,9 +2901,6 @@
       return null;
     }
 
-    // --------------------------------------------------------------------------
-    // 9. 雙向近戰格鬥系統
-    // --------------------------------------------------------------------------
     function spawnSlashTrail(originPos, yaw, colorHex, radius = 1.35) {
       const arcGeom = new THREE.RingGeometry(radius * 0.55, radius, 24, 1, -Math.PI * 0.45, Math.PI * 0.9);
       const arcMat = new THREE.MeshBasicMaterial({
@@ -3197,9 +3075,6 @@
       showToast('🏥 已解除全院警戒並完成急救治療！');
     }
 
-    // --------------------------------------------------------------------------
-    // 10. 手扶梯 / 電梯自動詢問與 B1 ~ 8F HTML 連結系統
-    // --------------------------------------------------------------------------
     let toastTimer = null;
     function showToast(msg) {
       const el = document.getElementById('toast-banner');
@@ -3294,9 +3169,6 @@
       document.getElementById('dialogue-modal').classList.add('hidden');
     }
 
-    // --------------------------------------------------------------------------
-    // 11. 每幀物理模擬、68+人潮動作、雙向 AI 戰鬥與阻尼滑鼠相機更新
-    // --------------------------------------------------------------------------
     function updateSimulation(dt) {
       const pFloor = getFloorKey(player.pos.y);
       updateFloorVisibility(pFloor);
@@ -3312,7 +3184,6 @@
         if (player.comboResetTimer <= 0) player.comboStep = 0;
       }
 
-      // ------------------ A. 玩家移動與跳躍 ------------------
       let forwardInput = 0;
       let rightInput = 0;
       if (!activeTalkNpc) {
@@ -3372,7 +3243,6 @@
       player.mesh.position.copy(player.pos);
       player.mesh.rotation.y = player.yaw;
 
-      // ------------------ B. 玩家肢體與近戰連擊動畫 ------------------
       if (player.isAttacking) {
         player.attackTimer -= dt;
         const progress = 1 - Math.max(0, player.attackTimer / player.attackDuration);
@@ -3454,7 +3324,6 @@
         player.rightShoulder.rotation.x *= 0.82;
       }
 
-      // ------------------ C. 68+ NPC 巡邏、候診動作、敵對反擊與實體分離 ------------------
       let closestNpc = null;
       let minTalkDist = 2.6;
 
@@ -3609,7 +3478,14 @@
 
       updateCurrentZoneHUD();
 
-      // ------------------ D. 揮擊光軌與命中粒子更新 ------------------
+      // 橫向雙向手扶梯踏階循環動畫（一上一下）
+      for (let i = 0; i < escalatorSteps.length; i++) {
+        const st = escalatorSteps[i];
+        st.t = (st.t + dt * 0.14 * st.dir + 1) % 1;
+        st.mesh.position.x = -st.spanX / 2 + st.t * st.spanX;
+        st.mesh.position.y = st.baseY + 0.16 + st.t * st.riseY;
+      }
+
       for (let i = slashEffects.length - 1; i >= 0; i--) {
         const s = slashEffects[i];
         s.life -= dt;
@@ -3633,7 +3509,6 @@
         }
       }
 
-      // ------------------ E. 阻尼平滑滑鼠相機更新 ------------------
       const rotLerp = Math.min(1, dt * 22);
       camState.yaw += (camState.targetYaw - camState.yaw) * rotLerp;
       camState.pitch += (camState.targetPitch - camState.pitch) * rotLerp;
@@ -3690,7 +3565,7 @@
       const pz = player.pos.z;
       let label = 'B1 地下一樓醫療與美食主走廊';
 
-      if (px >= -11.5 && px <= 3.5 && pz >= -17.5 && pz <= 6.2) {
+      if ((px >= -11.5 && px <= 3.5 && pz >= -17.5 && pz <= -3.2) || (px >= -6.2 && px <= 6.2 && pz >= -3.2 && pz <= 3.2)) {
         label = 'B1 中央手扶梯 / 電梯廳 (接觸自動選 B1~8F)';
       } else if (px < -12 && pz < -11) {
         label = 'B1 胸腔科門診候診大廳 (101~104診・大爆滿)';
@@ -3713,9 +3588,6 @@
       document.getElementById('current-zone-label').textContent = label;
     }
 
-    // --------------------------------------------------------------------------
-    // 12. 左下角 B1 緊急疏散圖同色系圓形小地圖雷達 (含爆滿人潮點位)
-    // --------------------------------------------------------------------------
     const minimapCanvas = document.getElementById('minimap-canvas');
     const mctx = minimapCanvas.getContext('2d');
 
@@ -3763,7 +3635,13 @@
       drawZoneRect(42.5, 32.5, 16.5, 18.5, '#cbd5e1');
 
       drawZoneRect(-6.5, -19.5, 8.5, 4.8, '#2dd4bf', '#0f766e');
-      drawZoneRect(0, 0, 5.2, 11.2, '#2dd4bf', '#0f766e');
+      drawZoneRect(0, 0, 11.2, 5.2, '#2dd4bf', '#0f766e');
+      mctx.strokeStyle = '#0f766e';
+      mctx.lineWidth = 1.0;
+      mctx.beginPath();
+      mctx.moveTo(-4.6 * scale, 0);
+      mctx.lineTo(4.6 * scale, 0);
+      mctx.stroke();
 
       minimapFurnitures.forEach((f) => {
         mctx.fillStyle = f.color;
@@ -3796,13 +3674,9 @@
       mctx.restore();
     }
 
-    // --------------------------------------------------------------------------
-    // 13. UI 事件綁定與全視角滑鼠轉向控制
-    // --------------------------------------------------------------------------
     function setupUIAndInputs() {
       const canvas = document.getElementById('game-canvas');
 
-      // 左上角「💡 燈光情境切換」按鈕綁定
       document.querySelectorAll('.light-mode-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
           applyLightingPreset(btn.dataset.lightMode);
@@ -4047,9 +3921,6 @@
       });
     }
 
-    // --------------------------------------------------------------------------
-    // 14. 主初始化與動畫迴圈 (ACESFilmicToneMapping + sRGBEncoding)
-    // --------------------------------------------------------------------------
     function init() {
       const canvas = document.getElementById('game-canvas');
       scene = new THREE.Scene();
@@ -4063,12 +3934,10 @@
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-      // 啟用 ACES 電影級色調映射與 sRGB 色彩編碼
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.08;
       renderer.outputEncoding = THREE.sRGBEncoding;
 
-      // 建置多層次分區點光源網絡
       setupZonalLightingSystem();
 
       scene.add(floorGroups.B1);
@@ -4077,7 +3946,6 @@
       spawnAllNpcs();
       setupUIAndInputs();
 
-      // 套用預設日間門診全亮情境
       applyLightingPreset('day', true);
 
       setTimeout(() => {
