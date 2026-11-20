@@ -82,7 +82,7 @@
   </style>
 </head>
 <body>
-  <!-- 3D 彰濱秀傳健康園區背景畫布 -->
+  <!-- 3D 幸運草醫院健康園區背景畫布 -->
   <canvas id="bg-canvas"></canvas>
 
   <!-- 暗角與漸層遮罩提升文字閱讀度 -->
@@ -104,7 +104,7 @@
             <span class="hidden sm:inline-block px-2 py-0.5 text-[11px] font-bold rounded bg-amber-400 text-slate-950">VIRTUAL HOSPITAL</span>
           </div>
           <p class="gta-font text-[11px] sm:text-xs text-emerald-300/90 tracking-widest uppercase">
-            Chang Bing Show Chwan Health Park • Smart Access Portal
+            Clover Hospital Health Park • Smart Access Portal
           </p>
         </div>
       </div>
@@ -264,7 +264,7 @@
 
             <div class="relative">
               <label for="card-number-input" class="block text-xs text-slate-300 mb-1.5">
-                員工識別證 / 門禁感應卡號（支援 4～16 碼英數字，例如 <span class="font-mono text-amber-300">18445</span> 或 <span class="font-mono text-amber-300">SC-8801</span>）
+                員工識別證 / 門禁感應卡號（支援 4～16 碼英數字，例如 <span class="font-mono text-amber-300">18445</span> 或 <span class="font-mono text-amber-300">CL-8801</span>）
               </label>
               <div class="relative flex items-center">
                 <span class="absolute left-3.5 text-lg pointer-events-none">💳</span>
@@ -307,7 +307,7 @@
 
     <!-- 底部版權與操作提示 -->
     <footer class="flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-400">
-      <div>© 2026 彰濱秀傳健康園區 Virtual Hospital 3D 智慧導覽系統</div>
+      <div>© 2026 幸運草醫院健康園區 Virtual Hospital 3D 智慧導覽系統</div>
       <div class="flex items-center gap-3">
         <span>背景 3D 場景可拖曳旋轉預覽</span>
         <span>•</span>
@@ -331,7 +331,7 @@
         <div>
           <div id="overlay-staff-name" class="text-sm font-black text-amber-300">員工驗證通過</div>
           <div id="overlay-role-name" class="text-base font-black text-white">護理師</div>
-          <div id="overlay-card-num" class="gta-font text-xs text-emerald-300 mt-0.5">CARD: SC-8801</div>
+          <div id="overlay-card-num" class="gta-font text-xs text-emerald-300 mt-0.5">CARD: CL-8801</div>
         </div>
       </div>
       <div class="mt-4 flex items-center justify-between text-[10px] text-emerald-300 font-bold">
@@ -384,7 +384,7 @@
         armor: 95,
         gear: '醫師白袍 / 聽診器',
         sampleCard: '18445',
-        desc: '秀傳醫療大樓主治醫師，身著專業白色醫師袍與天藍刷手服內搭，頸部配戴聽診器隨時支援臨床診療。'
+        desc: '幸運草醫療大樓主治醫師，身著專業白色醫師袍與天藍刷手服內搭，頸部配戴聽診器隨時支援臨床診療。'
       },
       it_engineer: {
         id: 'it_engineer',
@@ -563,7 +563,7 @@
 
     /**
      * ==========================================================================
-     * 2. 背景 3D 彰濱秀傳健康園區實景預覽 (Three.js)
+     * 2. 背景 3D 幸運草醫院健康園區實景預覽 (Three.js)
      * ==========================================================================
      */
     let scene, camera, renderer, sunLight, hemiLight;
@@ -572,7 +572,7 @@
     let isDraggingBg = false;
     let prevMouseX = 0;
 
-    function createShowChwanCrownTexture() {
+    function createCloverCrownTexture() {
       const canvas = document.createElement('canvas');
       canvas.width = 1024;
       canvas.height = 256;
@@ -594,8 +594,9 @@
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#ffd63b';
-      ctx.fillText('秀', cx - 190, cy + 6);
-      ctx.fillText('傳', cx + 190, cy + 6);
+      ctx.font = '900 108px "Noto Sans TC", sans-serif';
+      ctx.fillText('幸運', cx - 220, cy + 6);
+      ctx.fillText('草醫院', cx + 240, cy + 6);
       return new THREE.CanvasTexture(canvas);
     }
 
@@ -614,7 +615,7 @@
       ctx.fillStyle = '#59a822';
       ctx.fillRect(0, 236, 2048, 84);
 
-      const chars = ['彰', '濱', '秀', '傳', '健', '康', '園', '區'];
+      const chars = ['幸', '運', '草', '醫', '院', '園', '區', '🍀'];
       ctx.font = '900 106px "Noto Sans TC", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -743,8 +744,8 @@
       mainTower.position.set(3, 15.75, -33);
       scene.add(leftWing, rightWing, mainTower);
 
-      // 頂部「秀傳」皇冠塔樓
-      const crownTex = createShowChwanCrownTexture();
+      // 頂部「幸運草醫院」皇冠塔樓
+      const crownTex = createCloverCrownTexture();
       const crownMat = new THREE.MeshStandardMaterial({
         map: crownTex,
         emissive: 0xffd23f,
@@ -773,7 +774,7 @@
         });
       });
 
-      // 中央「彰濱秀傳健康園區」彩繪紀念牆
+      // 中央「幸運草醫院健康園區」彩繪紀念牆
       const monTex = createMonumentTexture();
       const monWall = new THREE.Mesh(
         new THREE.BoxGeometry(29, 4.2, 1.3),
