@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Virtual Hospital</title>
+  <title>Virtual Hospital - 幸運草醫院</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js r128 -->
@@ -96,7 +96,7 @@
     </a>
   </div>
 
-  <!-- 自由視角 / 越肩準心 -->
+  <!-- 越肩準心 -->
   <div id="crosshair-dot" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
     <div id="crosshair-ring" class="w-3 h-3 rounded-full border-2 border-white/85 bg-emerald-400/40 shadow-[0_0_6px_rgba(0,0,0,0.9)] transition-transform duration-150"></div>
   </div>
@@ -111,7 +111,7 @@
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2">
             <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
-            <span class="font-bold text-sm sm:text-base tracking-wide text-amber-300">彰濱秀傳健康園區</span>
+            <span class="font-bold text-sm sm:text-base tracking-wide text-amber-300">幸運草醫院健康園區</span>
           </div>
           <div class="flex items-center gap-1">
             <button id="toggle-help-btn" class="px-2 py-0.5 text-xs rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition">
@@ -152,7 +152,7 @@
           <div class="flex justify-between"><span class="text-slate-400">衝刺 / 跳躍煞車</span><span class="font-bold text-amber-300">Shift / Space</span></div>
           <div class="flex justify-between"><span class="text-slate-400">進入 / 離開車輛</span><span class="font-bold text-emerald-300">F 鍵</span></div>
           <div class="flex justify-between"><span class="text-slate-400">自動進入 1F 大廳</span><span class="font-bold text-emerald-300">步行靠近大門口</span></div>
-          <div class="flex justify-between"><span class="text-slate-400">360° 自由滑鼠視角</span><span class="font-bold text-sky-300">點擊畫面 (ESC 釋放)</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">360° 旋轉視角</span><span class="font-bold text-sky-300">按住滑鼠左鍵拖曳</span></div>
           <div class="flex justify-between"><span class="text-slate-400">越肩精準橫移模式</span><span class="font-bold text-sky-300">按住滑鼠右鍵</span></div>
           <div class="flex justify-between"><span class="text-slate-400">切換第三人稱視距</span><span class="font-bold text-slate-200">C 鍵 / 滑鼠滾輪</span></div>
           <div class="flex justify-between"><span class="text-slate-400">救護車警燈 / 重置</span><span class="font-bold text-rose-300">Q 鍵 / R 鍵</span></div>
@@ -193,13 +193,13 @@
         步行探索中
       </div>
       <div id="hud-cam-badge" class="mt-1 px-2.5 py-0.5 rounded-full bg-sky-950/80 border border-sky-400/30 text-[11px] font-medium text-sky-200">
-        🖱️ 點擊畫面 360° 自由視角 ｜ 右鍵越肩
+        🖱️ 按住滑鼠左鍵拖曳旋轉視角 ｜ 右鍵越肩
       </div>
     </div>
 
     <!-- 中央下方：互動提示框 -->
     <div id="interaction-prompt" class="hidden fixed bottom-28 sm:bottom-12 left-1/2 -translate-x-1/2 z-20 px-5 py-2.5 rounded-xl hud-panel text-white font-bold text-sm sm:text-base shadow-2xl prompt-pulse pointer-events-none">
-      按 <span class="px-2 py-0.5 mx-1 rounded bg-amber-400 text-slate-950 font-black">F</span> 駕駛 秀傳醫療救護車
+      按 <span class="px-2 py-0.5 mx-1 rounded bg-amber-400 text-slate-950 font-black">F</span> 駕駛 幸運草醫療救護車
     </div>
 
     <!-- 右上方通知氣泡 -->
@@ -241,7 +241,7 @@
   <script>
     /**
      * ============================================================================
-     * 彰濱秀傳健康園區 (Chang Bing Show Chwan Health Park) - 3D 開放世界原型
+     * 幸運草醫院健康園區 (Clover Hospital Health Park) - 3D 開放世界原型
      * ============================================================================
      */
 
@@ -249,7 +249,7 @@
     let sunLight, hemiLight;
     const clock = new THREE.Clock();
 
-    // 8 種園區職業與角色設定 (含 3D 服裝材質色與專屬配件)
+    // 8 種園區職業與角色設定
     const CHARACTER_ROLES = [
       {
         id: 'it_engineer',
@@ -259,8 +259,6 @@
         cash: 8800,
         health: 100,
         armor: 90,
-        gear: '智慧筆電 / 資訊識別證',
-        desc: '負責園區智慧醫療系統與核心機房維運，身穿深藍科技連帽外套、配戴識別證並手持行動工作筆電。',
         jacketColor: 0x1d4ed8,
         teeColor: 0xf8fafc,
         pantsColor: 0x1e293b,
@@ -278,8 +276,6 @@
         cash: 12000,
         health: 100,
         armor: 95,
-        gear: '醫師白袍 / 聽診器 / 識別證',
-        desc: '秀傳醫療大樓主治醫師，身著專業白色醫師袍與天藍刷手服內搭，頸部配戴聽診器隨時支援臨床診療。',
         jacketColor: 0xf8fafc,
         teeColor: 0x0284c7,
         pantsColor: 0x1e3a5f,
@@ -297,8 +293,6 @@
         cash: 7500,
         health: 100,
         armor: 90,
-        gear: '薄荷綠護理服 / 護理識別證',
-        desc: '第一線臨床照護護理師，身穿柔和薄荷綠醫療護理服與白色長褲，穿梭於大廳與各科病房之間。',
         jacketColor: 0x14b8a6,
         teeColor: 0xffffff,
         pantsColor: 0xf1f5f9,
@@ -316,8 +310,6 @@
         cash: 3200,
         health: 85,
         armor: 65,
-        gear: '病患休閒服 / 住院識別手環',
-        desc: '前來彰濱秀傳健康園區就診與健檢的民眾，穿著舒適淺藍休閒服並配戴患者識別手環。',
         jacketColor: 0x7dd3fc,
         teeColor: 0xfefce8,
         pantsColor: 0x64748b,
@@ -335,8 +327,6 @@
         cash: 8200,
         health: 100,
         armor: 88,
-        gear: '藥師白袍 / 綠十字識別證',
-        desc: '負責門診與住院藥事調劑及用藥安全諮詢，身穿整潔白袍與深綠內搭，配戴綠十字專業藥師證。',
         jacketColor: 0xf1f5f9,
         teeColor: 0x15803d,
         pantsColor: 0x334155,
@@ -354,8 +344,6 @@
         cash: 6800,
         health: 100,
         armor: 100,
-        gear: '急救紅勤務服 / 聽診器',
-        desc: '負責緊急醫療救護與救護車調度出勤，身穿高辨識度急救紅勤務外套，具備高體能專注力。',
         jacketColor: 0xdc2626,
         teeColor: 0xfef08a,
         pantsColor: 0x0f172a,
@@ -373,8 +361,6 @@
         cash: 7400,
         health: 100,
         armor: 85,
-        gear: '檢驗白袍 / 防護眼鏡 / 筆電',
-        desc: '負責臨床檢驗分析與精密醫療儀器判讀，配備實驗室防護眼鏡與數據分析終端。',
         jacketColor: 0xe2e8f0,
         teeColor: 0x6d28d9,
         pantsColor: 0x1e293b,
@@ -392,8 +378,6 @@
         cash: 6000,
         health: 100,
         armor: 100,
-        gear: '執勤黑制服 / 園區保全徽章',
-        desc: '維護醫療大樓出入口秩序與大門車道交通動線，全天候守護醫護人員與就診民眾安全。',
         jacketColor: 0x111827,
         teeColor: 0x38bdf8,
         pantsColor: 0x090d16,
@@ -421,7 +405,7 @@
       rightLeg: null,
       materials: {},
       accessories: {},
-      pos: new THREE.Vector3(0, 0, 9.2),
+      pos: new THREE.Vector3(-4.5, 0, 12.5),
       vel: new THREE.Vector3(0, 0, 0),
       yaw: Math.PI,
       radius: 0.45,
@@ -432,7 +416,7 @@
     };
 
     const mainEntrance = {
-      x: 0,
+      x: -4.5,
       z: -4.45,
       triggerZ: -2.05,
       halfWidth: 3.5,
@@ -449,24 +433,23 @@
 
     const camPresets = [
       { name: '越肩近距', dist: 4.8, shoulder: 0.72, pitch: 0.16 },
-      { name: '標準第三人稱', dist: 8.2, shoulder: 0.35, pitch: 0.23 },
+      { name: '標準第三人稱', dist: 8.6, shoulder: 0.35, pitch: 0.22 },
       { name: '園區廣角', dist: 14.5, shoulder: 0.0, pitch: 0.32 }
     ];
 
     const camState = {
       presetIndex: 1,
       yaw: 0,
-      pitch: 0.23,
-      distance: 8.2,
+      pitch: 0.22,
+      distance: 8.6,
       shoulderOffset: 0.35,
       targetYaw: 0,
-      targetPitch: 0.23,
-      targetDistance: 8.2,
+      targetPitch: 0.22,
+      targetDistance: 8.6,
       targetShoulderOffset: 0.35,
-      targetPos: new THREE.Vector3(0, 1.55, 9.2),
-      isDragging: false,
+      targetPos: new THREE.Vector3(-4.5, 1.55, 12.5),
+      isLeftDragging: false,
       isRightAiming: false,
-      isPointerLocked: false,
       lastMouseX: 0,
       lastMouseY: 0,
       mouseIdleTime: 0
@@ -485,7 +468,7 @@
     };
 
     // --------------------------------------------------------------------------
-    // 0. 右下角載入畫面控制器 (Bottom-Right Loader Controller)
+    // 0. 右下角載入畫面控制器
     // --------------------------------------------------------------------------
     function setBottomRightLoader({ visible = true, title, subtitle, percent, spinning = true }) {
       const box = document.getElementById('bottom-right-loader');
@@ -519,7 +502,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 1. 程序化紋理工廠
+    // 1. 程序化紋理工廠（寫實復刻彰濱秀傳紅磚、玻璃圓塔、白灰棋盤車道廣場）
     // --------------------------------------------------------------------------
     function createHospitalWallTextures(cols = 6, rows = 3, isMainTower = false) {
       const w = 1024;
@@ -537,72 +520,89 @@
       ectx.fillStyle = '#000000';
       ectx.fillRect(0, 0, w, h);
 
-      ctx.fillStyle = '#c86d44';
+      // 暖紅陶磚底色
+      ctx.fillStyle = '#b95c38';
       ctx.fillRect(0, 0, w, h);
 
-      ctx.fillStyle = 'rgba(130, 56, 28, 0.22)';
-      for (let y = 0; y < h; y += 8) {
+      // 水平與垂直磚縫紋理
+      ctx.fillStyle = 'rgba(110, 42, 20, 0.28)';
+      for (let y = 0; y < h; y += 7) {
         ctx.fillRect(0, y, w, 1.5);
       }
-      ctx.fillStyle = 'rgba(235, 165, 125, 0.14)';
-      for (let y = 2; y < h; y += 16) {
+      ctx.fillStyle = 'rgba(225, 145, 105, 0.16)';
+      for (let y = 2; y < h; y += 14) {
         ctx.fillRect(0, y, w, 2);
       }
 
       const rowH = h / rows;
       const colW = w / cols;
 
+      // 女兒牆頂部淺米色壓頂線腳與通風窗孔
+      ctx.fillStyle = '#ddd3bf';
+      ctx.fillRect(0, 0, w, 10);
+
       for (let r = 0; r < rows; r++) {
         const y0 = r * rowH;
 
-        ctx.fillStyle = '#e8dec8';
-        ctx.fillRect(0, y0, w, rowH * 0.14);
-        ctx.fillStyle = '#cbbba0';
-        ctx.fillRect(0, y0 + rowH * 0.14, w, 3);
+        // 窗間垂直立體紅磚壁柱陰影
+        for (let c = 0; c <= cols; c++) {
+          const px = c * colW;
+          ctx.fillStyle = 'rgba(85, 30, 14, 0.35)';
+          ctx.fillRect(px - 10, y0, 20, rowH);
+          ctx.fillStyle = '#c86a44';
+          ctx.fillRect(px - 7, y0, 14, rowH);
+        }
 
-        ctx.fillStyle = '#e5dbc4';
-        ctx.fillRect(0, y0 + rowH * 0.25, w, rowH * 0.05);
+        // 樓層間淺米色水平石材飾帶
+        if (r > 0) {
+          ctx.fillStyle = '#dfd5c0';
+          ctx.fillRect(0, y0 - 4, w, 8);
+          ctx.fillStyle = 'rgba(0,0,0,0.22)';
+          ctx.fillRect(0, y0 + 4, w, 3);
+        }
 
         for (let c = 0; c < cols; c++) {
           const x0 = c * colW;
-          const winW = colW * 0.56;
-          const winH = rowH * 0.44;
+          const winW = colW * 0.64;
+          const winH = r === 0 && !isMainTower ? rowH * 0.26 : rowH * 0.48;
           const winX = x0 + (colW - winW) / 2;
-          const winY = y0 + rowH * 0.36;
+          const winY = r === 0 && !isMainTower ? y0 + rowH * 0.24 : y0 + rowH * 0.28;
 
-          ctx.fillStyle = '#eadfc9';
-          ctx.beginPath();
-          ctx.moveTo(winX + winW * 0.22, y0 + rowH * 0.16);
-          ctx.lineTo(winX + winW * 0.78, y0 + rowH * 0.16);
-          ctx.lineTo(winX + winW * 0.68, y0 + rowH * 0.34);
-          ctx.lineTo(winX + winW * 0.32, y0 + rowH * 0.34);
-          ctx.closePath();
-          ctx.fill();
+          // 淺灰白混凝土窗台板 (Concrete Sill)
+          ctx.fillStyle = '#e5dcc8';
+          ctx.fillRect(winX - 6, winY + winH, winW + 12, 8);
+          ctx.fillStyle = 'rgba(0,0,0,0.28)';
+          ctx.fillRect(winX - 6, winY + winH + 8, winW + 12, 3);
 
-          ctx.fillStyle = '#e8dec8';
-          ctx.fillRect(winX - 4, winY + winH, winW + 8, 6);
+          // 深墨綠鋁窗外框
+          ctx.fillStyle = '#1b2c29';
+          ctx.fillRect(winX - 4, winY - 4, winW + 8, winH + 8);
 
-          ctx.fillStyle = '#1e2c2a';
-          ctx.fillRect(winX - 3, winY - 3, winW + 6, winH + 6);
-
+          // 玻璃反光漸層
           const grad = ctx.createLinearGradient(winX, winY, winX + winW, winY + winH);
-          grad.addColorStop(0, '#4e7382');
-          grad.addColorStop(0.5, '#729cab');
-          grad.addColorStop(1, '#395763');
+          grad.addColorStop(0, '#5d8494');
+          grad.addColorStop(0.5, '#8bb2c2');
+          grad.addColorStop(1, '#3d5e6b');
           ctx.fillStyle = grad;
           ctx.fillRect(winX, winY, winW, winH);
 
-          ctx.fillStyle = '#243533';
-          ctx.fillRect(winX + winW * 0.48, winY, 3, winH);
-          ctx.fillRect(winX, winY + winH * 0.32, winW, 2.5);
+          // 經典十字鋁窗分割橫桿與豎桿
+          ctx.fillStyle = '#1b2c29';
+          ctx.fillRect(winX + winW * 0.48, winY, 4, winH);
+          if (winH > 45) {
+            ctx.fillRect(winX, winY + winH * 0.28, winW, 3.5);
+          }
 
+          // 夜間室內暖光發光貼圖
           const seed = (r * 17 + c * 31 + (isMainTower ? 7 : 3)) % 11;
           if (seed < 7) {
             ectx.fillStyle = seed % 2 === 0 ? '#ffe6a3' : '#d4f3ff';
             ectx.fillRect(winX + 2, winY + 2, winW - 4, winH - 4);
             ectx.fillStyle = '#000000';
-            ectx.fillRect(winX + winW * 0.48, winY, 3, winH);
-            ectx.fillRect(winX, winY + winH * 0.32, winW, 2.5);
+            ectx.fillRect(winX + winW * 0.48, winY, 4, winH);
+            if (winH > 45) {
+              ectx.fillRect(winX, winY + winH * 0.28, winW, 3.5);
+            }
           }
         }
       }
@@ -632,35 +632,38 @@
       emCanvas.height = h;
       const ectx = emCanvas.getContext('2d');
 
+      // 參考照片中的淡灰藍與暖米色玻璃帷幕反射色調
       const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, '#5c97a8');
-      grad.addColorStop(0.45, '#89c0cf');
-      grad.addColorStop(0.55, '#528799');
-      grad.addColorStop(1, '#3d6d7d');
+      grad.addColorStop(0, '#6a8d96');
+      grad.addColorStop(0.35, '#9bb6bd');
+      grad.addColorStop(0.55, '#c7bfb0');
+      grad.addColorStop(0.85, '#7e9ba3');
+      grad.addColorStop(1, '#58757d');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, w, h);
 
       const emGrad = ectx.createLinearGradient(0, 0, 0, h);
-      emGrad.addColorStop(0, '#6bb8cc');
+      emGrad.addColorStop(0, '#78b8c9');
       emGrad.addColorStop(0.5, '#ffe5a8');
       emGrad.addColorStop(1, '#ffcf70');
       ectx.fillStyle = emGrad;
       ectx.fillRect(0, 0, w, h);
 
-      const vCols = 24;
-      const hRows = 8;
-      ctx.fillStyle = '#21453e';
+      const vCols = 28;
+      const hRows = 9;
       ectx.fillStyle = '#000000';
 
       for (let i = 0; i <= vCols; i++) {
         const x = (i / vCols) * w;
-        ctx.fillRect(x - 2, 0, 4, h);
-        ectx.fillRect(x - 2, 0, 4, h);
+        ctx.fillStyle = '#4f6659';
+        ctx.fillRect(x - 2.5, 0, 5, h);
+        ectx.fillRect(x - 2.5, 0, 5, h);
       }
       for (let j = 0; j <= hRows; j++) {
         const y = (j / hRows) * h;
-        const thick = (j === 0 || j === 4 || j === hRows) ? 8 : 3.5;
-        ctx.fillStyle = (j === 4) ? '#d8ceb8' : '#21453e';
+        const isMainBand = j === 0 || j === 3 || j === 6 || j === hRows;
+        const thick = isMainBand ? 12 : 4;
+        ctx.fillStyle = isMainBand ? '#708578' : '#4a6154';
         ctx.fillRect(0, y - thick / 2, w, thick);
         ectx.fillRect(0, y - thick / 2, w, thick);
       }
@@ -673,35 +676,119 @@
       return { map, emissiveMap };
     }
 
-    function createParapetScreenTexture() {
-      const w = 512;
-      const h = 128;
+    function createCheckeredForecourtTexture() {
+      // 參考照片：深灰柏油車道上鑲嵌多個「白色/淺灰棋盤格狀混凝土方塊區」
+      const w = 1024;
+      const h = 1024;
       const canvas = document.createElement('canvas');
       canvas.width = w;
       canvas.height = h;
       const ctx = canvas.getContext('2d');
 
-      ctx.fillStyle = 'rgba(26, 68, 56, 0.72)';
+      // 基底柏油路面
+      ctx.fillStyle = '#383e46';
       ctx.fillRect(0, 0, w, h);
 
-      ctx.fillStyle = '#13362c';
-      ctx.fillRect(0, 0, w, 12);
-      ctx.fillRect(0, h - 12, w, 12);
-      ctx.fillRect(0, h * 0.48, w, 6);
-
-      const bars = 16;
-      for (let i = 0; i <= bars; i++) {
-        const x = (i / bars) * w;
-        ctx.fillRect(x - 3, 0, 6, h);
+      // 細微顆粒質感
+      for (let i = 0; i < 6000; i++) {
+        const x = Math.random() * w;
+        const y = Math.random() * h;
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.035)' : 'rgba(0,0,0,0.08)';
+        ctx.fillRect(x, y, 2, 2);
       }
 
+      // 繪製白色細格網線地磚方塊
+      function drawTiledPad(px, py, pw, ph, tilesX, tilesY) {
+        ctx.fillStyle = '#e5e7eb';
+        ctx.fillRect(px, py, pw, ph);
+
+        // 內部細磚線條
+        ctx.strokeStyle = '#9ca3af';
+        ctx.lineWidth = 2;
+        const stepX = pw / tilesX;
+        const stepY = ph / tilesY;
+        for (let ix = 0; ix <= tilesX; ix++) {
+          ctx.beginPath();
+          ctx.moveTo(px + ix * stepX, py);
+          ctx.lineTo(px + ix * stepX, py + ph);
+          ctx.stroke();
+        }
+        for (let iy = 0; iy <= tilesY; iy++) {
+          ctx.beginPath();
+          ctx.moveTo(px, py + iy * stepY);
+          ctx.lineTo(px + pw, py + iy * stepY);
+          ctx.stroke();
+        }
+
+        // 外框收邊
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(px, py, pw, ph);
+      }
+
+      // 交錯棋盤格排列（對應照片中車道前方與右側的白色方塊陣列）
+      const padPositions = [
+        [80, 120, 190, 165],
+        [430, 120, 190, 165],
+        [760, 120, 190, 165],
+        [255, 340, 190, 165],
+        [595, 340, 190, 165],
+        [80, 560, 190, 165],
+        [430, 560, 190, 165],
+        [760, 560, 190, 165],
+        [255, 780, 190, 165],
+        [595, 780, 190, 165]
+      ];
+      padPositions.forEach(([x, y, pw, ph]) => {
+        drawTiledPad(x, y, pw, ph, 10, 9);
+      });
+
       const tex = new THREE.CanvasTexture(canvas);
-      tex.wrapS = THREE.RepeatWrapping;
-      tex.repeat.set(6, 1);
+      tex.anisotropy = 4;
       return tex;
     }
 
-    function createShowChwanCrownTexture() {
+    function createColumnPlaqueTexture() {
+      // 參考照片：迴廊磚柱正面的紫紅色導引牌與醫療資訊標示
+      const w = 128;
+      const h = 256;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#9d2b6b';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = '#f8fafc';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(6, 6, w - 12, h - 12);
+
+      // 白色醫療十字與方向標示
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(w / 2, 62, 26, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#9d2b6b';
+      ctx.fillRect(w / 2 - 6, 46, 12, 32);
+      ctx.fillRect(w / 2 - 16, 56, 32, 12);
+
+      ctx.fillStyle = '#fef08a';
+      ctx.font = 'bold 26px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('臨停', w / 2, 132);
+      ctx.fillText('接送區', w / 2, 168);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 18px "Chakra Petch", sans-serif';
+      ctx.fillText('DROP-OFF', w / 2, 212);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      return tex;
+    }
+
+    function createCloverCrownTexture() {
       const w = 1024;
       const h = 256;
       const canvas = document.createElement('canvas');
@@ -716,32 +803,43 @@
       ctx.lineWidth = 4;
       ctx.strokeRect(6, 6, w - 12, h - 12);
 
-      const cx = w / 2;
-      const cy = h / 2;
-      ctx.fillStyle = '#e6c245';
+      // 繪製四葉幸運草徽章
+      const lx = 155;
+      const ly = h / 2;
+      ctx.fillStyle = '#34d399';
+      const leafOffset = 22;
+      const leafRadius = 22;
+      [
+        [-leafOffset, -leafOffset],
+        [leafOffset, -leafOffset],
+        [-leafOffset, leafOffset],
+        [leafOffset, leafOffset]
+      ].forEach(([ox, oy]) => {
+        ctx.beginPath();
+        ctx.arc(lx + ox, ly + oy, leafRadius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 6;
       ctx.beginPath();
-      ctx.arc(cx, cy, 46, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.moveTo(lx, ly);
+      ctx.quadraticCurveTo(lx + 8, ly + 42, lx + 26, ly + 56);
+      ctx.stroke();
 
-      ctx.fillStyle = '#1d6b47';
-      ctx.fillRect(cx - 12, cy - 30, 24, 60);
-      ctx.fillRect(cx - 30, cy - 12, 60, 24);
-
-      ctx.font = '900 132px "Noto Sans TC", sans-serif';
+      ctx.font = '900 104px "Noto Sans TC", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
+      const textX = w / 2 + 65;
       ctx.shadowColor = 'rgba(255, 210, 60, 0.85)';
       ctx.shadowBlur = 18;
       ctx.fillStyle = '#ffd63b';
-      ctx.fillText('秀', cx - 190, cy + 6);
-      ctx.fillText('傳', cx + 190, cy + 6);
+      ctx.fillText('幸運草醫院', textX, ly + 4);
 
       ctx.shadowBlur = 0;
       ctx.strokeStyle = '#b88614';
       ctx.lineWidth = 3;
-      ctx.strokeText('秀', cx - 190, cy + 6);
-      ctx.strokeText('傳', cx + 190, cy + 6);
+      ctx.strokeText('幸運草醫院', textX, ly + 4);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.anisotropy = 4;
@@ -756,7 +854,7 @@
       canvas.height = h;
       const ctx = canvas.getContext('2d');
 
-      ctx.fillStyle = '#102e25';
+      ctx.fillStyle = '#15382e';
       ctx.fillRect(0, 0, w, h);
 
       ctx.strokeStyle = '#34d399';
@@ -818,81 +916,26 @@
       ctx.fillStyle = grassGrad;
       ctx.fillRect(0, h * 0.74, w, h * 0.26);
 
-      const treePositions = [180, 440, 1160, 1520, 1850];
-      treePositions.forEach((tx, idx) => {
-        const scale = idx % 2 === 0 ? 1.0 : 0.85;
-        ctx.fillStyle = '#6e4e32';
-        ctx.fillRect(tx - 7 * scale, h * 0.55, 14 * scale, h * 0.24);
-        ctx.fillStyle = idx % 2 === 0 ? '#6bb82d' : '#4e9c22';
-        ctx.beginPath();
-        ctx.ellipse(tx, h * 0.42, 46 * scale, 78 * scale, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = 'rgba(185, 235, 95, 0.45)';
-        ctx.beginPath();
-        ctx.ellipse(tx - 12 * scale, h * 0.38, 22 * scale, 48 * scale, 0, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      ctx.strokeStyle = 'rgba(120, 145, 160, 0.22)';
-      ctx.lineWidth = 2;
-      for (let x = 0; x < w; x += 128) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, h);
-        ctx.stroke();
-      }
-
-      const chars = ['彰', '濱', '秀', '傳', '健', '康', '園', '區'];
-      ctx.font = '900 106px "Noto Sans TC", sans-serif';
+      const chars = ['幸', '運', '草', '醫', '院', '健', '康', '園', '區'];
+      ctx.font = '900 96px "Noto Sans TC", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
       chars.forEach((ch, i) => {
-        const cx = 300 + i * 206;
+        const cx = 270 + i * 188;
         const cy = h * 0.53;
         ctx.fillStyle = '#261810';
         ctx.fillText(ch, cx + 6, cy + 6);
-        ctx.fillStyle = '#3d271a';
-        ctx.fillText(ch, cx + 3, cy + 3);
         ctx.fillStyle = '#694732';
         ctx.fillText(ch, cx, cy);
-        ctx.strokeStyle = '#b58d6d';
-        ctx.lineWidth = 2;
-        ctx.strokeText(ch, cx, cy);
       });
 
       ctx.font = '700 22px "Chakra Petch", sans-serif';
       ctx.fillStyle = '#284726';
-      ctx.fillText('C h a n g   B i n g   S h o u   C h w a n   H e a l t h   P a r k', w / 2, h * 0.85);
+      ctx.fillText('C l o v e r   H o s p i t a l   H e a l t h   P a r k', w / 2, h * 0.85);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.anisotropy = 4;
-      return tex;
-    }
-
-    function createHazardCurbTexture() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 256;
-      canvas.height = 64;
-      const ctx = canvas.getContext('2d');
-
-      ctx.fillStyle = '#f5c71a';
-      ctx.fillRect(0, 0, 256, 64);
-
-      ctx.fillStyle = '#1c2024';
-      for (let x = -64; x < 320; x += 64) {
-        ctx.beginPath();
-        ctx.moveTo(x, 64);
-        ctx.lineTo(x + 32, 64);
-        ctx.lineTo(x + 56, 0);
-        ctx.lineTo(x + 24, 0);
-        ctx.closePath();
-        ctx.fill();
-      }
-
-      const tex = new THREE.CanvasTexture(canvas);
-      tex.wrapS = THREE.RepeatWrapping;
-      tex.repeat.set(18, 1);
       return tex;
     }
 
@@ -930,89 +973,6 @@
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.RepeatWrapping;
       tex.repeat.set(1, 14);
-      tex.anisotropy = 4;
-      return tex;
-    }
-
-    function createDrivewayLaneTexture(arrowDir = 'up') {
-      const canvas = document.createElement('canvas');
-      canvas.width = 256;
-      canvas.height = 512;
-      const ctx = canvas.getContext('2d');
-
-      ctx.fillStyle = '#30363f';
-      ctx.fillRect(0, 0, 256, 512);
-
-      for (let i = 0; i < 2000; i++) {
-        const x = Math.random() * 256;
-        const y = Math.random() * 512;
-        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.08)';
-        ctx.fillRect(x, y, 2, 2);
-      }
-
-      ctx.fillStyle = '#f8fafc';
-      ctx.fillRect(10, 0, 7, 512);
-      ctx.fillRect(239, 0, 7, 512);
-
-      ctx.fillStyle = 'rgba(226, 232, 240, 0.65)';
-      for (let y = 24; y < 512; y += 86) {
-        ctx.fillRect(125, y, 6, 42);
-      }
-
-      if (arrowDir !== 'none') {
-        ctx.save();
-        ctx.translate(128, 256);
-        if (arrowDir === 'down') ctx.rotate(Math.PI);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
-        ctx.beginPath();
-        ctx.moveTo(0, -54);
-        ctx.lineTo(34, -12);
-        ctx.lineTo(14, -12);
-        ctx.lineTo(14, 52);
-        ctx.lineTo(-14, 52);
-        ctx.lineTo(-14, -12);
-        ctx.lineTo(-34, -12);
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
-      }
-
-      const tex = new THREE.CanvasTexture(canvas);
-      tex.wrapS = THREE.ClampToEdgeWrapping;
-      tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(1, 3);
-      tex.anisotropy = 4;
-      return tex;
-    }
-
-    function createDropOffZoneTexture() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 256;
-      const ctx = canvas.getContext('2d');
-
-      ctx.fillStyle = '#2d333b';
-      ctx.fillRect(0, 0, 512, 256);
-
-      ctx.strokeStyle = '#facc15';
-      ctx.lineWidth = 8;
-      ctx.strokeRect(12, 16, 488, 224);
-
-      ctx.strokeStyle = 'rgba(250, 204, 21, 0.85)';
-      ctx.lineWidth = 5;
-      for (let i = -240; i < 520; i += 44) {
-        ctx.beginPath();
-        ctx.moveTo(i, 16);
-        ctx.lineTo(i + 224, 240);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(i + 224, 16);
-        ctx.lineTo(i, 240);
-        ctx.stroke();
-      }
-
-      const tex = new THREE.CanvasTexture(canvas);
       tex.anisotropy = 4;
       return tex;
     }
@@ -1104,13 +1064,6 @@
       rimOuter.rotation.z = Math.PI / 2;
       spinGroup.add(rimOuter);
 
-      const rimInnerDark = new THREE.Mesh(
-        new THREE.CylinderGeometry(radius * 0.58, radius * 0.58, width * 1.03, 18),
-        new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.6 })
-      );
-      rimInnerDark.rotation.z = Math.PI / 2;
-      spinGroup.add(rimInnerDark);
-
       for (let i = 0; i < 5; i++) {
         const ang = (i / 5) * Math.PI * 2;
         const spoke = new THREE.Mesh(new THREE.BoxGeometry(width * 1.05, radius * 0.6, radius * 0.11), rimMat);
@@ -1183,22 +1136,9 @@
       roofShape.closePath();
       car.add(createSideExtrudedMesh(roofShape, 1.46, 0.05, 0.06, paintMat));
 
-      const fin = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.22, 6), paintMat);
-      fin.rotation.x = -0.55;
-      fin.position.set(0, 1.47, -0.52);
-      car.add(fin);
-
       const grille = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.22, 0.12), trimMat);
       grille.position.set(0, 0.44, 2.31);
       car.add(grille);
-
-      const grilleFrame = new THREE.Mesh(new THREE.BoxGeometry(1.10, 0.25, 0.06), chromeMat);
-      grilleFrame.position.set(0, 0.44, 2.33);
-      car.add(grilleFrame);
-
-      const frontLip = new THREE.Mesh(new THREE.BoxGeometry(1.86, 0.07, 0.24), trimMat);
-      frontLip.position.set(0, 0.24, 2.26);
-      car.add(frontLip);
 
       [-0.68, 0.68].forEach((hx) => {
         const sign = Math.sign(hx);
@@ -1220,36 +1160,11 @@
         car.add(cornerTail);
       });
 
-      const diffuser = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.14, 0.16), trimMat);
-      diffuser.position.set(0, 0.28, -2.26);
-      car.add(diffuser);
-
-      [-0.54, 0.54].forEach((ex) => {
-        const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.22, 12), chromeMat);
-        pipe.rotation.x = Math.PI / 2;
-        pipe.position.set(ex, 0.26, -2.28);
-        car.add(pipe);
-      });
-
-      const wingBlade = new THREE.Mesh(new THREE.BoxGeometry(1.76, 0.05, 0.24), trimMat);
-      wingBlade.position.set(0, 1.04, -2.06);
-      wingBlade.rotation.x = 0.12;
-      car.add(wingBlade);
-
-      [-0.58, 0.58].forEach((sx) => {
-        const strut = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.14, 0.16), trimMat);
-        strut.position.set(sx, 0.97, -2.05);
-        car.add(strut);
-      });
-
       [-0.94, 0.94].forEach((mx) => {
         const sign = Math.sign(mx);
-        const mirrorArm = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.04, 0.07), trimMat);
-        mirrorArm.position.set(mx, 0.92, 0.86);
         const mirrorCap = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.11, 0.14), paintMat);
         mirrorCap.position.set(mx + sign * 0.07, 0.94, 0.84);
-        mirrorCap.rotation.y = -sign * 0.2;
-        car.add(mirrorArm, mirrorCap);
+        car.add(mirrorCap);
       });
 
       const wheels = [];
@@ -1304,24 +1219,10 @@
       chassisBase.position.set(0, 0.40, 0);
       amb.add(chassisBase);
 
-      [-1.48, 1.68].forEach((az) => {
-        const arch = new THREE.Mesh(new THREE.CylinderGeometry(0.47, 0.47, 2.04, 18, 1, false, 0, Math.PI), trimMat);
-        arch.rotation.z = Math.PI / 2;
-        arch.rotation.y = Math.PI / 2;
-        arch.position.set(0, 0.44, az);
-        amb.add(arch);
-      });
-
       const windshield = new THREE.Mesh(new THREE.BoxGeometry(1.86, 0.86, 0.08), glassMat);
       windshield.position.set(0, 1.74, 1.72);
       windshield.rotation.x = -0.52;
       amb.add(windshield);
-
-      [-1.08, 1.08].forEach((sx) => {
-        const sideWin = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.66, 0.92), glassMat);
-        sideWin.position.set(sx, 1.68, 1.38);
-        amb.add(sideWin);
-      });
 
       [-1.095, 1.095].forEach((sx) => {
         const sideStripe = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.28, 3.45), redStripeMat);
@@ -1333,58 +1234,13 @@
         const crossH = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.22, 0.64), redStripeMat);
         crossH.position.set(sx, 1.76, -0.82);
         amb.add(crossV, crossH);
-
-        const rearSideWin = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.42, 0.95), glassMat);
-        rearSideWin.position.set(sx, 1.82, 0.18);
-        amb.add(rearSideWin);
       });
-
-      const rearStripe = new THREE.Mesh(new THREE.BoxGeometry(2.04, 0.28, 0.04), redStripeMat);
-      rearStripe.position.set(0, 1.15, -2.59);
-      amb.add(rearStripe);
-
-      [-0.46, 0.46].forEach((rx) => {
-        const rearWin = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.52, 0.04), glassMat);
-        rearWin.position.set(rx, 1.82, -2.59);
-        const rearTail = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.46, 0.06), tailLightMat);
-        rearTail.position.set(rx * 2.02, 0.96, -2.59);
-        amb.add(rearWin, rearTail);
-      });
-
-      const rearStep = new THREE.Mesh(new THREE.BoxGeometry(1.96, 0.10, 0.24), trimMat);
-      rearStep.position.set(0, 0.42, -2.66);
-      amb.add(rearStep);
-
-      const frontGrille = new THREE.Mesh(new THREE.BoxGeometry(1.24, 0.34, 0.10), trimMat);
-      frontGrille.position.set(0, 0.74, 2.61);
-      amb.add(frontGrille);
-
-      const frontBumper = new THREE.Mesh(new THREE.BoxGeometry(2.08, 0.22, 0.18), trimMat);
-      frontBumper.position.set(0, 0.46, 2.58);
-      amb.add(frontBumper);
 
       [-0.82, 0.82].forEach((hx) => {
-        const sign = Math.sign(hx);
         const hl = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.20, 0.18), headLightMat);
         hl.position.set(hx, 0.82, 2.54);
-        hl.rotation.y = sign * 0.25;
         amb.add(hl);
-
-        const mirrorHousing = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.32, 0.16), trimMat);
-        mirrorHousing.position.set(hx + sign * 0.34, 1.56, 1.66);
-        const armTop = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.035, 0.04), trimMat);
-        armTop.position.set(hx + sign * 0.26, 1.68, 1.66);
-        const armBot = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.035, 0.04), trimMat);
-        armBot.position.set(hx + sign * 0.26, 1.44, 1.66);
-        amb.add(mirrorHousing, armTop, armBot);
       });
-
-      const lightbarBase = new THREE.Mesh(
-        new THREE.BoxGeometry(1.56, 0.08, 0.32),
-        new THREE.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.7, roughness: 0.3 })
-      );
-      lightbarBase.position.set(0, 2.51, 0.82);
-      amb.add(lightbarBase);
 
       const redBeaconMat = new THREE.MeshStandardMaterial({ color: 0xff1e1e, emissive: 0xff0000, emissiveIntensity: 1.5, roughness: 0.15 });
       const blueBeaconMat = new THREE.MeshStandardMaterial({ color: 0x1e90ff, emissive: 0x0066ff, emissiveIntensity: 1.5, roughness: 0.15 });
@@ -1393,12 +1249,7 @@
       redBeacon.position.set(-0.46, 2.61, 0.82);
       const blueBeacon = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.16, 0.28), blueBeaconMat);
       blueBeacon.position.set(0.46, 2.61, 0.82);
-      const centerPod = new THREE.Mesh(
-        new THREE.BoxGeometry(0.32, 0.15, 0.26),
-        new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.2 })
-      );
-      centerPod.position.set(0, 2.60, 0.82);
-      amb.add(redBeacon, blueBeacon, centerPod);
+      amb.add(redBeacon, blueBeacon);
 
       const redSirenLight = new THREE.PointLight(0xff2222, 2.2, 16);
       redSirenLight.position.set(-0.6, 2.85, 0.82);
@@ -1442,125 +1293,85 @@
       const glassMat = new THREE.MeshStandardMaterial({ color: 0x132030, roughness: 0.1, metalness: 0.85 });
       const trimMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.65 });
 
-      if (type === 'bus') {
-        const busShape = new THREE.Shape();
-        busShape.moveTo(-4.10, 0.45);
-        busShape.quadraticCurveTo(-4.22, 0.65, -4.16, 1.00);
-        busShape.lineTo(-4.12, 2.65);
-        busShape.quadraticCurveTo(-4.08, 2.92, -3.75, 2.95);
-        busShape.lineTo(3.55, 2.95);
-        busShape.quadraticCurveTo(3.96, 2.92, 4.12, 2.48);
-        busShape.quadraticCurveTo(4.26, 1.65, 4.22, 0.85);
-        busShape.quadraticCurveTo(4.20, 0.55, 4.02, 0.45);
-        busShape.lineTo(3.06, 0.45);
-        busShape.absarc(2.55, 0.48, 0.52, 0.05, Math.PI - 0.05, false);
-        busShape.lineTo(2.04, 0.45);
-        busShape.lineTo(-1.94, 0.45);
-        busShape.absarc(-2.45, 0.48, 0.52, 0.05, Math.PI - 0.05, false);
-        busShape.lineTo(-2.96, 0.45);
-        busShape.closePath();
+      const busShape = new THREE.Shape();
+      busShape.moveTo(-4.10, 0.45);
+      busShape.quadraticCurveTo(-4.22, 0.65, -4.16, 1.00);
+      busShape.lineTo(-4.12, 2.65);
+      busShape.quadraticCurveTo(-4.08, 2.92, -3.75, 2.95);
+      busShape.lineTo(3.55, 2.95);
+      busShape.quadraticCurveTo(3.96, 2.92, 4.12, 2.48);
+      busShape.quadraticCurveTo(4.26, 1.65, 4.22, 0.85);
+      busShape.quadraticCurveTo(4.20, 0.55, 4.02, 0.45);
+      busShape.lineTo(3.06, 0.45);
+      busShape.absarc(2.55, 0.48, 0.52, 0.05, Math.PI - 0.05, false);
+      busShape.lineTo(2.04, 0.45);
+      busShape.lineTo(-1.94, 0.45);
+      busShape.absarc(-2.45, 0.48, 0.52, 0.05, Math.PI - 0.05, false);
+      busShape.lineTo(-2.96, 0.45);
+      busShape.closePath();
 
-        g.add(createSideExtrudedMesh(busShape, 2.38, 0.12, 0.14, bodyMat));
+      g.add(createSideExtrudedMesh(busShape, 2.38, 0.12, 0.14, bodyMat));
 
-        const greenBand = new THREE.Mesh(
-          new THREE.BoxGeometry(2.42, 0.30, 8.22),
-          new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.4 })
-        );
-        greenBand.position.set(0, 1.18, 0.02);
-        g.add(greenBand);
+      // 參考照片左側紅白綠塗裝醫院接駁巴士
+      const redBand = new THREE.Mesh(
+        new THREE.BoxGeometry(2.42, 0.55, 8.22),
+        new THREE.MeshStandardMaterial({ color: 0xc82333, roughness: 0.4 })
+      );
+      redBand.position.set(0, 0.95, 0.02);
+      g.add(redBand);
 
-        const frontGlass = new THREE.Mesh(new THREE.BoxGeometry(2.08, 1.15, 0.10), glassMat);
-        frontGlass.position.set(0, 2.02, 4.14);
-        frontGlass.rotation.x = -0.16;
-        g.add(frontGlass);
+      const greenLogo = new THREE.Mesh(
+        new THREE.BoxGeometry(2.43, 0.62, 1.8),
+        new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.4 })
+      );
+      greenLogo.position.set(0, 1.85, -3.25);
+      g.add(greenLogo);
 
-        [-1.20, 1.20].forEach((sx) => {
-          const sideGlassStrip = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.82, 6.8), glassMat);
-          sideGlassStrip.position.set(sx, 2.05, -0.05);
-          g.add(sideGlassStrip);
-        });
+      const frontGlass = new THREE.Mesh(new THREE.BoxGeometry(2.08, 1.15, 0.10), glassMat);
+      frontGlass.position.set(0, 2.02, 4.14);
+      frontGlass.rotation.x = -0.16;
+      g.add(frontGlass);
 
-        const acPod = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.24, 2.4), trimMat);
-        acPod.position.set(0, 3.06, 0.3);
-        g.add(acPod);
+      [-1.20, 1.20].forEach((sx) => {
+        const sideGlassStrip = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.82, 6.8), glassMat);
+        sideGlassStrip.position.set(sx, 2.05, -0.05);
+        g.add(sideGlassStrip);
+      });
 
-        [
-          [-1.08, 0.48, 2.55],
-          [1.08, 0.48, 2.55],
-          [-1.08, 0.48, -2.45],
-          [1.08, 0.48, -2.45]
-        ].forEach(([wx, wy, wz]) => {
-          const { steerPivot } = createDetailedWheel(0.48, 0.32, 0xdbe4ee);
-          steerPivot.position.set(wx, wy, wz);
-          g.add(steerPivot);
-        });
-      } else {
-        const truckShape = new THREE.Shape();
-        truckShape.moveTo(-2.15, 0.42);
-        truckShape.lineTo(-2.18, 1.05);
-        truckShape.lineTo(-0.48, 1.05);
-        truckShape.lineTo(-0.44, 1.62);
-        truckShape.quadraticCurveTo(-0.40, 1.76, -0.20, 1.78);
-        truckShape.lineTo(0.42, 1.78);
-        truckShape.quadraticCurveTo(0.66, 1.76, 0.82, 1.54);
-        truckShape.lineTo(1.26, 1.06);
-        truckShape.quadraticCurveTo(1.86, 0.98, 2.16, 0.76);
-        truckShape.quadraticCurveTo(2.24, 0.56, 2.12, 0.38);
-        truckShape.lineTo(1.74, 0.38);
-        truckShape.absarc(1.32, 0.42, 0.42, 0.1, Math.PI - 0.1, false);
-        truckShape.lineTo(0.90, 0.38);
-        truckShape.lineTo(-0.90, 0.38);
-        truckShape.absarc(-1.32, 0.42, 0.42, 0.1, Math.PI - 0.1, false);
-        truckShape.lineTo(-1.74, 0.38);
-        truckShape.closePath();
+      const acPod = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.24, 2.4), trimMat);
+      acPod.position.set(0, 3.06, 0.3);
+      g.add(acPod);
 
-        g.add(createSideExtrudedMesh(truckShape, 1.94, 0.10, 0.12, bodyMat));
-
-        const cabGlass = new THREE.Mesh(new THREE.BoxGeometry(1.62, 0.56, 0.08), glassMat);
-        cabGlass.position.set(0, 1.40, 1.04);
-        cabGlass.rotation.x = -0.58;
-        g.add(cabGlass);
-
-        const cargoBed = new THREE.Mesh(new THREE.BoxGeometry(1.66, 0.12, 1.55), trimMat);
-        cargoBed.position.set(0, 1.02, -1.32);
-        g.add(cargoBed);
-
-        [
-          [-0.90, 0.40, 1.32],
-          [0.90, 0.40, 1.32],
-          [-0.90, 0.40, -1.32],
-          [0.90, 0.40, -1.32]
-        ].forEach(([wx, wy, wz]) => {
-          const { steerPivot } = createDetailedWheel(0.40, 0.28, 0xcbd5e1);
-          steerPivot.position.set(wx, wy, wz);
-          g.add(steerPivot);
-        });
-      }
+      [
+        [-1.08, 0.48, 2.55],
+        [1.08, 0.48, 2.55],
+        [-1.08, 0.48, -2.45],
+        [1.08, 0.48, -2.45]
+      ].forEach(([wx, wy, wz]) => {
+        const { steerPivot } = createDetailedWheel(0.48, 0.32, 0xdbe4ee);
+        steerPivot.position.set(wx, wy, wz);
+        g.add(steerPivot);
+      });
 
       return g;
     }
 
     // --------------------------------------------------------------------------
-    // 4. 建構「彰濱秀傳健康園區」3D 醫療大樓建築群
+    // 4. 建構「幸運草醫院健康園區」寫實大門與建築群
     // --------------------------------------------------------------------------
     function buildMedicalComplex() {
       const campusGroup = new THREE.Group();
 
-      const darkGreenMetalMat = new THREE.MeshStandardMaterial({ color: 0x184236, roughness: 0.45, metalness: 0.35 });
-      const creamStoneMat = new THREE.MeshStandardMaterial({ color: 0xe8dec8, roughness: 0.72, metalness: 0.05 });
-      const terracottaMat = new THREE.MeshStandardMaterial({ color: 0xc86d44, roughness: 0.78, metalness: 0.05 });
+      // 參考照片中的建築色系：灰綠鋼構、淺米灰混凝土梁柱、暖紅陶磚
+      const sageGreenSteelMat = new THREE.MeshStandardMaterial({ color: 0x5c7365, roughness: 0.48, metalness: 0.32 });
+      const darkGreenMetalMat = new THREE.MeshStandardMaterial({ color: 0x263d34, roughness: 0.45, metalness: 0.38 });
+      const concreteBeigeMat = new THREE.MeshStandardMaterial({ color: 0xd8cfc0, roughness: 0.78, metalness: 0.05 });
+      const concreteShadowMat = new THREE.MeshStandardMaterial({ color: 0xbcb2a2, roughness: 0.85, metalness: 0.05 });
+      const terracottaMat = new THREE.MeshStandardMaterial({ color: 0xb95c38, roughness: 0.76, metalness: 0.05 });
 
-      const parapetTex = createParapetScreenTexture();
-      const parapetMat = new THREE.MeshStandardMaterial({
-        map: parapetTex,
-        transparent: true,
-        opacity: 0.88,
-        roughness: 0.3,
-        metalness: 0.4,
-        side: THREE.DoubleSide
-      });
-
-      // A. 中央圓柱形玻璃帷幕塔樓
+      // ========================================================================
+      // A. 中央圓柱形玻璃帷幕塔樓（附外環垂直灰綠鋼肋與大圓盤飛碟屋頂）
+      // ========================================================================
       const rotundaTex = createRotundaCurtainWallTextures();
       const rotundaMat = new THREE.MeshStandardMaterial({
         map: rotundaTex.map,
@@ -1568,51 +1379,87 @@
         emissiveMap: rotundaTex.emissiveMap,
         emissiveIntensity: 0.0,
         roughness: 0.18,
-        metalness: 0.65
+        metalness: 0.62
       });
       nightGlowMaterials.push(rotundaMat);
 
-      const rotundaX = 0;
-      const rotundaZ = -15;
-      const rotundaRadius = 10.5;
-      const rotundaHeight = 23.5;
+      const rotundaX = -4.5;
+      const rotundaZ = -13.5;
+      const rotundaRadius = 11.2;
+      const rotundaHeight = 22.8;
 
       const rotundaCyl = new THREE.Mesh(
-        new THREE.CylinderGeometry(rotundaRadius, rotundaRadius, rotundaHeight, 36),
+        new THREE.CylinderGeometry(rotundaRadius, rotundaRadius, rotundaHeight, 40),
         rotundaMat
       );
       rotundaCyl.position.set(rotundaX, rotundaHeight / 2, rotundaZ);
       rotundaCyl.castShadow = true;
       rotundaCyl.receiveShadow = true;
       campusGroup.add(rotundaCyl);
-      addCollider(rotundaX, rotundaZ, rotundaRadius * 1.82, rotundaRadius * 1.82, rotundaHeight, '中央圓弧玻璃塔樓');
+      addCollider(rotundaX, rotundaZ, rotundaRadius * 1.75, rotundaRadius * 1.75, rotundaHeight, '中央圓弧玻璃塔樓');
 
-      const discRoof = new THREE.Mesh(new THREE.CylinderGeometry(12.6, 12.2, 1.3, 40), darkGreenMetalMat);
-      discRoof.position.set(rotundaX, rotundaHeight + 0.65, rotundaZ);
-      discRoof.castShadow = true;
-      campusGroup.add(discRoof);
+      // 參考照片特徵：環繞玻璃圓塔外側的 20 根垂直灰綠色工字鋼肋柱
+      const ribCount = 20;
+      for (let i = 0; i < ribCount; i++) {
+        const ang = (i / ribCount) * Math.PI * 2;
+        const rx = rotundaX + Math.cos(ang) * (rotundaRadius + 0.32);
+        const rz = rotundaZ + Math.sin(ang) * (rotundaRadius + 0.32);
+        const rib = new THREE.Mesh(
+          new THREE.BoxGeometry(0.32, rotundaHeight + 0.6, 0.68),
+          sageGreenSteelMat
+        );
+        rib.position.set(rx, rotundaHeight / 2 + 0.3, rz);
+        rib.rotation.y = -ang;
+        rib.castShadow = true;
+        campusGroup.add(rib);
+      }
 
-      const discCap = new THREE.Mesh(new THREE.CylinderGeometry(9.2, 10.2, 0.9, 36), darkGreenMetalMat);
-      discCap.position.set(rotundaX, rotundaHeight + 1.65, rotundaZ);
-      campusGroup.add(discCap);
+      // 玻璃塔樓水平環形鋼帶
+      [11.2, 16.8, 22.4].forEach((bandY) => {
+        const ringBand = new THREE.Mesh(
+          new THREE.CylinderGeometry(rotundaRadius + 0.42, rotundaRadius + 0.42, 0.55, 40),
+          sageGreenSteelMat
+        );
+        ringBand.position.set(rotundaX, bandY, rotundaZ);
+        campusGroup.add(ringBand);
+      });
 
-      const rotundaBelt = new THREE.Mesh(
-        new THREE.CylinderGeometry(rotundaRadius + 0.25, rotundaRadius + 0.25, 0.7, 36),
-        creamStoneMat
+      // 參考照片特徵：大直徑淺灰綠寬邊圓盤屋頂
+      const discSoffit = new THREE.Mesh(
+        new THREE.CylinderGeometry(14.6, 13.8, 0.95, 48),
+        sageGreenSteelMat
       );
-      rotundaBelt.position.set(rotundaX, 13.5, rotundaZ);
-      campusGroup.add(rotundaBelt);
+      discSoffit.position.set(rotundaX, rotundaHeight + 0.75, rotundaZ);
+      discSoffit.castShadow = true;
+      campusGroup.add(discSoffit);
 
-      // A2. 正門 1F 大廳自動滑動玻璃門與地板感應區
+      const discRim = new THREE.Mesh(
+        new THREE.CylinderGeometry(14.9, 14.9, 0.48, 48),
+        concreteBeigeMat
+      );
+      discRim.position.set(rotundaX, rotundaHeight + 1.25, rotundaZ);
+      campusGroup.add(discRim);
+
+      const discUpperCap = new THREE.Mesh(
+        new THREE.CylinderGeometry(11.5, 13.2, 0.85, 40),
+        sageGreenSteelMat
+      );
+      discUpperCap.position.set(rotundaX, rotundaHeight + 1.85, rotundaZ);
+      campusGroup.add(discUpperCap);
+
+      // ========================================================================
+      // B. 正門 1F 大廳自動滑動玻璃門與地板感應區（整合於中央迎賓迴廊內）
+      // ========================================================================
       const entranceGroup = new THREE.Group();
+      const doorX = mainEntrance.x;
       const doorZ = mainEntrance.z;
 
-      const portalFrameLeft = new THREE.Mesh(new THREE.BoxGeometry(0.45, 3.4, 0.65), darkGreenMetalMat);
-      portalFrameLeft.position.set(-2.35, 1.7, doorZ);
-      const portalFrameRight = new THREE.Mesh(new THREE.BoxGeometry(0.45, 3.4, 0.65), darkGreenMetalMat);
-      portalFrameRight.position.set(2.35, 1.7, doorZ);
+      const portalFrameLeft = new THREE.Mesh(new THREE.BoxGeometry(0.45, 3.6, 0.65), darkGreenMetalMat);
+      portalFrameLeft.position.set(doorX - 2.35, 1.8, doorZ);
+      const portalFrameRight = new THREE.Mesh(new THREE.BoxGeometry(0.45, 3.6, 0.65), darkGreenMetalMat);
+      portalFrameRight.position.set(doorX + 2.35, 1.8, doorZ);
       const portalHeader = new THREE.Mesh(new THREE.BoxGeometry(5.15, 0.55, 0.75), darkGreenMetalMat);
-      portalHeader.position.set(0, 3.55, doorZ);
+      portalHeader.position.set(doorX, 3.75, doorZ);
       entranceGroup.add(portalFrameLeft, portalFrameRight, portalHeader);
 
       const signTex = createEntranceSignTexture();
@@ -1624,12 +1471,12 @@
         roughness: 0.3
       });
       const signBoard = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 0.85), signMat);
-      signBoard.position.set(0, 4.25, doorZ + 0.22);
+      signBoard.position.set(doorX, 4.45, doorZ + 0.22);
       entranceGroup.add(signBoard);
 
       const lobbyGlowMat = new THREE.MeshBasicMaterial({ color: 0xfff3d1 });
-      const lobbyBackdrop = new THREE.Mesh(new THREE.PlaneGeometry(4.25, 3.25), lobbyGlowMat);
-      lobbyBackdrop.position.set(0, 1.65, doorZ - 0.12);
+      const lobbyBackdrop = new THREE.Mesh(new THREE.PlaneGeometry(4.25, 3.45), lobbyGlowMat);
+      lobbyBackdrop.position.set(doorX, 1.75, doorZ - 0.12);
       entranceGroup.add(lobbyBackdrop);
 
       const slidingGlassMat = new THREE.MeshStandardMaterial({
@@ -1643,16 +1490,16 @@
 
       function buildDoorLeaf(offsetX) {
         const leaf = new THREE.Group();
-        const pane = new THREE.Mesh(new THREE.BoxGeometry(2.05, 3.15, 0.08), slidingGlassMat);
-        pane.position.y = 1.60;
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(2.05, 3.35, 0.08), slidingGlassMat);
+        pane.position.y = 1.70;
         const topRail = new THREE.Mesh(new THREE.BoxGeometry(2.08, 0.12, 0.11), doorMullionMat);
-        topRail.position.y = 3.14;
+        topRail.position.y = 3.34;
         const botRail = new THREE.Mesh(new THREE.BoxGeometry(2.08, 0.14, 0.11), doorMullionMat);
         botRail.position.y = 0.08;
-        const sideRail = new THREE.Mesh(new THREE.BoxGeometry(0.10, 3.15, 0.11), doorMullionMat);
-        sideRail.position.set(offsetX > 0 ? -0.98 : 0.98, 1.60, 0);
+        const sideRail = new THREE.Mesh(new THREE.BoxGeometry(0.10, 3.35, 0.11), doorMullionMat);
+        sideRail.position.set(offsetX > 0 ? -0.98 : 0.98, 1.70, 0);
         leaf.add(pane, topRail, botRail, sideRail);
-        leaf.position.set(offsetX, 0, doorZ + 0.05);
+        leaf.position.set(doorX + offsetX, 0, doorZ + 0.05);
         return leaf;
       }
 
@@ -1667,7 +1514,7 @@
         new THREE.MeshStandardMaterial({ color: 0x0f3d2e, roughness: 0.9 })
       );
       welcomeMat.rotation.x = -Math.PI / 2;
-      welcomeMat.position.set(0, 0.028, -3.15);
+      welcomeMat.position.set(doorX, 0.028, -3.15);
       entranceGroup.add(welcomeMat);
 
       const sensorRingMat = new THREE.MeshBasicMaterial({
@@ -1678,81 +1525,136 @@
       });
       const sensorRing = new THREE.Mesh(new THREE.RingGeometry(1.75, 2.05, 32), sensorRingMat);
       sensorRing.rotation.x = -Math.PI / 2;
-      sensorRing.position.set(0, 0.035, -2.75);
+      sensorRing.position.set(doorX, 0.035, -2.75);
       entranceGroup.add(sensorRing);
       mainEntrance.sensorRing = sensorRing;
 
       campusGroup.add(entranceGroup);
 
-      // B. 正門迎賓車道雨庇
-      const canopyW = 28;
-      const canopyD = 9.6;
-      const canopyH = 6.2;
-      const canopyZ = 1.2;
+      // ========================================================================
+      // C. 參考照片核心特徵：連續淺米色混凝土「牛腿齒飾挑簷迴廊」(Porte-Cochère & Arcade)
+      // ========================================================================
+      const plaqueTex = createColumnPlaqueTexture();
+      const plaqueMat = new THREE.MeshStandardMaterial({ map: plaqueTex, roughness: 0.4 });
 
-      const mainCanopy = new THREE.Mesh(new THREE.BoxGeometry(canopyW, 1.4, canopyD), creamStoneMat);
-      mainCanopy.position.set(0, canopyH, canopyZ);
-      mainCanopy.castShadow = true;
-      mainCanopy.receiveShadow = true;
-      campusGroup.add(mainCanopy);
+      // 輔助函式：建立帶有重複混凝土托架（牛腿/齒飾）的連續挑簷橫梁
+      function buildCorbelledEaveBeam(centerX, centerZ, beamW, beamD, beamBottomY) {
+        const beamH = 1.25;
+        const beamGroup = new THREE.Group();
 
-      const canopyRoofTrim = new THREE.Mesh(new THREE.BoxGeometry(canopyW + 0.8, 0.45, canopyD + 0.8), darkGreenMetalMat);
-      canopyRoofTrim.position.set(0, canopyH + 0.85, canopyZ);
-      campusGroup.add(canopyRoofTrim);
+        // 主體混凝土水平大梁
+        const mainBeam = new THREE.Mesh(
+          new THREE.BoxGeometry(beamW, beamH, beamD),
+          concreteBeigeMat
+        );
+        mainBeam.position.set(centerX, beamBottomY + beamH / 2, centerZ);
+        mainBeam.castShadow = true;
+        mainBeam.receiveShadow = true;
+        beamGroup.add(mainBeam);
 
-      const redFestiveMat = new THREE.MeshStandardMaterial({ color: 0xb81d18, roughness: 0.45 });
-      const goldTrimMat = new THREE.MeshStandardMaterial({ color: 0xe6b83a, roughness: 0.35, metalness: 0.6 });
-      const lanternMat = new THREE.MeshStandardMaterial({
-        color: 0xd9261c,
-        emissive: 0xff4518,
-        emissiveIntensity: 0.35,
-        roughness: 0.4
+        // 頂部收邊線腳與綠色植栽槽飾條
+        const topCoping = new THREE.Mesh(
+          new THREE.BoxGeometry(beamW + 0.3, 0.24, beamD + 0.3),
+          concreteShadowMat
+        );
+        topCoping.position.set(centerX, beamBottomY + beamH + 0.12, centerZ);
+        beamGroup.add(topCoping);
+
+        // 沿著挑簷正面與側面排列「混凝土垂直牛腿托架」(Corbel Brackets)
+        const spacing = 1.15;
+        const startX = centerX - beamW / 2 + 0.6;
+        const endX = centerX + beamW / 2 - 0.6;
+        for (let bx = startX; bx <= endX; bx += spacing) {
+          const bracket = new THREE.Mesh(
+            new THREE.BoxGeometry(0.28, beamH * 0.88, beamD + 0.38),
+            concreteBeigeMat
+          );
+          bracket.position.set(bx, beamBottomY + beamH * 0.48, centerZ);
+          bracket.castShadow = true;
+          beamGroup.add(bracket);
+        }
+
+        // 前後側的深度托架
+        const startZ = centerZ - beamD / 2 + 0.7;
+        const endZ = centerZ + beamD / 2 - 0.7;
+        for (let bz = startZ; bz <= endZ; bz += spacing) {
+          const sideBracket = new THREE.Mesh(
+            new THREE.BoxGeometry(beamW + 0.38, beamH * 0.88, 0.28),
+            concreteBeigeMat
+          );
+          sideBracket.position.set(centerX, beamBottomY + beamH * 0.48, bz);
+          beamGroup.add(sideBracket);
+        }
+
+        campusGroup.add(beamGroup);
+      }
+
+      // 輔助函式：建立參考照片中的「紅磚包覆方柱＋淺米混凝土柱頭柱礎＋紫紅標示牌」
+      function buildArcadeColumn(px, pz, colHeight, addPlaque = true) {
+        const colGroup = new THREE.Group();
+
+        // 淺灰混凝土柱腳
+        const plinth = new THREE.Mesh(new THREE.BoxGeometry(0.96, 0.65, 0.96), concreteBeigeMat);
+        plinth.position.set(px, 0.325, pz);
+        colGroup.add(plinth);
+
+        // 暖紅陶磚柱身
+        const shaftH = colHeight - 1.25;
+        const shaft = new THREE.Mesh(new THREE.BoxGeometry(0.82, shaftH, 0.82), terracottaMat);
+        shaft.position.set(px, 0.65 + shaftH / 2, pz);
+        shaft.castShadow = true;
+        shaft.receiveShadow = true;
+        colGroup.add(shaft);
+
+        // 淺米混凝土柱頭
+        const capital = new THREE.Mesh(new THREE.BoxGeometry(0.98, 0.6, 0.98), concreteBeigeMat);
+        capital.position.set(px, colHeight - 0.3, pz);
+        colGroup.add(capital);
+
+        // 柱身正面紫紅色醫療導引牌（還原照片中每根柱子上的紫紅牌子）
+        if (addPlaque) {
+          const plaque = new THREE.Mesh(new THREE.PlaneGeometry(0.36, 0.68), plaqueMat);
+          plaque.position.set(px, 1.95, pz + 0.425);
+          colGroup.add(plaque);
+        }
+
+        campusGroup.add(colGroup);
+        addCollider(px, pz, 0.95, 0.95, colHeight, '醫療大樓迴廊方柱');
+      }
+
+      // 1) 正門突出迎賓車道大雨庇（左側與中央較高挑簷，高度 6.4m）
+      buildCorbelledEaveBeam(-8.5, 0.8, 22.5, 9.2, 6.35);
+
+      const mainCanopyCols = [
+        [-18.2, -3.1], [-12.2, -3.1], [-7.8, -3.1], [-1.2, -3.1],
+        [-18.2, 4.7],  [-12.2, 4.7],  [-7.8, 4.7],  [-1.2, 4.7]
+      ];
+      mainCanopyCols.forEach(([cx, cz]) => {
+        buildArcadeColumn(cx, cz, 6.35, cz > 0);
       });
-      nightGlowMaterials.push(lanternMat);
 
-      const pillarXs = [-11.8, -5.2, 5.2, 11.8];
-      const pillarZs = [-2.15, 5.35];
-      pillarZs.forEach((pz, rowIdx) => {
-        pillarXs.forEach((px) => {
-          const base = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.8, 1.1), creamStoneMat);
-          base.position.set(px, 0.4, pz);
-          campusGroup.add(base);
+      // 2) 右側與左側連續一樓臨停接送騎樓迴廊（高度 4.65m，與中央大雨庇銜接）
+      buildCorbelledEaveBeam(21.5, -2.6, 38.0, 6.8, 4.65);
+      buildCorbelledEaveBeam(-29.5, -2.6, 20.0, 6.8, 4.65);
 
-          const col = new THREE.Mesh(new THREE.BoxGeometry(0.85, canopyH - 0.7, 0.85), redFestiveMat);
-          col.position.set(px, (canopyH - 0.7) / 2 + 0.4, pz);
-          col.castShadow = true;
-          campusGroup.add(col);
-
-          const cap = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.45, 1.0), goldTrimMat);
-          cap.position.set(px, canopyH - 0.85, pz);
-          campusGroup.add(cap);
-
-          if (rowIdx === 1) {
-            for (let l = 0; l < 4; l++) {
-              const lantern = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 10), lanternMat);
-              lantern.scale.set(1, 1.25, 1);
-              lantern.position.set(px + 0.6, canopyH - 1.25 - l * 0.75, pz);
-              campusGroup.add(lantern);
-            }
-          }
-
-          addCollider(px, pz, 1.05, 1.05, canopyH, '迎賓車道廊柱');
-        });
+      // 右側騎樓一字排開的 7 根紅磚方柱（形成 6 個可停放轎車的柱間車位！）
+      const rightArcadeXs = [4.2, 10.4, 16.6, 22.8, 29.0, 35.2, 39.6];
+      rightArcadeXs.forEach((rx) => {
+        buildArcadeColumn(rx, 0.3, 4.65, true);
+        buildArcadeColumn(rx, -5.4, 4.65, false);
       });
 
-      [-25.5, 25.5].forEach((sideX) => {
-        const walkwayRoof = new THREE.Mesh(new THREE.BoxGeometry(20, 0.65, 4.2), creamStoneMat);
-        walkwayRoof.position.set(sideX, 4.4, -3.5);
-        walkwayRoof.castShadow = true;
-        campusGroup.add(walkwayRoof);
-
-        const walkwayGreenEdge = new THREE.Mesh(new THREE.BoxGeometry(20.2, 0.25, 4.4), darkGreenMetalMat);
-        walkwayGreenEdge.position.set(sideX, 4.82, -3.5);
-        campusGroup.add(walkwayGreenEdge);
+      // 左側延伸騎樓方柱
+      const leftArcadeXs = [-23.8, -29.8, -35.8];
+      leftArcadeXs.forEach((lx) => {
+        buildArcadeColumn(lx, 0.3, 4.65, true);
+        buildArcadeColumn(lx, -5.4, 4.65, false);
       });
 
-      // C. 左右對稱三層前翼大樓
-      const wingWallTex = createHospitalWallTextures(6, 3, false);
+      // ========================================================================
+      // D. 緊鄰玻璃圓塔右側的「三層暖紅陶磚醫療大樓主翼」（還原照片右側建築立面）
+      // ========================================================================
+      const wingWallTex = createHospitalWallTextures(7, 3, false);
       const wingWallMat = new THREE.MeshStandardMaterial({
         map: wingWallTex.map,
         emissive: new THREE.Color(0xffdfa0),
@@ -1763,50 +1665,35 @@
       nightGlowMaterials.push(wingWallMat);
 
       const frontWingConfigs = [
-        { x: -25.5, z: -15.5, w: 26, d: 20, h: 14.2 },
-        { x: 25.5, z: -15.5, w: 26, d: 20, h: 14.2 },
-        { x: -47.5, z: -19.5, w: 18, d: 18, h: 12.2 },
-        { x: 47.5, z: -19.5, w: 18, d: 18, h: 12.2 }
+        // 右側緊貼中央圓塔的三層暖紅陶磚醫療大樓（2F/3F大窗 + 4F氣窗帶）
+        { x: 21.8, z: -13.5, w: 37.5, d: 18.0, h: 15.8 },
+        // 左側對稱紅磚建築翼
+        { x: -27.5, z: -14.5, w: 24.0, d: 18.0, h: 14.8 },
+        // 遠端延伸 wing
+        { x: 47.5, z: -17.5, w: 16.0, d: 18.0, h: 13.5 },
+        { x: -46.5, z: -17.5, w: 16.0, d: 18.0, h: 13.5 }
       ];
 
       frontWingConfigs.forEach((cfg) => {
         const wingMesh = new THREE.Mesh(
           new THREE.BoxGeometry(cfg.w, cfg.h, cfg.d),
-          [wingWallMat, wingWallMat, creamStoneMat, creamStoneMat, wingWallMat, wingWallMat]
+          [wingWallMat, wingWallMat, concreteBeigeMat, concreteBeigeMat, wingWallMat, wingWallMat]
         );
         wingMesh.position.set(cfg.x, cfg.h / 2, cfg.z);
         wingMesh.castShadow = true;
         wingMesh.receiveShadow = true;
         campusGroup.add(wingMesh);
-        addCollider(cfg.x, cfg.z, cfg.w, cfg.d, cfg.h, '前翼醫療大樓');
+        addCollider(cfg.x, cfg.z, cfg.w, cfg.d, cfg.h, '紅磚醫療大樓');
 
-        const cornice = new THREE.Mesh(new THREE.BoxGeometry(cfg.w + 0.6, 0.55, cfg.d + 0.6), creamStoneMat);
+        // 屋頂淺米灰石材女兒牆壓頂
+        const cornice = new THREE.Mesh(new THREE.BoxGeometry(cfg.w + 0.5, 0.55, cfg.d + 0.5), concreteBeigeMat);
         cornice.position.set(cfg.x, cfg.h + 0.25, cfg.z);
         campusGroup.add(cornice);
-
-        const pH = 2.3;
-        const pY = cfg.h + 0.5 + pH / 2;
-
-        const pFront = new THREE.Mesh(new THREE.PlaneGeometry(cfg.w + 0.4, pH), parapetMat);
-        pFront.position.set(cfg.x, pY, cfg.z + cfg.d / 2 + 0.2);
-        campusGroup.add(pFront);
-
-        const pBack = new THREE.Mesh(new THREE.PlaneGeometry(cfg.w + 0.4, pH), parapetMat);
-        pBack.position.set(cfg.x, pY, cfg.z - cfg.d / 2 - 0.2);
-        campusGroup.add(pBack);
-
-        const pLeft = new THREE.Mesh(new THREE.PlaneGeometry(cfg.d + 0.4, pH), parapetMat);
-        pLeft.rotation.y = Math.PI / 2;
-        pLeft.position.set(cfg.x - cfg.w / 2 - 0.2, pY, cfg.z);
-        campusGroup.add(pLeft);
-
-        const pRight = new THREE.Mesh(new THREE.PlaneGeometry(cfg.d + 0.4, pH), parapetMat);
-        pRight.rotation.y = Math.PI / 2;
-        pRight.position.set(cfg.x + cfg.w / 2 + 0.2, pY, cfg.z);
-        campusGroup.add(pRight);
       });
 
-      // D. 後方八層主醫療大樓與「秀傳」皇冠塔樓
+      // ========================================================================
+      // E. 後方八層主醫療大樓與「秀傳」皇冠塔樓
+      // ========================================================================
       const towerTex = createHospitalWallTextures(10, 7, true);
       const towerMat = new THREE.MeshStandardMaterial({
         map: towerTex.map,
@@ -1820,12 +1707,12 @@
       const mainTowerW = 54;
       const mainTowerD = 20;
       const mainTowerH = 31.5;
-      const mainTowerX = 3;
-      const mainTowerZ = -33;
+      const mainTowerX = 2;
+      const mainTowerZ = -32;
 
       const mainTower = new THREE.Mesh(
         new THREE.BoxGeometry(mainTowerW, mainTowerH, mainTowerD),
-        [towerMat, towerMat, creamStoneMat, creamStoneMat, towerMat, towerMat]
+        [towerMat, towerMat, concreteBeigeMat, concreteBeigeMat, towerMat, towerMat]
       );
       mainTower.position.set(mainTowerX, mainTowerH / 2, mainTowerZ);
       mainTower.castShadow = true;
@@ -1833,16 +1720,7 @@
       campusGroup.add(mainTower);
       addCollider(mainTowerX, mainTowerZ, mainTowerW, mainTowerD, mainTowerH, '八層主醫療大樓');
 
-      const towerCornice = new THREE.Mesh(new THREE.BoxGeometry(mainTowerW + 0.8, 0.7, mainTowerD + 0.8), creamStoneMat);
-      towerCornice.position.set(mainTowerX, mainTowerH + 0.35, mainTowerZ);
-      campusGroup.add(towerCornice);
-
-      const skylight = new THREE.Mesh(new THREE.BoxGeometry(15.5, 7.5, 9.5), rotundaMat);
-      skylight.position.set(-1, 24.5, -22.5);
-      skylight.rotation.x = 0.34;
-      campusGroup.add(skylight);
-
-      const crownTex = createShowChwanCrownTexture();
+      const crownTex = createCloverCrownTexture();
       const crownSignMat = new THREE.MeshStandardMaterial({
         map: crownTex,
         emissive: new THREE.Color(0xffd23f),
@@ -1854,11 +1732,11 @@
       nightGlowMaterials.push(crownSignMat);
 
       const crownX = -1.5;
-      const crownZ = -29.5;
+      const crownZ = -28.5;
       const crownW = 21;
       const crownD = 15;
       const crownH = 5.4;
-      const crownBaseY = mainTowerH + 0.7;
+      const crownBaseY = mainTowerH + 0.5;
 
       const crownBottomEave = new THREE.Mesh(new THREE.BoxGeometry(crownW + 3.2, 0.65, crownD + 3.2), darkGreenMetalMat);
       crownBottomEave.position.set(crownX, crownBaseY + 0.3, crownZ);
@@ -1876,190 +1754,175 @@
       crownTopEave.position.set(crownX, crownBaseY + 0.65 + crownH + 0.35, crownZ);
       campusGroup.add(crownTopEave);
 
-      // E. 右後方階梯狀圓柱磚紅塔樓
-      const rightTowerX = 33.5;
-      const rightTowerZ = -32.5;
-      const rightTowerH = 34.5;
+      // ========================================================================
+      // F. 參考照片大門前廣場：白灰棋盤格方塊鋪面、紅漆弧形緣石、黃色防撞柱、三角錐與騎樓臨停車輛
+      // ========================================================================
+      const checkeredTex = createCheckeredForecourtTexture();
+      const checkeredMat = new THREE.MeshStandardMaterial({ map: checkeredTex, roughness: 0.82 });
 
-      const rightCylTower = new THREE.Mesh(new THREE.CylinderGeometry(5.6, 6.2, rightTowerH, 24), towerMat);
-      rightCylTower.position.set(rightTowerX, rightTowerH / 2, rightTowerZ);
-      rightCylTower.castShadow = true;
-      campusGroup.add(rightCylTower);
-      addCollider(rightTowerX, rightTowerZ, 11.5, 11.5, rightTowerH, '右後側圓柱塔樓');
+      // 大門前主廣場柏油＋白灰棋盤格地磚鋪面
+      const forecourtPlaza = new THREE.Mesh(new THREE.PlaneGeometry(66, 36), checkeredMat);
+      forecourtPlaza.rotation.x = -Math.PI / 2;
+      forecourtPlaza.position.set(6.5, 0.024, 15.5);
+      forecourtPlaza.receiveShadow = true;
+      campusGroup.add(forecourtPlaza);
 
-      for (let a = 0; a < 8; a++) {
-        const ang = (a / 8) * Math.PI * 2;
-        const rib = new THREE.Mesh(new THREE.BoxGeometry(1.1, rightTowerH - 2, 1.4), terracottaMat);
-        rib.position.set(rightTowerX + Math.cos(ang) * 5.7, (rightTowerH - 2) / 2, rightTowerZ + Math.sin(ang) * 5.7);
-        rib.rotation.y = -ang;
-        campusGroup.add(rib);
+      // 騎樓下方淺灰磨石子地面
+      const arcadeFloor = new THREE.Mesh(
+        new THREE.PlaneGeometry(78, 11.5),
+        new THREE.MeshStandardMaterial({ color: 0x9ca3af, roughness: 0.75 })
+      );
+      arcadeFloor.rotation.x = -Math.PI / 2;
+      arcadeFloor.position.set(2, 0.026, -0.5);
+      arcadeFloor.receiveShadow = true;
+      campusGroup.add(arcadeFloor);
+
+      // 參考照片左側：紅色油漆弧形人行道緣石 (Red Curb) 與灰色人行道島
+      const redCurbMat = new THREE.MeshStandardMaterial({ color: 0xd94848, roughness: 0.55 });
+      const sidewalkMat = new THREE.MeshStandardMaterial({ color: 0xb0b7c0, roughness: 0.85 });
+
+      const leftSidewalkBase = new THREE.Mesh(new THREE.CylinderGeometry(11.5, 11.5, 0.22, 32), sidewalkMat);
+      leftSidewalkBase.position.set(-22.5, 0.11, 14.5);
+      leftSidewalkBase.receiveShadow = true;
+      campusGroup.add(leftSidewalkBase);
+
+      const redCurbRing = new THREE.Mesh(
+        new THREE.TorusGeometry(11.55, 0.16, 10, 36, Math.PI * 0.85),
+        redCurbMat
+      );
+      redCurbRing.rotation.x = Math.PI / 2;
+      redCurbRing.rotation.z = -Math.PI * 0.42;
+      redCurbRing.position.set(-22.5, 0.18, 14.5);
+      campusGroup.add(redCurbRing);
+
+      // 參考照片左側人行道上的黃色 U 型防撞護欄柱
+      const yellowBollardMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.3 });
+      for (let b = 0; b < 5; b++) {
+        const bx = -18.5 - b * 1.45;
+        const bz = 7.8 + b * 0.55;
+        const bollard = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.82, 10), yellowBollardMat);
+        bollard.position.set(bx, 0.41, bz);
+        bollard.castShadow = true;
+        campusGroup.add(bollard);
       }
 
-      const rightTowerRoof = new THREE.Mesh(new THREE.CylinderGeometry(7.2, 6.6, 1.1, 32), darkGreenMetalMat);
-      rightTowerRoof.position.set(rightTowerX, rightTowerH + 0.8, rightTowerZ);
-      campusGroup.add(rightTowerRoof);
+      // 參考照片前景中央偏左的「橘白反光交通錐」(Traffic Cones)
+      const coneOrangeMat = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.4 });
+      const coneWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, emissive: 0xffffff, emissiveIntensity: 0.15 });
+      const coneBaseMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 });
 
-      const rightTowerNeck = new THREE.Mesh(new THREE.CylinderGeometry(4.6, 4.8, 1.2, 24), creamStoneMat);
-      rightTowerNeck.position.set(rightTowerX, rightTowerH + 0.2, rightTowerZ);
-      campusGroup.add(rightTowerNeck);
-
-      // F. 大門口車道系統
-      const inboundLaneMat = new THREE.MeshStandardMaterial({ map: createDrivewayLaneTexture('up'), roughness: 0.85 });
-      const outboundLaneMat = new THREE.MeshStandardMaterial({ map: createDrivewayLaneTexture('down'), roughness: 0.85 });
-      const porteCochereMat = new THREE.MeshStandardMaterial({ map: createDrivewayLaneTexture('none'), roughness: 0.85 });
-      const dropOffGridMat = new THREE.MeshStandardMaterial({ map: createDropOffZoneTexture(), roughness: 0.82 });
-
-      const westDriveway = new THREE.Mesh(new THREE.PlaneGeometry(7.6, 36.5), inboundLaneMat);
-      westDriveway.rotation.x = -Math.PI / 2;
-      westDriveway.position.set(-21, 0.024, 17.5);
-      westDriveway.receiveShadow = true;
-      campusGroup.add(westDriveway);
-
-      const eastDriveway = new THREE.Mesh(new THREE.PlaneGeometry(7.6, 36.5), outboundLaneMat);
-      eastDriveway.rotation.x = -Math.PI / 2;
-      eastDriveway.position.set(21, 0.024, 17.5);
-      eastDriveway.receiveShadow = true;
-      campusGroup.add(eastDriveway);
-
-      const frontDropLane = new THREE.Mesh(new THREE.PlaneGeometry(49.6, 6.8), porteCochereMat);
-      frontDropLane.rotation.x = -Math.PI / 2;
-      frontDropLane.rotation.z = Math.PI / 2;
-      frontDropLane.position.set(0, 0.025, 1.6);
-      frontDropLane.receiveShadow = true;
-      campusGroup.add(frontDropLane);
-
-      const dropOffGrid = new THREE.Mesh(new THREE.PlaneGeometry(14.5, 6.2), dropOffGridMat);
-      dropOffGrid.rotation.x = -Math.PI / 2;
-      dropOffGrid.position.set(0, 0.029, 1.6);
-      campusGroup.add(dropOffGrid);
-
-      const crosswalkMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc });
-      for (let cx = -2.4; cx <= 2.4; cx += 0.96) {
-        const stripe = new THREE.Mesh(new THREE.PlaneGeometry(0.48, 6.4), crosswalkMat);
-        stripe.rotation.x = -Math.PI / 2;
-        stripe.position.set(cx, 0.032, 1.6);
-        campusGroup.add(stripe);
-      }
-
-      const hazardCurbTex = createHazardCurbTexture();
-      const hazardCurbMat = new THREE.MeshStandardMaterial({ map: hazardCurbTex, roughness: 0.6 });
-
-      [-16.9, 16.9].forEach((curbX) => {
-        const sideCurb = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.18, 28), hazardCurbMat);
-        sideCurb.position.set(curbX, 0.09, 20.5);
-        campusGroup.add(sideCurb);
+      [
+        [-8.2, 13.8],
+        [-8.8, 15.6]
+      ].forEach(([cx, cz]) => {
+        const coneGroup = new THREE.Group();
+        const cBase = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.06, 0.46), coneBaseMat);
+        cBase.position.y = 0.03;
+        const cBody = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.72, 16), coneOrangeMat);
+        cBody.position.y = 0.40;
+        cBody.castShadow = true;
+        const cStripe = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.125, 0.18, 16), coneWhiteMat);
+        cStripe.position.y = 0.44;
+        coneGroup.add(cBase, cBody, cStripe);
+        coneGroup.position.set(cx, 0, cz);
+        campusGroup.add(coneGroup);
       });
 
-      // G. 中央安全島「彰濱秀傳健康園區」彩繪紀念牆
+      // 參考照片左側前景的「多層次南洋杉／松柏常綠大樹」
+      function createLayeredConiferTree(tx, tz, scale = 1.0) {
+        const tree = new THREE.Group();
+        const trunk = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.28 * scale, 0.45 * scale, 4.5 * scale, 12),
+          new THREE.MeshStandardMaterial({ color: 0x4a3525, roughness: 0.9 })
+        );
+        trunk.position.y = 2.25 * scale;
+        trunk.castShadow = true;
+        tree.add(trunk);
+
+        const pineMat1 = new THREE.MeshStandardMaterial({ color: 0x2d4c2b, roughness: 0.85 });
+        const pineMat2 = new THREE.MeshStandardMaterial({ color: 0x3b6136, roughness: 0.82 });
+
+        const tiers = [
+          { y: 3.6, r: 3.1, h: 3.2, mat: pineMat1 },
+          { y: 5.5, r: 2.6, h: 3.0, mat: pineMat2 },
+          { y: 7.3, r: 2.1, h: 2.8, mat: pineMat1 },
+          { y: 9.0, r: 1.5, h: 2.5, mat: pineMat2 },
+          { y: 10.5, r: 0.9, h: 2.2, mat: pineMat1 }
+        ];
+        tiers.forEach((t) => {
+          const cone = new THREE.Mesh(new THREE.ConeGeometry(t.r * scale, t.h * scale, 14), t.mat);
+          cone.position.y = t.y * scale;
+          cone.castShadow = true;
+          tree.add(cone);
+        });
+
+        tree.position.set(tx, 0, tz);
+        campusGroup.add(tree);
+        addCollider(tx, tz, 1.1 * scale, 1.1 * scale, 10 * scale, '園區景觀松柏樹');
+      }
+
+      createLayeredConiferTree(-18.5, 16.5, 1.15);
+      createLayeredConiferTree(-25.5, 12.0, 0.95);
+
+      // 參考照片右側騎樓柱間停放的一排白／黑轎車（車頭朝建築內停入柱間車位）
+      const arcadeParkedSpecs = [
+        { x: 7.3, z: -2.4, color: 0xf8fafc, yaw: Math.PI },
+        { x: 13.5, z: -2.4, color: 0xf1f5f9, yaw: Math.PI },
+        { x: 19.7, z: -2.4, color: 0x111827, yaw: Math.PI },
+        { x: 25.9, z: -2.4, color: 0x1e293b, yaw: Math.PI },
+        { x: 32.1, z: -2.4, color: 0xffffff, yaw: Math.PI },
+        // 左側接駁巴士（紅白綠幸運草醫院接駁車）
+        { x: -16.2, z: -1.8, color: 0xf8fafc, type: 'bus', yaw: Math.PI },
+        // 左下角銀色小掀背車
+        { x: -15.5, z: 23.5, color: 0xcbd5e1, yaw: 0.65 }
+      ];
+
+      arcadeParkedSpecs.forEach((pc) => {
+        const staticMesh = createSimpleParkedVehicle(pc.color, pc.type || 'sedan');
+        staticMesh.position.set(pc.x, 0, pc.z);
+        staticMesh.rotation.y = pc.yaw;
+        campusGroup.add(staticMesh);
+        const bw = pc.type === 'bus' ? 2.5 : 2.1;
+        const bd = pc.type === 'bus' ? 8.4 : 4.5;
+        addCollider(pc.x, pc.z, bw, bd, 2.8, '停放車輛');
+      });
+
+      // ========================================================================
+      // G. 中央安全島「幸運草醫院健康園區」彩繪紀念牆與外圍道路
+      // ========================================================================
       const monumentTex = createMonumentWallTexture();
       const monumentFrontMat = new THREE.MeshStandardMaterial({ map: monumentTex, roughness: 0.55, metalness: 0.08 });
 
       const monW = 29;
       const monH = 4.2;
       const monD = 1.3;
-      const monZ = 15.0;
+      const monZ = 33.5;
 
       const monBase = new THREE.Mesh(
         new THREE.BoxGeometry(monW + 0.6, 0.5, monD + 0.5),
         new THREE.MeshStandardMaterial({ color: 0x5c636a, roughness: 0.85 })
       );
-      monBase.position.set(0, 0.25, monZ);
+      monBase.position.set(2, 0.25, monZ);
       campusGroup.add(monBase);
 
       const monWall = new THREE.Mesh(
         new THREE.BoxGeometry(monW, monH, monD),
-        [creamStoneMat, creamStoneMat, creamStoneMat, creamStoneMat, monumentFrontMat, creamStoneMat]
+        [concreteBeigeMat, concreteBeigeMat, concreteBeigeMat, concreteBeigeMat, monumentFrontMat, concreteBeigeMat]
       );
-      monWall.position.set(0, 0.5 + monH / 2, monZ);
+      monWall.position.set(2, 0.5 + monH / 2, monZ);
       monWall.castShadow = true;
       monWall.receiveShadow = true;
       campusGroup.add(monWall);
-      addCollider(0, monZ, monW + 0.4, monD + 0.4, monH + 0.6, '彰濱秀傳健康園區紀念牆');
+      addCollider(2, monZ, monW + 0.4, monD + 0.4, monH + 0.6, '幸運草醫院健康園區紀念牆');
 
-      // H. 園區現代亮綠色波浪「大樹」公共藝術雕塑
-      const sculptureSpecs = [
-        { x: 27.5, z: 3.5, h: 6.2, color: 0x52c41a },
-        { x: 30.8, z: 6.2, h: 5.4, color: 0x8ce02c },
-        { x: 33.5, z: 3.2, h: 4.8, color: 0x73d13d },
-        { x: 36.5, z: 5.5, h: 6.6, color: 0x389e0d },
-        { x: 39.2, z: 8.5, h: 4.4, color: 0xa0d911 }
-      ];
-
-      sculptureSpecs.forEach((sc, idx) => {
-        const treeArt = new THREE.Group();
-        const artMat = new THREE.MeshStandardMaterial({ color: sc.color, roughness: 0.35, metalness: 0.2 });
-
-        const dir = idx % 2 === 0 ? 1 : -1;
-        const curve = new THREE.CatmullRomCurve3([
-          new THREE.Vector3(0, 0, 0),
-          new THREE.Vector3(0.35 * dir, sc.h * 0.32, 0.15),
-          new THREE.Vector3(-0.3 * dir, sc.h * 0.66, -0.15),
-          new THREE.Vector3(0.1 * dir, sc.h, 0)
-        ]);
-        const trunk = new THREE.Mesh(new THREE.TubeGeometry(curve, 16, 0.16, 8, false), artMat);
-        trunk.castShadow = true;
-        treeArt.add(trunk);
-
-        const crownRadius = sc.h * 0.24;
-        const outerCrown = new THREE.Mesh(
-          new THREE.IcosahedronGeometry(crownRadius, 1),
-          new THREE.MeshStandardMaterial({ color: sc.color, wireframe: true, emissive: sc.color, emissiveIntensity: 0.12 })
-        );
-        outerCrown.position.set(0.1 * dir, sc.h + crownRadius * 0.65, 0);
-        treeArt.add(outerCrown);
-
-        const innerCrown = new THREE.Mesh(new THREE.DodecahedronGeometry(crownRadius * 0.65, 0), artMat);
-        innerCrown.position.copy(outerCrown.position);
-        innerCrown.castShadow = true;
-        treeArt.add(innerCrown);
-
-        treeArt.position.set(sc.x, 0, sc.z);
-        campusGroup.add(treeArt);
-        addCollider(sc.x, sc.z, 0.7, 0.7, sc.h, '綠色藝術樹雕塑');
-      });
-
-      // I. 綠籬與停車場
-      const hedgeMat = new THREE.MeshStandardMaterial({ color: 0x2b6e32, roughness: 0.88 });
-      const frontHedge1 = new THREE.Mesh(new THREE.BoxGeometry(22, 1.0, 2.2), hedgeMat);
-      frontHedge1.position.set(0, 0.5, 29.5);
-      frontHedge1.castShadow = true;
-      campusGroup.add(frontHedge1);
-      addCollider(0, 29.5, 22, 2.2, 1.1, '中央安全島綠籬');
-
-      const stallLineMat = new THREE.MeshBasicMaterial({ color: 0xe2e8f0 });
-      for (let sx = -44; sx <= 44; sx += 3.5) {
-        if (Math.abs(sx) < 26) continue;
-        const line = new THREE.Mesh(new THREE.PlaneGeometry(0.14, 4.8), stallLineMat);
-        line.rotation.x = -Math.PI / 2;
-        line.position.set(sx, 0.03, 24.5);
-        campusGroup.add(line);
-      }
-
-      const parkedCarSpecs = [
-        { x: -39.5, z: 24.5, color: 0x1e293b, type: 'sedan', yaw: 0 },
-        { x: -32.5, z: 24.5, color: 0x2563eb, type: 'truck', yaw: 0 },
-        { x: 29.5, z: 24.5, color: 0xdc2626, type: 'sedan', yaw: 0 },
-        { x: 36.5, z: 24.5, color: 0xf8fafc, type: 'sedan', yaw: 0 },
-        { x: -36.5, z: 6.5, color: 0xfef08a, type: 'bus', yaw: Math.PI / 2 }
-      ];
-      parkedCarSpecs.forEach((pc) => {
-        const staticMesh = createSimpleParkedVehicle(pc.color, pc.type);
-        staticMesh.position.set(pc.x, 0, pc.z);
-        staticMesh.rotation.y = pc.yaw;
-        campusGroup.add(staticMesh);
-        const bw = pc.type === 'bus' ? 8.5 : 2.1;
-        const bd = pc.type === 'bus' ? 2.5 : 4.5;
-        addCollider(pc.x, pc.z, bw, bd, 2.8, '停放車輛');
-      });
-
-      // J. 園區前方主幹道與外圍道路
+      // 前方主幹道與外圍道路
       const roadTex = createRoadTexture();
       const roadMat = new THREE.MeshStandardMaterial({ map: roadTex, roughness: 0.85 });
 
       const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(24, 340), roadMat);
       mainRoad.rotation.x = -Math.PI / 2;
       mainRoad.rotation.z = Math.PI / 2;
-      mainRoad.position.set(0, 0.02, 46);
+      mainRoad.position.set(0, 0.02, 50);
       mainRoad.receiveShadow = true;
       campusGroup.add(mainRoad);
 
@@ -2071,29 +1934,17 @@
         campusGroup.add(sideRoad);
       });
 
-      [-44, 44].forEach((mx) => {
-        const medianIsland = new THREE.Mesh(new THREE.BoxGeometry(34, 0.32, 3.2), hazardCurbMat);
-        medianIsland.position.set(mx, 0.16, 46);
-        medianIsland.receiveShadow = true;
-        campusGroup.add(medianIsland);
-
-        const medianGrass = new THREE.Mesh(new THREE.BoxGeometry(33.2, 0.36, 2.4), hedgeMat);
-        medianGrass.position.set(mx, 0.19, 46);
-        campusGroup.add(medianGrass);
-      });
-
-      // K. 園區路燈與周邊城市街區剪影
-      const poleMat = new THREE.MeshStandardMaterial({ color: 0x1e3a34, metalness: 0.6, roughness: 0.4 });
+      // 園區路燈
+      const poleMat = new THREE.MeshStandardMaterial({ color: 0x4b5563, metalness: 0.6, roughness: 0.4 });
       const bulbMat = new THREE.MeshStandardMaterial({ color: 0xfff3c4, emissive: 0xffd166, emissiveIntensity: 0.0 });
       nightGlowMaterials.push(bulbMat);
 
       const lampCoords = [
-        [-26, 33], [-15, 33], [15, 33], [26, 33],
-        [-26, 12], [26, 12], [-58, 33], [58, 33]
+        [-14.5, 16.5], [24, 28], [-28, 32], [38, 18]
       ];
       lampCoords.forEach(([lx, lz], idx) => {
         const lamp = new THREE.Group();
-        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.16, 7.2, 8), poleMat);
+        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.14, 7.2, 8), poleMat);
         pole.position.y = 3.6;
         const arm = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 1.6), poleMat);
         arm.position.set(0, 7.1, 0.7);
@@ -2112,30 +1963,11 @@
         }
       });
 
-      const bgBuildingColors = [0x94a3b8, 0xb8a99a, 0x7c8b99, 0xa89f91];
-      for (let i = 0; i < 24; i++) {
-        const angle = (i / 24) * Math.PI * 2;
-        const dist = 115 + (i % 4) * 22;
-        const bx = Math.cos(angle) * dist;
-        const bz = Math.sin(angle) * dist - 15;
-        if (Math.abs(bx) < 45 && bz > 35) continue;
-
-        const bw = 14 + (i % 3) * 8;
-        const bd = 14 + ((i + 1) % 3) * 7;
-        const bh = 10 + (i % 5) * 6;
-        const bMesh = new THREE.Mesh(
-          new THREE.BoxGeometry(bw, bh, bd),
-          new THREE.MeshStandardMaterial({ color: bgBuildingColors[i % bgBuildingColors.length], roughness: 0.85 })
-        );
-        bMesh.position.set(bx, bh / 2, bz);
-        campusGroup.add(bMesh);
-      }
-
       scene.add(campusGroup);
     }
 
     // --------------------------------------------------------------------------
-    // 5. 建構圓弧有機 3D 可操控角色 (支援 8 種身分服裝與配件即時切換)
+    // 5. 建構圓弧有機 3D 可操控角色
     // --------------------------------------------------------------------------
     function createPlayableCharacter() {
       const charGroup = new THREE.Group();
@@ -2191,18 +2023,11 @@
       collarRing.scale.set(1.1, 0.92, 1.0);
       upperBodyGroup.add(collarRing);
 
-      const zipper = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.48, 8), buckleMat);
-      zipper.position.set(0, 0.24, 0.162);
-      zipper.rotation.x = -0.05;
-      upperBodyGroup.add(zipper);
-
-      // 胸前識別證吊牌
       const idBadge = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.10, 0.015), badgeMat);
       idBadge.position.set(0.11, 0.42, 0.178);
       idBadge.rotation.y = 0.25;
       upperBodyGroup.add(idBadge);
 
-      // 醫師 / 救護員專屬 3D 聽診器配件
       const stethoscopeGroup = new THREE.Group();
       const stethTube = new THREE.Mesh(
         new THREE.TorusGeometry(0.145, 0.014, 8, 22, Math.PI * 1.15),
@@ -2227,18 +2052,11 @@
       belt.scale.set(1.14, 0.74, 1.0);
       upperBodyGroup.add(belt);
 
-      const buckle = new THREE.Mesh(new THREE.SphereGeometry(0.028, 12, 10), buckleMat);
-      buckle.scale.set(1.2, 0.85, 0.55);
-      buckle.position.set(0, 0.02, 0.158);
-      upperBodyGroup.add(buckle);
-
-      // 頭部群組
       const headGroup = new THREE.Group();
       headGroup.position.set(0, 0.69, 0.01);
       upperBodyGroup.add(headGroup);
 
       const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.078, 0.092, 0.16, 18), skinMat);
-      neck.position.set(0, 0.0, 0);
       neck.castShadow = true;
       headGroup.add(neck);
 
@@ -2247,18 +2065,6 @@
       head.position.set(0, 0.20, 0);
       head.castShadow = true;
       headGroup.add(head);
-
-      const nose = new THREE.Mesh(new THREE.SphereGeometry(0.024, 12, 10), skinMat);
-      nose.scale.set(0.85, 1.15, 1.2);
-      nose.position.set(0, 0.18, 0.178);
-      headGroup.add(nose);
-
-      [-0.172, 0.172].forEach((ex) => {
-        const ear = new THREE.Mesh(new THREE.SphereGeometry(0.036, 12, 10), skinMat);
-        ear.scale.set(0.55, 1.05, 0.82);
-        ear.position.set(ex, 0.19, -0.01);
-        headGroup.add(ear);
-      });
 
       const hairDome = new THREE.Mesh(
         new THREE.SphereGeometry(0.196, 26, 20, 0, Math.PI * 2, 0, Math.PI * 0.62),
@@ -2270,13 +2076,6 @@
       hairDome.castShadow = true;
       headGroup.add(hairDome);
 
-      const hairQuiff = new THREE.Mesh(new THREE.SphereGeometry(0.088, 16, 14), hairMat);
-      hairQuiff.scale.set(1.45, 0.65, 1.15);
-      hairQuiff.position.set(0, 0.365, 0.065);
-      hairQuiff.rotation.x = 0.25;
-      headGroup.add(hairQuiff);
-
-      // 眼鏡 / 護目鏡群組
       const glassesGroup = new THREE.Group();
       [-0.068, 0.068].forEach((sx) => {
         const sign = Math.sign(sx);
@@ -2285,20 +2084,10 @@
         lens.position.set(sx, 0.22, 0.162);
         lens.rotation.y = sign * 0.22;
         glassesGroup.add(lens);
-
-        const temple = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.16, 8), shadesMat);
-        temple.rotation.x = Math.PI / 2;
-        temple.rotation.y = -sign * 0.15;
-        temple.position.set(sx + sign * 0.068, 0.225, 0.085);
-        glassesGroup.add(temple);
       });
-      const noseBridge = new THREE.Mesh(new THREE.TorusGeometry(0.024, 0.007, 8, 14, Math.PI), buckleMat);
-      noseBridge.position.set(0, 0.225, 0.174);
-      glassesGroup.add(noseBridge);
       headGroup.add(glassesGroup);
 
       const armCapsuleGeom = createSmoothCapsuleGeometry(0.076, 0.38, 10, 18);
-
       function buildRoundedArm(sideSign) {
         const armPivot = new THREE.Group();
         armPivot.position.set(sideSign * 0.335, 0.55, 0);
@@ -2311,11 +2100,6 @@
         sleeve.position.y = -0.23;
         sleeve.castShadow = true;
         armPivot.add(sleeve);
-
-        const cuff = new THREE.Mesh(new THREE.TorusGeometry(0.076, 0.015, 10, 18), jacketMat);
-        cuff.rotation.x = Math.PI / 2;
-        cuff.position.y = -0.43;
-        armPivot.add(cuff);
 
         const hand = new THREE.Mesh(new THREE.SphereGeometry(0.068, 16, 14), skinMat);
         hand.scale.set(0.82, 1.18, 0.94);
@@ -2330,7 +2114,6 @@
       const rightArmPivot = buildRoundedArm(1);
       upperBodyGroup.add(leftArmPivot, rightArmPivot);
 
-      // 資訊工程師 / 醫檢師專屬智慧筆電
       const laptopGroup = new THREE.Group();
       const laptopBase = new THREE.Mesh(
         new THREE.BoxGeometry(0.04, 0.24, 0.32),
@@ -2345,7 +2128,6 @@
       laptopGroup.position.set(-0.07, -0.46, 0.05);
       leftArmPivot.add(laptopGroup);
 
-      // 患者專屬住院識別手環
       const wristband = new THREE.Mesh(
         new THREE.TorusGeometry(0.072, 0.014, 8, 16),
         new THREE.MeshStandardMaterial({ color: 0xf43f5e, emissive: 0xf43f5e, emissiveIntensity: 0.3 })
@@ -2380,11 +2162,6 @@
         legMesh.castShadow = true;
         legPivot.add(legMesh);
 
-        const ankleCuff = new THREE.Mesh(new THREE.TorusGeometry(0.092, 0.015, 10, 18), pantsMat);
-        ankleCuff.rotation.x = Math.PI / 2;
-        ankleCuff.position.y = -0.53;
-        legPivot.add(ankleCuff);
-
         const shoeUpper = new THREE.Mesh(shoeUpperGeom, shoeMat);
         shoeUpper.rotation.x = Math.PI / 2;
         shoeUpper.scale.set(1.02, 1.0, 0.72);
@@ -2417,7 +2194,6 @@
       player.rightLeg = rightLegPivot;
     }
 
-    // 即時套用選擇的角色身分外觀與數值
     function applyCharacterRole(roleId) {
       const role = CHARACTER_ROLES.find((r) => r.id === roleId) || CHARACTER_ROLES[0];
       gameState.selectedRoleId = role.id;
@@ -2441,7 +2217,6 @@
         player.accessories.idBadge.visible = role.id !== 'patient';
       }
 
-      // 更新遊戲中右上角 HUD 數值
       document.getElementById('hud-cash').textContent = `$${String(role.cash).padStart(7, '0')}`;
       document.getElementById('hud-health-bar').style.width = `${role.health}%`;
       document.getElementById('hud-armor-bar').style.width = `${role.armor}%`;
@@ -2450,12 +2225,12 @@
 
     function createDrivableVehicles() {
       const ambBuilt = createAmbulanceMesh();
-      ambBuilt.group.position.set(-10.5, 0, 1.6);
+      ambBuilt.group.position.set(-10.5, 0, 1.8);
       ambBuilt.group.rotation.y = Math.PI / 2;
       scene.add(ambBuilt.group);
 
       vehicles.push({
-        name: '秀傳醫療救護車',
+        name: '幸運草醫療救護車',
         isAmbulance: true,
         mesh: ambBuilt.group,
         wheels: ambBuilt.wheels,
@@ -2475,12 +2250,12 @@
       });
 
       const sedanBuilt = createSportsSedanMesh(0x38bdf8);
-      sedanBuilt.group.position.set(21.0, 0, 22.0);
+      sedanBuilt.group.position.set(16.0, 0, 22.0);
       sedanBuilt.group.rotation.y = Math.PI;
       scene.add(sedanBuilt.group);
 
       vehicles.push({
-        name: '彰濱 GT 運動房車',
+        name: '幸運草 GT 運動房車',
         isAmbulance: false,
         mesh: sedanBuilt.group,
         wheels: sedanBuilt.wheels,
@@ -2518,10 +2293,6 @@
     function triggerEnterLobby1F() {
       if (mainEntrance.isTransitioning) return;
       mainEntrance.isTransitioning = true;
-
-      if (document.pointerLockElement) {
-        document.exitPointerLock();
-      }
 
       const overlay = document.getElementById('enter-lobby-overlay');
       overlay.classList.remove('hidden');
@@ -2607,10 +2378,10 @@
       if (player.inVehicle) toggleVehicleEnterExit();
 
       if (spawnKey === 'entrance') {
-        player.pos.set(0, 0, 9.2);
+        player.pos.set(mainEntrance.x, 0, 11.5);
         player.yaw = Math.PI;
-        camState.targetYaw = 0;
-        camState.targetPitch = 0.23;
+        camState.targetYaw = -0.18;
+        camState.targetPitch = 0.20;
       } else if (spawnKey === 'ambulance') {
         const amb = vehicles[0];
         player.pos.set(amb.pos.x, 0, amb.pos.z + 3.4);
@@ -2618,7 +2389,7 @@
         camState.targetYaw = 0.22;
         camState.targetPitch = 0.23;
       } else if (spawnKey === 'monument') {
-        player.pos.set(0, 0, 21.5);
+        player.pos.set(2, 0, 26.5);
         player.yaw = Math.PI;
         camState.targetYaw = 0;
         camState.targetPitch = 0.24;
@@ -2723,8 +2494,8 @@
       const targetOpen = shouldOpenDoors ? 1 : 0;
       mainEntrance.doorOpenRatio += (targetOpen - mainEntrance.doorOpenRatio) * Math.min(1, dt * 8);
       if (mainEntrance.leftDoor && mainEntrance.rightDoor) {
-        mainEntrance.leftDoor.position.x = -1.04 - mainEntrance.doorOpenRatio * 1.18;
-        mainEntrance.rightDoor.position.x = 1.04 + mainEntrance.doorOpenRatio * 1.18;
+        mainEntrance.leftDoor.position.x = mainEntrance.x - 1.04 - mainEntrance.doorOpenRatio * 1.18;
+        mainEntrance.rightDoor.position.x = mainEntrance.x + 1.04 + mainEntrance.doorOpenRatio * 1.18;
       }
 
       const promptEl = document.getElementById('interaction-prompt');
@@ -2761,7 +2532,7 @@
           player.yaw = normalizeAngle(player.yaw + diff * Math.min(1, dt * 22));
         } else {
           crosshairRing.style.transform = 'scale(1.0)';
-          if (!camState.isPointerLocked) crosshairEl.classList.add('hidden');
+          crosshairEl.classList.add('hidden');
         }
 
         if (moveLen > 0.001 && !mainEntrance.isTransitioning) {
@@ -2773,7 +2544,7 @@
             const diff = normalizeAngle(targetYaw - player.yaw);
             player.yaw = normalizeAngle(player.yaw + diff * Math.min(1, dt * 20));
 
-            if (forwardInput > 0 && rightInput !== 0 && camState.mouseIdleTime > 0.45 && !camState.isDragging) {
+            if (forwardInput > 0 && rightInput !== 0 && camState.mouseIdleTime > 0.45 && !camState.isLeftDragging) {
               camState.targetYaw -= rightInput * dt * 0.65;
             }
           }
@@ -2906,7 +2677,7 @@
           w.rotation.x += v.speed * dt * 2.2;
         });
 
-        if (Math.abs(v.speed) > 1.2 && camState.mouseIdleTime > 1.2 && !camState.isDragging) {
+        if (Math.abs(v.speed) > 1.2 && camState.mouseIdleTime > 1.2 && !camState.isLeftDragging) {
           const followYaw = v.yaw + Math.PI;
           const yawDiff = normalizeAngle(followYaw - camState.targetYaw);
           camState.targetYaw += yawDiff * Math.min(1, dt * 3.0);
@@ -3002,25 +2773,20 @@
         mctx.fillRect(rx, rz, ww * scale, wd * scale);
       }
 
-      drawWorldRect(0, 46, 300, 24, '#3b4452');
+      drawWorldRect(0, 50, 300, 24, '#3b4452');
       drawWorldRect(-75, -10, 18, 240, '#3b4452');
       drawWorldRect(75, -10, 18, 240, '#3b4452');
 
-      drawWorldRect(-21, 17.5, 7.6, 36.5, '#475569');
-      drawWorldRect(21, 17.5, 7.6, 36.5, '#475569');
-      drawWorldRect(0, 1.6, 49.6, 6.8, '#475569');
-
-      drawWorldRect(3, -33, 54, 20, '#b85c38');
-      drawWorldRect(-25.5, -15.5, 26, 20, '#c86d44');
-      drawWorldRect(25.5, -15.5, 26, 20, '#c86d44');
-      drawWorldRect(-47.5, -19.5, 18, 18, '#c86d44');
-      drawWorldRect(47.5, -19.5, 18, 18, '#c86d44');
-      drawWorldRect(0, 1.2, 28, 9.6, 'rgba(226, 214, 190, 0.55)');
-      drawWorldRect(0, 15.0, 29, 2.0, '#4ade80');
+      drawWorldRect(6.5, 15.5, 66, 36, '#475569');
+      drawWorldRect(2, -32, 54, 20, '#b85c38');
+      drawWorldRect(-27.5, -14.5, 24, 18, '#b95c38');
+      drawWorldRect(21.8, -13.5, 37.5, 18, '#b95c38');
+      drawWorldRect(-8.5, 0.8, 22.5, 9.2, 'rgba(216, 207, 192, 0.65)');
+      drawWorldRect(2, 33.5, 29, 2.0, '#4ade80');
 
       mctx.fillStyle = '#38bdf8';
       mctx.beginPath();
-      mctx.arc((0 - px) * scale, (-15 - pz) * scale, 10.5 * scale, 0, Math.PI * 2);
+      mctx.arc((-4.5 - px) * scale, (-13.5 - pz) * scale, 11.2 * scale, 0, Math.PI * 2);
       mctx.fill();
 
       mctx.fillStyle = '#10b981';
@@ -3063,7 +2829,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 11. 場景初始化、事件監聽與主迴圈 (直接進入遊戲)
+    // 11. 場景初始化、事件監聽與主迴圈（無須鎖定滑鼠，按住滑鼠左鍵拖曳旋轉視角）
     // --------------------------------------------------------------------------
     function initScene() {
       const canvas = document.getElementById('game-canvas');
@@ -3081,7 +2847,7 @@
       scene.fog = new THREE.FogExp2(0x8ec5f0, 0.0028);
 
       camera = new THREE.PerspectiveCamera(56, window.innerWidth / window.innerHeight, 0.2, 450);
-      camera.position.set(0.35, 3.35, 17.2);
+      camera.position.set(-4.5, 3.35, 19.5);
 
       renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -3114,16 +2880,16 @@
       scene.add(ground);
 
       const plazaMat = new THREE.MeshStandardMaterial({ color: 0xbec5cc, roughness: 0.78 });
-      const plaza = new THREE.Mesh(new THREE.PlaneGeometry(118, 56), plazaMat);
+      const plaza = new THREE.Mesh(new THREE.PlaneGeometry(126, 62), plazaMat);
       plaza.rotation.x = -Math.PI / 2;
-      plaza.position.set(0, 0.015, 6);
+      plaza.position.set(0, 0.015, 8);
       plaza.receiveShadow = true;
       scene.add(plaza);
 
       setBottomRightLoader({
         visible: true,
         title: '園區 3D 場景載入中',
-        subtitle: '建構彰濱秀傳醫療大樓與迎賓車道...',
+        subtitle: '建構幸運草醫療大樓與迎賓迴廊...',
         percent: 62,
         spinning: true
       });
@@ -3147,21 +2913,19 @@
       setBottomRightLoader({
         visible: true,
         title: '園區連線完成',
-        subtitle: '歡迎進入彰濱秀傳健康園區！',
+        subtitle: '歡迎進入幸運草醫院健康園區！',
         percent: 100,
         spinning: false
       });
 
       setTimeout(() => {
         setBottomRightLoader({ visible: false });
-        showToast('歡迎進入彰濱秀傳健康園區（靠近大門自動連接 1F.html）');
+        showToast('歡迎進入幸運草醫院健康園區（按住滑鼠左鍵拖曳旋轉視角）');
       }, 650);
     }
 
     function bindEvents() {
       const canvas = document.getElementById('game-canvas');
-      const camBadge = document.getElementById('hud-cam-badge');
-      const crosshair = document.getElementById('crosshair-dot');
 
       window.addEventListener('keydown', (e) => {
         keys[e.code] = true;
@@ -3175,10 +2939,10 @@
           showToast(ambulanceSirenOn ? '🚨 救護車紅藍警示燈：開啟' : '救護車紅藍警示燈：關閉');
         } else if (e.code === 'KeyR') {
           if (player.inVehicle) toggleVehicleEnterExit();
-          player.pos.set(0, 0, 9.2);
+          player.pos.set(mainEntrance.x, 0, 11.5);
           player.vel.set(0, 0, 0);
-          camState.targetYaw = 0;
-          camState.targetPitch = 0.23;
+          camState.targetYaw = -0.18;
+          camState.targetPitch = 0.20;
           camState.presetIndex = 1;
           camState.targetDistance = camPresets[1].dist;
           showToast('已重置角色至大門口車道前方');
@@ -3191,74 +2955,45 @@
 
       canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
-      document.addEventListener('pointerlockchange', () => {
-        camState.isPointerLocked = document.pointerLockElement === canvas;
-        if (camState.isPointerLocked) {
-          camBadge.textContent = '🎯 自由視角已鎖定 (ESC 釋放 ｜ 右鍵越肩)';
-          camBadge.className = 'mt-1 px-2.5 py-0.5 rounded-full bg-emerald-950/85 border border-emerald-400/40 text-[11px] font-medium text-emerald-200';
-          crosshair.classList.remove('hidden');
-        } else {
-          camBadge.textContent = '🖱️ 點擊畫面 360° 自由視角 ｜ 右鍵越肩';
-          camBadge.className = 'mt-1 px-2.5 py-0.5 rounded-full bg-sky-950/80 border border-sky-400/30 text-[11px] font-medium text-sky-200';
-          if (!camState.isRightAiming) crosshair.classList.add('hidden');
-        }
-      });
-
-      let downX = 0;
-      let downY = 0;
-
+      // 無須鎖定滑鼠：按住滑鼠左鍵拖曳即可旋轉視角；按住右鍵進入越肩瞄準
       canvas.addEventListener('mousedown', (e) => {
-        camState.isDragging = true;
         camState.lastMouseX = e.clientX;
         camState.lastMouseY = e.clientY;
-        downX = e.clientX;
-        downY = e.clientY;
 
-        if (e.button === 2 && !player.inVehicle) {
+        if (e.button === 0) {
+          camState.isLeftDragging = true;
+        } else if (e.button === 2 && !player.inVehicle) {
           camState.isRightAiming = true;
         }
       });
 
       window.addEventListener('mousemove', (e) => {
-        if (camState.isPointerLocked) {
-          const mx = e.movementX || 0;
-          const my = e.movementY || 0;
-          const sens = camState.isRightAiming ? 0.0022 : 0.0031;
-          camState.targetYaw -= mx * sens;
-          camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + my * 0.0025, 0.04, 1.25);
-          camState.mouseIdleTime = 0;
-          return;
-        }
+        if (!camState.isLeftDragging && !camState.isRightAiming) return;
 
-        if (!camState.isDragging) return;
         const dx = e.clientX - camState.lastMouseX;
         const dy = e.clientY - camState.lastMouseY;
         camState.lastMouseX = e.clientX;
         camState.lastMouseY = e.clientY;
 
-        camState.targetYaw -= dx * 0.0072;
-        camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * 0.006, 0.04, 1.25);
+        const sensX = camState.isRightAiming ? 0.0052 : 0.0072;
+        const sensY = camState.isRightAiming ? 0.0045 : 0.0060;
+
+        camState.targetYaw -= dx * sensX;
+        camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * sensY, 0.04, 1.25);
         camState.mouseIdleTime = 0;
       });
 
       window.addEventListener('mouseup', (e) => {
-        const moveDist = Math.hypot(e.clientX - downX, e.clientY - downY);
-        camState.isDragging = false;
-
-        if (e.button === 2) {
+        if (e.button === 0) {
+          camState.isLeftDragging = false;
+        } else if (e.button === 2) {
           camState.isRightAiming = false;
         }
+      });
 
-        if (e.target === canvas && e.button === 0 && moveDist < 5 && !camState.isPointerLocked) {
-          if (canvas.requestPointerLock) {
-            try {
-              const promise = canvas.requestPointerLock();
-              if (promise && typeof promise.catch === 'function') {
-                promise.catch(() => {});
-              }
-            } catch (err) {}
-          }
-        }
+      window.addEventListener('blur', () => {
+        camState.isLeftDragging = false;
+        camState.isRightAiming = false;
       });
 
       canvas.addEventListener(
@@ -3274,7 +3009,7 @@
         'touchstart',
         (e) => {
           if (e.touches.length === 1) {
-            camState.isDragging = true;
+            camState.isLeftDragging = true;
             camState.lastMouseX = e.touches[0].clientX;
             camState.lastMouseY = e.touches[0].clientY;
           }
@@ -3285,7 +3020,7 @@
       canvas.addEventListener(
         'touchmove',
         (e) => {
-          if (camState.isDragging && e.touches.length === 1) {
+          if (camState.isLeftDragging && e.touches.length === 1) {
             const dx = e.touches[0].clientX - camState.lastMouseX;
             const dy = e.touches[0].clientY - camState.lastMouseY;
             camState.lastMouseX = e.touches[0].clientX;
@@ -3299,7 +3034,7 @@
       );
 
       canvas.addEventListener('touchend', () => {
-        camState.isDragging = false;
+        camState.isLeftDragging = false;
       });
 
       document.querySelectorAll('.time-btn').forEach((btn) => {
@@ -3317,21 +3052,21 @@
 
       document.getElementById('tp-plaza').addEventListener('click', () => {
         if (player.inVehicle) toggleVehicleEnterExit();
-        player.pos.set(0, 0, 9.2);
-        camState.targetYaw = 0;
-        camState.targetPitch = 0.22;
-        camState.targetDistance = 8.8;
+        player.pos.set(mainEntrance.x, 0, 11.5);
+        camState.targetYaw = -0.18;
+        camState.targetPitch = 0.20;
+        camState.targetDistance = 8.6;
         showToast('視角切換：1F 大門口迎賓車道前方');
       });
 
       document.getElementById('tp-ambulance').addEventListener('click', () => {
         if (player.inVehicle) toggleVehicleEnterExit();
         const amb = vehicles[0];
-        player.pos.set(amb.pos.x, 0, amb.pos.z + 3.2);
-        camState.targetYaw = 0.25;
-        camState.targetPitch = 0.25;
+        player.pos.set(amb.pos.x, 0, amb.pos.z + 3.4);
+        camState.targetYaw = 0.22;
+        camState.targetPitch = 0.23;
         camState.targetDistance = 10.2;
-        showToast('已傳送至秀傳醫療救護車旁（按 F 上車）');
+        showToast('已傳送至幸運草醫療救護車旁（按 F 上車）');
       });
 
       document.getElementById('tp-aerial').addEventListener('click', () => {
