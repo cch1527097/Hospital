@@ -115,25 +115,25 @@
   <!-- 載入遮罩 -->
   <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 text-white transition-opacity duration-500">
     <div class="w-16 h-16 border-4 border-teal-400 border-t-amber-400 rounded-full animate-spin mb-4"></div>
-    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">彰濱秀傳紀念醫院 8F 會議與資訊空間 3D 實境</h1>
-    <p id="loading-status-text" class="text-xs sm:text-sm text-slate-300">正在載入 黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理、廁所如廁NPC與資訊室感應電動門...</p>
+    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">彰濱秀傳紀念醫院 會議與資訊空間 3D 實境</h1>
+    <p id="loading-status-text" class="text-xs sm:text-sm text-slate-300">正在載入 黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理、洗手間如廁NPC與資訊室感應電動門...</p>
   </div>
 
-  <!-- 頂部橫向：B1 ~ 8F 全院樓層與 8F 各區域快速導覽列 -->
+  <!-- 頂部橫向：全院樓層與頂樓各區域快速導覽列 -->
   <div class="fixed top-2.5 left-1/2 -translate-x-1/2 z-20 w-[97vw] max-w-6xl">
     <div class="hud-glass rounded-full px-2.5 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-xl">
       <span class="shrink-0 px-2 py-0.5 rounded-full bg-indigo-500/35 border border-indigo-400/60 text-[11px] font-black text-indigo-200">
-        🏛️ 8F 頂樓會議/資訊處
+        🏛️ 頂樓會議/資訊處
       </span>
-      <button data-zone="f8_here" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-indigo-400/95 hover:bg-indigo-300 text-slate-950 transition">📍 8F 現在位置</button>
+      <button data-zone="f8_here" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-indigo-400/95 hover:bg-indigo-300 text-slate-950 transition">📍 現在位置</button>
       <button data-zone="f8_round_conf" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-amber-500/45 hover:bg-amber-400 hover:text-slate-950 text-amber-100 border border-amber-300/70 transition">👑 大圓桌會議室 (總裁/執行長/總經理/協理)</button>
       <button data-zone="f8_medici_1" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-sky-500/40 hover:bg-sky-400 hover:text-slate-950 text-sky-100 border border-sky-300/60 transition">🏛️ 美帝奇會議室一 (U型桌)</button>
       <button data-zone="f8_medici_2" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-pink-500/40 hover:bg-pink-400 hover:text-slate-950 text-pink-100 border border-pink-300/60 transition">🏛️ 美帝奇會議室二 (U型桌)</button>
-      <button data-zone="f8_large_conf" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-blue-500/35 hover:bg-blue-400 hover:text-slate-950 text-blue-200 border border-blue-400/50 transition">🏢 8F 大型會議室 (U型桌)</button>
-      <button data-zone="f8_pantry_wc" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-emerald-500/35 hover:bg-emerald-400 hover:text-slate-950 text-emerald-200 border border-emerald-400/50 transition">🚻 開放式廁所及茶水間</button>
+      <button data-zone="f8_large_conf" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-blue-500/35 hover:bg-blue-400 hover:text-slate-950 text-blue-200 border border-blue-400/50 transition">🏢 大型會議室 (U型桌)</button>
+      <button data-zone="f8_pantry_wc" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-emerald-500/35 hover:bg-emerald-400 hover:text-slate-950 text-emerald-200 border border-emerald-400/50 transition">🚻 美蒂琪吧檯</button>
       <button data-zone="f8_it" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-cyan-500/35 hover:bg-cyan-400 hover:text-slate-950 text-cyan-200 border border-cyan-400/50 transition">🚪 資訊處 (感應電動門進出)</button>
       <button data-zone="f8_atrium" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/30 hover:bg-amber-400 hover:text-slate-950 text-amber-200 border border-amber-400/40 transition">🛋️ 中央開放交流中庭</button>
-      <button data-zone="f8_elevator" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-teal-500/30 hover:bg-teal-400 hover:text-slate-950 text-teal-200 border border-teal-400/40 transition">🛗 8F 中央電梯廳</button>
+      <button data-zone="f8_elevator" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-teal-500/30 hover:bg-teal-400 hover:text-slate-950 text-teal-200 border border-teal-400/40 transition">🛗 中央電梯廳</button>
 
       <span class="shrink-0 px-2 py-0.5 rounded-full bg-amber-500/25 border border-amber-400/50 text-[11px] font-black text-amber-200 ml-1">
         🔗 電梯樓層直達
@@ -145,14 +145,13 @@
       <button data-link-floor="5F" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-emerald-400 hover:text-slate-950 text-emerald-200 transition">5F</button>
       <button data-link-floor="6F" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-400 hover:text-slate-950 text-teal-200 transition">6F</button>
       <button data-link-floor="7F" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-purple-400 hover:text-slate-950 text-purple-200 transition">7F</button>
-      <button data-link-floor="8F" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-indigo-500/40 hover:bg-indigo-400 hover:text-slate-950 text-indigo-100 border border-indigo-300/50 transition">8F</button>
     </div>
   </div>
 
   <!-- 操作提示膠囊 -->
   <div class="fixed top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-max max-w-[95vw]">
     <div id="control-hint-pill" class="hud-glass px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-teal-200 border border-teal-400/35 shadow-lg text-center">
-      👑 大圓桌會議室：黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理 ｜ 👊 點擊NPC或按 J / K 直接攻擊全場人員（已取消對話功能）
+      👑 大圓桌會議室：黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理 ｜ 👊 點擊NPC或按 J / K 直接攻擊全場人員
     </div>
   </div>
 
@@ -162,7 +161,7 @@
       <div class="flex items-center justify-between gap-2">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-teal-400 shadow-[0_0_8px_#2dd4bf]"></span>
-          <span class="font-bold text-xs sm:text-sm text-teal-200">彰濱秀傳 8F 實境控制台</span>
+          <span class="font-bold text-xs sm:text-sm text-teal-200">彰濱秀傳 頂樓實境控制台</span>
         </div>
         <button id="btn-toggle-help" class="px-2 py-0.5 text-[11px] rounded bg-white/10 hover:bg-white/20 text-slate-200">
           收合
@@ -187,7 +186,7 @@
         </div>
 
         <button id="btn-open-elevator" class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-teal-700/85 hover:bg-teal-600 border border-teal-300/40 text-white transition">
-          <span>🛗 搭乘電梯 (B1 ~ 8F)</span>
+          <span>🛗 搭乘電梯 (B1 ~ 7F)</span>
           <span class="px-1.5 py-0.5 rounded bg-black/30 text-[10px]">接觸 / E 鍵</span>
         </button>
 
@@ -230,7 +229,7 @@
       14:20
     </div>
     <div id="hud-combo-badge" class="gta-font gta-shadow text-sm sm:text-base font-bold text-emerald-400 leading-tight mt-0.5">
-      健保卡已連線・8F 最高樓層會議/資訊處
+      健保卡已連線・頂樓會議/資訊處
     </div>
 
     <!-- 生命值 & 護甲狀態條 -->
@@ -259,19 +258,19 @@
     <!-- 目前所在空間徽章 -->
     <div class="mt-1.5 px-3 py-1 rounded-xl hud-glass border-l-4 border-pink-500 text-right shadow-lg">
       <div class="text-[10px] text-slate-400 font-medium">現在位置 You Are Here</div>
-      <div id="current-zone-label" class="text-xs sm:text-sm font-black text-white">8F 大圓桌會議室前走廊・高階主管會議進行中</div>
+      <div id="current-zone-label" class="text-xs sm:text-sm font-black text-white">大圓桌會議室前走廊・高階主管會議進行中</div>
     </div>
   </div>
 
   <!-- 浮動傷害數字與 NPC 血條覆蓋層 -->
   <div id="floating-fx-layer" class="fixed inset-0 z-10 pointer-events-none overflow-hidden"></div>
 
-  <!-- 中央下方：僅在靠近電梯感應區時顯示互動提示（已移除 NPC 對話提示） -->
+  <!-- 中央下方：僅在靠近電梯感應區時顯示互動提示 -->
   <button id="elevator-prompt" class="hidden fixed bottom-36 sm:bottom-12 left-1/2 z-20 px-5 py-2.5 rounded-xl hud-glass border border-teal-400/50 text-white font-bold text-xs sm:text-sm shadow-2xl prompt-float">
-    按 <span class="px-2 py-0.5 mx-1 rounded bg-teal-400 text-slate-950 font-black">E</span> 開啟 <span id="prompt-elevator-name" class="text-amber-300">8F 中央四座電梯廳 (B1 ~ 8F)</span>
+    按 <span class="px-2 py-0.5 mx-1 rounded bg-teal-400 text-slate-950 font-black">E</span> 開啟 <span id="prompt-elevator-name" class="text-amber-300">中央四座電梯廳 (B1 ~ 7F)</span>
   </button>
 
-  <!-- 電梯 B1~8F 樓層選擇視窗 Modal（僅用於電梯樓層切換，不提供 NPC 對話） -->
+  <!-- 電梯 B1~7F 樓層選擇視窗 Modal -->
   <div id="elevator-modal" class="hidden fixed inset-0 z-40 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
     <div class="hud-glass w-full max-w-xl rounded-2xl p-5 text-white border border-teal-400/40 shadow-2xl">
       <div class="flex items-center justify-between gap-3 pb-3 border-b border-white/15">
@@ -280,8 +279,8 @@
             🛗
           </div>
           <div>
-            <h3 id="elv-name" class="font-black text-base sm:text-lg text-amber-300">8F 中央四座電梯廳・全院樓層直達選單</h3>
-            <p class="text-xs text-teal-300 font-medium">目前所在：8F 會議中心與資訊處（8F 為本棟最高樓層，無 9F 以上樓層）</p>
+            <h3 id="elv-name" class="font-black text-base sm:text-lg text-amber-300">中央四座電梯廳・全院樓層直達選單</h3>
+            <p class="text-xs text-teal-300 font-medium">目前所在：頂樓會議中心與資訊處</p>
           </div>
         </div>
         <button id="elv-close-btn" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-rose-500/80 text-xs font-bold transition">
@@ -295,14 +294,14 @@
     </div>
   </div>
 
-  <!-- 左下角：8F 平面圖雷達小地圖 -->
+  <!-- 左下角：頂樓平面圖雷達小地圖 -->
   <div id="minimap-shell" class="fixed bottom-4 left-4 z-20 w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden bg-amber-50">
     <canvas id="minimap-canvas" width="220" height="220" class="w-full h-full block"></canvas>
     <div class="absolute top-1 left-1/2 -translate-x-1/2 px-1.5 rounded bg-slate-900/85 text-[10px] font-black text-teal-300 pointer-events-none">
       N
     </div>
     <div id="minimap-floor-label" class="absolute bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-slate-900/85 text-[9px] font-bold text-white pointer-events-none">
-      8F 會議空間平面圖
+      會議空間平面圖
     </div>
   </div>
 
@@ -337,15 +336,7 @@
   <script>
     /**
      * ============================================================================
-     * 彰濱秀傳紀念醫院 8F 醫療與會議資訊空間 3D 實境（純戰鬥互動版）
-     * 更新重點：
-     * 1. 【主管姓名全面更新】：
-     *    - 黃合合 總裁、黃媛媛 執行長、劉玲 總經理、郭盛名 協理
-     *    - 配置於「8F 大圓桌會議室」主座區進行體系營運決策會議。
-     * 2. 【取消所有 NPC 對話視窗功能，開放全體 NPC 近戰攻擊與反擊】：
-     *    - 移除 NPC 對話視窗、對話選項與交談提示，點擊 NPC 可直接步行靠近並揮拳攻擊，
-     *      或直接按 J（三連擊）/ K（重擊）/ 畫面攻擊按鈕攻擊任何一位 NPC（含總裁、執行長、總經理、協理及全場人員）。
-     *    - 受擊後 NPC 會進入敵對反擊狀態，觸發院區通緝星級與保全支援壓制。
+     * 彰濱秀傳紀念醫院 頂樓醫療與會議資訊空間 3D 實境（完整整合版）
      * ============================================================================
      */
 
@@ -393,7 +384,7 @@
     let transportPromptCooldown = false;
     let isTransportModalOpen = false;
 
-    // 樓層對應外部 HTML 連結設定表
+    // 樓層對應外部 HTML 連結設定表（僅保留 B1 ~ 7F）
     const FLOOR_HTML_LINKS = [
       { code: 'B1', keyDigit: 'Digit0', numHint: '0', file: 'B1.html', title: 'B1 地下一樓', desc: '美食街・停車場・核子醫學中心・放射腫瘤中心', badgeBg: 'bg-slate-600/40 border-slate-300/50 text-slate-100' },
       { code: '1F', keyDigit: 'Digit1', numHint: '1', file: '1F.html', title: '1F 一樓大廳', desc: '入口門廳・批價掛號・門診區(1~27診)・急診室・放射科', badgeBg: 'bg-sky-500/30 border-sky-300/50 text-sky-100' },
@@ -401,8 +392,7 @@
       { code: '3F', keyDigit: 'Digit3', numHint: '3', file: '3F.html', title: '3F 三樓醫療層', desc: '睡眠中心 (353~363)・婦產科 VIP 病房・班廷俱樂部 / 眼科', badgeBg: 'bg-pink-500/30 border-pink-300/50 text-pink-100' },
       { code: '5F', keyDigit: 'Digit5', numHint: '5', file: '5F.html', title: '5F 五樓病房層', desc: '517~563 住院病房・537 正壓隔離病房・祈禱室 / 神明廳', badgeBg: 'bg-emerald-500/30 border-emerald-300/50 text-emerald-100' },
       { code: '6F', keyDigit: 'Digit6', numHint: '6', file: '6F.html', title: '6F 六樓病房層', desc: '610~663 住院病房・雙圓弧護理站島・南側半圓弧展望廳', badgeBg: 'bg-teal-500/30 border-teal-300/50 text-teal-100' },
-      { code: '7F', keyDigit: 'Digit7', numHint: '7', file: '7F.html', title: '7F 七樓 VIP 層', desc: '732/733/735~755 VIP 尊榮病房・全景交誼廳・商務中心', badgeBg: 'bg-purple-500/35 border-purple-300/50 text-purple-100' },
-      { code: '8F', keyDigit: 'Digit8', numHint: '8', file: '8F.html', title: '8F 八樓會議中心與資訊處（最高樓層）', desc: '美帝奇會議室一/二・大圓桌會議室・大型會議室・資訊處與機房', badgeBg: 'bg-indigo-500/45 border-indigo-300 text-indigo-100' }
+      { code: '7F', keyDigit: 'Digit7', numHint: '7', file: '7F.html', title: '7F 七樓 VIP 層', desc: '732/733/735~755 VIP 尊榮病房・全景交誼廳・商務中心', badgeBg: 'bg-purple-500/35 border-purple-300/50 text-purple-100' }
     ];
 
     // 戰鬥視覺特效、單擊地面波紋標記與自動導航點
@@ -452,7 +442,7 @@
       totalHitsLanded: 0
     };
 
-    // 自由滑鼠相機狀態（無須鎖定滑鼠，按住左鍵拖曳移動即自由旋轉視角）
+    // 自由滑鼠相機狀態（按住左鍵拖曳移動即自由旋轉視角）
     const camState = {
       yaw: Math.PI * 0.5,
       targetYaw: Math.PI * 0.5,
@@ -480,17 +470,17 @@
     const mouseNDC = new THREE.Vector2();
     const floorHitPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -FLOOR_Y[8]);
 
-    // 8F 快速傳送座標表
+    // 快速傳送座標表（已將「開放式廁所及茶水間」更新為「美蒂琪吧檯」，並移除 8F 字樣）
     const ZONES = {
-      f8_here:       { label: '8F 大圓桌會議室前走廊・高階主管會議入口', pos: new THREE.Vector3(-22.8, 27.6, -17.75), yaw: -Math.PI * 0.5 },
-      f8_round_conf: { label: '8F 大圓桌會議室 (黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理)', pos: new THREE.Vector3(-28.6, 27.6, -17.75), yaw: -Math.PI * 0.5 },
-      f8_medici_1:   { label: '8F 美帝奇會議室一 (U型會議桌・投影大布幕・醫護會議)', pos: new THREE.Vector3(21.5, 27.6, -19.5), yaw: Math.PI * 0.5 },
-      f8_medici_2:   { label: '8F 美帝奇會議室二 (U型會議桌・投影大布幕・跨科討論)', pos: new THREE.Vector3(21.5, 27.6, -1.5), yaw: Math.PI * 0.5 },
-      f8_large_conf: { label: '8F 大型會議室 (大型U型會議桌・投影機大布幕・全院研討)', pos: new THREE.Vector3(-16.0, 27.6, -34.0), yaw: -Math.PI * 0.5 },
-      f8_pantry_wc:  { label: '8F 開放式廁所及茶水間 (多位如廁與洗手NPC)', pos: new THREE.Vector3(-27.2, 27.6, 10.3), yaw: -Math.PI * 0.5 },
-      f8_it:         { label: '8F 資訊處 / 開放式機房 (感應式自動電動門進出)', pos: new THREE.Vector3(8.5, 27.6, 11.7), yaw: Math.PI * 0.5 },
-      f8_atrium:     { label: '8F 中央開放式交流中庭', pos: new THREE.Vector3(-2.0, 27.6, 6.2), yaw: 0 },
-      f8_elevator:   { label: '8F 中央四座電梯廳', pos: new THREE.Vector3(-16.2, 27.6, -12.5), yaw: Math.PI * 0.5 }
+      f8_here:       { label: '大圓桌會議室前走廊・高階主管會議入口', pos: new THREE.Vector3(-22.8, 27.6, -17.75), yaw: -Math.PI * 0.5 },
+      f8_round_conf: { label: '大圓桌會議室 (黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理)', pos: new THREE.Vector3(-28.6, 27.6, -17.75), yaw: -Math.PI * 0.5 },
+      f8_medici_1:   { label: '美帝奇會議室一 (U型會議桌・投影大布幕・醫護會議)', pos: new THREE.Vector3(21.5, 27.6, -19.5), yaw: Math.PI * 0.5 },
+      f8_medici_2:   { label: '美帝奇會議室二 (U型會議桌・投影大布幕・跨科討論)', pos: new THREE.Vector3(21.5, 27.6, -1.5), yaw: Math.PI * 0.5 },
+      f8_large_conf: { label: '大型會議室 (大型U型會議桌・投影機大布幕・全院研討)', pos: new THREE.Vector3(-16.0, 27.6, -34.0), yaw: -Math.PI * 0.5 },
+      f8_pantry_wc:  { label: '美蒂琪吧檯 (咖啡吧台・洗手間區域)', pos: new THREE.Vector3(-27.2, 27.6, 10.3), yaw: -Math.PI * 0.5 },
+      f8_it:         { label: '資訊處 / 開放式機房 (感應式自動電動門進出)', pos: new THREE.Vector3(8.5, 27.6, 11.7), yaw: Math.PI * 0.5 },
+      f8_atrium:     { label: '中央開放式交流中庭', pos: new THREE.Vector3(-2.0, 27.6, 6.2), yaw: 0 },
+      f8_elevator:   { label: '中央四座電梯廳', pos: new THREE.Vector3(-16.2, 27.6, -12.5), yaw: Math.PI * 0.5 }
     };
 
     // 非阻塞式 Toast 訊息提示
@@ -1831,7 +1821,8 @@
       (activeBuildGroup || scene).add(group);
     }
 
-    function addWardDoorFacade(x, z, roomCode, baseY, isNorthRow = true, isOffice = true) {
+    // 建構北排房間木門（已移除門牌）
+    function addWardDoorFacade(x, z, baseY, isOffice = true) {
       const target = activeBuildGroup || scene;
       const g = new THREE.Group();
       const doorWoodMat = new THREE.MeshStandardMaterial({
@@ -1850,29 +1841,12 @@
       const win = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.95, 0.14), glassMat);
       win.position.set(0, 1.45, 0);
 
-      const plaqueTex = createSignTexture(
-        roomCode,
-        'ADMINISTRATION & TEACHING',
-        '#0f4c5c',
-        '#2dd4bf'
-      );
-      const plaque = new THREE.Mesh(
-        new THREE.BoxGeometry(1.35, 0.42, 0.08),
-        new THREE.MeshStandardMaterial({
-          map: plaqueTex,
-          emissive: 0xffffff,
-          emissiveMap: plaqueTex,
-          emissiveIntensity: 0.35
-        })
-      );
-      plaque.position.set(0, 2.55, isNorthRow ? 0.06 : -0.06);
-      if (!isNorthRow) plaque.rotation.y = Math.PI;
-
-      g.add(door, win, plaque);
+      g.add(door, win);
       g.position.set(x, baseY, z);
       target.add(g);
     }
 
+    // 美帝奇會議室一 & 美帝奇會議室二（已移除會議室招牌，投影布幕標題移除 8F 字樣）
     function buildMediciConferenceRooms(baseY, wallWoodIvoryMat) {
       const target = activeBuildGroup || scene;
 
@@ -1897,8 +1871,6 @@
       addCorridorHandrail(16.95, -26.4, 16.95, -21.4, baseY);
       addCorridorHandrail(16.95, -17.6, 16.95, -12.6, baseY);
 
-      addHangingSign(16.2, baseY + 3.65, -19.5, 6.2, 0.88, '8F 美帝奇會議室一 (MEDICI ROOM 1)', 'U型會議桌・投影大布幕・跨科臨床討論室', '#1d4ed8', '#93c5fd', -Math.PI / 2);
-
       addBacklitWoodSlatWall(42.95, baseY + 2.15, -19.5, 11.6, 4.1, -Math.PI / 2, 36);
       addProjectorAndBigScreen(
         42.68,
@@ -1908,7 +1880,7 @@
         -Math.PI / 2,
         baseY,
         6.8,
-        '8F 美帝奇會議室一・臨床多專科聯合討論會',
+        '美帝奇會議室一・臨床多專科聯合討論會',
         'MEDICI CONFERENCE ROOM 1',
         [
           '1. 內外科暨重症跨團隊病例整合照護報告',
@@ -1942,8 +1914,6 @@
       addCorridorHandrail(16.95, -9.4, 16.95, -3.4, baseY);
       addCorridorHandrail(16.95, 0.4, 16.95, 6.4, baseY);
 
-      addHangingSign(16.2, baseY + 3.65, -1.5, 6.2, 0.88, '8F 美帝奇會議室二 (MEDICI ROOM 2)', 'U型會議桌・投影大布幕・國際學術交流廳', '#9d174d', '#f9a8d4', -Math.PI / 2);
-
       addBacklitWoodSlatWall(42.95, baseY + 2.15, -1.5, 12.6, 4.1, -Math.PI / 2, 38);
       addProjectorAndBigScreen(
         42.68,
@@ -1953,7 +1923,7 @@
         -Math.PI / 2,
         baseY,
         6.8,
-        '8F 美帝奇會議室二・護理品質促進與教學研討',
+        '美帝奇會議室二・護理品質促進與教學研討',
         'MEDICI CONFERENCE ROOM 2',
         [
           '1. 住院病人安全與高警訊藥物雙重核對成效',
@@ -1967,6 +1937,7 @@
       buildUShapedConferenceTableAndChairs(31.2, -1.5, 0, baseY, 7.8, 5.6, '美帝奇會議室二 U型會議桌');
     }
 
+    // 大型會議室（已移除會議室招牌，投影布幕標題移除 8F 字樣）
     function buildLargeConferenceRoom(baseY, wallCreamMat) {
       const target = activeBuildGroup || scene;
 
@@ -1988,21 +1959,18 @@
       borderN.position.set(-16.0, baseY + 0.017, -38.85);
       target.add(nordicWoodFloor, borderS, borderN);
 
-      addWall(-31.0, -34.0, 0.5, 10.2, 4.4, wallCreamMat, '8F 大型會議室西側隔間牆', 8, baseY);
-      addWall(-1.0, -34.0, 0.5, 10.2, 4.4, wallCreamMat, '8F 大型會議室東側隔間牆', 8, baseY);
+      addWall(-31.0, -34.0, 0.5, 10.2, 4.4, wallCreamMat, '大型會議室西側隔間牆', 8, baseY);
+      addWall(-1.0, -34.0, 0.5, 10.2, 4.4, wallCreamMat, '大型會議室東側隔間牆', 8, baseY);
 
-      addWoodGlassViewingWall(-28.55, -28.9, 4.9, 0, baseY, wallCreamMat, '8F 大型會議室南側景觀玻璃窗(西)');
+      addWoodGlassViewingWall(-28.55, -28.9, 4.9, 0, baseY, wallCreamMat, '大型會議室南側景觀玻璃窗(西)');
       addDoubleGlassDoorPortal(-24.5, -28.9, 3.2, 0, baseY);
-      addWoodGlassViewingWall(-16.0, -28.9, 13.8, 0, baseY, wallCreamMat, '8F 大型會議室南側景觀玻璃窗(中)');
+      addWoodGlassViewingWall(-16.0, -28.9, 13.8, 0, baseY, wallCreamMat, '大型會議室南側景觀玻璃窗(中)');
       addDoubleGlassDoorPortal(-7.5, -28.9, 3.2, 0, baseY);
-      addWoodGlassViewingWall(-3.45, -28.9, 4.9, 0, baseY, wallCreamMat, '8F 大型會議室南側景觀玻璃窗(東)');
+      addWoodGlassViewingWall(-3.45, -28.9, 4.9, 0, baseY, wallCreamMat, '大型會議室南側景觀玻璃窗(東)');
 
       addCorridorHandrail(-30.8, -28.58, -26.3, -28.58, baseY);
       addCorridorHandrail(-22.7, -28.58, -9.3, -28.58, baseY);
       addCorridorHandrail(-5.7, -28.58, -1.2, -28.58, baseY);
-
-      addHangingSign(-24.5, baseY + 3.65, -27.5, 5.4, 0.86, '8F 大型會議室 (U型會議桌・投影大布幕)', 'LARGE U-TABLE CONFERENCE HALL (WEST GATE)', '#1d4ed8', '#93c5fd');
-      addHangingSign(-7.5, baseY + 3.65, -27.5, 5.4, 0.86, '8F 大型會議室 (U型會議桌・全院學術會議廳)', 'LARGE U-TABLE CONFERENCE HALL (EAST GATE)', '#1d4ed8', '#93c5fd');
 
       addBacklitWoodSlatWall(-30.65, baseY + 2.15, -34.0, 9.2, 4.1, Math.PI / 2, 34);
 
@@ -2029,7 +1997,7 @@
         Math.PI / 2,
         baseY,
         6.8,
-        '彰濱秀傳 8F 大型會議室・全院醫療品質與臨床教學研討',
+        '彰濱秀傳 大型會議室・全院醫療品質與臨床教學研討',
         'LARGE U-SHAPE CONFERENCE HALL',
         [
           '1. 全院跨科部急重症整合照護與臨床路徑成果',
@@ -2043,6 +2011,7 @@
       buildLargeHallUShapedTableAndChairs(baseY);
     }
 
+    // 大圓桌會議室（投影布幕標題移除 8F 字樣）
     function buildRoundTableRoom(baseY, wallCreamMat) {
       const target = activeBuildGroup || scene;
       const centerX = -34.2;
@@ -2067,11 +2036,11 @@
       brassFloorRing.position.set(centerX, baseY + 0.032, centerZ);
       target.add(herringboneFloor, brassFloorRing);
 
-      addWall(-34.55, -26.0, 17.1, 0.5, 4.4, wallCreamMat, '8F 大圓桌會議室北側隔間牆', 8, baseY);
-      addWall(-34.55, -9.5, 17.1, 0.5, 4.4, wallCreamMat, '8F 大圓桌會議室南側隔間牆', 8, baseY);
+      addWall(-34.55, -26.0, 17.1, 0.5, 4.4, wallCreamMat, '大圓桌會議室北側隔間牆', 8, baseY);
+      addWall(-34.55, -9.5, 17.1, 0.5, 4.4, wallCreamMat, '大圓桌會議室南側隔間牆', 8, baseY);
 
-      addWoodGlassViewingWall(-26.0, -22.775, 6.45, Math.PI / 2, baseY, wallCreamMat, '8F 大圓桌會議室東側景觀窗(北)');
-      addWoodGlassViewingWall(-26.0, -12.725, 6.45, Math.PI / 2, baseY, wallCreamMat, '8F 大圓桌會議室東側景觀窗(南)');
+      addWoodGlassViewingWall(-26.0, -22.775, 6.45, Math.PI / 2, baseY, wallCreamMat, '大圓桌會議室東側景觀窗(北)');
+      addWoodGlassViewingWall(-26.0, -12.725, 6.45, Math.PI / 2, baseY, wallCreamMat, '大圓桌會議室東側景觀窗(南)');
 
       addBacklitWoodSlatWall(-26.0, baseY + 2.2, -19.8, 0.65, 4.2, Math.PI / 2, 5);
       addBacklitWoodSlatWall(-26.0, baseY + 2.2, -15.7, 0.65, 4.2, Math.PI / 2, 5);
@@ -2088,7 +2057,7 @@
         Math.PI / 2,
         baseY,
         5.2,
-        '8F 大圓桌會議室・秀傳醫療體系高階決策會議',
+        '大圓桌會議室・秀傳醫療體系高階決策會議',
         'EXECUTIVE ROUND-TABLE BOARDROOM',
         [
           '1. 彰濱秀傳醫療品質提升與智慧醫院發展藍圖',
@@ -2163,10 +2132,11 @@
         cz: centerZ,
         radius: 3.85,
         floor: 8,
-        label: '8F 大圓桌與環形座椅'
+        label: '大圓桌與環形座椅'
       });
     }
 
+    // 洗手間及美蒂琪吧檯（懸吊招牌已更新為「美蒂琪吧檯」與「洗手間」）
     function buildOpenRestroomsAndPantry(baseY, wallWoodMat) {
       const target = activeBuildGroup || scene;
 
@@ -2212,12 +2182,12 @@
         target.add(cord, shade);
       });
 
-      addWall(-34.55, 5.5, 17.1, 0.5, 4.4, wallWoodMat, '8F 開放式廁所北側隔牆', 8, baseY);
-      addWall(-26.0, 6.85, 0.45, 2.7, 4.4, wallWoodMat, '8F 開放式廁所北側木屏風', 8, baseY);
-      addWall(-26.0, 13.75, 0.45, 2.7, 4.4, wallWoodMat, '8F 開放式廁所南側木屏風', 8, baseY);
+      addWall(-34.55, 5.5, 17.1, 0.5, 4.4, wallWoodMat, '洗手間北側隔牆', 8, baseY);
+      addWall(-26.0, 6.85, 0.45, 2.7, 4.4, wallWoodMat, '洗手間北側木屏風', 8, baseY);
+      addWall(-26.0, 13.75, 0.45, 2.7, 4.4, wallWoodMat, '洗手間南側木屏風', 8, baseY);
 
-      addHangingSign(-20.2, baseY + 3.65, 5.5, 7.2, 0.88, '8F 開放式廁所及茶水間', 'OPEN CAFÉ PANTRY & RESTROOMS', '#0f766e', '#fde047');
-      addHangingSign(-26.2, baseY + 3.45, 10.3, 4.2, 0.72, '開放式洗手間・男女/無障礙廁所', 'OPEN-VANITY RESTROOMS', '#9d174d', '#f9a8d4', Math.PI / 2);
+      addHangingSign(-20.2, baseY + 3.65, 5.5, 6.4, 0.88, '美蒂琪吧檯', 'MEDICI CAFÉ BAR & LOUNGE', '#0f766e', '#fde047');
+      addHangingSign(-26.2, baseY + 3.45, 10.3, 3.6, 0.72, '洗手間', 'RESTROOMS', '#9d174d', '#f9a8d4', Math.PI / 2);
 
       const marbleMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.1 });
       const vanityBaseMat = new THREE.MeshStandardMaterial({ color: 0x5c2d0c, roughness: 0.42 });
@@ -2245,7 +2215,7 @@
       });
       vanityGroup.position.set(-28.8, baseY, 10.3);
       target.add(vanityGroup);
-      colliders.push({ minX: -29.45, maxX: -28.15, minZ: 8.6, maxZ: 12.0, floor: 8, label: '開放式洗手間洗手台' });
+      colliders.push({ minX: -29.45, maxX: -28.15, minZ: 8.6, maxZ: 12.0, floor: 8, label: '洗手間洗手台' });
 
       const stallMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.4 });
       const stallDoorMat = new THREE.MeshStandardMaterial({
@@ -2317,7 +2287,7 @@
       const microwave = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.42, 0.48), applianceMat);
       microwave.position.set(-16.2, baseY + 1.16, 14.4);
       target.add(fridge, coffeeMachine, waterDispenser, microwave);
-      colliders.push({ minX: -25.3, maxX: -14.5, minZ: 13.85, maxZ: 15.05, floor: 8, label: '開放式茶水間電器料理台' });
+      colliders.push({ minX: -25.3, maxX: -14.5, minZ: 13.85, maxZ: 15.05, floor: 8, label: '美蒂琪吧檯電器料理台' });
 
       const islandBody = new THREE.Mesh(new THREE.BoxGeometry(6.8, 1.02, 0.95), woodCounterMat);
       islandBody.position.set(-20.0, baseY + 0.51, 10.8);
@@ -2332,7 +2302,7 @@
         stoolLeg.position.set(sx, baseY + 0.35, 9.95);
         target.add(stoolSeat, stoolLeg);
       });
-      colliders.push({ minX: -23.6, maxX: -16.4, minZ: 9.75, maxZ: 11.4, floor: 8, label: '開放式茶水間中島吧台' });
+      colliders.push({ minX: -23.6, maxX: -16.4, minZ: 9.75, maxZ: 11.4, floor: 8, label: '美蒂琪吧檯中島吧台' });
 
       [-22.0, -17.2].forEach((cx) => {
         const cafeTable = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.68, 0.06, 24), stoneTopMat);
@@ -2340,7 +2310,7 @@
         const cafeLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.28, 0.72, 16), chromeMat);
         cafeLeg.position.set(cx, baseY + 0.36, 7.1);
         target.add(cafeTable, cafeLeg);
-        colliders.push({ isCircle: true, cx, cz: 7.1, radius: 0.78, floor: 8, label: '茶水間交流圓桌' });
+        colliders.push({ isCircle: true, cx, cz: 7.1, radius: 0.78, floor: 8, label: '美蒂琪吧檯交流圓桌' });
       });
     }
 
@@ -2387,6 +2357,7 @@
       });
     }
 
+    // 資訊處與開放式機房（已移除上方三座懸吊燈箱招牌）
     function buildITDepartmentAndServerRoom(baseY) {
       const target = activeBuildGroup || scene;
 
@@ -2490,10 +2461,6 @@
       addGlassPartition(27.5, 8.0, 27.5, 13.1, '開放式機房玻璃隔間北段');
       addAutomaticSlidingDoor(27.5, 14.9, 3.6, Math.PI / 2, baseY, '開放式機房自動電動門');
       addGlassPartition(27.5, 16.7, 27.5, 23.2, '開放式機房玻璃隔間南段');
-
-      addHangingSign(9.7, baseY + 3.65, 11.7, 5.2, 0.88, '8F 資訊處・開放式機房 (自動電動門進出)', 'IT DEPARTMENT & OPEN SERVER ROOM', '#0369a1', '#38bdf8', -Math.PI / 2);
-      addHangingSign(19.0, baseY + 3.65, 15.6, 5.6, 0.85, '資訊處・系統研發與維護辦公區', 'SENIOR & MAINTENANCE ENGINEERS', '#0f4c5c', '#2dd4bf', 0);
-      addHangingSign(27.5, baseY + 3.65, 14.9, 4.6, 0.85, '開放式機房 OPEN SERVER ROOM', 'CORE NETWORK & DATA CENTER', '#0f172a', '#38bdf8', -Math.PI / 2);
 
       function buildITWorkstation(wx, wz, rotY, labelText, hasDualMonitor = true) {
         const g = new THREE.Group();
@@ -2657,14 +2624,15 @@
       colliders.push({ minX: 32.3, maxX: 36.7, minZ: 21.5, maxZ: 22.7, floor: 8, label: 'UPS不斷電系統櫃' });
     }
 
+    // 電梯感應區地墊（已移除所有 8F 字樣，顯示前往 B1 ~ 7F）
     function registerTransportZone({ x, z, y, radius, type, name }) {
       const zoneObj = { x, z, y, radius, type, name };
       transportTriggerZones.push(zoneObj);
 
       const colorHex = 0x2dd4bf;
       const padTex = createSignTexture(
-        '🛗 全院電梯感應區 (8F為最高樓層)',
-        '接觸或點擊自動詢問前往 B1 ~ 8F',
+        '🛗 全院電梯感應區',
+        '接觸或點擊自動詢問前往 B1 ~ 7F',
         '#0f4c5c',
         '#5eead4'
       );
@@ -2696,7 +2664,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 2. 建構 8F 完整改造空間
+    // 2. 建構頂樓完整空間
     // --------------------------------------------------------------------------
     function buildFloor8() {
       const warmOakFloorTex = createWoodPlankTexture('warmOak', 24, 20);
@@ -2760,64 +2728,44 @@
 
       buildCeilingFixturesAndLighting(f8Y);
 
-      addWall(0, -39.5, 88, 0.8, 4.5, wallWoodIvoryMat, '8F 北側外牆', 8, f8Y);
-      addWall(-43.5, -12.0, 0.8, 56, 4.5, wallWoodIvoryMat, '8F 西側外牆', 8, f8Y);
-      addWall(43.5, -8.0, 0.8, 64, 4.5, wallWoodIvoryMat, '8F 東側外牆', 8, f8Y);
-      addWall(-28.5, 15.5, 30.0, 0.8, 4.5, wallWoodIvoryMat, '8F 南側西段外牆', 8, f8Y);
-      addWall(26.8, 23.5, 34.0, 0.8, 4.5, wallWoodIvoryMat, '8F 資訊處與開放式機房南側外牆', 8, f8Y);
-      addWall(-2.0, 29.8, 24.0, 0.8, 4.5, glassMat, '8F 南側中央空中展望玻璃牆', 8, f8Y);
-      addWall(-13.8, 22.5, 0.6, 14.5, 4.5, wallWoodIvoryMat, '8F 南側核心西牆', 8, f8Y);
-      addWall(9.8, 22.5, 0.6, 14.5, 4.5, wallWoodIvoryMat, '8F 南側核心東牆', 8, f8Y);
+      addWall(0, -39.5, 88, 0.8, 4.5, wallWoodIvoryMat, '北側外牆', 8, f8Y);
+      addWall(-43.5, -12.0, 0.8, 56, 4.5, wallWoodIvoryMat, '西側外牆', 8, f8Y);
+      addWall(43.5, -8.0, 0.8, 64, 4.5, wallWoodIvoryMat, '東側外牆', 8, f8Y);
+      addWall(-28.5, 15.5, 30.0, 0.8, 4.5, wallWoodIvoryMat, '南側西段外牆', 8, f8Y);
+      addWall(26.8, 23.5, 34.0, 0.8, 4.5, wallWoodIvoryMat, '資訊處與開放式機房南側外牆', 8, f8Y);
+      addWall(-2.0, 29.8, 24.0, 0.8, 4.5, glassMat, '南側中央空中展望玻璃牆', 8, f8Y);
+      addWall(-13.8, 22.5, 0.6, 14.5, 4.5, wallWoodIvoryMat, '南側核心西牆', 8, f8Y);
+      addWall(9.8, 22.5, 0.6, 14.5, 4.5, wallWoodIvoryMat, '南側核心東牆', 8, f8Y);
 
-      addWall(-38.0, -34.0, 10.2, 10.2, 4.4, wallMintWoodMat, '8F 西北安全梯', 8, f8Y);
-      addHangingSign(-32.2, f8Y + 3.55, -34.0, 4.4, 0.78, '8F 西北安全梯・緊急出口', 'NW EMERGENCY STAIR', '#065f46', '#6ee7b7', Math.PI / 2);
+      addWall(-38.0, -34.0, 10.2, 10.2, 4.4, wallMintWoodMat, '西北安全梯', 8, f8Y);
+      addHangingSign(-32.2, f8Y + 3.55, -34.0, 4.4, 0.78, '西北安全梯・緊急出口', 'NW EMERGENCY STAIR', '#065f46', '#6ee7b7', Math.PI / 2);
 
       buildLargeConferenceRoom(f8Y, wallWoodIvoryMat);
 
-      const northAdminRooms = [
-        { code: '會議簡報室' },
-        { code: '主任辦公室' },
-        { code: '庫房 / 電腦室' },
-        { code: '衛教室' },
-        { code: '討論室 / 辦公室' }
-      ];
+      // 北排房間（已移除招牌與門牌）
       const adminW = 18.0;
-      const adminStep = adminW / northAdminRooms.length;
-      addWall(8.0, -34.0, adminW, 10.2, 4.4, wallWarmTeakMat, '8F 北排主任辦公室/電腦室/衛教室/討論室', 8, f8Y);
+      const adminStep = adminW / 5;
+      addWall(8.0, -34.0, adminW, 10.2, 4.4, wallWarmTeakMat, '北排辦公室與討論室', 8, f8Y);
       addCorridorHandrail(-0.5, -28.82, 16.5, -28.82, f8Y);
-      northAdminRooms.forEach((rm, idx) => {
+      for (let idx = 0; idx < 5; idx++) {
         const rx = -1.0 + (idx + 0.5) * adminStep;
-        addWardDoorFacade(rx, -28.88, rm.code, f8Y, true, true);
-      });
-      addHangingSign(8.0, f8Y + 3.65, -27.5, 7.6, 0.88, '主任辦公室・電腦室・衛教室・討論室', 'DIRECTOR OFFICE, COMPUTER & EDUCATION ROOMS', '#0f4c5c', '#2dd4bf');
+        addWardDoorFacade(rx, -28.88, f8Y, true);
+      }
 
       buildRoundTableRoom(f8Y, wallWoodIvoryMat);
 
-      addWall(-34.55, -2.0, 17.1, 15.0, 4.4, wallWarmTeakMat, '8F 值班室・儲藏室・更衣室', 8, f8Y);
+      // 西側房間（已移除值班室/清潔室/更衣室門牌）
+      addWall(-34.55, -2.0, 17.1, 15.0, 4.4, wallWarmTeakMat, '西側房間區', 8, f8Y);
       addCorridorHandrail(-25.92, -9.2, -25.92, 5.2, f8Y);
-      [
-        { label: '值班室', z: -6.8 },
-        { label: '清潔室 / 儲藏室', z: -2.0 },
-        { label: '更衣室', z: 2.8 }
-      ].forEach((rm) => {
-        const plaqueTex = createSignTexture(rm.label, 'STAFF & UTILITY', '#334155', '#fde047');
-        const plaque = new THREE.Mesh(
-          new THREE.BoxGeometry(0.1, 0.44, 1.45),
-          new THREE.MeshStandardMaterial({ map: plaqueTex, emissive: 0xffffff, emissiveMap: plaqueTex, emissiveIntensity: 0.36 })
-        );
-        plaque.position.set(-25.95, f8Y + 2.55, rm.z);
-        activeBuildGroup.add(plaque);
-      });
 
       buildOpenRestroomsAndPantry(f8Y, wallWoodIvoryMat);
       buildCentralOpenAtrium(f8Y);
 
-      addWall(-8.5, -12.5, 11.5, 14.5, 4.4, hallBlueWoodMat, '8F 中央服務台・電梯・電腦室・會議室', 8, f8Y);
+      // 中央核心區（已移除含會議室/電腦室的懸吊燈箱招牌）
+      addWall(-8.5, -12.5, 11.5, 14.5, 4.4, hallBlueWoodMat, '中央服務台與電梯核心區', 8, f8Y);
       addBacklitWoodSlatWall(-14.28, f8Y + 2.15, -12.5, 2.2, 4.1, -Math.PI / 2, 12);
       addCorridorHandrail(-14.1, -19.82, 9.1, -19.82, f8Y);
       addCorridorHandrail(-14.1, -5.18, 9.1, -5.18, f8Y);
-      addHangingSign(-8.5, f8Y + 3.65, -20.2, 7.2, 0.88, '8F 中央服務台・四座電梯・電腦室・會議室', '8F SERVICE DESK, ELEVATORS & COMPUTER ROOM', '#0369a1', '#7dd3fc');
-      addHangingSign(-8.5, f8Y + 3.65, -4.8, 7.2, 0.88, '8F 中央服務台・會議室・電腦室', 'SERVICE DESK & CONFERENCE ROOM', '#0369a1', '#7dd3fc', Math.PI);
 
       [-14.8, -10.2].forEach((ez, idx) => {
         const elFrame = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.45, 2.1), darkFrameMat);
@@ -2828,7 +2776,7 @@
         );
         elLeaf.position.set(-14.33, f8Y + 1.15, ez);
         activeBuildGroup.add(elFrame, elLeaf);
-        addHangingSign(-14.6, f8Y + 2.85, ez, 1.75, 0.42, `8F 電梯 ${idx + 1}`, '接觸或點擊選層', '#0f172a', '#2dd4bf', -Math.PI / 2);
+        addHangingSign(-14.6, f8Y + 2.85, ez, 1.75, 0.42, `電梯 ${idx + 1}`, '接觸或點擊選層', '#0f172a', '#2dd4bf', -Math.PI / 2);
       });
 
       registerTransportZone({
@@ -2837,20 +2785,20 @@
         y: f8Y,
         radius: 2.35,
         type: '電梯',
-        name: '8F 中央四座電梯廳'
+        name: '中央四座電梯廳'
       });
 
-      addWall(4.5, -12.5, 9.5, 14.5, 4.4, wallMintWoodMat, '8F 書記室・討論室・值班室・備餐室・辦公室', 8, f8Y);
-      addHangingSign(4.5, f8Y + 3.65, -20.2, 6.8, 0.88, '書記室・討論室・值班室・備餐室・辦公室', 'CLERK, DISCUSSION, ON-CALL & PANTRY', '#065f46', '#6ee7b7');
+      // 東北核心區（已移除書記室/討論室招牌）
+      addWall(4.5, -12.5, 9.5, 14.5, 4.4, wallMintWoodMat, '東北房間區', 8, f8Y);
 
-      addWall(38.0, -34.0, 10.0, 10.2, 4.4, wallMintWoodMat, '8F 東北安全梯與研討室', 8, f8Y);
-      addHangingSign(31.8, f8Y + 3.55, -34.0, 4.6, 0.78, '8F 東北安全梯・研討室', 'NE STAIR & SEMINAR ROOM', '#065f46', '#6ee7b7', -Math.PI / 2);
+      addWall(38.0, -34.0, 10.0, 10.2, 4.4, wallMintWoodMat, '東北安全梯與研討室', 8, f8Y);
+      addHangingSign(31.8, f8Y + 3.55, -34.0, 4.6, 0.78, '東北安全梯・研討室', 'NE STAIR & SEMINAR ROOM', '#065f46', '#6ee7b7', -Math.PI / 2);
 
       buildMediciConferenceRooms(f8Y, wallWoodIvoryMat);
 
-      addWall(-8.5, 22.0, 7.5, 9.5, 4.4, hallBlueWoodMat, '8F 南側電梯廳與設備間', 8, f8Y);
-      addWall(4.5, 22.0, 7.5, 9.5, 4.4, wallMintWoodMat, '8F 南側安全梯與休息室', 8, f8Y);
-      addHangingSign(-2.0, f8Y + 3.65, 16.5, 6.6, 0.88, '8F 南側電梯廳・安全梯・展望休憩區', 'SOUTH ELEVATORS & EMERGENCY STAIR', '#0f4c5c', '#2dd4bf', Math.PI);
+      // 南側電梯廳（已移除懸吊燈箱招牌）
+      addWall(-8.5, 22.0, 7.5, 9.5, 4.4, hallBlueWoodMat, '南側電梯廳與設備間', 8, f8Y);
+      addWall(4.5, 22.0, 7.5, 9.5, 4.4, wallMintWoodMat, '南側安全梯與休息室', 8, f8Y);
 
       const southElFrame = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.45, 2.2), darkFrameMat);
       southElFrame.position.set(-4.68, f8Y + 1.22, 21.5);
@@ -2862,7 +2810,7 @@
         y: f8Y,
         radius: 2.25,
         type: '電梯',
-        name: '8F 南側電梯廳'
+        name: '南側電梯廳'
       });
 
       buildITDepartmentAndServerRoom(f8Y);
@@ -2876,7 +2824,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 3. 全圓弧立體角色與 8F 專屬 NPC（含四位長官、廁所如廁 NPC、資訊處人員）
+    // 3. 全圓弧立體角色與專屬 NPC（主管姓名更新、移除所有 8F 字樣、美蒂琪吧檯職稱更新）
     // --------------------------------------------------------------------------
     function createHumanoidMesh(opts = {}) {
       const {
@@ -3143,10 +3091,10 @@
       const floatingLayer = document.getElementById('floating-fx-layer');
 
       const npcDefinitions = [
-        // ================= 8F 大圓桌會議室四位高階長官 NPC（已更新為 黃合合總裁、黃媛媛執行長、劉玲總經理、郭盛名協理） =================
+        // ================= 大圓桌會議室四位高階長官 NPC（已替換為黃合合總裁、黃媛媛執行長、劉玲總經理、郭盛名協理） =================
         {
           name: '黃合合 總裁',
-          role: '秀傳醫療體系 總裁・8F 大圓桌會議室主座',
+          role: '秀傳醫療體系 總裁・大圓桌會議室主座',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3164,7 +3112,7 @@
         },
         {
           name: '黃媛媛 執行長',
-          role: '秀傳醫療體系 執行長・8F 大圓桌會議室',
+          role: '秀傳醫療體系 執行長・大圓桌會議室',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3183,7 +3131,7 @@
         },
         {
           name: '劉玲 總經理',
-          role: '秀傳醫療體系 總經理・8F 大圓桌會議室',
+          role: '秀傳醫療體系 總經理・大圓桌會議室',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3202,7 +3150,7 @@
         },
         {
           name: '郭盛名 協理',
-          role: '秀傳醫療體系 協理・8F 大圓桌會議室',
+          role: '秀傳醫療體系 協理・大圓桌會議室',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3219,10 +3167,10 @@
           yaw: -Math.PI * 0.92
         },
 
-        // ================= 8F 開放式廁所多名正在上廁所與洗手的 NPC =================
+        // ================= 洗手間多名正在上廁所與洗手的 NPC =================
         {
           name: '王大明 (男廁如廁中)',
-          role: '8F 男廁隔間 1・上廁所中',
+          role: '男廁隔間 1・上廁所中',
           type: 'visitor',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3239,7 +3187,7 @@
         },
         {
           name: '林志豪 (男廁如廁中)',
-          role: '8F 男廁隔間 2・開會中場上廁所',
+          role: '男廁隔間 2・開會中場上廁所',
           type: 'visitor',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3256,7 +3204,7 @@
         },
         {
           name: '張建國 (男廁小便斗如廁中)',
-          role: '8F 男廁小便斗區・如廁中',
+          role: '男廁小便斗區・如廁中',
           type: 'visitor',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3272,7 +3220,7 @@
         },
         {
           name: '陳雅婷 (女廁如廁中)',
-          role: '8F 女廁隔間 1・上廁所中',
+          role: '女廁隔間 1・上廁所中',
           type: 'visitor',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3290,7 +3238,7 @@
         },
         {
           name: '吳佳蓉 (女廁如廁中)',
-          role: '8F 女廁隔間 2・上廁所中',
+          role: '女廁隔間 2・上廁所中',
           type: 'visitor',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3308,7 +3256,7 @@
         },
         {
           name: '周怡君 護理師 (洗手清潔中)',
-          role: '8F 開放式洗手間洗手台・內外夾弓大立腕',
+          role: '洗手間洗手台・內外夾弓大立腕',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3325,10 +3273,10 @@
           isWashingHands: true
         },
 
-        // ================= 8F 資訊處與開放式機房工程師 NPC =================
+        // ================= 資訊處與開放式機房工程師 NPC =================
         {
           name: '許先生 資深工程師',
-          role: '8F 資訊處・HIS 醫療資訊系統與資料庫架構',
+          role: '資訊處・HIS 醫療資訊系統與資料庫架構',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3340,7 +3288,7 @@
         },
         {
           name: '陳先生 資深工程師',
-          role: '8F 資訊處・資訊安全與伺服器虛擬化架構',
+          role: '資訊處・資訊安全與伺服器虛擬化架構',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3352,7 +3300,7 @@
         },
         {
           name: '李伽好 維護工程師',
-          role: '8F 資訊處・醫療端末設備與臨床系統維護',
+          role: '資訊處・醫療端末設備與臨床系統維護',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3364,7 +3312,7 @@
         },
         {
           name: '陳湧玉 維護工程師',
-          role: '8F 資訊處・硬體伺服器與機房設備定期檢修',
+          role: '資訊處・硬體伺服器與機房設備定期檢修',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3376,7 +3324,7 @@
         },
         {
           name: '李雨如 資訊助理員',
-          role: '8F 資訊處(女)・資訊行政協調與自動門接待窗口',
+          role: '資訊處(女)・資訊行政協調與自動門接待窗口',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3387,10 +3335,10 @@
           yaw: -Math.PI * 0.5
         },
 
-        // ================= 8F 大型會議室、茶水間與保全 =================
+        // ================= 大型會議室、美蒂琪吧檯與駐衛警 =================
         {
-          name: '陳明輝 8F 教學與會議中心主任',
-          role: '8F 大型會議室 / 主任辦公室走廊',
+          name: '陳明輝 教學與會議中心主任',
+          role: '大型會議室 / 辦公室走廊',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3403,8 +3351,8 @@
           speed: 1.15
         },
         {
-          name: '許淑惠 開放式茶水間服務員',
-          role: '8F 開放式茶水間・咖啡吧台與會議茶點服務',
+          name: '許淑惠 美蒂琪吧檯服務員',
+          role: '美蒂琪吧檯・咖啡吧台與會議茶點服務',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3417,8 +3365,8 @@
           speed: 1.05
         },
         {
-          name: '蔡志強 8F 駐衛警',
-          role: '8F 中央電梯廳與會議樓層安全維護',
+          name: '蔡志強 駐衛警',
+          role: '中央電梯廳與會議樓層安全維護',
           type: 'security',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3648,7 +3596,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 5. 雙向近戰格鬥與單擊地板波紋步行標記（無 NPC 對話阻礙）
+    // 5. 雙向近戰格鬥與單擊地板波紋步行標記（純戰鬥互動模式）
     // --------------------------------------------------------------------------
     function performPlayerAttack(isHeavy = false) {
       if (player.isDead || isTransportModalOpen || player.isAttacking) return;
@@ -3920,13 +3868,13 @@
         badge.textContent = `⚠️ 院區警戒等級 ${player.wantedStars} 星・保全人員巡檢中`;
         badge.className = 'gta-font gta-shadow text-sm sm:text-base font-bold text-rose-400 leading-tight mt-0.5';
       } else {
-        badge.textContent = '健保卡已連線・8F 最高樓層會議/資訊處';
+        badge.textContent = '健保卡已連線・頂樓會議/資訊處';
         badge.className = 'gta-font gta-shadow text-sm sm:text-base font-bold text-emerald-400 leading-tight mt-0.5';
       }
     }
 
     // --------------------------------------------------------------------------
-    // 6. 8F 平面圖雷達小地圖渲染
+    // 6. 平面圖雷達小地圖渲染
     // --------------------------------------------------------------------------
     function renderMinimap() {
       const canvas = document.getElementById('minimap-canvas');
@@ -4041,7 +3989,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 7. 自由滑鼠操控、鍵盤移動、電梯選單與每幀動畫更新（無 NPC 對話功能）
+    // 7. 自由滑鼠操控、鍵盤移動、電梯選單與每幀動畫更新
     // --------------------------------------------------------------------------
     function teleportToZone(zoneKey) {
       const z = ZONES[zoneKey];
@@ -4064,11 +4012,6 @@
 
       closeElevatorModal();
 
-      if (floorCode === '8F') {
-        showToast('🏛️ 您目前正位於 8F（本棟最高樓層・會議中心與資訊處）！');
-        return;
-      }
-
       const overlay = document.getElementById('floor-redirect-overlay');
       document.getElementById('redirect-title').textContent = `正在前往 ${item.title}...`;
       document.getElementById('redirect-subtitle').textContent = `即將自動連結至 ${item.file}（${item.desc}）`;
@@ -4080,7 +4023,7 @@
       }, 650);
     }
 
-    function openElevatorModal(zoneName = '8F 中央四座電梯廳') {
+    function openElevatorModal(zoneName = '中央四座電梯廳') {
       isTransportModalOpen = true;
       player.autoMoveTarget = null;
       pendingAttackNpc = null;
@@ -4118,28 +4061,28 @@
     function updateCurrentZoneHUD() {
       const px = player.pos.x;
       const pz = player.pos.z;
-      let zoneText = '8F 中央環形走廊・會議中心與資訊空間';
+      let zoneText = '中央環形走廊・會議中心與資訊空間';
 
       if (px >= -43.2 && px <= -25.8 && pz >= -26.0 && pz <= -9.5) {
-        zoneText = '8F 大圓桌會議室 (黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理)';
+        zoneText = '大圓桌會議室 (黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理)';
       } else if (px >= -31.0 && px <= -1.0 && pz >= -39.2 && pz <= -28.9) {
-        zoneText = '8F 大型會議室 (大型U型會議桌・投影大布幕)';
+        zoneText = '大型會議室 (大型U型會議桌・投影大布幕)';
       } else if (px >= 17.3 && px <= 43.2 && pz >= -26.8 && pz <= -12.2) {
-        zoneText = '8F 美帝奇會議室一 (U型會議桌・投影大布幕)';
+        zoneText = '美帝奇會議室一 (U型會議桌・投影大布幕)';
       } else if (px >= 17.3 && px <= 43.2 && pz >= -9.8 && pz <= 6.8) {
-        zoneText = '8F 美帝奇會議室二 (U型會議桌・投影大布幕)';
+        zoneText = '美帝奇會議室二 (U型會議桌・投影大布幕)';
       } else if (px >= -43.2 && px <= -26.0 && pz >= 5.5 && pz <= 15.2) {
-        zoneText = '8F 開放式廁所 (男廁/女廁/無障礙廁所・多人如廁與洗手區)';
+        zoneText = '洗手間 (男廁/女廁/無障礙廁所・多人如廁與洗手區)';
       } else if (px >= -26.0 && px <= -14.2 && pz >= 5.5 && pz <= 15.2) {
-        zoneText = '8F 開放式茶水間 (咖啡吧台・中島交流區)';
+        zoneText = '美蒂琪吧檯 (咖啡吧台・中島交流區)';
       } else if (px >= 10.5 && px <= 27.5 && pz >= 8.0 && pz <= 23.2) {
-        zoneText = '8F 資訊處辦公室 (感應自動電動門・系統維護與工程團隊)';
+        zoneText = '資訊處辦公室 (感應自動電動門・系統維護與工程團隊)';
       } else if (px >= 27.5 && px <= 43.2 && pz >= 8.0 && pz <= 23.2) {
-        zoneText = '8F 開放式機房 (感應自動電動門・CORE SWITCH 與伺服器機櫃)';
+        zoneText = '開放式機房 (感應自動電動門・CORE SWITCH 與伺服器機櫃)';
       } else if (px >= -8.0 && px <= 4.0 && pz >= 4.0 && pz <= 14.5) {
-        zoneText = '8F 中央開放式交流中庭';
+        zoneText = '中央開放式交流中庭';
       } else if (px >= -19.5 && px <= -14.0 && pz >= -17.0 && pz <= -8.0) {
-        zoneText = '8F 中央四座電梯廳 (B1 ~ 8F)';
+        zoneText = '中央四座電梯廳 (B1 ~ 7F)';
       }
 
       document.getElementById('current-zone-label').textContent = zoneText;
@@ -4160,7 +4103,6 @@
         if (player.comboResetTimer <= 0) player.comboStep = 0;
       }
 
-      // 若玩家點擊了某位 NPC，自動步行靠近後直接朝其揮拳攻擊（無任何對話）
       if (pendingAttackNpc) {
         if (pendingAttackNpc.knockedTimer > 0) {
           pendingAttackNpc = null;
@@ -4348,7 +4290,6 @@
         camera.lookAt(camState.targetPos);
       }
 
-      // 檢測是否進入電梯感應區（已移除靠近 NPC 的交談提示）
       nearTransportZone = null;
       for (let i = 0; i < transportTriggerZones.length; i++) {
         const tz = transportTriggerZones[i];
@@ -4361,7 +4302,7 @@
 
       const elvPromptEl = document.getElementById('elevator-prompt');
       if (nearTransportZone && !isTransportModalOpen) {
-        document.getElementById('prompt-elevator-name').textContent = `${nearTransportZone.name} (B1 ~ 8F)`;
+        document.getElementById('prompt-elevator-name').textContent = `${nearTransportZone.name} (B1 ~ 7F)`;
         elvPromptEl.classList.remove('hidden');
         if (!transportPromptCooldown) {
           openElevatorModal(nearTransportZone.name);
@@ -4606,7 +4547,6 @@
       mouseNDC.y = -(clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera(mouseNDC, camera);
 
-      // 1. 優先檢測是否點擊到任何 NPC -> 直接步行靠近並揮拳攻擊（無對話功能）
       const npcHits = raycaster.intersectObjects(npcHitMeshes, false);
       if (npcHits.length > 0) {
         const targetNpc = npcHits[0].object.userData.npcRef;
@@ -4628,7 +4568,6 @@
         }
       }
 
-      // 2. 檢測是否點擊到 8F 電梯感應區地板
       const padHits = raycaster.intersectObjects(transportHitMeshes, false);
       if (padHits.length > 0) {
         const elvZone = padHits[0].object.userData.elevatorZone;
@@ -4639,7 +4578,6 @@
         }
       }
 
-      // 3. 單擊 8F 地板任意位置產生波紋標記並自動步行前往
       const hitPt = new THREE.Vector3();
       if (raycaster.ray.intersectPlane(floorHitPlane, hitPt)) {
         pendingAttackNpc = null;
@@ -4679,7 +4617,7 @@
           if (nearTransportZone) {
             openElevatorModal(nearTransportZone.name);
           } else {
-            openElevatorModal('8F 中央四座電梯廳');
+            openElevatorModal('中央四座電梯廳');
           }
         } else if (e.code === 'KeyV') {
           player.firstPerson = !player.firstPerson;
@@ -4807,7 +4745,7 @@
       });
 
       document.getElementById('btn-open-elevator').addEventListener('click', () => {
-        openElevatorModal(nearTransportZone ? nearTransportZone.name : '8F 中央四座電梯廳');
+        openElevatorModal(nearTransportZone ? nearTransportZone.name : '中央四座電梯廳');
       });
 
       document.getElementById('btn-clear-wanted').addEventListener('click', clearWantedAndHeal);
@@ -4836,7 +4774,7 @@
       document.getElementById('elv-close-btn').addEventListener('click', closeElevatorModal);
 
       document.getElementById('btn-touch-elevator').addEventListener('click', () => {
-        openElevatorModal(nearTransportZone ? nearTransportZone.name : '8F 中央四座電梯廳');
+        openElevatorModal(nearTransportZone ? nearTransportZone.name : '中央四座電梯廳');
       });
       document.getElementById('btn-touch-jump').addEventListener('click', () => {
         if (player.onGround && !player.isDead) {
