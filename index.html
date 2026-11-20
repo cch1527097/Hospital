@@ -135,9 +135,7 @@
 
         <h2 class="text-3xl sm:text-4xl font-black leading-tight gta-shadow">
           歡迎蒞臨<br/>
-          <h2 class="text-3xl sm:text-4xl font-black leading-tight gta-shadow">
-            幸運草醫院-模擬人生
-          </span>
+          幸運草醫院-模擬人生
         </h2>
 
         <p class="text-xs sm:text-sm text-slate-200/90 leading-relaxed">
@@ -257,15 +255,9 @@
                 <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center">2</span>
                 <h3 class="text-base sm:text-lg font-black tracking-wide text-white">登入識別卡號驗證</h3>
               </div>
-              <button type="button" id="demo-card-btn" class="text-[11px] px-2.5 py-1 rounded-lg bg-sky-500/20 hover:bg-sky-500/35 text-sky-300 border border-sky-400/30 font-bold transition">
-                🪄 帶入測試卡號
-              </button>
             </div>
 
             <div class="relative">
-              <label for="card-number-input" class="block text-xs text-slate-300 mb-1.5">
-                員工識別證 / 門禁感應卡號（支援 4～16 碼英數字，例如 <span class="font-mono text-amber-300">123456</span>）
-              </label>
               <div class="relative flex items-center">
                 <span class="absolute left-3.5 text-lg pointer-events-none">💳</span>
                 <input
@@ -358,8 +350,7 @@
       '10047': { name: '許博捷' },
       '601471': { name: '陳永育' },
       '6513': { name: '李承州' },
-      '11110': { name: '林佳蘭' },
-      'TEST': { name: '實習生' }
+      '11110': { name: '林佳蘭' }
     };
 
     const ROLES_CONFIG = {
@@ -372,7 +363,6 @@
         cash: 7500,
         armor: 90,
         gear: '薄荷綠護理服',
-        sampleCard: '18445',
         desc: '第一線臨床照護護理師，身穿薄荷綠醫療護理服與白色長褲，穿梭於大廳、門診與各科病房照護病患。'
       },
       doctor: {
@@ -384,7 +374,6 @@
         cash: 12000,
         armor: 95,
         gear: '醫師白袍 / 聽診器',
-        sampleCard: '18445',
         desc: '幸運草醫療大樓主治醫師，身著專業白色醫師袍與天藍刷手服內搭，頸部配戴聽診器隨時支援臨床診療。'
       },
       it_engineer: {
@@ -396,7 +385,6 @@
         cash: 8800,
         armor: 90,
         gear: '行動筆電 / 資訊證',
-        sampleCard: '18445',
         desc: '負責園區智慧醫療系統與核心機房維運，身穿深藍科技外套、配戴識別證並手持行動工作筆電。'
       },
       educator: {
@@ -408,7 +396,6 @@
         cash: 7800,
         armor: 88,
         gear: '衛教手冊 / 諮詢證',
-        sampleCard: '18445',
         desc: '專責慢性病防治、用藥與健康促進諮詢，於一樓大廳與衛教中心協助就診民眾建立正確保健觀念。'
       }
     };
@@ -483,14 +470,6 @@
       clearBtn.classList.add('hidden');
       hideError();
       cardInput.focus();
-    });
-
-    // 帶入對應職業的測試卡號 (18445)
-    document.getElementById('demo-card-btn').addEventListener('click', () => {
-      const role = ROLES_CONFIG[selectedRoleKey] || ROLES_CONFIG.nurse;
-      cardInput.value = role.sampleCard;
-      clearBtn.classList.remove('hidden');
-      hideError();
     });
 
     // 表單送出驗證與跳轉至主園區 1index.html
