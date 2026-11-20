@@ -4178,7 +4178,7 @@
       addWaitingBenchRow(26.8, 31.6, Math.PI / 2, 4);
 
       addWall(35.2, 31.5, 0.5, 23.0, 4.4, wallMarbleBlueMat, '國際會議廳西牆');
-      addHangingSign(43.5, 3.55, 22.0, 5.4, 0.76, '國際會議廳 / 員工餐廳', 'CONFERENCE & DINING HALL', '#1e3a8a', '#93c5fd');
+      addHangingSign(43.5, 3.55, 22.0, 5.4, 0.76, '國際會議廳', 'CONFERENCE', '#1e3a8a');
 
       for (let r = 0; r < 3; r++) {
         for (let c = 0; c < 2; c++) {
@@ -4203,8 +4203,8 @@
       addWall(-35.5, -36.5, 35.0, 0.7, 4.4, wallMarbleMainMat, '工務與警衛監控室南牆');
       addHangingSign(-35.5, 3.55, -37.2, 5.2, 0.72, '工務室 / 消防監控中心', 'FACILITY & SECURITY', '#334155', '#fbbf24');
 
-      addWall(35.5, -36.5, 35.0, 0.7, 4.4, wallMarblePinkMat, '1F 洗腎室南牆');
-      addHangingSign(35.5, 3.55, -37.2, 4.6, 0.72, '1F 血液透析中心 (洗腎室)', 'HEMODIALYSIS UNIT', '#9d174d', '#f9a8d4');
+      addWall(35.5, -36.5, 35.0, 0.7, 4.4, wallMarblePinkMat, '洗腎室南牆');
+      addHangingSign(35.5, 3.55, -37.2, 4.6, 0.72, '血液透析中心 (洗腎室)', 'HEMODIALYSIS UNIT', '#9d174d', '#f9a8d4');
 
       addFireHydrantCabinet(-14.3, 21.5, Math.PI / 2);
       addFireHydrantCabinet(14.3, 21.5, -Math.PI / 2);
@@ -4279,7 +4279,7 @@
           atriumZ,
           4.2,
           0.62,
-          idx === 0 ? '西側採光中庭 (2F挑空)' : '東側採光中庭 (2F挑空)',
+          idx === 0 ? '西側採光中庭' : '東側採光中庭',
           'ATRIUM LIGHTWELL',
           '#0f766e',
           '#fde047'
@@ -4508,7 +4508,7 @@
       });
 
       addHangingSign(24.5, 3.68, -12.6, 6.2, 0.88, '急診室 EMERGENCY', '24小時急重症醫療中心・自動感應門', '#be123c', '#fda4af');
-      addHangingSign(39.6, 3.55, -8.2, 4.2, 0.72, '急診管制門', '檢傷分類 / 家屬休息區', '#9f1239', '#fecdd3', -Math.PI / 2);
+      addHangingSign(39.6, 3.55, -8.2, 4.2, 0.72, '急診管制門', '檢傷 / 家屬休息區', '#9f1239', '#fecdd3', -Math.PI / 2);
 
       const bedFrameMat = getCachedStandardMat(0xf8fafc, 0.35, 0.35);
       const bedMattressMat = getCachedStandardMat(0x0284c7, 0.55, 0.05);
@@ -4605,12 +4605,12 @@
       const erRegTop = new THREE.Mesh(getCachedBoxGeom(8.4, 0.12, 1.35), bedFrameMat);
       erRegTop.position.set(45.5, 1.18, -26.5);
       scene.add(erRegTop);
-      addHangingSign(45.5, 3.55, -26.5, 5.4, 0.78, '急診批價掛號 / 檢傷分類處', 'ER REGISTRATION & TRIAGE', '#be185d', '#fbcfe8');
+      addHangingSign(45.5, 3.55, -26.5, 5.4, 0.78, '急診批價掛號', 'ER REGISTRATION', '#be185d',);
 
       // 急診家屬休息等待區排椅
       addWaitingBenchRow(43.8, -14.5, 0, 4);
       addWaitingBenchRow(43.8, -10.5, Math.PI, 4);
-      addHangingSign(43.8, 3.45, -12.5, 4.8, 0.62, '急診家屬休息等待區', 'ER FAMILY WAITING AREA', '#0f4c5c', '#5eead4');
+      addHangingSign(43.8, 3.45, -12.5, 4.8, 0.62, '急診家屬等待區', 'ER FAMILY WAITING AREA', '#0f4c5c', '#5eead4');
     }
 
     // --------------------------------------------------------------------------
