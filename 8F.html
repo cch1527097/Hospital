@@ -116,7 +116,7 @@
   <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 text-white transition-opacity duration-500">
     <div class="w-16 h-16 border-4 border-teal-400 border-t-amber-400 rounded-full animate-spin mb-4"></div>
     <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">彰濱秀傳紀念醫院 8F 會議與資訊空間 3D 實境</h1>
-    <p id="loading-status-text" class="text-xs sm:text-sm text-slate-300">正在載入 黃明和總裁・黃靜媛執行長・劉力總經理・郭盛名協理、廁所如廁NPC與資訊室感應電動門...</p>
+    <p id="loading-status-text" class="text-xs sm:text-sm text-slate-300">正在載入 黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理、廁所如廁NPC與資訊室感應電動門...</p>
   </div>
 
   <!-- 頂部橫向：B1 ~ 8F 全院樓層與 8F 各區域快速導覽列 -->
@@ -152,7 +152,7 @@
   <!-- 操作提示膠囊 -->
   <div class="fixed top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-max max-w-[95vw]">
     <div id="control-hint-pill" class="hud-glass px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-teal-200 border border-teal-400/35 shadow-lg text-center">
-      👑 大圓桌會議室：黃明和總裁・黃靜媛執行長・劉力總經理・郭盛名協理 ｜ 🚻 廁所多位如廁中NPC ｜ 🚪 資訊室感應式自動電動門進出
+      👑 大圓桌會議室：黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理 ｜ 👊 點擊NPC或按 J / K 直接攻擊全場人員（已取消對話功能）
     </div>
   </div>
 
@@ -183,7 +183,7 @@
         <!-- 自由滑鼠模式狀態標示 -->
         <div class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-indigo-900/60 border border-indigo-400/40 text-indigo-100">
           <span>🖱️ 自由滑鼠操控模式</span>
-          <span class="px-1.5 py-0.5 rounded bg-teal-400/20 border border-teal-300/40 text-[10px] text-teal-200">無須鎖定滑鼠</span>
+          <span class="px-1.5 py-0.5 rounded bg-rose-400/20 border border-rose-300/40 text-[10px] text-rose-200">純戰鬥無對話</span>
         </div>
 
         <button id="btn-open-elevator" class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-teal-700/85 hover:bg-teal-600 border border-teal-300/40 text-white transition">
@@ -215,11 +215,11 @@
       <!-- 按鍵操作表 -->
       <div id="help-body" class="mt-2 pt-2 border-t border-white/10 text-[11px] text-slate-200 space-y-1">
         <div class="flex justify-between"><span class="text-slate-400">左鍵拖曳移動滑鼠</span><span class="font-bold text-teal-300">360° 自由旋轉視角</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">單擊地板 / 點擊NPC</span><span class="font-bold text-amber-300">自動步行前往 / 交談</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">單擊地板 / 點擊NPC</span><span class="font-bold text-rose-300">自動步行前往 / 直接攻擊</span></div>
         <div class="flex justify-between"><span class="text-slate-400">鍵盤移動 / 衝刺 / 跳</span><span class="font-bold text-amber-300">WASD / Shift / Space</span></div>
         <div class="flex justify-between"><span class="text-slate-400">資訊室感應電動門</span><span class="font-bold text-cyan-300">靠近自動滑開進出</span></div>
         <div class="flex justify-between"><span class="text-slate-400">近戰三連擊 / 重擊</span><span class="font-bold text-rose-300">J 鍵 / K 鍵</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">搭電梯 / 對話</span><span class="font-bold text-emerald-300">自動接觸 / E 鍵 / 點擊NPC</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">搭乘電梯選樓層</span><span class="font-bold text-emerald-300">靠近電梯感應區 / E 鍵</span></div>
       </div>
     </div>
   </div>
@@ -266,32 +266,32 @@
   <!-- 浮動傷害數字與 NPC 血條覆蓋層 -->
   <div id="floating-fx-layer" class="fixed inset-0 z-10 pointer-events-none overflow-hidden"></div>
 
-  <!-- 中央下方：靠近 NPC 或電梯時的互動提示 -->
-  <button id="npc-talk-prompt" class="hidden fixed bottom-36 sm:bottom-12 left-1/2 z-20 px-5 py-2.5 rounded-xl hud-glass border border-emerald-400/50 text-white font-bold text-xs sm:text-sm shadow-2xl prompt-float">
-    按 <span class="px-2 py-0.5 mx-1 rounded bg-emerald-400 text-slate-950 font-black">E</span> 與 <span id="prompt-npc-name" class="text-amber-300">黃明和 總裁</span> 交談
+  <!-- 中央下方：僅在靠近電梯感應區時顯示互動提示（已移除 NPC 對話提示） -->
+  <button id="elevator-prompt" class="hidden fixed bottom-36 sm:bottom-12 left-1/2 z-20 px-5 py-2.5 rounded-xl hud-glass border border-teal-400/50 text-white font-bold text-xs sm:text-sm shadow-2xl prompt-float">
+    按 <span class="px-2 py-0.5 mx-1 rounded bg-teal-400 text-slate-950 font-black">E</span> 開啟 <span id="prompt-elevator-name" class="text-amber-300">8F 中央四座電梯廳 (B1 ~ 8F)</span>
   </button>
 
-  <!-- NPC 對話 / 電梯 B1~8F 樓層選擇視窗 Modal -->
-  <div id="dialogue-modal" class="hidden fixed inset-0 z-40 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+  <!-- 電梯 B1~8F 樓層選擇視窗 Modal（僅用於電梯樓層切換，不提供 NPC 對話） -->
+  <div id="elevator-modal" class="hidden fixed inset-0 z-40 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
     <div class="hud-glass w-full max-w-xl rounded-2xl p-5 text-white border border-teal-400/40 shadow-2xl">
       <div class="flex items-center justify-between gap-3 pb-3 border-b border-white/15">
         <div class="flex items-center gap-3">
-          <div id="dlg-avatar" class="w-11 h-11 rounded-full bg-teal-500/25 border border-teal-300/40 flex items-center justify-center text-2xl">
-            👑
+          <div class="w-11 h-11 rounded-full bg-teal-500/25 border border-teal-300/40 flex items-center justify-center text-2xl">
+            🛗
           </div>
           <div>
-            <h3 id="dlg-name" class="font-black text-base sm:text-lg text-amber-300">黃明和 總裁</h3>
-            <p id="dlg-role" class="text-xs text-teal-300 font-medium">秀傳醫療體系 總裁・8F 大圓桌會議室</p>
+            <h3 id="elv-name" class="font-black text-base sm:text-lg text-amber-300">8F 中央四座電梯廳・全院樓層直達選單</h3>
+            <p class="text-xs text-teal-300 font-medium">目前所在：8F 會議中心與資訊處（8F 為本棟最高樓層，無 9F 以上樓層）</p>
           </div>
         </div>
-        <button id="dlg-close-btn" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-rose-500/80 text-xs font-bold transition">
+        <button id="elv-close-btn" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-rose-500/80 text-xs font-bold transition">
           關閉 (ESC)
         </button>
       </div>
-      <p id="dlg-text" class="mt-3.5 text-sm leading-relaxed text-slate-100 bg-slate-900/70 p-3.5 rounded-xl border border-white/10">
-        歡迎來到彰濱秀傳紀念醫院！
+      <p class="mt-3.5 text-sm leading-relaxed text-slate-100 bg-slate-900/70 p-3.5 rounded-xl border border-white/10">
+        請選擇您要搭乘電梯前往的目標樓層（點擊後將自動連結並開啟該樓層網頁）：
       </p>
-      <div id="dlg-options" class="mt-3 flex flex-col gap-2 max-h-72 overflow-y-auto pr-1"></div>
+      <div id="elv-options" class="mt-3 flex flex-col gap-2 max-h-72 overflow-y-auto pr-1"></div>
     </div>
   </div>
 
@@ -317,10 +317,10 @@
       </button>
     </div>
 
-    <!-- 行動裝置虛擬方向鍵與跳躍/對話 -->
+    <!-- 行動裝置虛擬方向鍵與跳躍/電梯 -->
     <div class="md:hidden flex flex-col items-end gap-1.5">
       <div class="flex gap-1.5">
-        <button id="btn-touch-talk" class="px-3 h-10 rounded-full hud-glass text-emerald-300 font-bold text-xs active:scale-95">電梯/對話 E</button>
+        <button id="btn-touch-elevator" class="px-3 h-10 rounded-full hud-glass text-teal-300 font-bold text-xs active:scale-95">搭乘電梯 E</button>
         <button id="btn-touch-jump" class="px-3 h-10 rounded-full hud-glass text-amber-300 font-bold text-xs active:scale-95">跳躍</button>
       </div>
       <div class="grid grid-cols-3 gap-1 w-32 h-32">
@@ -337,19 +337,15 @@
   <script>
     /**
      * ============================================================================
-     * 彰濱秀傳紀念醫院 8F 醫療與會議資訊空間 3D 實境
-     * 新增改造重點：
-     * 1. 【會議室新增四位高階長官 NPC】：
-     *    - 黃明和 總裁、黃靜媛 執行長、劉力 總經理、郭盛名 協理
-     *    - 配置於「8F 大圓桌會議室」主座區進行體系營運決策會議，具備專屬西裝/套裝外觀、
-     *      頭頂金色/尊榮名牌與豐富互動對話選項。
-     * 2. 【開放式廁所新增多名正在上廁所與洗手的 NPC】：
-     *    - 在男廁隔間排（Z ≈ 6.55）、女廁隔間排（Z ≈ 14.05）及洗手台區新增多位 NPC，
-     *      具備如廁中專屬動作、便器隔間站位與趣味互動對話。
-     * 3. 【資訊室（8F 資訊處與開放式機房）改建為感應式自動電動門進出】：
-     *    - 資訊處西側主門（X=10.5, Z=11.7）、北側門（X=14.5, Z=8.0）與機房玻璃門（X=27.5, Z=14.9）
-     *      均安裝雙開玻璃自動門、頂部鋁合金軌道與紅外線感應器，玩家或 NPC 靠近時自動滑開、
-     *      動態解除碰撞阻擋，離開後平滑關閉並恢復阻擋。
+     * 彰濱秀傳紀念醫院 8F 醫療與會議資訊空間 3D 實境（純戰鬥互動版）
+     * 更新重點：
+     * 1. 【主管姓名全面更新】：
+     *    - 黃合合 總裁、黃媛媛 執行長、劉玲 總經理、郭盛名 協理
+     *    - 配置於「8F 大圓桌會議室」主座區進行體系營運決策會議。
+     * 2. 【取消所有 NPC 對話視窗功能，開放全體 NPC 近戰攻擊與反擊】：
+     *    - 移除 NPC 對話視窗、對話選項與交談提示，點擊 NPC 可直接步行靠近並揮拳攻擊，
+     *      或直接按 J（三連擊）/ K（重擊）/ 畫面攻擊按鈕攻擊任何一位 NPC（含總裁、執行長、總經理、協理及全場人員）。
+     *    - 受擊後 NPC 會進入敵對反擊狀態，觸發院區通緝星級與保全支援壓制。
      * ============================================================================
      */
 
@@ -384,8 +380,7 @@
     const npcs = [];
     const npcHitMeshes = [];
     let showNpcLabels = true;
-    let activeTalkNpc = null;
-    let nearestNpc = null;
+    let pendingAttackNpc = null;
 
     // 機房伺服器指示燈動畫陣列
     const serverBlinkLeds = [];
@@ -416,7 +411,7 @@
     const floorClickRipples = [];
     let camShake = 0;
 
-    // 玩家角色狀態（初始面向西側大圓桌會議室方向，方便就近參觀四位高階長官會議）
+    // 玩家角色狀態（初始面向西側大圓桌會議室方向）
     const player = {
       mesh: null,
       bodyRoot: null,
@@ -488,7 +483,7 @@
     // 8F 快速傳送座標表
     const ZONES = {
       f8_here:       { label: '8F 大圓桌會議室前走廊・高階主管會議入口', pos: new THREE.Vector3(-22.8, 27.6, -17.75), yaw: -Math.PI * 0.5 },
-      f8_round_conf: { label: '8F 大圓桌會議室 (黃明和總裁・黃靜媛執行長・劉力總經理・郭盛名協理)', pos: new THREE.Vector3(-28.6, 27.6, -17.75), yaw: -Math.PI * 0.5 },
+      f8_round_conf: { label: '8F 大圓桌會議室 (黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理)', pos: new THREE.Vector3(-28.6, 27.6, -17.75), yaw: -Math.PI * 0.5 },
       f8_medici_1:   { label: '8F 美帝奇會議室一 (U型會議桌・投影大布幕・醫護會議)', pos: new THREE.Vector3(21.5, 27.6, -19.5), yaw: Math.PI * 0.5 },
       f8_medici_2:   { label: '8F 美帝奇會議室二 (U型會議桌・投影大布幕・跨科討論)', pos: new THREE.Vector3(21.5, 27.6, -1.5), yaw: Math.PI * 0.5 },
       f8_large_conf: { label: '8F 大型會議室 (大型U型會議桌・投影機大布幕・全院研討)', pos: new THREE.Vector3(-16.0, 27.6, -34.0), yaw: -Math.PI * 0.5 },
@@ -1534,10 +1529,7 @@
     }
 
     /**
-     * 【新增功能 3】建構感應式自動玻璃電動門 (Automatic Sliding Glass Doors)
-     * - 頂部黑色鋁合金驅動橫樑 + 雙側紅外線感應器 LED + 「自動門 AUTOMATIC DOOR」標示
-     * - 左右雙扇無框強化玻璃門片（含中縫警示條與不鏽鋼防撞推把）
-     * - 內建動態碰撞箱：閉合時阻擋穿過，人員靠近 3.2m 內自動平滑向左右滑開並解除碰撞
+     * 建構感應式自動玻璃電動門 (Automatic Sliding Glass Doors)
      */
     function addAutomaticSlidingDoor(cx, cz, openingWidth, rotY, baseY, doorLabel = '資訊處感應式自動電動門') {
       const target = activeBuildGroup || scene;
@@ -1559,7 +1551,6 @@
       });
       const steelMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.88, roughness: 0.18 });
 
-      // 1. 門框立柱與頂部自動門驅動軌道機箱
       [-openingWidth * 0.5, openingWidth * 0.5].forEach((jx) => {
         const post = new THREE.Mesh(new THREE.BoxGeometry(0.14, 4.4, 0.22), headerMat);
         post.position.set(jx, 2.2, 0);
@@ -1576,7 +1567,6 @@
       topBeam.position.set(0, 4.34, 0);
       g.add(trackBox, transomGlass, topBeam);
 
-      // 2. 雙向紅外線動作感應器（帶狀態 LED 指示燈）
       const sensorLedMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
       [-0.14, 0.14].forEach((sz) => {
         const sensorBox = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.11, 0.07), headerMat);
@@ -1586,7 +1576,6 @@
         g.add(sensorBox, ledDot);
       });
 
-      // 3. 自動門雙面發光標示牌
       const signTex = createSignTexture('自動門 AUTOMATIC DOOR', '紅外線感應進出・請勿倚靠玻璃門扇', '#0f172a', '#38bdf8');
       const signBoard = new THREE.Mesh(
         new THREE.BoxGeometry(Math.min(2.6, openingWidth * 0.78), 0.34, 0.28),
@@ -1595,7 +1584,6 @@
       signBoard.position.set(0, 3.12, 0);
       g.add(signBoard);
 
-      // 4. 左右雙扇可滑動玻璃門片
       const leafW = (openingWidth - 0.16) * 0.5;
       const closedOffset = leafW * 0.5;
       const openOffset = leafW * 1.42;
@@ -1610,14 +1598,12 @@
         const botClamp = new THREE.Mesh(new THREE.BoxGeometry(leafW, 0.09, 0.075), headerMat);
         botClamp.position.y = 0.045;
 
-        // 玻璃門警示條紋與貼紙
         const stripe = new THREE.Mesh(new THREE.BoxGeometry(leafW - 0.04, 0.08, 0.052), warnStripeMat);
         stripe.position.y = 1.18;
 
         const cyanLine = new THREE.Mesh(new THREE.BoxGeometry(leafW - 0.04, 0.04, 0.052), trimMat);
         cyanLine.position.y = 1.26;
 
-        // 門緣防撞立柱與把手
         const innerEdge = new THREE.Mesh(new THREE.BoxGeometry(0.04, 2.48, 0.065), steelMat);
         innerEdge.position.set(-sideSign * (leafW * 0.5 - 0.02), 1.25, 0);
 
@@ -1633,7 +1619,6 @@
       const rightLeaf = createSlidingLeaf(1);
       g.add(leftLeaf, rightLeaf);
 
-      // 5. 地面金屬導軌壓條
       const floorTrack = new THREE.Mesh(new THREE.BoxGeometry(openingWidth, 0.014, 0.12), steelMat);
       floorTrack.position.set(0, 0.008, 0);
       g.add(floorTrack);
@@ -1642,7 +1627,6 @@
       g.rotation.y = rotY;
       target.add(g);
 
-      // 6. 動態碰撞箱（門關閉時阻擋，開啟超過 45% 時移開碰撞範圍讓人員自由進出）
       const isRotated90 = Math.abs(Math.sin(rotY)) > 0.7;
       const boxW = isRotated90 ? 0.28 : openingWidth;
       const boxD = isRotated90 ? openingWidth : 0.28;
@@ -2183,10 +2167,6 @@
       });
     }
 
-    /**
-     * 8F 開放式廁所及茶水間 (X: [-43.0, -14.2], Z: [5.5, 15.1])
-     * - 為方便玩家走入男廁/女廁參觀正在上廁所的 NPC，將隔間門設計為半開狀態，並保留走道空間
-     */
     function buildOpenRestroomsAndPantry(baseY, wallWoodMat) {
       const target = activeBuildGroup || scene;
 
@@ -2267,7 +2247,6 @@
       target.add(vanityGroup);
       colliders.push({ minX: -29.45, maxX: -28.15, minZ: 8.6, maxZ: 12.0, floor: 8, label: '開放式洗手間洗手台' });
 
-      // 男女廁所分界牆 + 男廁小便斗區 + 隔間排（隔間門做半透/半開設計，可清楚看見裡面上廁所的 NPC）
       const stallMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.4 });
       const stallDoorMat = new THREE.MeshStandardMaterial({
         color: 0x0d9488,
@@ -2287,7 +2266,6 @@
       addHangingSign(-32.2, baseY + 2.85, 8.2, 2.2, 0.46, '🚹 男廁 MEN', '小便斗與如廁隔間', '#0369a1', '#7dd3fc', Math.PI / 2);
       addHangingSign(-32.2, baseY + 2.85, 12.4, 2.2, 0.46, '🚺 女廁 WOMEN', '如廁隔間與無障礙廁所', '#be185d', '#f9a8d4', Math.PI / 2);
 
-      // 男廁分界牆北側安裝 3 座壁掛式陶瓷小便斗（X: -35.8, -34.4, -33.0）
       [-35.8, -34.4, -33.0].forEach((ux) => {
         const urinal = new THREE.Mesh(createSmoothCapsuleGeometry(0.18, 0.34, 14, 6), porcelainMat);
         urinal.position.set(ux, baseY + 0.92, 9.95);
@@ -2296,9 +2274,7 @@
         target.add(urinal, divider);
       });
 
-      // 男女廁隔間排與馬桶（隔間門半開或半透明，方便查看 NPC 如廁）
       [-40.5, -38.3, -36.1, -33.9].forEach((sx, idx) => {
-        // 男廁隔間（Z = 6.35，隔間側板）
         const mSideL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.25, 1.45), stallMat);
         mSideL.position.set(sx - 0.95, baseY + 1.12, 6.45);
         const mSideR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.25, 1.45), stallMat);
@@ -2309,7 +2285,6 @@
         mDoor.position.set(sx - 0.38, baseY + 1.08, 7.18);
         mDoor.rotation.y = idx % 2 === 0 ? 0.55 : -0.45;
 
-        // 女廁隔間（Z = 14.15）
         const wSideL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.25, 1.45), stallMat);
         wSideL.position.set(sx - 0.95, baseY + 1.12, 14.15);
         const wSideR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.25, 1.45), stallMat);
@@ -2412,10 +2387,6 @@
       });
     }
 
-    /**
-     * 8F 資訊處與開放式機房 (X: [10.5, 43.2], Z: [8.0, 23.2])
-     * - 三處出入口全面安裝【感應式自動玻璃電動門】進出
-     */
     function buildITDepartmentAndServerRoom(baseY) {
       const target = activeBuildGroup || scene;
 
@@ -2508,17 +2479,14 @@
         });
       }
 
-      // 資訊處西側玻璃牆與【主出入口感應式自動電動門 (X=10.5, Z=11.7, 寬3.6m)】
       addGlassPartition(10.5, 8.0, 10.5, 9.9, '資訊處西側玻璃牆北段');
       addAutomaticSlidingDoor(10.5, 11.7, 3.6, Math.PI / 2, baseY, '資訊處西側主自動電動門');
       addGlassPartition(10.5, 13.5, 10.5, 23.2, '資訊處西側玻璃牆南段');
 
-      // 資訊處北側玻璃牆與【北側感應式自動電動門 (X=14.5, Z=8.0, 寬3.2m)】
       addGlassPartition(10.5, 8.0, 12.9, 8.0, '資訊處北側玻璃牆西段');
       addAutomaticSlidingDoor(14.5, 8.0, 3.2, 0, baseY, '資訊處北側自動電動門');
       addGlassPartition(16.1, 8.0, 43.2, 8.0, '資訊處與開放式機房北側全景玻璃牆');
 
-      // 開放式機房玻璃隔間與【機房感應式自動電動門 (X=27.5, Z=14.9, 寬3.6m)】
       addGlassPartition(27.5, 8.0, 27.5, 13.1, '開放式機房玻璃隔間北段');
       addAutomaticSlidingDoor(27.5, 14.9, 3.6, Math.PI / 2, baseY, '開放式機房自動電動門');
       addGlassPartition(27.5, 16.7, 27.5, 23.2, '開放式機房玻璃隔間南段');
@@ -2946,7 +2914,6 @@
       pelvis.position.y = 0.80;
       bodyRoot.add(torso, pelvis);
 
-      // 高階長官領帶或胸針裝飾
       if (isExecutive && !isFemale) {
         const shirt = new THREE.Mesh(
           new THREE.BoxGeometry(0.11, 0.28, 0.04),
@@ -3176,11 +3143,10 @@
       const floatingLayer = document.getElementById('floating-fx-layer');
 
       const npcDefinitions = [
-        // ================= 【新增 1】8F 大圓桌會議室四位高階長官 NPC =================
+        // ================= 8F 大圓桌會議室四位高階長官 NPC（已更新為 黃合合總裁、黃媛媛執行長、劉玲總經理、郭盛名協理） =================
         {
-          name: '黃明和 總裁',
+          name: '黃合合 總裁',
           role: '秀傳醫療體系 總裁・8F 大圓桌會議室主座',
-          avatar: '👑',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3194,23 +3160,11 @@
           },
           waypoints: [new THREE.Vector3(-30.68, FLOOR_Y[8], -17.75)],
           speed: 0,
-          yaw: -Math.PI * 0.5,
-          dialogue: '歡迎來到彰濱秀傳紀念醫院！我們始終秉持「梅約精神（Mayo Clinic Spirit）」，結合科技與人文關懷，打造最值得信賴的健康園區！',
-          options: [
-            {
-              label: '請教總裁對智慧醫療與微創中心發展的願景',
-              reply: '黃明和 總裁：「彰濱秀傳結合國際級微創手術訓練中心與 AI 智慧醫療，讓在地鄉親不用遠赴北部就能享有世界一流的精準醫療服務！」'
-            },
-            {
-              label: '詢問今日 8F 大圓桌會議的主要議題',
-              reply: '黃明和 總裁：「今天我們與執行長、總經理及協理正共同檢視全院醫療品質指標、資訊系統升級進度，以及病人安全照護的全面優化。」'
-            }
-          ]
+          yaw: -Math.PI * 0.5
         },
         {
-          name: '黃靜媛 執行長',
+          name: '黃媛媛 執行長',
           role: '秀傳醫療體系 執行長・8F 大圓桌會議室',
-          avatar: '👩‍💼',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3225,23 +3179,11 @@
           },
           waypoints: [new THREE.Vector3(-31.38, FLOOR_Y[8], -19.86)],
           speed: 0,
-          yaw: -Math.PI * 0.72,
-          dialogue: '您好！我是秀傳醫療體系執行長黃靜媛。我們正積極推動跨院區數位轉型與高齡友善整合醫療，歡迎參觀 8F 會議與資訊空間！',
-          options: [
-            {
-              label: '請教執行長在跨院區數位轉型與創新服務的規劃',
-              reply: '黃靜媛 執行長：「我們整合行動醫療 APP、遠距視訊會診與全院無紙化臨床系統，讓醫護團隊能將更多寶貴時間留給病人照護。」'
-            },
-            {
-              label: '了解 8F 美帝奇會議室與大圓桌會議室的定位',
-              reply: '黃靜媛 執行長：「8F 是全院學術研討與決策中樞，美帝奇會議室配備 U 型討論桌與高畫質投影布幕，最適合跨科部臨床個案討論。」'
-            }
-          ]
+          yaw: -Math.PI * 0.72
         },
         {
-          name: '劉力 總經理',
+          name: '劉玲 總經理',
           role: '秀傳醫療體系 總經理・8F 大圓桌會議室',
-          avatar: '💼',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3251,23 +3193,16 @@
             pantsColor: 0x0f172a,
             hairColor: 0x1e1b18,
             isSeated: true,
+            isFemale: true,
             isExecutive: true
           },
           waypoints: [new THREE.Vector3(-31.38, FLOOR_Y[8], -15.64)],
           speed: 0,
-          yaw: -Math.PI * 0.28,
-          dialogue: '您好！我是總經理劉力。醫院的高效營運離不開完善的後勤支援、流暢的就醫動線與穩定的資訊基礎建設。',
-          options: [
-            {
-              label: '詢問總經理對醫院營運效率與空間優化的重點',
-              reply: '劉力 總經理：「我們持續優化門診、急重症與住院病房的空間動線，並透過數據儀表板即時掌握各樓層服務量能與品質。」'
-            }
-          ]
+          yaw: -Math.PI * 0.28
         },
         {
           name: '郭盛名 協理',
           role: '秀傳醫療體系 協理・8F 大圓桌會議室',
-          avatar: '📋',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3281,21 +3216,13 @@
           },
           waypoints: [new THREE.Vector3(-33.42, FLOOR_Y[8], -21.18)],
           speed: 0,
-          yaw: -Math.PI * 0.92,
-          dialogue: '您好！我是協理郭盛名。目前正與總裁、執行長、總經理向西側投影大布幕簡報各部門專案執行進度，歡迎隨時交流！',
-          options: [
-            {
-              label: '請教協理關於資訊處自動門與機房升級的專案',
-              reply: '郭盛名 協理：「東側 8F 資訊處與開放式機房已全面升級為紅外線感應式自動電動門，兼顧無障礙進出便利性與核心機房門禁安全！」'
-            }
-          ]
+          yaw: -Math.PI * 0.92
         },
 
-        // ================= 【新增 2】8F 開放式廁所多名正在上廁所與洗手的 NPC =================
+        // ================= 8F 開放式廁所多名正在上廁所與洗手的 NPC =================
         {
           name: '王大明 (男廁如廁中)',
           role: '8F 男廁隔間 1・上廁所中',
-          avatar: '🚻',
           type: 'visitor',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3308,14 +3235,11 @@
           waypoints: [new THREE.Vector3(-40.5, FLOOR_Y[8], 6.45)],
           speed: 0,
           yaw: 0,
-          isUsingRestroom: true,
-          dialogue: '「咳咳……抱歉！男廁隔間 1 號目前有人正在上廁所，請稍等一下下，馬上就好！」',
-          options: []
+          isUsingRestroom: true
         },
         {
           name: '林志豪 (男廁如廁中)',
           role: '8F 男廁隔間 2・開會中場上廁所',
-          avatar: '🚻',
           type: 'visitor',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3328,14 +3252,11 @@
           waypoints: [new THREE.Vector3(-38.3, FLOOR_Y[8], 6.45)],
           speed: 0,
           yaw: 0,
-          isUsingRestroom: true,
-          dialogue: '「剛從大型會議室出來趁中場休息上個廁所，8F 開放式廁所動線真寬敞！」',
-          options: []
+          isUsingRestroom: true
         },
         {
           name: '張建國 (男廁小便斗如廁中)',
           role: '8F 男廁小便斗區・如廁中',
-          avatar: '🚹',
           type: 'visitor',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3347,14 +3268,11 @@
           waypoints: [new THREE.Vector3(-34.4, FLOOR_Y[8], 9.45)],
           speed: 0,
           yaw: 0,
-          isUsingRestroom: true,
-          dialogue: '「正在男廁小便斗上廁所中，待會要記得去洗手台用肥皂洗手！」',
-          options: []
+          isUsingRestroom: true
         },
         {
           name: '陳雅婷 (女廁如廁中)',
           role: '8F 女廁隔間 1・上廁所中',
-          avatar: '🚺',
           type: 'visitor',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3368,14 +3286,11 @@
           waypoints: [new THREE.Vector3(-38.3, FLOOR_Y[8], 14.15)],
           speed: 0,
           yaw: Math.PI,
-          isUsingRestroom: true,
-          dialogue: '「不好意思，女廁隔間目前使用中喔！旁邊還有其他隔間與無障礙廁所可以使用。」',
-          options: []
+          isUsingRestroom: true
         },
         {
           name: '吳佳蓉 (女廁如廁中)',
           role: '8F 女廁隔間 2・上廁所中',
-          avatar: '🚺',
           type: 'visitor',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3389,14 +3304,11 @@
           waypoints: [new THREE.Vector3(-36.1, FLOOR_Y[8], 14.15)],
           speed: 0,
           yaw: Math.PI,
-          isUsingRestroom: true,
-          dialogue: '「正在上廁所中，8F 洗手間維持得很乾淨明亮呢！」',
-          options: []
+          isUsingRestroom: true
         },
         {
           name: '周怡君 護理師 (洗手清潔中)',
           role: '8F 開放式洗手間洗手台・內外夾弓大立腕',
-          avatar: '🧼',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3410,16 +3322,13 @@
           waypoints: [new THREE.Vector3(-27.85, FLOOR_Y[8], 10.3)],
           speed: 0,
           yaw: -Math.PI * 0.5,
-          isWashingHands: true,
-          dialogue: '「上完廁所一定要落實洗手七字訣『內、外、夾、弓、大、立、腕』並擦乾雙手喔！」',
-          options: []
+          isWashingHands: true
         },
 
         // ================= 8F 資訊處與開放式機房工程師 NPC =================
         {
           name: '許先生 資深工程師',
           role: '8F 資訊處・HIS 醫療資訊系統與資料庫架構',
-          avatar: '👨‍💻',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3427,14 +3336,11 @@
           appearance: { coatColor: 0x1e3a8a, pantsColor: 0x0f172a },
           waypoints: [new THREE.Vector3(17.5, FLOOR_Y[8], 12.6)],
           speed: 0,
-          yaw: Math.PI,
-          dialogue: '您好！我是資訊處資深工程師許先生，負責全院 HIS 醫療資訊系統與資料庫架構。資訊室入口已全面改為感應式自動電動門，走近即可自動開啟！',
-          options: []
+          yaw: Math.PI
         },
         {
           name: '陳先生 資深工程師',
           role: '8F 資訊處・資訊安全與伺服器虛擬化架構',
-          avatar: '👨‍💻',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3442,14 +3348,11 @@
           appearance: { coatColor: 0x1e3a8a, pantsColor: 0x0f172a },
           waypoints: [new THREE.Vector3(17.5, FLOOR_Y[8], 18.4)],
           speed: 0,
-          yaw: 0,
-          dialogue: '您好！我是資訊處資深工程師陳先生，負責全院資訊安全防護、虛擬化叢集與會議室遠距視訊系統穩定運作！',
-          options: []
+          yaw: 0
         },
         {
           name: '李伽好 維護工程師',
           role: '8F 資訊處・醫療端末設備與臨床系統維護',
-          avatar: '🛠️',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3457,14 +3360,11 @@
           appearance: { coatColor: 0x0d9488, pantsColor: 0x0f172a },
           waypoints: [new THREE.Vector3(23.2, FLOOR_Y[8], 12.6)],
           speed: 0,
-          yaw: Math.PI,
-          dialogue: '您好！我是資訊處維護工程師李伽好，負責各樓層病房護理站端末設備、會議室投影設備與臨床系統即時維護！',
-          options: []
+          yaw: Math.PI
         },
         {
           name: '陳湧玉 維護工程師',
           role: '8F 資訊處・硬體伺服器與機房設備定期檢修',
-          avatar: '🛠️',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3472,14 +3372,11 @@
           appearance: { coatColor: 0x0d9488, pantsColor: 0x0f172a },
           waypoints: [new THREE.Vector3(23.2, FLOOR_Y[8], 18.4)],
           speed: 0,
-          yaw: 0,
-          dialogue: '您好！我是資訊處維護工程師陳湧玉，往東走穿過感應式玻璃自動門就是開放式核心機房區！',
-          options: []
+          yaw: 0
         },
         {
           name: '李雨如 資訊助理員',
           role: '8F 資訊處(女)・資訊行政協調與自動門接待窗口',
-          avatar: '👩‍💼',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3487,16 +3384,13 @@
           appearance: { coatColor: 0xf43f5e, pantsColor: 0x1e293b, isFemale: true },
           waypoints: [new THREE.Vector3(12.4, FLOOR_Y[8], 15.8)],
           speed: 0,
-          yaw: -Math.PI * 0.5,
-          dialogue: '您好！我是資訊助理員李雨如，資訊處西側與北側出入口都已改建為感應式自動電動門，靠近就會自動打開歡迎您！',
-          options: []
+          yaw: -Math.PI * 0.5
         },
 
         // ================= 8F 大型會議室、茶水間與保全 =================
         {
           name: '陳明輝 8F 教學與會議中心主任',
           role: '8F 大型會議室 / 主任辦公室走廊',
-          avatar: '🎓',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3506,14 +3400,11 @@
             new THREE.Vector3(-18.0, FLOOR_Y[8], -24.5),
             new THREE.Vector3(6.5, FLOOR_Y[8], -24.5)
           ],
-          speed: 1.15,
-          dialogue: '歡迎參觀 8F 會議樓層！目前「8F 大圓桌會議室」內有黃明和總裁、黃靜媛執行長、劉力總經理與郭盛名協理正在主持高階會議！',
-          options: []
+          speed: 1.15
         },
         {
           name: '許淑惠 開放式茶水間服務員',
           role: '8F 開放式茶水間・咖啡吧台與會議茶點服務',
-          avatar: '☕',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3523,14 +3414,11 @@
             new THREE.Vector3(-22.5, FLOOR_Y[8], 8.6),
             new THREE.Vector3(-16.5, FLOOR_Y[8], 8.6)
           ],
-          speed: 1.05,
-          dialogue: '歡迎來到「8F 開放式茶水間」！西側就是開放式洗手間，東側則是交流中庭與資訊處自動門！',
-          options: []
+          speed: 1.05
         },
         {
           name: '蔡志強 8F 駐衛警',
           role: '8F 中央電梯廳與會議樓層安全維護',
-          avatar: '👮',
           type: 'security',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3540,9 +3428,7 @@
             new THREE.Vector3(-15.5, FLOOR_Y[8], -22.5),
             new THREE.Vector3(12.5, FLOOR_Y[8], -22.5)
           ],
-          speed: 1.35,
-          dialogue: '您好！目前總裁與各位長官正在大圓桌會議室開會，請維持會議秩序，祝您參觀愉快！',
-          options: []
+          speed: 1.35
         }
       ];
 
@@ -3620,7 +3506,7 @@
           walkCycle: Math.random() * Math.PI * 2,
           isStationaryGuard: def.speed === 0,
           isSeated: !!def.appearance.isSeated,
-          isPresenting: !!def.isPresenting,
+          isExecutive: !!def.appearance.isExecutive,
           isUsingRestroom: !!def.isUsingRestroom,
           isWashingHands: !!def.isWashingHands,
           hp: maxHp,
@@ -3707,10 +3593,6 @@
       }
     }
 
-    /**
-     * 即時更新資訊室感應式自動玻璃電動門：
-     * 偵測玩家或任一 NPC 靠近門中心 3.3m 內時自動平滑滑開並解除碰撞箱
-     */
     function updateAutomaticSlidingDoors(dt) {
       const triggerRadius = 3.3;
 
@@ -3747,10 +3629,8 @@
         door.leftLeaf.position.x = -curOffset;
         door.rightLeaf.position.x = curOffset;
 
-        // 感應器 LED 燈色切換：開啟中為亮綠色，待機閉合為科技藍
         door.sensorLedMat.color.setHex(door.openProgress > 0.35 ? 0x22c55e : 0x38bdf8);
 
-        // 門開度超過 45% 時移除通道阻擋，否則恢復玻璃門阻擋
         if (door.openProgress > 0.45) {
           door.doorCollider.minX = 9999;
           door.doorCollider.maxX = 9999;
@@ -3768,12 +3648,13 @@
     }
 
     // --------------------------------------------------------------------------
-    // 5. 雙向近戰格鬥與單擊地板波紋步行標記
+    // 5. 雙向近戰格鬥與單擊地板波紋步行標記（無 NPC 對話阻礙）
     // --------------------------------------------------------------------------
     function performPlayerAttack(isHeavy = false) {
-      if (player.isDead || activeTalkNpc || player.isAttacking) return;
+      if (player.isDead || isTransportModalOpen || player.isAttacking) return;
 
       player.autoMoveTarget = null;
+      pendingAttackNpc = null;
       player.isAttacking = true;
       player.attackTimer = 0;
       player.hitApplied = false;
@@ -3804,7 +3685,7 @@
     function applyPlayerHitbox() {
       const isHeavy = player.attackType === 4;
       const isSpinKick = player.attackType === 3;
-      const reach = isHeavy ? 2.15 : isSpinKick ? 2.0 : 1.75;
+      const reach = isHeavy ? 2.25 : isSpinKick ? 2.1 : 1.85;
       const baseDmg = isHeavy ? 46 : isSpinKick ? 34 : 24;
 
       const fwdX = Math.sin(player.yaw);
@@ -3821,7 +3702,7 @@
 
         if (!isSpinKick && dist > 0.05) {
           const dot = (dx / dist) * fwdX + (dz / dist) * fwdZ;
-          if (dot < 0.25) return;
+          if (dot < 0.22) return;
         }
 
         hitCount++;
@@ -4006,6 +3887,7 @@
       player.hp = player.maxHp;
       player.armor = 90;
       player.isDead = false;
+      pendingAttackNpc = null;
       document.getElementById('ko-overlay').classList.add('hidden');
       npcs.forEach((n) => {
         n.isHostile = false;
@@ -4070,13 +3952,11 @@
       const scale = 3.1;
       ctx.translate(-player.pos.x * scale, -player.pos.z * scale);
 
-      // 8F 外框底板
       ctx.fillStyle = '#e7dcc4';
       ctx.fillRect(-43.5 * scale, -39.5 * scale, 87 * scale, 55 * scale);
       ctx.fillRect(-13.8 * scale, 15.5 * scale, 23.6 * scale, 14.3 * scale);
       ctx.fillRect(10.5 * scale, 8.0 * scale, 32.7 * scale, 15.2 * scale);
 
-      // 西北安全梯 & 8F 大型會議室 & 北排辦公室
       ctx.fillStyle = '#99f6e4';
       ctx.fillRect(-43.1 * scale, -39.1 * scale, 10.2 * scale, 10.2 * scale);
       ctx.fillStyle = '#bfdbfe';
@@ -4084,7 +3964,6 @@
       ctx.fillStyle = '#cbd5e1';
       ctx.fillRect(-1.0 * scale, -39.1 * scale, 18.0 * scale, 10.2 * scale);
 
-      // 8F 大圓桌會議室 (紫色)
       ctx.fillStyle = '#e9d5ff';
       ctx.fillRect(-43.1 * scale, -26.0 * scale, 17.1 * scale, 16.5 * scale);
       ctx.fillStyle = '#7e22ce';
@@ -4092,13 +3971,11 @@
       ctx.arc(-34.2 * scale, -17.75 * scale, 3.3 * scale, 0, Math.PI * 2);
       ctx.fill();
 
-      // 8F 開放式廁所及茶水間
       ctx.fillStyle = '#fbcfe8';
       ctx.fillRect(-43.1 * scale, 5.5 * scale, 17.1 * scale, 9.6 * scale);
       ctx.fillStyle = '#fde68a';
       ctx.fillRect(-26.0 * scale, 5.5 * scale, 11.8 * scale, 9.6 * scale);
 
-      // 中央交流中庭與中央核心
       ctx.fillStyle = '#fef3c7';
       ctx.beginPath();
       ctx.arc(-2.0 * scale, 9.2 * scale, 4.6 * scale, 0, Math.PI * 2);
@@ -4106,19 +3983,16 @@
       ctx.fillStyle = '#bae6fd';
       ctx.fillRect(-14.25 * scale, -19.75 * scale, 11.5 * scale, 14.5 * scale);
 
-      // 美帝奇會議室一 & 二
       ctx.fillStyle = '#dbeafe';
       ctx.fillRect(17.35 * scale, -26.65 * scale, 25.4 * scale, 14.3 * scale);
       ctx.fillStyle = '#fce7f3';
       ctx.fillRect(17.35 * scale, -9.65 * scale, 25.4 * scale, 16.3 * scale);
 
-      // 資訊處與開放式機房
       ctx.fillStyle = '#cffafe';
       ctx.fillRect(10.5 * scale, 8.0 * scale, 17.0 * scale, 15.2 * scale);
       ctx.fillStyle = '#a5f3fc';
       ctx.fillRect(27.5 * scale, 8.0 * scale, 15.7 * scale, 15.2 * scale);
 
-      // 資訊室自動電動門位置標記（亮綠色線段）
       ctx.strokeStyle = '#16a34a';
       ctx.lineWidth = 3;
       ctx.beginPath();
@@ -4130,12 +4004,10 @@
       ctx.lineTo(27.5 * scale, 16.7 * scale);
       ctx.stroke();
 
-      // 電梯位置
       ctx.fillStyle = '#0d9488';
       ctx.fillRect(-17.4 * scale, -13.7 * scale, 2.4 * scale, 2.4 * scale);
       ctx.fillRect(-3.8 * scale, 20.3 * scale, 2.4 * scale, 2.4 * scale);
 
-      // NPC 圓點
       npcs.forEach((n) => {
         if (n.knockedTimer > 0) return;
         ctx.fillStyle = n.isHostile ? '#ef4444' : (n.isExecutive ? '#f59e0b' : (n.isUsingRestroom ? '#ec4899' : '#0284c7'));
@@ -4146,7 +4018,6 @@
 
       ctx.restore();
 
-      // 玩家箭頭
       ctx.save();
       ctx.translate(cx, cy);
       ctx.rotate(camState.yaw - player.yaw + Math.PI);
@@ -4170,47 +4041,651 @@
     }
 
     // --------------------------------------------------------------------------
-    // 7. 自由滑鼠操控、鍵盤移動與自動電動門/NPC 動畫更新
+    // 7. 自由滑鼠操控、鍵盤移動、電梯選單與每幀動畫更新（無 NPC 對話功能）
     // --------------------------------------------------------------------------
-    function initEventListeners() {
+    function teleportToZone(zoneKey) {
+      const z = ZONES[zoneKey];
+      if (!z) return;
+      player.pos.copy(z.pos);
+      player.yaw = z.yaw;
+      player.vel.set(0, 0, 0);
+      player.knockVel.set(0, 0, 0);
+      player.autoMoveTarget = null;
+      pendingAttackNpc = null;
+      camState.targetYaw = z.yaw + Math.PI;
+      camState.yaw = z.yaw + Math.PI;
+      document.getElementById('current-zone-label').textContent = z.label;
+      showToast(`📍 已傳送至：${z.label}`);
+    }
+
+    function redirectToFloorHtml(floorCode) {
+      const item = FLOOR_HTML_LINKS.find((f) => f.code === floorCode);
+      if (!item) return;
+
+      closeElevatorModal();
+
+      if (floorCode === '8F') {
+        showToast('🏛️ 您目前正位於 8F（本棟最高樓層・會議中心與資訊處）！');
+        return;
+      }
+
+      const overlay = document.getElementById('floor-redirect-overlay');
+      document.getElementById('redirect-title').textContent = `正在前往 ${item.title}...`;
+      document.getElementById('redirect-subtitle').textContent = `即將自動連結至 ${item.file}（${item.desc}）`;
+      overlay.classList.remove('hidden');
+      SoundFX.playChime();
+
+      setTimeout(() => {
+        window.location.href = item.file;
+      }, 650);
+    }
+
+    function openElevatorModal(zoneName = '8F 中央四座電梯廳') {
+      isTransportModalOpen = true;
+      player.autoMoveTarget = null;
+      pendingAttackNpc = null;
+      document.getElementById('elv-name').textContent = `${zoneName}・全院樓層直達選單`;
+
+      const optWrap = document.getElementById('elv-options');
+      optWrap.innerHTML = '';
+
+      FLOOR_HTML_LINKS.forEach((fl) => {
+        const btn = document.createElement('button');
+        btn.className = `w-full text-left px-3.5 py-2.5 rounded-xl border transition flex items-center justify-between gap-2 hover:brightness-110 ${fl.badgeBg}`;
+        btn.innerHTML = `
+          <div>
+            <div class="font-black text-xs sm:text-sm">${fl.title} <span class="opacity-75 text-[11px]">(${fl.file})</span></div>
+            <div class="text-[11px] opacity-90 mt-0.5">${fl.desc}</div>
+          </div>
+          <span class="shrink-0 px-2 py-0.5 rounded bg-black/35 text-[11px] font-black">按 ${fl.numHint} 鍵</span>
+        `;
+        btn.addEventListener('click', () => redirectToFloorHtml(fl.code));
+        optWrap.appendChild(btn);
+      });
+
+      document.getElementById('elevator-modal').classList.remove('hidden');
+    }
+
+    function closeElevatorModal() {
+      isTransportModalOpen = false;
+      document.getElementById('elevator-modal').classList.add('hidden');
+      transportPromptCooldown = true;
+      setTimeout(() => {
+        transportPromptCooldown = false;
+      }, 1500);
+    }
+
+    function updateCurrentZoneHUD() {
+      const px = player.pos.x;
+      const pz = player.pos.z;
+      let zoneText = '8F 中央環形走廊・會議中心與資訊空間';
+
+      if (px >= -43.2 && px <= -25.8 && pz >= -26.0 && pz <= -9.5) {
+        zoneText = '8F 大圓桌會議室 (黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理)';
+      } else if (px >= -31.0 && px <= -1.0 && pz >= -39.2 && pz <= -28.9) {
+        zoneText = '8F 大型會議室 (大型U型會議桌・投影大布幕)';
+      } else if (px >= 17.3 && px <= 43.2 && pz >= -26.8 && pz <= -12.2) {
+        zoneText = '8F 美帝奇會議室一 (U型會議桌・投影大布幕)';
+      } else if (px >= 17.3 && px <= 43.2 && pz >= -9.8 && pz <= 6.8) {
+        zoneText = '8F 美帝奇會議室二 (U型會議桌・投影大布幕)';
+      } else if (px >= -43.2 && px <= -26.0 && pz >= 5.5 && pz <= 15.2) {
+        zoneText = '8F 開放式廁所 (男廁/女廁/無障礙廁所・多人如廁與洗手區)';
+      } else if (px >= -26.0 && px <= -14.2 && pz >= 5.5 && pz <= 15.2) {
+        zoneText = '8F 開放式茶水間 (咖啡吧台・中島交流區)';
+      } else if (px >= 10.5 && px <= 27.5 && pz >= 8.0 && pz <= 23.2) {
+        zoneText = '8F 資訊處辦公室 (感應自動電動門・系統維護與工程團隊)';
+      } else if (px >= 27.5 && px <= 43.2 && pz >= 8.0 && pz <= 23.2) {
+        zoneText = '8F 開放式機房 (感應自動電動門・CORE SWITCH 與伺服器機櫃)';
+      } else if (px >= -8.0 && px <= 4.0 && pz >= 4.0 && pz <= 14.5) {
+        zoneText = '8F 中央開放式交流中庭';
+      } else if (px >= -19.5 && px <= -14.0 && pz >= -17.0 && pz <= -8.0) {
+        zoneText = '8F 中央四座電梯廳 (B1 ~ 8F)';
+      }
+
+      document.getElementById('current-zone-label').textContent = zoneText;
+    }
+
+    function updatePlayerAndCamera(dt) {
+      if (player.isDead) {
+        player.respawnTimer -= dt;
+        if (player.respawnTimer <= 0) {
+          clearWantedAndHeal();
+          teleportToZone('f8_here');
+        }
+        return;
+      }
+
+      if (player.comboResetTimer > 0) {
+        player.comboResetTimer -= dt;
+        if (player.comboResetTimer <= 0) player.comboStep = 0;
+      }
+
+      // 若玩家點擊了某位 NPC，自動步行靠近後直接朝其揮拳攻擊（無任何對話）
+      if (pendingAttackNpc) {
+        if (pendingAttackNpc.knockedTimer > 0) {
+          pendingAttackNpc = null;
+          player.autoMoveTarget = null;
+        } else {
+          const distToTarget = Math.hypot(
+            pendingAttackNpc.pos.x - player.pos.x,
+            pendingAttackNpc.pos.z - player.pos.z
+          );
+          if (distToTarget <= 1.55) {
+            player.yaw = Math.atan2(
+              pendingAttackNpc.pos.x - player.pos.x,
+              pendingAttackNpc.pos.z - player.pos.z
+            );
+            pendingAttackNpc = null;
+            player.autoMoveTarget = null;
+            performPlayerAttack(false);
+          } else {
+            player.autoMoveTarget = pendingAttackNpc.pos.clone();
+          }
+        }
+      }
+
+      let moveX = 0;
+      let moveZ = 0;
+      const forwardX = -Math.sin(camState.yaw);
+      const forwardZ = -Math.cos(camState.yaw);
+      const rightX = Math.cos(camState.yaw);
+      const rightZ = -Math.sin(camState.yaw);
+
+      if (!isTransportModalOpen) {
+        if (keys['KeyW'] || keys['ArrowUp']) { moveX += forwardX; moveZ += forwardZ; }
+        if (keys['KeyS'] || keys['ArrowDown']) { moveX -= forwardX; moveZ -= forwardZ; }
+        if (keys['KeyA'] || keys['ArrowLeft']) { moveX -= rightX; moveZ -= rightZ; }
+        if (keys['KeyD'] || keys['ArrowRight']) { moveX += rightX; moveZ += rightZ; }
+      }
+
+      const hasManualInput = (moveX !== 0 || moveZ !== 0);
+      if (hasManualInput) {
+        player.autoMoveTarget = null;
+        pendingAttackNpc = null;
+      } else if (player.autoMoveTarget && !isTransportModalOpen) {
+        player.autoMoveTimer -= dt;
+        const dx = player.autoMoveTarget.x - player.pos.x;
+        const dz = player.autoMoveTarget.z - player.pos.z;
+        const dist = Math.hypot(dx, dz);
+        if (dist < 0.35 || player.autoMoveTimer <= 0) {
+          player.autoMoveTarget = null;
+        } else {
+          moveX = dx / dist;
+          moveZ = dz / dist;
+        }
+      }
+
+      const isSprinting = !!(keys['ShiftLeft'] || keys['ShiftRight']);
+      const moveSpeed = isSprinting ? 7.4 : 4.8;
+
+      if (moveX !== 0 || moveZ !== 0) {
+        const len = Math.hypot(moveX, moveZ);
+        moveX /= len;
+        moveZ /= len;
+
+        player.pos.x += moveX * moveSpeed * dt;
+        player.pos.z += moveZ * moveSpeed * dt;
+
+        const targetYaw = Math.atan2(moveX, moveZ);
+        let diff = targetYaw - player.yaw;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        player.yaw += diff * Math.min(1, dt * 14);
+
+        player.walkCycle += dt * (isSprinting ? 13 : 9);
+      } else {
+        player.walkCycle = 0;
+      }
+
+      if (player.knockVel.lengthSq() > 0.01) {
+        player.pos.x += player.knockVel.x * dt;
+        player.pos.z += player.knockVel.z * dt;
+        player.knockVel.multiplyScalar(Math.pow(0.06, dt));
+      }
+
+      player.vel.y -= 22.0 * dt;
+      player.pos.y += player.vel.y * dt;
+      if (player.pos.y <= FLOOR_Y[8]) {
+        player.pos.y = FLOOR_Y[8];
+        player.vel.y = 0;
+        player.onGround = true;
+      }
+
+      for (let i = 0; i < npcs.length; i++) {
+        separateCircles(player.pos, player.radius, npcs[i].pos, npcs[i].radius, 0.85);
+      }
+      resolveCircleAllAABBs(player.pos, player.radius, 8);
+      player.pos.x = THREE.MathUtils.clamp(player.pos.x, -42.6, 42.6);
+      player.pos.z = THREE.MathUtils.clamp(player.pos.z, -38.6, 29.0);
+
+      player.mesh.position.copy(player.pos);
+      player.mesh.rotation.y = player.yaw;
+
+      if (player.isAttacking) {
+        player.attackTimer += dt;
+        const p = Math.min(1, player.attackTimer / player.attackDuration);
+        const swing = Math.sin(p * Math.PI);
+
+        if (player.attackType === 1) {
+          player.rightShoulder.rotation.x = -swing * 2.1;
+          player.rightElbow.rotation.x = -0.3 + swing * 0.25;
+          player.rightFistAura.material.opacity = swing * 0.65;
+        } else if (player.attackType === 2) {
+          player.leftShoulder.rotation.x = -swing * 2.1;
+          player.leftElbow.rotation.x = -0.3 + swing * 0.25;
+          player.leftFistAura.material.opacity = swing * 0.65;
+        } else if (player.attackType === 3) {
+          player.bodyRoot.rotation.y = swing * Math.PI * 2;
+          player.rightHip.rotation.x = -swing * 1.45;
+          player.rightFootAura.material.opacity = swing * 0.75;
+        } else {
+          player.rightShoulder.rotation.x = -swing * 2.4;
+          player.leftShoulder.rotation.x = -swing * 2.2;
+          player.rightFistAura.material.opacity = swing * 0.85;
+          player.leftFistAura.material.opacity = swing * 0.85;
+        }
+
+        if (p >= 0.42 && !player.hitApplied) {
+          player.hitApplied = true;
+          applyPlayerHitbox();
+        }
+
+        if (p >= 1) {
+          player.isAttacking = false;
+          player.bodyRoot.rotation.y = 0;
+          player.rightFistAura.material.opacity = 0;
+          player.leftFistAura.material.opacity = 0;
+          player.rightFootAura.material.opacity = 0;
+        }
+      } else {
+        const legSwing = Math.sin(player.walkCycle) * 0.68;
+        player.leftHip.rotation.x = legSwing;
+        player.rightHip.rotation.x = -legSwing;
+        player.leftKnee.rotation.x = Math.max(0, -legSwing) * 0.7;
+        player.rightKnee.rotation.x = Math.max(0, legSwing) * 0.7;
+        player.leftShoulder.rotation.x = -legSwing * 0.55;
+        player.rightShoulder.rotation.x = legSwing * 0.55;
+        player.leftElbow.rotation.x = -0.25;
+        player.rightElbow.rotation.x = -0.25;
+      }
+
+      camState.yaw += (camState.targetYaw - camState.yaw) * Math.min(1, dt * 16);
+      camState.pitch += (camState.targetPitch - camState.pitch) * Math.min(1, dt * 16);
+      camState.distance += (camState.targetDistance - camState.distance) * Math.min(1, dt * 12);
+
+      const eyeHeight = player.firstPerson ? 1.62 : 1.48;
+      camState.targetPos.set(player.pos.x, player.pos.y + eyeHeight, player.pos.z);
+
+      if (player.firstPerson) {
+        player.mesh.visible = false;
+        camera.position.copy(camState.targetPos);
+        const lookDist = 10;
+        camera.lookAt(
+          camState.targetPos.x - Math.sin(camState.yaw) * Math.cos(camState.pitch) * lookDist,
+          camState.targetPos.y - Math.sin(camState.pitch) * lookDist,
+          camState.targetPos.z - Math.cos(camState.yaw) * Math.cos(camState.pitch) * lookDist
+        );
+      } else {
+        player.mesh.visible = true;
+        const horizDist = Math.cos(camState.pitch) * camState.distance;
+        const vertDist = Math.sin(camState.pitch) * camState.distance;
+        let camX = camState.targetPos.x + Math.sin(camState.yaw) * horizDist;
+        let camY = camState.targetPos.y + vertDist;
+        let camZ = camState.targetPos.z + Math.cos(camState.yaw) * horizDist;
+
+        camX = THREE.MathUtils.clamp(camX, -42.8, 42.8);
+        camZ = THREE.MathUtils.clamp(camZ, -38.8, 29.2);
+        camY = Math.max(FLOOR_Y[8] + 0.55, Math.min(FLOOR_Y[8] + 4.15, camY));
+
+        if (camShake > 0.001) {
+          camX += (Math.random() - 0.5) * camShake;
+          camY += (Math.random() - 0.5) * camShake;
+          camZ += (Math.random() - 0.5) * camShake;
+          camShake *= Math.pow(0.02, dt);
+        }
+
+        camera.position.set(camX, camY, camZ);
+        camera.lookAt(camState.targetPos);
+      }
+
+      // 檢測是否進入電梯感應區（已移除靠近 NPC 的交談提示）
+      nearTransportZone = null;
+      for (let i = 0; i < transportTriggerZones.length; i++) {
+        const tz = transportTriggerZones[i];
+        const d = Math.hypot(player.pos.x - tz.x, player.pos.z - tz.z);
+        if (d <= tz.radius) {
+          nearTransportZone = tz;
+          break;
+        }
+      }
+
+      const elvPromptEl = document.getElementById('elevator-prompt');
+      if (nearTransportZone && !isTransportModalOpen) {
+        document.getElementById('prompt-elevator-name').textContent = `${nearTransportZone.name} (B1 ~ 8F)`;
+        elvPromptEl.classList.remove('hidden');
+        if (!transportPromptCooldown) {
+          openElevatorModal(nearTransportZone.name);
+        }
+      } else {
+        elvPromptEl.classList.add('hidden');
+      }
+
+      updateCurrentZoneHUD();
+    }
+
+    function updateNpcs(dt, elapsed) {
+      npcs.forEach((npc) => {
+        npc.badge.visible = showNpcLabels;
+
+        if (npc.barkTimer > 0) {
+          npc.barkTimer -= dt;
+          if (npc.barkTimer <= 0) npc.barkEl.classList.add('hidden');
+        }
+
+        if (npc.knockedTimer > 0) {
+          npc.knockedTimer -= dt;
+          npc.dizzyGroup.rotation.y += dt * 4.5;
+          if (npc.knockedTimer <= 0) {
+            npc.hp = npc.maxHp;
+            npc.dizzyGroup.visible = false;
+            npc.rig.bodyRoot.rotation.x = 0;
+            npc.rig.bodyRoot.position.y = 0;
+            npc.isHostile = true;
+          }
+        } else {
+          if (npc.knockVel.lengthSq() > 0.01) {
+            npc.pos.x += npc.knockVel.x * dt;
+            npc.pos.z += npc.knockVel.z * dt;
+            npc.knockVel.multiplyScalar(Math.pow(0.05, dt));
+            resolveCircleAllAABBs(npc.pos, npc.radius, 8);
+          }
+
+          if (npc.isHostile && !player.isDead) {
+            const dx = player.pos.x - npc.pos.x;
+            const dz = player.pos.z - npc.pos.z;
+            const dist = Math.hypot(dx, dz);
+            npc.yaw = Math.atan2(dx, dz);
+            npc.alertRing.visible = true;
+
+            if (npc.attackCooldown > 0) npc.attackCooldown -= dt;
+
+            if (dist > 1.38) {
+              const chaseSpd = npc.type === 'security' ? 3.5 : 2.7;
+              npc.pos.x += (dx / dist) * chaseSpd * dt;
+              npc.pos.z += (dz / dist) * chaseSpd * dt;
+              npc.walkCycle += dt * 10;
+              resolveCircleAllAABBs(npc.pos, npc.radius, 8);
+            } else if (npc.attackCooldown <= 0) {
+              npc.attackCooldown = 1.35;
+              npc.swingAnimTimer = 0.28;
+              triggerNpcCounterAttack(npc);
+            }
+          } else {
+            npc.alertRing.visible = false;
+
+            if (npc.isSeated) {
+              npc.rig.bodyRoot.position.y = -0.22 + Math.sin(elapsed * 2.2 + npc.walkCycle) * 0.012;
+              npc.rig.leftHip.rotation.x = -Math.PI * 0.45;
+              npc.rig.rightHip.rotation.x = -Math.PI * 0.45;
+              npc.rig.leftKnee.rotation.x = Math.PI * 0.45;
+              npc.rig.rightKnee.rotation.x = Math.PI * 0.45;
+              if (npc.isExecutive) {
+                npc.rig.rightShoulder.rotation.x = -0.45 + Math.sin(elapsed * 2.6 + npc.walkCycle) * 0.14;
+                npc.rig.rightElbow.rotation.x = -0.65;
+              }
+            } else if (npc.isWashingHands) {
+              npc.rig.leftShoulder.rotation.x = -0.75 + Math.sin(elapsed * 8.0) * 0.14;
+              npc.rig.rightShoulder.rotation.x = -0.75 - Math.sin(elapsed * 8.0) * 0.14;
+              npc.rig.leftElbow.rotation.x = -0.85;
+              npc.rig.rightElbow.rotation.x = -0.85;
+            } else if (npc.isUsingRestroom) {
+              npc.rig.bodyRoot.position.y = Math.sin(elapsed * 2.0 + npc.walkCycle) * 0.015;
+            } else if (!npc.isStationaryGuard && npc.waypoints.length > 1) {
+              const targetWp = npc.waypoints[npc.wpIndex];
+              const dx = targetWp.x - npc.pos.x;
+              const dz = targetWp.z - npc.pos.z;
+              const dist = Math.hypot(dx, dz);
+              if (dist < 0.35) {
+                npc.wpIndex = (npc.wpIndex + 1) % npc.waypoints.length;
+              } else {
+                npc.pos.x += (dx / dist) * npc.speed * dt;
+                npc.pos.z += (dz / dist) * npc.speed * dt;
+                npc.yaw = Math.atan2(dx, dz);
+                npc.walkCycle += dt * 7.5;
+                resolveCircleAllAABBs(npc.pos, npc.radius, 8);
+              }
+            }
+          }
+
+          if (!npc.isSeated && !npc.isWashingHands) {
+            const swing = Math.sin(npc.walkCycle) * 0.55;
+            npc.rig.leftHip.rotation.x = swing;
+            npc.rig.rightHip.rotation.x = -swing;
+            if (npc.swingAnimTimer > 0) {
+              npc.swingAnimTimer -= dt;
+              npc.rig.rightShoulder.rotation.x = -1.9;
+            } else {
+              npc.rig.leftShoulder.rotation.x = -swing * 0.45;
+              npc.rig.rightShoulder.rotation.x = swing * 0.45;
+            }
+          }
+        }
+
+        npc.rig.group.position.copy(npc.pos);
+        npc.rig.group.rotation.y = npc.yaw;
+
+        const distToCam = camera.position.distanceTo(npc.pos);
+        if ((npc.isHostile || npc.hp < npc.maxHp) && distToCam < 24) {
+          const headPos = new THREE.Vector3(npc.pos.x, npc.pos.y + 2.55, npc.pos.z);
+          const proj = headPos.project(camera);
+          if (proj.z < 1) {
+            const sx = (proj.x * 0.5 + 0.5) * window.innerWidth;
+            const sy = (-proj.y * 0.5 + 0.5) * window.innerHeight;
+            npc.hpBarWrap.style.left = `${sx}px`;
+            npc.hpBarWrap.style.top = `${sy}px`;
+            npc.hpFillEl.style.width = `${Math.max(0, (npc.hp / npc.maxHp) * 100)}%`;
+            npc.hpBarWrap.classList.remove('hidden');
+          } else {
+            npc.hpBarWrap.classList.add('hidden');
+          }
+        } else {
+          npc.hpBarWrap.classList.add('hidden');
+        }
+      });
+    }
+
+    function updateVisualEffects(dt, elapsed) {
+      transportPads.forEach((ring, idx) => {
+        const s = 1 + Math.sin(elapsed * 3.5 + idx) * 0.08;
+        ring.scale.set(s, s, 1);
+      });
+
+      serverBlinkLeds.forEach((led) => {
+        const blink = Math.sin(elapsed * 7.5 + led.phase) > 0;
+        led.mat.visible = blink;
+      });
+
+      for (let i = slashEffects.length - 1; i >= 0; i--) {
+        const ef = slashEffects[i];
+        ef.life -= dt;
+        ef.mesh.material.opacity = Math.max(0, (ef.life / ef.maxLife) * 0.85);
+        ef.mesh.scale.addScalar(dt * 2.5);
+        if (ef.life <= 0) {
+          scene.remove(ef.mesh);
+          slashEffects.splice(i, 1);
+        }
+      }
+
+      for (let i = impactParticles.length - 1; i >= 0; i--) {
+        const pt = impactParticles[i];
+        pt.life -= dt;
+        pt.vel.y -= 9.8 * dt;
+        pt.mesh.position.addScaledVector(pt.vel, dt);
+        if (pt.life <= 0) {
+          scene.remove(pt.mesh);
+          impactParticles.splice(i, 1);
+        }
+      }
+
+      for (let i = floorClickRipples.length - 1; i >= 0; i--) {
+        const rp = floorClickRipples[i];
+        rp.life -= dt;
+        const prog = 1 - Math.max(0, rp.life / rp.maxLife);
+        const sc = 1 + prog * 2.2;
+        rp.outerRing.scale.set(sc, sc, 1);
+        rp.outerRing.material.opacity = (1 - prog) * 0.95;
+        rp.innerDot.material.opacity = (1 - prog) * 0.85;
+        if (rp.life <= 0) {
+          scene.remove(rp.outerRing);
+          scene.remove(rp.innerDot);
+          floorClickRipples.splice(i, 1);
+        }
+      }
+    }
+
+    function init() {
+      const canvas = document.getElementById('game-canvas');
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xdbeafe);
+      scene.fog = new THREE.FogExp2(0xe0f2fe, 0.0045);
+
+      camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.15, 220);
+
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.12;
+
+      const hemiLight = new THREE.HemisphereLight(0xffffff, 0xd6c7b2, 1.05);
+      hemiLight.position.set(0, 50, 0);
+      scene.add(hemiLight);
+
+      const dirLight = new THREE.DirectionalLight(0xfffbeb, 0.85);
+      dirLight.position.set(28, 65, 22);
+      dirLight.castShadow = true;
+      dirLight.shadow.mapSize.width = 2048;
+      dirLight.shadow.mapSize.height = 2048;
+      dirLight.shadow.camera.near = 10;
+      dirLight.shadow.camera.far = 140;
+      const d = 55;
+      dirLight.shadow.camera.left = -d;
+      dirLight.shadow.camera.right = d;
+      dirLight.shadow.camera.top = d;
+      dirLight.shadow.camera.bottom = -d;
+      scene.add(dirLight);
+
+      buildFloor8();
+      spawnAllNpcs();
+      bindEvents();
+
       window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
 
+      setTimeout(() => {
+        const loader = document.getElementById('loading-overlay');
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(() => loader.remove(), 500);
+        }
+      }, 450);
+
+      animate();
+    }
+
+    function handleCanvasClickInteraction(clientX, clientY) {
+      if (isTransportModalOpen) return;
+
+      mouseNDC.x = (clientX / window.innerWidth) * 2 - 1;
+      mouseNDC.y = -(clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouseNDC, camera);
+
+      // 1. 優先檢測是否點擊到任何 NPC -> 直接步行靠近並揮拳攻擊（無對話功能）
+      const npcHits = raycaster.intersectObjects(npcHitMeshes, false);
+      if (npcHits.length > 0) {
+        const targetNpc = npcHits[0].object.userData.npcRef;
+        if (targetNpc && targetNpc.knockedTimer <= 0) {
+          const dist = Math.hypot(targetNpc.pos.x - player.pos.x, targetNpc.pos.z - player.pos.z);
+          if (dist <= 1.85) {
+            pendingAttackNpc = null;
+            player.autoMoveTarget = null;
+            player.yaw = Math.atan2(targetNpc.pos.x - player.pos.x, targetNpc.pos.z - player.pos.z);
+            performPlayerAttack(false);
+          } else {
+            pendingAttackNpc = targetNpc;
+            spawnFloorClickRipple(targetNpc.pos.x, targetNpc.pos.z, false);
+            player.autoMoveTarget = targetNpc.pos.clone();
+            player.autoMoveTimer = 6.0;
+            showToast(`👊 鎖定攻擊目標：${targetNpc.name}`);
+          }
+          return;
+        }
+      }
+
+      // 2. 檢測是否點擊到 8F 電梯感應區地板
+      const padHits = raycaster.intersectObjects(transportHitMeshes, false);
+      if (padHits.length > 0) {
+        const elvZone = padHits[0].object.userData.elevatorZone;
+        if (elvZone) {
+          pendingAttackNpc = null;
+          openElevatorModal(elvZone.name);
+          return;
+        }
+      }
+
+      // 3. 單擊 8F 地板任意位置產生波紋標記並自動步行前往
+      const hitPt = new THREE.Vector3();
+      if (raycaster.ray.intersectPlane(floorHitPlane, hitPt)) {
+        pendingAttackNpc = null;
+        spawnFloorClickRipple(hitPt.x, hitPt.z, true);
+      }
+    }
+
+    function bindEvents() {
+      const canvas = document.getElementById('game-canvas');
+
       window.addEventListener('keydown', (e) => {
         keys[e.code] = true;
 
-        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
-          e.preventDefault();
-        }
-        if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
-          player.autoMoveTarget = null;
-        }
-
-        if (e.code === 'KeyE') {
-          if (activeTalkNpc) {
-            closeDialogueModal();
-          } else if (nearTransportZone) {
-            openTransportSelectorModal(nearTransportZone);
-          } else if (nearestNpc) {
-            openDialogueModal(nearestNpc);
-          }
-        }
         if (e.code === 'Escape') {
-          if (activeTalkNpc) closeDialogueModal();
+          if (isTransportModalOpen) closeElevatorModal();
+          return;
         }
-        if (e.code === 'KeyJ') performPlayerAttack(false);
-        if (e.code === 'KeyK') performPlayerAttack(true);
-        if (e.code === 'KeyC') clearWantedAndHeal();
-        if (e.code === 'KeyV') toggleFirstPersonView();
 
-        if (!activeTalkNpc) {
-          const matchedLink = FLOOR_HTML_LINKS.find((item) => item.keyDigit === e.code);
-          if (matchedLink) {
-            navigateToFloorHtml(matchedLink);
+        if (isTransportModalOpen) {
+          const matched = FLOOR_HTML_LINKS.find((f) => f.keyDigit === e.code);
+          if (matched) {
+            redirectToFloorHtml(matched.code);
           }
+          return;
+        }
+
+        if (e.code === 'Space') {
+          if (player.onGround && !player.isDead) {
+            player.vel.y = 7.4;
+            player.onGround = false;
+          }
+        } else if (e.code === 'KeyJ') {
+          performPlayerAttack(false);
+        } else if (e.code === 'KeyK') {
+          performPlayerAttack(true);
+        } else if (e.code === 'KeyE') {
+          if (nearTransportZone) {
+            openElevatorModal(nearTransportZone.name);
+          } else {
+            openElevatorModal('8F 中央四座電梯廳');
+          }
+        } else if (e.code === 'KeyV') {
+          player.firstPerson = !player.firstPerson;
+          document.getElementById('btn-toggle-pov').textContent = player.firstPerson ? '👁️ 第一人稱 (V)' : '👁️ 第三人稱 (V)';
+        } else if (e.code === 'KeyC') {
+          clearWantedAndHeal();
         }
       });
 
@@ -4218,28 +4693,36 @@
         keys[e.code] = false;
       });
 
-      const canvas = document.getElementById('game-canvas');
-      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-
       canvas.addEventListener('mousedown', (e) => {
-        if (activeTalkNpc) return;
-        camState.mouseDownX = e.clientX;
-        camState.mouseDownY = e.clientY;
-        camState.lastMouseX = e.clientX;
-        camState.lastMouseY = e.clientY;
-        camState.hasDraggedSinceDown = false;
-
         if (e.button === 0) {
           camState.isLeftMouseDown = true;
+          camState.hasDraggedSinceDown = false;
+          camState.mouseDownX = e.clientX;
+          camState.mouseDownY = e.clientY;
+          camState.lastMouseX = e.clientX;
+          camState.lastMouseY = e.clientY;
         } else if (e.button === 2) {
           camState.isRightDragging = true;
+          camState.lastMouseX = e.clientX;
+          camState.lastMouseY = e.clientY;
         }
       });
 
-      window.addEventListener('mousemove', (e) => {
-        if (activeTalkNpc) return;
+      window.addEventListener('mouseup', (e) => {
+        if (e.button === 0) {
+          if (camState.isLeftMouseDown && !camState.hasDraggedSinceDown && e.target === canvas) {
+            handleCanvasClickInteraction(e.clientX, e.clientY);
+          }
+          camState.isLeftMouseDown = false;
+        } else if (e.button === 2) {
+          camState.isRightDragging = false;
+        }
+      });
 
-        if (camState.lastMouseX === null) {
+      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+      window.addEventListener('mousemove', (e) => {
+        if (camState.lastMouseX === null || camState.lastMouseY === null) {
           camState.lastMouseX = e.clientX;
           camState.lastMouseY = e.clientY;
           return;
@@ -4250,52 +4733,33 @@
         camState.lastMouseX = e.clientX;
         camState.lastMouseY = e.clientY;
 
-        if (camState.isLeftMouseDown || camState.isRightDragging) {
+        if (camState.isLeftMouseDown) {
           const totalMoved = Math.hypot(e.clientX - camState.mouseDownX, e.clientY - camState.mouseDownY);
-          if (totalMoved > 5) {
+          if (totalMoved > 6) {
             camState.hasDraggedSinceDown = true;
           }
+        }
 
-          const factor = 0.0046 * camState.sensitivity;
+        if ((camState.isLeftMouseDown || camState.isRightDragging) && !isTransportModalOpen) {
+          const rotFactor = 0.0046 * camState.sensitivity;
           const ySign = camState.invertY ? -1 : 1;
-          camState.targetYaw -= dx * factor;
+          camState.targetYaw -= dx * rotFactor;
           camState.targetPitch = THREE.MathUtils.clamp(
-            camState.targetPitch + dy * factor * ySign,
+            camState.targetPitch + dy * rotFactor * 0.85 * ySign,
             -0.38,
-            1.15
+            0.85
           );
         }
       });
 
-      window.addEventListener('mouseup', (e) => {
-        if (e.button === 0 && camState.isLeftMouseDown) {
-          const wasClick = !camState.hasDraggedSinceDown;
-          camState.isLeftMouseDown = false;
-          if (wasClick && !activeTalkNpc) {
-            handleCanvasSingleClick(e.clientX, e.clientY);
-          }
-        }
-        if (e.button === 2) {
-          camState.isRightDragging = false;
-        }
-      });
-
       canvas.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        if (player.firstPerson) return;
-        camState.targetDistance = THREE.MathUtils.clamp(
-          camState.targetDistance + e.deltaY * 0.0045,
-          2.2,
-          12.5
-        );
-      }, { passive: false });
+        if (player.firstPerson || isTransportModalOpen) return;
+        camState.targetDistance = THREE.MathUtils.clamp(camState.targetDistance + e.deltaY * 0.0045, 2.4, 11.5);
+      }, { passive: true });
 
       canvas.addEventListener('touchstart', (e) => {
         if (e.touches.length === 1) {
           camState.touchDragging = true;
-          camState.hasDraggedSinceDown = false;
-          camState.mouseDownX = e.touches[0].clientX;
-          camState.mouseDownY = e.touches[0].clientY;
           camState.lastTouchX = e.touches[0].clientX;
           camState.lastTouchY = e.touches[0].clientY;
         }
@@ -4303,837 +4767,115 @@
 
       canvas.addEventListener('touchmove', (e) => {
         if (camState.touchDragging && e.touches.length === 1) {
-          const tx = e.touches[0].clientX;
-          const ty = e.touches[0].clientY;
-          const dx = tx - camState.lastTouchX;
-          const dy = ty - camState.lastTouchY;
-          if (Math.hypot(tx - camState.mouseDownX, ty - camState.mouseDownY) > 6) {
-            camState.hasDraggedSinceDown = true;
-          }
-          const factor = 0.0052 * camState.sensitivity;
+          const dx = e.touches[0].clientX - camState.lastTouchX;
+          const dy = e.touches[0].clientY - camState.lastTouchY;
+          camState.lastTouchX = e.touches[0].clientX;
+          camState.lastTouchY = e.touches[0].clientY;
+          const rotFactor = 0.0055 * camState.sensitivity;
           const ySign = camState.invertY ? -1 : 1;
-          camState.targetYaw -= dx * factor;
-          camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * factor * ySign, -0.38, 1.15);
-          camState.lastTouchX = tx;
-          camState.lastTouchY = ty;
+          camState.targetYaw -= dx * rotFactor;
+          camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * rotFactor * ySign, -0.35, 0.85);
         }
       }, { passive: true });
 
       canvas.addEventListener('touchend', () => {
-        if (camState.touchDragging && !camState.hasDraggedSinceDown && !activeTalkNpc) {
-          handleCanvasSingleClick(camState.mouseDownX, camState.mouseDownY);
-        }
         camState.touchDragging = false;
       });
 
-      const sensSlider = document.getElementById('mouse-sens-slider');
-      const sensValue = document.getElementById('mouse-sens-value');
-      if (sensSlider && sensValue) {
-        sensSlider.addEventListener('input', (e) => {
-          camState.sensitivity = parseFloat(e.target.value);
-          sensValue.textContent = `${camState.sensitivity.toFixed(1)}x`;
-        });
-      }
-
-      const btnInvertY = document.getElementById('btn-invert-y');
-      if (btnInvertY) {
-        btnInvertY.addEventListener('click', () => {
-          camState.invertY = !camState.invertY;
-          btnInvertY.textContent = camState.invertY ? '開啟' : '關閉';
-          btnInvertY.className = camState.invertY
-            ? 'px-2 py-0.5 rounded bg-teal-600 hover:bg-teal-500 text-[10px] font-black text-white border border-teal-300/40 transition'
-            : 'px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-[10px] font-black text-slate-200 border border-white/15 transition';
-        });
-      }
-
-      document.getElementById('btn-toggle-help').addEventListener('click', (e) => {
-        const body = document.getElementById('help-body');
-        body.classList.toggle('hidden');
-        e.target.textContent = body.classList.contains('hidden') ? '展開' : '收合';
-      });
-
-      document.getElementById('btn-toggle-pov').addEventListener('click', toggleFirstPersonView);
-
-      document.getElementById('btn-toggle-labels').addEventListener('click', (e) => {
-        showNpcLabels = !showNpcLabels;
-        npcs.forEach((n) => (n.badge.visible = showNpcLabels));
-        e.target.textContent = `🏷️ NPC 標籤: ${showNpcLabels ? '開' : '關'}`;
-      });
-
-      document.getElementById('btn-open-elevator').addEventListener('click', () => {
-        openTransportSelectorModal({ type: '電梯', name: '8F 中央四座電梯廳' });
-      });
-
-      document.getElementById('btn-clear-wanted').addEventListener('click', clearWantedAndHeal);
-      document.getElementById('btn-action-attack').addEventListener('click', () => performPlayerAttack(false));
-      document.getElementById('btn-action-heavy').addEventListener('click', () => performPlayerAttack(true));
-
       document.querySelectorAll('.tp-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const zoneKey = btn.dataset.zone;
-          const z = ZONES[zoneKey];
-          if (!z) return;
-          player.autoMoveTarget = null;
-          player.pos.copy(z.pos);
-          player.yaw = z.yaw;
-          camState.yaw = z.yaw + Math.PI;
-          camState.targetYaw = camState.yaw;
-          document.getElementById('current-zone-label').textContent = z.label;
-          showToast(`📍 已抵達：${z.label}`);
-        });
+        btn.addEventListener('click', () => teleportToZone(btn.dataset.zone));
       });
 
       document.querySelectorAll('.floor-link-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const code = btn.dataset.linkFloor;
-          const item = FLOOR_HTML_LINKS.find((f) => f.code === code);
-          if (item) navigateToFloorHtml(item);
-        });
+        btn.addEventListener('click', () => redirectToFloorHtml(btn.dataset.linkFloor));
       });
 
-      document.getElementById('npc-talk-prompt').addEventListener('click', () => {
-        if (nearTransportZone) {
-          openTransportSelectorModal(nearTransportZone);
-        } else if (nearestNpc) {
-          openDialogueModal(nearestNpc);
-        }
+      document.getElementById('btn-toggle-help').addEventListener('click', (e) => {
+        const body = document.getElementById('help-body');
+        const hidden = body.classList.toggle('hidden');
+        e.target.textContent = hidden ? '展開' : '收合';
       });
 
-      document.getElementById('dlg-close-btn').addEventListener('click', closeDialogueModal);
-
-      document.querySelectorAll('.touch-pad').forEach((pad) => {
-        const code = pad.dataset.key;
-        pad.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          keys[code] = true;
-          player.autoMoveTarget = null;
-        });
-        pad.addEventListener('touchend', (e) => {
-          e.preventDefault();
-          keys[code] = false;
-        });
+      document.getElementById('btn-toggle-pov').addEventListener('click', (e) => {
+        player.firstPerson = !player.firstPerson;
+        e.target.textContent = player.firstPerson ? '👁️ 第一人稱 (V)' : '👁️ 第三人稱 (V)';
       });
 
-      document.getElementById('btn-touch-jump').addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        keys['Space'] = true;
-      });
-      document.getElementById('btn-touch-jump').addEventListener('touchend', (e) => {
-        e.preventDefault();
-        keys['Space'] = false;
-      });
-      document.getElementById('btn-touch-talk').addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (nearTransportZone) openTransportSelectorModal(nearTransportZone);
-        else if (nearestNpc) openDialogueModal(nearestNpc);
-      });
-    }
-
-    function handleCanvasSingleClick(clientX, clientY) {
-      mouseNDC.x = (clientX / window.innerWidth) * 2 - 1;
-      mouseNDC.y = -(clientY / window.innerHeight) * 2 + 1;
-      raycaster.setFromCamera(mouseNDC, camera);
-
-      const npcHits = raycaster.intersectObjects(npcHitMeshes, false);
-      if (npcHits.length > 0) {
-        const clickedNpc = npcHits[0].object.userData.npcRef;
-        if (clickedNpc && clickedNpc.knockedTimer <= 0) {
-          const dist = player.pos.distanceTo(clickedNpc.pos);
-          if (dist <= 4.2) {
-            openDialogueModal(clickedNpc);
-          } else {
-            const dir = new THREE.Vector3().subVectors(player.pos, clickedNpc.pos).setY(0).normalize();
-            const standPos = clickedNpc.pos.clone().addScaledVector(dir, 1.85);
-            spawnFloorClickRipple(standPos.x, standPos.z, true);
-            showToast(`🚶 正步行前往與 ${clickedNpc.name} 交談...`, 1800);
-          }
-          return;
-        }
-      }
-
-      const elHits = raycaster.intersectObjects(transportHitMeshes, false);
-      if (elHits.length > 0) {
-        const ez = elHits[0].object.userData.elevatorZone;
-        if (ez) {
-          openTransportSelectorModal(ez);
-          return;
-        }
-      }
-
-      const hitPt = new THREE.Vector3();
-      if (raycaster.ray.intersectPlane(floorHitPlane, hitPt)) {
-        spawnFloorClickRipple(hitPt.x, hitPt.z, true);
-      }
-    }
-
-    function toggleFirstPersonView() {
-      player.firstPerson = !player.firstPerson;
-      player.mesh.visible = !player.firstPerson;
-      const btn = document.getElementById('btn-toggle-pov');
-      btn.textContent = player.firstPerson ? '🎥 第一人稱 (V)' : '👁️ 第三人稱 (V)';
-      showToast(player.firstPerson ? '🎥 已切換為第一人稱視角' : '👁️ 已切換為第三人稱視角', 1600);
-    }
-
-    function navigateToFloorHtml(floorItem) {
-      if (floorItem.code === '8F') {
-        closeDialogueModal();
-        showToast('🏛️ 您目前正位於 8F 頂樓會議中心與資訊處（最高樓層）！');
-        return;
-      }
-
-      const overlay = document.getElementById('floor-redirect-overlay');
-      document.getElementById('redirect-badge').textContent = `ELEVATOR・前往 ${floorItem.title}`;
-      document.getElementById('redirect-title').textContent = `正在搭乘電梯前往 ${floorItem.title}`;
-      document.getElementById('redirect-subtitle').textContent = `即將自動開啟 ${floorItem.file}（${floorItem.desc}）...`;
-      overlay.classList.remove('hidden');
-      SoundFX.playChime();
-
-      setTimeout(() => {
-        window.location.href = floorItem.file;
-      }, 950);
-    }
-
-    function openTransportSelectorModal(zone) {
-      if (isTransportModalOpen) return;
-      isTransportModalOpen = true;
-      activeTalkNpc = { name: zone.name };
-      player.autoMoveTarget = null;
-      SoundFX.playChime();
-
-      document.getElementById('dlg-avatar').textContent = '🛗';
-      document.getElementById('dlg-name').textContent = `${zone.name}・全院樓層直達選單`;
-      document.getElementById('dlg-role').textContent = '目前所在：8F 會議中心與資訊處（8F 為本棟最高樓層，無 9F 以上樓層）';
-      document.getElementById('dlg-text').textContent = '請選擇您要搭乘電梯前往的目標樓層（點擊後將自動連結並開啟該樓層網頁）：';
-
-      const optionsBox = document.getElementById('dlg-options');
-      optionsBox.innerHTML = '';
-
-      FLOOR_HTML_LINKS.forEach((item) => {
-        const isCurrent = item.code === '8F';
-        const btn = document.createElement('button');
-        btn.className = `w-full text-left px-3.5 py-2.5 rounded-xl border transition flex items-center justify-between gap-2 ${
-          isCurrent
-            ? 'bg-indigo-500/35 border-indigo-300 text-white font-black'
-            : 'bg-white/10 hover:bg-teal-500/30 border-white/15 text-slate-100'
-        }`;
-        btn.innerHTML = `
-          <div>
-            <div class="text-xs sm:text-sm font-black flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded-md border text-[11px] ${item.badgeBg}">${item.code}</span>
-              <span>${item.title}</span>
-              ${isCurrent ? '<span class="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black">現在樓層・最高層</span>' : ''}
-            </div>
-            <div class="text-[11px] text-slate-300 mt-0.5">${item.desc}</div>
-          </div>
-          <span class="shrink-0 text-xs font-bold text-teal-300">${isCurrent ? '停留本層' : `前往 ${item.file} →`}</span>
-        `;
-        btn.addEventListener('click', () => navigateToFloorHtml(item));
-        optionsBox.appendChild(btn);
+      document.getElementById('btn-toggle-labels').addEventListener('click', (e) => {
+        showNpcLabels = !showNpcLabels;
+        e.target.textContent = showNpcLabels ? '🏷️ NPC 標籤: 開' : '🏷️ NPC 標籤: 關';
       });
 
-      document.getElementById('dialogue-modal').classList.remove('hidden');
-    }
-
-    function openDialogueModal(npc) {
-      activeTalkNpc = npc;
-      isTransportModalOpen = false;
-      player.autoMoveTarget = null;
-      SoundFX.playChime();
-
-      document.getElementById('dlg-avatar').textContent = npc.avatar || '👨‍⚕️';
-      document.getElementById('dlg-name').textContent = npc.name;
-      document.getElementById('dlg-role').textContent = npc.role;
-      document.getElementById('dlg-text').textContent = npc.dialogue;
-
-      const optionsBox = document.getElementById('dlg-options');
-      optionsBox.innerHTML = '';
-
-      if (npc.options && npc.options.length > 0) {
-        npc.options.forEach((opt) => {
-          const btn = document.createElement('button');
-          btn.className = 'w-full text-left px-3.5 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/35 border border-amber-300/40 text-xs sm:text-sm font-bold text-amber-100 transition';
-          btn.textContent = `💬 ${opt.label}`;
-          btn.addEventListener('click', () => {
-            document.getElementById('dlg-text').textContent = opt.reply;
-            SoundFX.playChime();
-          });
-          optionsBox.appendChild(btn);
-        });
-      }
-
-      const closeOpt = document.createElement('button');
-      closeOpt.className = 'w-full text-left px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-teal-500/30 border border-white/15 text-xs sm:text-sm font-bold text-teal-200 transition';
-      closeOpt.textContent = '👋 感謝說明，繼續參觀 8F 會議與資訊空間';
-      closeOpt.addEventListener('click', closeDialogueModal);
-      optionsBox.appendChild(closeOpt);
-
-      document.getElementById('dialogue-modal').classList.remove('hidden');
-    }
-
-    function closeDialogueModal() {
-      activeTalkNpc = null;
-      isTransportModalOpen = false;
-      transportPromptCooldown = true;
-      setTimeout(() => {
-        transportPromptCooldown = false;
-      }, 2800);
-      document.getElementById('dialogue-modal').classList.add('hidden');
-    }
-
-    function updatePlayerAndCamera(dt) {
-      const baseFloorY = FLOOR_Y[8];
-
-      if (player.isDead) {
-        player.respawnTimer -= dt;
-        if (player.respawnTimer <= 0) {
-          clearWantedAndHeal();
-          const z = ZONES.f8_here;
-          player.pos.copy(z.pos);
-          player.yaw = z.yaw;
-        }
-        return;
-      }
-
-      if (player.comboResetTimer > 0) {
-        player.comboResetTimer -= dt;
-        if (player.comboResetTimer <= 0) player.comboStep = 0;
-      }
-
-      let moveForward = 0;
-      let moveRight = 0;
-      if (!activeTalkNpc) {
-        if (keys['KeyW'] || keys['ArrowUp']) moveForward += 1;
-        if (keys['KeyS'] || keys['ArrowDown']) moveForward -= 1;
-        if (keys['KeyD'] || keys['ArrowRight']) moveRight += 1;
-        if (keys['KeyA'] || keys['ArrowLeft']) moveRight -= 1;
-      }
-
-      const isSprinting = keys['ShiftLeft'] || keys['ShiftRight'];
-      const maxSpeed = isSprinting ? 7.6 : 4.8;
-
-      const camFwdX = -Math.sin(camState.yaw);
-      const camFwdZ = -Math.cos(camState.yaw);
-      const camRightX = Math.cos(camState.yaw);
-      const camRightZ = -Math.sin(camState.yaw);
-
-      let wishX = camFwdX * moveForward + camRightX * moveRight;
-      let wishZ = camFwdZ * moveForward + camRightZ * moveRight;
-      const wishLen = Math.hypot(wishX, wishZ);
-
-      if (wishLen > 0.001) {
-        player.autoMoveTarget = null;
-        wishX /= wishLen;
-        wishZ /= wishLen;
-        player.vel.x = wishX * maxSpeed;
-        player.vel.z = wishZ * maxSpeed;
-
-        const targetYaw = Math.atan2(wishX, wishZ);
-        let diff = targetYaw - player.yaw;
-        while (diff > Math.PI) diff -= Math.PI * 2;
-        while (diff < -Math.PI) diff += Math.PI * 2;
-        player.yaw += diff * Math.min(1, dt * 14);
-      } else if (player.autoMoveTarget && !activeTalkNpc) {
-        player.autoMoveTimer -= dt;
-        const adx = player.autoMoveTarget.x - player.pos.x;
-        const adz = player.autoMoveTarget.z - player.pos.z;
-        const adist = Math.hypot(adx, adz);
-
-        if (adist <= 0.28 || player.autoMoveTimer <= 0) {
-          player.autoMoveTarget = null;
-          player.vel.x = 0;
-          player.vel.z = 0;
-        } else {
-          const dirX = adx / adist;
-          const dirZ = adz / adist;
-          const walkSpd = 4.6;
-          player.vel.x = dirX * walkSpd;
-          player.vel.z = dirZ * walkSpd;
-
-          const targetYaw = Math.atan2(dirX, dirZ);
-          let diff = targetYaw - player.yaw;
-          while (diff > Math.PI) diff -= Math.PI * 2;
-          while (diff < -Math.PI) diff += Math.PI * 2;
-          player.yaw += diff * Math.min(1, dt * 12);
-        }
-      } else {
-        player.vel.x *= Math.pow(0.001, dt);
-        player.vel.z *= Math.pow(0.001, dt);
-      }
-
-      if (keys['Space'] && player.onGround && !activeTalkNpc) {
-        player.vel.y = 6.2;
-        player.onGround = false;
-      }
-      player.vel.y -= 17.5 * dt;
-
-      player.pos.x += (player.vel.x + player.knockVel.x) * dt;
-      player.pos.z += (player.vel.z + player.knockVel.z) * dt;
-      player.pos.y += player.vel.y * dt;
-
-      player.knockVel.multiplyScalar(Math.pow(0.002, dt));
-
-      if (player.pos.y <= baseFloorY) {
-        player.pos.y = baseFloorY;
-        player.vel.y = 0;
-        player.onGround = true;
-      }
-
-      for (let i = 0; i < npcs.length; i++) {
-        const npc = npcs[i];
-        if (npc.knockedTimer > 0) continue;
-        separateCircles(player.pos, player.radius, npc.pos, npc.radius, 0.85);
-      }
-      resolveCircleAllAABBs(player.pos, player.radius, 8);
-
-      player.mesh.position.copy(player.pos);
-      player.mesh.rotation.y = player.yaw;
-
-      const horizSpeed = Math.hypot(player.vel.x, player.vel.z);
-      if (horizSpeed > 0.25 && player.onGround) {
-        player.walkCycle += dt * horizSpeed * 2.1;
-        const swing = Math.sin(player.walkCycle) * 0.58;
-        player.leftHip.rotation.x = swing;
-        player.rightHip.rotation.x = -swing;
-        player.leftKnee.rotation.x = Math.max(0, -swing) * 0.65;
-        player.rightKnee.rotation.x = Math.max(0, swing) * 0.65;
-        if (!player.isAttacking) {
-          player.leftShoulder.rotation.x = -swing * 0.72;
-          player.rightShoulder.rotation.x = swing * 0.72;
-        }
-        player.bodyRoot.position.y = Math.abs(Math.cos(player.walkCycle)) * 0.045;
-      } else {
-        player.leftHip.rotation.x *= 0.82;
-        player.rightHip.rotation.x *= 0.82;
-        player.leftKnee.rotation.x *= 0.82;
-        player.rightKnee.rotation.x *= 0.82;
-        player.bodyRoot.position.y *= 0.82;
-      }
-
-      if (player.isAttacking) {
-        player.attackTimer += dt;
-        const p = Math.min(1, player.attackTimer / player.attackDuration);
-        const punchCurve = Math.sin(p * Math.PI);
-
-        if (p >= 0.42 && !player.hitApplied) {
-          player.hitApplied = true;
-          applyPlayerHitbox();
-        }
-
-        if (player.attackType === 1) {
-          player.rightShoulder.rotation.x = -punchCurve * 1.65;
-          player.rightElbow.rotation.x = -punchCurve * 0.45;
-          player.rightFistAura.material.opacity = punchCurve * 0.85;
-        } else if (player.attackType === 2) {
-          player.leftShoulder.rotation.x = -punchCurve * 1.75;
-          player.leftElbow.rotation.x = -punchCurve * 0.45;
-          player.leftFistAura.material.opacity = punchCurve * 0.85;
-        } else if (player.attackType === 3) {
-          player.bodyRoot.rotation.y = p * Math.PI * 2;
-          player.rightHip.rotation.x = -punchCurve * 1.45;
-          player.rightFootAura.material.opacity = punchCurve * 0.9;
-        } else {
-          player.rightShoulder.rotation.x = -punchCurve * 1.9;
-          player.leftShoulder.rotation.x = -punchCurve * 1.6;
-          player.rightFistAura.material.opacity = punchCurve * 0.95;
-          player.leftFistAura.material.opacity = punchCurve * 0.95;
-        }
-
-        if (p >= 1) {
-          player.isAttacking = false;
-          player.bodyRoot.rotation.y = 0;
-          player.rightShoulder.rotation.x = 0;
-          player.leftShoulder.rotation.x = 0;
-          player.rightElbow.rotation.x = 0;
-          player.leftElbow.rotation.x = 0;
-          player.rightHip.rotation.x = 0;
-          player.rightFistAura.material.opacity = 0;
-          player.leftFistAura.material.opacity = 0;
-          player.rightFootAura.material.opacity = 0;
-        }
-      }
-
-      // 更新當前所在空間標籤
-      const px = player.pos.x;
-      const pz = player.pos.z;
-      let zoneText = '8F 醫療會議與資訊中心・主迴廊';
-      if (px < -25.8 && pz >= -26.0 && pz <= -9.5) {
-        zoneText = '8F 大圓桌會議室 (黃明和總裁・黃靜媛執行長・劉力總經理・郭盛名協理)';
-      } else if (pz < -28.8 && px >= -31.0 && px <= -1.0) {
-        zoneText = '8F 大型會議室 (U型會議桌・投影機大布幕)';
-      } else if (px > 17.2 && pz >= -26.8 && pz <= -12.2) {
-        zoneText = '8F 美帝奇會議室一 (U型會議桌・投影大布幕)';
-      } else if (px > 17.2 && pz >= -9.8 && pz <= 6.8) {
-        zoneText = '8F 美帝奇會議室二 (U型會議桌・投影大布幕)';
-      } else if (px < -14.2 && pz >= 5.5 && pz <= 15.1) {
-        zoneText = px < -26.0 ? '8F 開放式洗手間 (男女廁如廁中 / 洗手台)' : '8F 開放式茶水間 (咖啡吧台 / 中島)';
-      } else if (px >= 10.5 && pz >= 8.0) {
-        zoneText = px >= 27.5 ? '8F 開放式機房 (感應式電動門內・伺服器機櫃)' : '8F 資訊處 (感應式電動門內・工程師辦公區)';
-      } else if (px >= -14.5 && px <= -2.5 && pz >= -19.8 && pz <= -5.2) {
-        zoneText = '8F 中央服務台・四座電梯廳';
-      } else if (px >= -8.0 && px <= 4.5 && pz >= 4.0 && pz <= 15.0) {
-        zoneText = '8F 中央開放式交流中庭';
-      }
-      document.getElementById('current-zone-label').textContent = zoneText;
-
-      camState.yaw += (camState.targetYaw - camState.yaw) * Math.min(1, dt * 16);
-      camState.pitch += (camState.targetPitch - camState.pitch) * Math.min(1, dt * 16);
-      camState.distance += (camState.targetDistance - camState.distance) * Math.min(1, dt * 12);
-
-      const shakeX = camShake > 0 ? (Math.random() - 0.5) * camShake : 0;
-      const shakeY = camShake > 0 ? (Math.random() - 0.5) * camShake : 0;
-      camShake = Math.max(0, camShake - dt * 1.8);
-
-      if (player.firstPerson) {
-        const eyePos = new THREE.Vector3(player.pos.x + shakeX, player.pos.y + 1.66 + shakeY, player.pos.z);
-        camera.position.copy(eyePos);
-        const lookTarget = new THREE.Vector3(
-          eyePos.x - Math.sin(camState.yaw) * Math.cos(camState.pitch),
-          eyePos.y - Math.sin(camState.pitch),
-          eyePos.z - Math.cos(camState.yaw) * Math.cos(camState.pitch)
-        );
-        camera.lookAt(lookTarget);
-      } else {
-        const focusPoint = new THREE.Vector3(player.pos.x, player.pos.y + 1.48, player.pos.z);
-        camState.targetPos.lerp(focusPoint, Math.min(1, dt * 16));
-
-        const horizDist = camState.distance * Math.cos(camState.pitch);
-        const vertDist = camState.distance * Math.sin(camState.pitch);
-
-        const desiredCamX = camState.targetPos.x + Math.sin(camState.yaw) * horizDist;
-        const desiredCamY = Math.max(baseFloorY + 0.55, camState.targetPos.y + vertDist);
-        const desiredCamZ = camState.targetPos.z + Math.cos(camState.yaw) * horizDist;
-
-        camera.position.set(desiredCamX + shakeX, desiredCamY + shakeY, desiredCamZ);
-        camera.lookAt(camState.targetPos);
-      }
-    }
-
-    function updateNpcsAndWorld(dt, elapsed) {
-      gameClockMinutes += dt * 0.4;
-      const hh = String(Math.floor(gameClockMinutes / 60) % 24).padStart(2, '0');
-      const mm = String(Math.floor(gameClockMinutes % 60)).padStart(2, '0');
-      document.getElementById('hud-clock').textContent = `${hh}:${mm}`;
-
-      serverBlinkLeds.forEach((led) => {
-        const pulse = Math.sin(elapsed * 4.5 + led.phase);
-        led.mat.visible = pulse > -0.35;
+      document.getElementById('btn-open-elevator').addEventListener('click', () => {
+        openElevatorModal(nearTransportZone ? nearTransportZone.name : '8F 中央四座電梯廳');
       });
 
-      transportPads.forEach((ring, idx) => {
-        const s = 1 + Math.sin(elapsed * 3 + idx) * 0.06;
-        ring.scale.set(s, s, 1);
+      document.getElementById('btn-clear-wanted').addEventListener('click', clearWantedAndHeal);
+
+      const sensSlider = document.getElementById('mouse-sens-slider');
+      const sensVal = document.getElementById('mouse-sens-value');
+      sensSlider.addEventListener('input', (e) => {
+        camState.sensitivity = parseFloat(e.target.value);
+        sensVal.textContent = `${camState.sensitivity.toFixed(1)}x`;
       });
 
-      // 即時更新資訊處與機房三座感應式自動玻璃電動門
-      updateAutomaticSlidingDoors(dt);
+      document.getElementById('btn-invert-y').addEventListener('click', (e) => {
+        camState.invertY = !camState.invertY;
+        e.target.textContent = camState.invertY ? '開啟' : '關閉';
+        e.target.className = camState.invertY
+          ? 'px-2 py-0.5 rounded bg-teal-600 text-[10px] font-black text-white border border-teal-300/40 transition'
+          : 'px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-[10px] font-black text-slate-200 border border-white/15 transition';
+      });
 
-      let foundZone = null;
-      for (let i = 0; i < transportTriggerZones.length; i++) {
-        const z = transportTriggerZones[i];
-        const dist = Math.hypot(player.pos.x - z.x, player.pos.z - z.z);
-        if (dist <= z.radius) {
-          foundZone = z;
-          break;
-        }
-      }
-      nearTransportZone = foundZone;
+      document.getElementById('btn-action-attack').addEventListener('click', () => performPlayerAttack(false));
+      document.getElementById('btn-action-heavy').addEventListener('click', () => performPlayerAttack(true));
 
-      if (nearTransportZone && !activeTalkNpc && !transportPromptCooldown && !player.isDead) {
-        openTransportSelectorModal(nearTransportZone);
-      }
+      document.getElementById('elevator-prompt').addEventListener('click', () => {
+        if (nearTransportZone) openElevatorModal(nearTransportZone.name);
+      });
+      document.getElementById('elv-close-btn').addEventListener('click', closeElevatorModal);
 
-      nearestNpc = null;
-      let minDist = 3.2;
-
-      npcs.forEach((npc) => {
-        if (npc.barkTimer > 0) {
-          npc.barkTimer -= dt;
-          if (npc.barkTimer <= 0) npc.barkEl.classList.add('hidden');
-        }
-
-        if (npc.knockedTimer > 0) {
-          npc.knockedTimer -= dt;
-          npc.dizzyGroup.rotation.y += dt * 5.0;
-          npc.pos.addScaledVector(npc.knockVel, dt);
-          npc.knockVel.multiplyScalar(Math.pow(0.002, dt));
-          resolveCircleAllAABBs(npc.pos, npc.radius, 8);
-          npc.rig.group.position.copy(npc.pos);
-
-          if (npc.knockedTimer <= 0) {
-            npc.hp = npc.maxHp;
-            npc.dizzyGroup.visible = false;
-            npc.rig.bodyRoot.rotation.x = 0;
-            npc.rig.bodyRoot.position.y = 0;
-          }
-          npc.hpBarWrap.classList.add('hidden');
-          return;
-        }
-
-        if (npc.isHostile && !player.isDead) {
-          npc.alertRing.visible = true;
-          npc.alertRing.rotation.z += dt * 2.5;
-
-          const toPlayer = new THREE.Vector3().subVectors(player.pos, npc.pos);
-          toPlayer.y = 0;
-          const distToPlayer = toPlayer.length();
-
-          if (distToPlayer > 0.01) {
-            npc.yaw = Math.atan2(toPlayer.x, toPlayer.z);
-            npc.rig.group.rotation.y = npc.yaw;
-          }
-
-          if (npc.attackCooldown > 0) npc.attackCooldown -= dt;
-
-          if (npc.windupTimer > 0) {
-            npc.windupTimer -= dt;
-            npc.rig.rightShoulder.rotation.x = -1.65;
-            if (npc.windupTimer <= 0) {
-              npc.swingAnimTimer = 0.24;
-              npc.attackCooldown = 1.35;
-              if (distToPlayer <= 1.85) {
-                triggerNpcCounterAttack(npc);
-              }
-            }
-          } else if (distToPlayer > 1.45) {
-            toPlayer.normalize();
-            const chaseSpeed = npc.type === 'security' ? 3.5 : 2.8;
-            npc.pos.addScaledVector(toPlayer, chaseSpeed * dt);
-            npc.walkCycle += dt * 9.0;
-            const swing = Math.sin(npc.walkCycle) * 0.55;
-            npc.rig.leftHip.rotation.x = swing;
-            npc.rig.rightHip.rotation.x = -swing;
-          } else if (npc.attackCooldown <= 0) {
-            npc.windupTimer = 0.42;
-            npc.barkEl.textContent = '💥 接招！';
-            npc.barkEl.classList.remove('hidden');
-            npc.barkTimer = 1.0;
-          }
-
-          if (npc.swingAnimTimer > 0) {
-            npc.swingAnimTimer -= dt;
-            npc.rig.rightShoulder.rotation.x = 0.5;
-          } else if (npc.windupTimer <= 0) {
-            npc.rig.rightShoulder.rotation.x *= 0.8;
-          }
-        } else {
-          npc.alertRing.visible = false;
-
-          if (npc.isSeated) {
-            // 會議室就座長官與如廁隔間就座 NPC 微幅自然動作
-            npc.walkCycle += dt * 1.9;
-            npc.rig.bodyRoot.position.y = -0.22 + Math.sin(npc.walkCycle) * 0.014;
-            if (npc.isExecutive) {
-              // 高階長官偶爾點頭發言與手勢
-              npc.rig.rightShoulder.rotation.x = -0.35 + Math.sin(npc.walkCycle * 1.2) * 0.16;
-              npc.rig.rightElbow.rotation.x = -0.45;
-              npc.rig.leftShoulder.rotation.x = -0.22 + Math.cos(npc.walkCycle) * 0.08;
-            } else {
-              npc.rig.leftShoulder.rotation.x = -0.25;
-              npc.rig.rightShoulder.rotation.x = -0.25;
-            }
-          } else if (npc.isUsingRestroom) {
-            // 男廁小便斗如廁中 NPC 微幅站立呼吸動作
-            npc.walkCycle += dt * 1.6;
-            npc.rig.bodyRoot.position.y = Math.sin(npc.walkCycle) * 0.012;
-            npc.rig.rightShoulder.rotation.x = -0.32;
-            npc.rig.leftShoulder.rotation.x = -0.32;
-          } else if (npc.isWashingHands) {
-            // 洗手台前雙手搓洗動作
-            npc.walkCycle += dt * 6.5;
-            npc.rig.leftShoulder.rotation.x = -0.78 + Math.sin(npc.walkCycle) * 0.12;
-            npc.rig.rightShoulder.rotation.x = -0.78 - Math.sin(npc.walkCycle) * 0.12;
-            npc.rig.leftElbow.rotation.x = -0.65;
-            npc.rig.rightElbow.rotation.x = -0.65;
-          } else if (npc.isStationaryGuard) {
-            npc.walkCycle += dt * 2.2;
-            npc.rig.bodyRoot.position.y = Math.sin(npc.walkCycle) * 0.015;
-            npc.rig.rightShoulder.rotation.x = -0.45 + Math.sin(npc.walkCycle * 1.3) * 0.12;
-            npc.rig.rightElbow.rotation.x = -0.5;
-          } else if (npc.waypoints && npc.waypoints.length > 1) {
-            const targetWp = npc.waypoints[npc.wpIndex];
-            const toWp = new THREE.Vector3().subVectors(targetWp, npc.pos);
-            toWp.y = 0;
-            const d = toWp.length();
-
-            if (d < 0.35) {
-              npc.wpIndex = (npc.wpIndex + 1) % npc.waypoints.length;
-            } else {
-              toWp.normalize();
-              npc.pos.addScaledVector(toWp, npc.speed * dt);
-              const targetYaw = Math.atan2(toWp.x, toWp.z);
-              let diff = targetYaw - npc.yaw;
-              while (diff > Math.PI) diff -= Math.PI * 2;
-              while (diff < -Math.PI) diff += Math.PI * 2;
-              npc.yaw += diff * Math.min(1, dt * 8);
-
-              npc.walkCycle += dt * npc.speed * 2.6;
-              const swing = Math.sin(npc.walkCycle) * 0.45;
-              npc.rig.leftHip.rotation.x = swing;
-              npc.rig.rightHip.rotation.x = -swing;
-              npc.rig.leftShoulder.rotation.x = -swing * 0.55;
-              npc.rig.rightShoulder.rotation.x = swing * 0.55;
-            }
-          }
-        }
-
-        npc.pos.addScaledVector(npc.knockVel, dt);
-        npc.knockVel.multiplyScalar(Math.pow(0.002, dt));
-
-        for (let j = 0; j < npcs.length; j++) {
-          const other = npcs[j];
-          if (other === npc || other.knockedTimer > 0) continue;
-          separateCircles(npc.pos, npc.radius, other.pos, other.radius, 0.5);
-        }
-        separateCircles(npc.pos, npc.radius, player.pos, player.radius, 0.15);
-        resolveCircleAllAABBs(npc.pos, npc.radius, 8);
-
-        npc.pos.y = npc.baseY;
-        npc.rig.group.position.copy(npc.pos);
-        npc.rig.group.rotation.y = npc.yaw;
-
-        if (npc.isHostile || npc.hp < npc.maxHp) {
-          const headWorld = new THREE.Vector3(npc.pos.x, npc.pos.y + 2.55, npc.pos.z);
-          const proj = headWorld.project(camera);
-          if (proj.z < 1) {
-            const sx = (proj.x * 0.5 + 0.5) * window.innerWidth;
-            const sy = (-proj.y * 0.5 + 0.5) * window.innerHeight;
-            npc.hpBarWrap.style.left = `${sx}px`;
-            npc.hpBarWrap.style.top = `${sy}px`;
-            npc.hpFillEl.style.width = `${(npc.hp / npc.maxHp) * 100}%`;
-            npc.hpBarWrap.classList.remove('hidden');
-          } else {
-            npc.hpBarWrap.classList.add('hidden');
-          }
-        } else {
-          npc.hpBarWrap.classList.add('hidden');
-        }
-
-        const pDist = player.pos.distanceTo(npc.pos);
-        if (pDist < minDist) {
-          minDist = pDist;
-          nearestNpc = npc;
+      document.getElementById('btn-touch-elevator').addEventListener('click', () => {
+        openElevatorModal(nearTransportZone ? nearTransportZone.name : '8F 中央四座電梯廳');
+      });
+      document.getElementById('btn-touch-jump').addEventListener('click', () => {
+        if (player.onGround && !player.isDead) {
+          player.vel.y = 7.4;
+          player.onGround = false;
         }
       });
 
-      const promptBtn = document.getElementById('npc-talk-prompt');
-      if (!activeTalkNpc && !player.isDead) {
-        if (nearTransportZone) {
-          promptBtn.innerHTML = `按 <span class="px-2 py-0.5 mx-1 rounded bg-teal-400 text-slate-950 font-black">E</span> 開啟 <span class="text-amber-300">${nearTransportZone.name} (B1 ~ 8F)</span>`;
-          promptBtn.classList.remove('hidden');
-        } else if (nearestNpc) {
-          promptBtn.innerHTML = `按 <span class="px-2 py-0.5 mx-1 rounded bg-emerald-400 text-slate-950 font-black">E</span> 與 <span class="text-amber-300">${nearestNpc.name}</span> 交談`;
-          promptBtn.classList.remove('hidden');
-        } else {
-          promptBtn.classList.add('hidden');
-        }
-      } else {
-        promptBtn.classList.add('hidden');
-      }
-
-      for (let i = slashEffects.length - 1; i >= 0; i--) {
-        const s = slashEffects[i];
-        s.life -= dt;
-        s.mesh.material.opacity = Math.max(0, (s.life / s.maxLife) * 0.85);
-        s.mesh.scale.multiplyScalar(1 + dt * 2.5);
-        if (s.life <= 0) {
-          scene.remove(s.mesh);
-          slashEffects.splice(i, 1);
-        }
-      }
-
-      for (let i = impactParticles.length - 1; i >= 0; i--) {
-        const pt = impactParticles[i];
-        pt.life -= dt;
-        pt.vel.y -= 9.8 * dt;
-        pt.mesh.position.addScaledVector(pt.vel, dt);
-        pt.mesh.scale.setScalar(Math.max(0.01, pt.life / 0.35));
-        if (pt.life <= 0) {
-          scene.remove(pt.mesh);
-          impactParticles.splice(i, 1);
-        }
-      }
-
-      for (let i = floorClickRipples.length - 1; i >= 0; i--) {
-        const rp = floorClickRipples[i];
-        rp.life -= dt;
-        const prog = 1 - rp.life / rp.maxLife;
-        const scaleVal = 0.7 + prog * 1.9;
-        rp.outerRing.scale.set(scaleVal, scaleVal, 1);
-        rp.outerRing.material.opacity = Math.max(0, 1 - prog);
-        rp.innerDot.material.opacity = Math.max(0, 1 - prog * 1.15);
-        if (rp.life <= 0) {
-          scene.remove(rp.outerRing);
-          scene.remove(rp.innerDot);
-          floorClickRipples.splice(i, 1);
-        }
-      }
+      document.querySelectorAll('.touch-pad').forEach((btn) => {
+        const k = btn.dataset.key;
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[k] = true; }, { passive: false });
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[k] = false; }, { passive: false });
+      });
     }
 
-    // --------------------------------------------------------------------------
-    // 8. 引擎初始化與主迴圈啟動
-    // --------------------------------------------------------------------------
-    function initScene() {
-      const canvas = document.getElementById('game-canvas');
-      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.06;
-
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xe6dfd3);
-      scene.fog = new THREE.FogExp2(0xe6dfd3, 0.0048);
-
-      camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 180);
-
-      const hemiLight = new THREE.HemisphereLight(0xfffbeb, 0xc29b70, 0.85);
-      hemiLight.position.set(0, 48, 0);
-      scene.add(hemiLight);
-
-      const dirLight = new THREE.DirectionalLight(0xfff8eb, 0.75);
-      dirLight.position.set(22, 58, 28);
-      dirLight.castShadow = true;
-      dirLight.shadow.mapSize.width = 2048;
-      dirLight.shadow.mapSize.height = 2048;
-      dirLight.shadow.camera.near = 5;
-      dirLight.shadow.camera.far = 140;
-      const d = 52;
-      dirLight.shadow.camera.left = -d;
-      dirLight.shadow.camera.right = d;
-      dirLight.shadow.camera.top = d;
-      dirLight.shadow.camera.bottom = -d;
-      dirLight.shadow.bias = -0.0005;
-      scene.add(dirLight);
-
-      buildFloor8();
-      spawnAllNpcs();
-      initEventListeners();
-      updateCombatHUD();
-
-      setTimeout(() => {
-        const overlay = document.getElementById('loading-overlay');
-        overlay.classList.add('opacity-0');
-        setTimeout(() => overlay.remove(), 500);
-      }, 450);
-
-      animate();
-    }
-
+    let lastClockTick = 0;
     function animate() {
       requestAnimationFrame(animate);
-      const dt = Math.min(clock.getDelta(), 0.05);
-      const elapsed = clock.getElapsedTime();
+      const dt = Math.min(0.05, clock.getDelta());
+      const elapsed = clock.elapsedTime;
 
+      updateAutomaticSlidingDoors(dt);
       updatePlayerAndCamera(dt);
-      updateNpcsAndWorld(dt, elapsed);
+      updateNpcs(dt, elapsed);
+      updateVisualEffects(dt, elapsed);
       renderMinimap();
+
+      if (elapsed - lastClockTick >= 1.0) {
+        lastClockTick = elapsed;
+        gameClockMinutes = (gameClockMinutes + 1) % (24 * 60);
+        const hh = String(Math.floor(gameClockMinutes / 60)).padStart(2, '0');
+        const mm = String(gameClockMinutes % 60).padStart(2, '0');
+        document.getElementById('hud-clock').textContent = `${hh}:${mm}`;
+      }
 
       renderer.render(scene, camera);
     }
 
-    window.addEventListener('DOMContentLoaded', initScene);
+    window.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
