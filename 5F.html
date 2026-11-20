@@ -46,7 +46,7 @@
       text-shadow: 2px 2px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000;
     }
     .hud-glass {
-      background: rgba(12, 20, 31, 0.82);
+      background: rgba(12, 20, 31, 0.84);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.16);
@@ -83,7 +83,7 @@
   <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 text-white transition-opacity duration-500">
     <div class="w-16 h-16 border-4 border-teal-400 border-t-amber-400 rounded-full animate-spin mb-4"></div>
     <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">彰濱秀傳紀念醫院 5F 住院病房實境</h1>
-    <p class="text-xs sm:text-sm text-slate-300">正在載入溫潤木質地板、開放式木質環形護理站、可走入式病房與 E化行動護理車...</p>
+    <p class="text-xs sm:text-sm text-slate-300">正在載入高級水磨石醫療磁磚地板（無閃頻穩定渲染）...</p>
   </div>
 
   <!-- 頂部橫向：全院各科區域與電梯快速傳送列 -->
@@ -124,8 +124,8 @@
     </div>
   </div>
 
-  <!-- 左上角：操作說明與滑鼠靈敏度控制面板 -->
-  <div class="fixed top-14 left-3 sm:left-4 z-20 flex flex-col gap-2 max-w-[295px] sm:max-w-[325px]">
+  <!-- 左上角：操作說明、地板材質切換與滑鼠靈敏度控制面板 -->
+  <div class="fixed top-14 left-3 sm:left-4 z-20 flex flex-col gap-2 max-w-[305px] sm:max-w-[335px]">
     <div class="hud-glass rounded-2xl p-3 text-white shadow-xl">
       <div class="flex items-center justify-between gap-2">
         <div class="flex items-center gap-2">
@@ -153,6 +153,14 @@
         </button>
         <button id="btn-clear-wanted" class="py-1.5 px-2 rounded-xl text-xs font-bold bg-emerald-500/20 border border-emerald-400/50 text-emerald-200 hover:bg-emerald-500/35 transition">
           🏥 消除通緝/滿血 (C)
+        </button>
+      </div>
+
+      <!-- 全院地板材質即時切換按鈕 -->
+      <div class="mt-1.5">
+        <button id="btn-cycle-floor" class="w-full py-1.5 px-2.5 rounded-xl text-xs font-black bg-teal-500/25 border border-teal-400/55 text-teal-200 hover:bg-teal-500/40 transition flex items-center justify-between">
+          <span>🧱 地板材質切換</span>
+          <span id="floor-style-badge" class="px-2 py-0.5 rounded bg-teal-400/25 text-white font-bold">水磨石醫療磚</span>
         </button>
       </div>
 
@@ -194,7 +202,7 @@
       </div>
     </div>
 
-    <!-- 通緝警星 -->
+    <!-- 通緝警星（已移除高頻閃爍動畫，改為穩定常亮） -->
     <div id="hud-wanted-stars" class="mt-1 flex items-center gap-1 text-base sm:text-lg gta-shadow">
       <span class="text-slate-600">★</span>
       <span class="text-slate-600">★</span>
@@ -214,13 +222,13 @@
   <div id="floating-ui-layer" class="fixed inset-0 z-10 pointer-events-none overflow-hidden"></div>
 
   <!-- 畫面中央準心 -->
-  <div id="crosshair" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-15 pointer-events-none opacity-45 transition-opacity">
+  <div id="crosshair" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-15 pointer-events-none opacity-45">
     <div class="w-5 h-5 rounded-full border border-white/80 flex items-center justify-center">
       <div class="w-1.5 h-1.5 rounded-full bg-teal-300"></div>
     </div>
   </div>
 
-  <!-- 玩家受擊紅色邊緣閃爍濾鏡 -->
+  <!-- 玩家受擊紅色邊緣濾鏡 -->
   <div id="damage-vignette" class="fixed inset-0 z-15 pointer-events-none opacity-0 transition-opacity duration-150"
        style="background: radial-gradient(circle, transparent 52%, rgba(220, 38, 38, 0.72) 100%);"></div>
 
@@ -292,14 +300,19 @@
   <script>
     /**
      * ============================================================================
-     * 彰濱秀傳紀念醫院 5F 住院病房與全院樓層 3D 實境（無閃爍 Z-Fighting 修正版）
+     * 彰濱秀傳紀念醫院 5F 住院病房與全院樓層 3D 實境（水磨石醫療磁磚・零閃頻版）
      * ============================================================================
-     * 1. 【無須鎖定滑鼠 (No Pointer Lock)】：完全不調用 requestPointerLock()，
-     *    支援滑鼠左鍵或右鍵拖曳旋轉視角、滾輪縮放視角，且可直接按 WASD / 方向鍵移動。
-     * 2. 【全館溫潤木質地板 & 已移除所有手扶梯】：1F、2F、3F、5F 皆無任何手扶梯結構或文字殘留。
-     * 3. 【實景可走入式住院病房 & 開放式木質環形護理站 & E化行動護理車】。
-     * 4. 【零深度衝突 (Zero Z-Fighting)】：精準切割各樓層樓板交界、為疊加地板與貼地壓條設定
-     *    高度差與 polygonOffset，並將攝影機 near 近裁面設為 0.35 提升遠景深度解析度。
+     * 1. 【變更全院地板材質】：
+     *    - 全館預設地坪升級為「高級亮面微晶石／水磨石醫療防滑磁磚地板（Polished Terrazzo & Porcelain Tile）」，
+     *      具備象牙白／淺灰米色基底、細膩暖灰與淡藍綠天然骨材碎石顆粒、60x60cm 柔和分格線與法線凹凸質感。
+     *    - 走廊壓條同步更新為深灰岩板金屬收邊條，並支援左上角一鍵切換「水磨石醫療磚 / 大理石紋地磚 / 溫潤木紋地板」。
+     * 2. 【徹底消除任何閃頻 (Zero Flicker / Zero Z-Fighting / Anti-Moiré)】：
+     *    - 關閉 logarithmicDepthBuffer，採用標準高精度深度緩衝並設定 camera near = 0.5, far = 180。
+     *    - 全貼圖強制啟用 LinearMipmapLinearFilter + 最大各向異性過濾 (getMaxAnisotropy)，
+     *      且磁磚分格線採柔和漸層低高頻對比設計，徹底杜絕移動時的遠景摩爾紋閃頻。
+     *    - 所有同層子樓板之間保留嚴格水平微間隙（>= 0.04 單位）與垂直高度差，零共面重疊。
+     *    - 電梯地面感應墊改為靜態穩定發光（固定 opacity: 0.24, y = baseY + 0.045, depthWrite: false），
+     *      警星移除 animate-pulse 閃爍動畫。
      */
 
     // --------------------------------------------------------------------------
@@ -307,6 +320,16 @@
     // --------------------------------------------------------------------------
     let scene, camera, renderer;
     const clock = new THREE.Clock();
+
+    // 追蹤所有地坪網格與走廊壓條網格，支援一鍵即時切換三種地坪材質
+    const floorSurfaceRegistry = [];
+    const floorInlayMaterials = [];
+    const FLOOR_STYLES = [
+      { key: 'terrazzo', label: '水磨石醫療磚', inlayColor: 0x64748b },
+      { key: 'marble',   label: '大理石紋地磚', inlayColor: 0x475569 },
+      { key: 'wood',     label: '溫潤木紋地板', inlayColor: 0x7c4d2b }
+    ];
+    let currentFloorStyleIdx = 0;
 
     // 牆面與大型醫療設施碰撞箱陣列：{ minX, maxX, minZ, maxZ, floor, label }
     const colliders = [];
@@ -519,13 +542,34 @@
     }
 
     // --------------------------------------------------------------------------
-    // 3. 實景級程序化貼圖工廠（全館木質地板、輕鋼架LED天花板、實景病房護牆板）
+    // 3. 實景級無閃頻程序化貼圖工廠
+    //    （高級亮面水磨石醫療防滑磁磚、大理石紋微晶石、溫潤木紋、抗摩爾紋天花板）
     // --------------------------------------------------------------------------
     const ArchitecturalMaterials = (() => {
       const cache = {};
 
-      function getWarmWoodFloorMaterial(repeatX = 36, repeatY = 32) {
-        const key = `floor_wood_all_${repeatX}_${repeatY}`;
+      function applyAntiAliasingFilter(tex, repeatX, repeatY) {
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.wrapT = THREE.RepeatWrapping;
+        tex.repeat.set(repeatX, repeatY);
+        tex.generateMipmaps = true;
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        if (renderer && renderer.capabilities) {
+          tex.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
+        } else {
+          tex.anisotropy = 8;
+        }
+        tex.needsUpdate = true;
+      }
+
+      /**
+       * 1) 全新預設：高級亮面微晶石／水磨石醫療防滑磁磚地板 (Polished Terrazzo Medical Tile)
+       *    - 象牙白與淺灰米色溫潤基底，搭配細膩天然暖灰與淡藍綠礦物骨材顆粒
+       *    - 柔和漸層 60x60cm 磁磚分格線，避免遠景高頻摩爾紋閃頻
+       */
+      function getTerrazzoTileFloorMaterial(repeatX = 34, repeatY = 30, elevated = false) {
+        const key = `floor_terrazzo_${repeatX}_${repeatY}_${elevated ? 1 : 0}`;
         if (cache[key]) return cache[key];
 
         const size = 1024;
@@ -538,8 +582,186 @@
         bumpCanvas.width = size;
         bumpCanvas.height = size;
         const bctx = bumpCanvas.getContext('2d');
-        bctx.fillStyle = '#e5e5e5';
+        bctx.fillStyle = '#efefef';
         bctx.fillRect(0, 0, size, size);
+
+        // 4x4 塊 60x60cm 水磨石磁磚單元
+        const tiles = 4;
+        const tileSize = size / tiles;
+        const baseTones = ['#f3efe8', '#efeae1', '#f5f2ec', '#ede8df'];
+
+        // 決定性偽隨機數產生器，保證多區塊之間紋理自然一致
+        let seed = 13579;
+        const rand = () => {
+          seed = (seed * 16807) % 2147483647;
+          return (seed - 1) / 2147483646;
+        };
+
+        for (let r = 0; r < tiles; r++) {
+          for (let c = 0; c < tiles; c++) {
+            const tx = c * tileSize;
+            const ty = r * tileSize;
+            ctx.fillStyle = baseTones[(r * 3 + c * 5) % baseTones.length];
+            ctx.fillRect(tx, ty, tileSize, tileSize);
+
+            // 細微云霧色階變化
+            const grad = ctx.createRadialGradient(
+              tx + tileSize * (0.35 + rand() * 0.3),
+              ty + tileSize * (0.35 + rand() * 0.3),
+              10,
+              tx + tileSize * 0.5,
+              ty + tileSize * 0.5,
+              tileSize * 0.72
+            );
+            grad.addColorStop(0, 'rgba(255, 255, 255, 0.24)');
+            grad.addColorStop(1, 'rgba(203, 213, 225, 0.14)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(tx, ty, tileSize, tileSize);
+          }
+        }
+
+        // 天然水磨石碎石骨材顆粒（暖灰、米褐、淡藍綠礦物石粒）
+        const chipColors = [
+          'rgba(148, 163, 184, 0.42)', // 暖岩灰
+          'rgba(180, 168, 152, 0.45)', // 砂岩米褐
+          'rgba(110, 168, 162, 0.32)', // 淡醫療青綠石粒
+          'rgba(255, 255, 255, 0.72)', // 白石英結晶
+          'rgba(100, 116, 139, 0.30)'  // 深頁岩微粒
+        ];
+
+        for (let i = 0; i < 2400; i++) {
+          const px = rand() * size;
+          const py = rand() * size;
+          const rad = 1.1 + rand() * 3.4;
+          ctx.fillStyle = chipColors[Math.floor(rand() * chipColors.length)];
+          ctx.beginPath();
+          const sides = 4 + Math.floor(rand() * 3);
+          for (let s = 0; s < sides; s++) {
+            const ang = (s / sides) * Math.PI * 2 + rand() * 0.5;
+            const rJitter = rad * (0.65 + rand() * 0.55);
+            const vx = px + Math.cos(ang) * rJitter;
+            const vy = py + Math.sin(ang) * rJitter;
+            if (s === 0) ctx.moveTo(vx, vy);
+            else ctx.lineTo(vx, vy);
+          }
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        // 柔和抗摩爾紋磁磚接縫線（低高頻對比漸層填縫，遠距離不閃頻）
+        for (let i = 0; i <= tiles; i++) {
+          const p = i * tileSize;
+
+          // 水平縫
+          const hGrad = ctx.createLinearGradient(0, p - 4, 0, p + 4);
+          hGrad.addColorStop(0, 'rgba(148, 163, 184, 0)');
+          hGrad.addColorStop(0.5, 'rgba(148, 163, 184, 0.34)');
+          hGrad.addColorStop(1, 'rgba(148, 163, 184, 0)');
+          ctx.fillStyle = hGrad;
+          ctx.fillRect(0, p - 4, size, 8);
+
+          // 垂直縫
+          const vGrad = ctx.createLinearGradient(p - 4, 0, p + 4, 0);
+          vGrad.addColorStop(0, 'rgba(148, 163, 184, 0)');
+          vGrad.addColorStop(0.5, 'rgba(148, 163, 184, 0.34)');
+          vGrad.addColorStop(1, 'rgba(148, 163, 184, 0)');
+          ctx.fillStyle = vGrad;
+          ctx.fillRect(p - 4, 0, 8, size);
+
+          bctx.strokeStyle = '#b8b8b8';
+          bctx.lineWidth = 3;
+          bctx.beginPath(); bctx.moveTo(0, p); bctx.lineTo(size, p); bctx.stroke();
+          bctx.beginPath(); bctx.moveTo(p, 0); bctx.lineTo(p, size); bctx.stroke();
+        }
+
+        const mapTex = new THREE.CanvasTexture(canvas);
+        applyAntiAliasingFilter(mapTex, repeatX, repeatY);
+
+        const bumpTex = new THREE.CanvasTexture(bumpCanvas);
+        applyAntiAliasingFilter(bumpTex, repeatX, repeatY);
+
+        const mat = new THREE.MeshStandardMaterial({
+          map: mapTex,
+          bumpMap: bumpTex,
+          bumpScale: 0.004,
+          roughness: 0.24,
+          metalness: 0.08,
+          polygonOffset: elevated,
+          polygonOffsetFactor: elevated ? -2 : 0,
+          polygonOffsetUnits: elevated ? -2 : 0
+        });
+        cache[key] = mat;
+        return mat;
+      }
+
+      /**
+       * 2) 可選切換：高級卡拉拉白大理石紋拋光磚 (Polished Carrara Marble Tile)
+       */
+      function getMarbleTileFloorMaterial(repeatX = 34, repeatY = 30, elevated = false) {
+        const key = `floor_marble_${repeatX}_${repeatY}_${elevated ? 1 : 0}`;
+        if (cache[key]) return cache[key];
+
+        const size = 1024;
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(0, 0, size, size);
+
+        // 柔和天然大理石水墨流紋
+        for (let v = 0; v < 18; v++) {
+          ctx.strokeStyle = v % 3 === 0 ? 'rgba(148, 163, 184, 0.22)' : 'rgba(203, 213, 225, 0.28)';
+          ctx.lineWidth = 1.5 + (v % 4) * 1.4;
+          ctx.beginPath();
+          let sx = (v * 97) % size;
+          let sy = 0;
+          ctx.moveTo(sx, sy);
+          for (let step = 1; step <= 8; step++) {
+            sy = (size / 8) * step;
+            sx += Math.sin(v * 1.7 + step * 0.9) * 48;
+            ctx.lineTo(sx, sy);
+          }
+          ctx.stroke();
+        }
+
+        const tiles = 4;
+        const tileSize = size / tiles;
+        for (let i = 0; i <= tiles; i++) {
+          const p = i * tileSize;
+          ctx.fillStyle = 'rgba(148, 163, 184, 0.28)';
+          ctx.fillRect(0, p - 1.5, size, 3);
+          ctx.fillRect(p - 1.5, 0, 3, size);
+        }
+
+        const mapTex = new THREE.CanvasTexture(canvas);
+        applyAntiAliasingFilter(mapTex, repeatX, repeatY);
+
+        const mat = new THREE.MeshStandardMaterial({
+          map: mapTex,
+          roughness: 0.18,
+          metalness: 0.12,
+          polygonOffset: elevated,
+          polygonOffsetFactor: elevated ? -2 : 0,
+          polygonOffsetUnits: elevated ? -2 : 0
+        });
+        cache[key] = mat;
+        return mat;
+      }
+
+      /**
+       * 3) 可選切換：溫潤木質地板 (Warm Oak Wood Flooring)
+       */
+      function getWarmWoodFloorMaterial(repeatX = 34, repeatY = 30, elevated = false) {
+        const key = `floor_wood_${repeatX}_${repeatY}_${elevated ? 1 : 0}`;
+        if (cache[key]) return cache[key];
+
+        const size = 1024;
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
 
         const plankH = 64;
         const plankW = 256;
@@ -558,62 +780,34 @@
             ctx.fillStyle = woodShades[toneIdx];
             ctx.fillRect(x, y, plankW, plankH);
 
-            ctx.save();
-            ctx.beginPath();
-            ctx.rect(x + 1, y + 1, plankW - 2, plankH - 2);
-            ctx.clip();
-
-            for (let g = 4; g < plankH; g += 5) {
-              ctx.strokeStyle = g % 10 === 0
-                ? 'rgba(110, 68, 32, 0.16)'
-                : 'rgba(255, 244, 228, 0.18)';
-              ctx.lineWidth = 1.1;
-              ctx.beginPath();
-              ctx.moveTo(x, y + g);
-              ctx.bezierCurveTo(
-                x + plankW * 0.33, y + g + Math.sin(row + g) * 2.4,
-                x + plankW * 0.66, y + g - Math.cos(col + g) * 2.4,
-                x + plankW, y + g
-              );
-              ctx.stroke();
-            }
-
-            ctx.strokeStyle = 'rgba(255, 248, 238, 0.28)';
+            ctx.strokeStyle = 'rgba(101, 62, 28, 0.24)';
             ctx.lineWidth = 1.5;
-            ctx.strokeRect(x + 1.5, y + 1.5, plankW - 3, plankH - 3);
-            ctx.restore();
-
-            ctx.strokeStyle = 'rgba(84, 48, 20, 0.38)';
-            ctx.lineWidth = 2;
             ctx.strokeRect(x, y, plankW, plankH);
-
-            bctx.strokeStyle = '#686868';
-            bctx.lineWidth = 2.5;
-            bctx.strokeRect(x, y, plankW, plankH);
           }
         }
 
         const mapTex = new THREE.CanvasTexture(canvas);
-        mapTex.wrapS = mapTex.wrapT = THREE.RepeatWrapping;
-        mapTex.repeat.set(repeatX, repeatY);
-        mapTex.anisotropy = 4;
-
-        const bumpTex = new THREE.CanvasTexture(bumpCanvas);
-        bumpTex.wrapS = bumpTex.wrapT = THREE.RepeatWrapping;
-        bumpTex.repeat.set(repeatX, repeatY);
+        applyAntiAliasingFilter(mapTex, repeatX, repeatY);
 
         const mat = new THREE.MeshStandardMaterial({
           map: mapTex,
-          bumpMap: bumpTex,
-          bumpScale: 0.01,
-          roughness: 0.32,
-          metalness: 0.06
+          roughness: 0.34,
+          metalness: 0.05,
+          polygonOffset: elevated,
+          polygonOffsetFactor: elevated ? -2 : 0,
+          polygonOffsetUnits: elevated ? -2 : 0
         });
         cache[key] = mat;
         return mat;
       }
 
-      function getAcousticCeilingMaterial(repeatX = 28, repeatY = 24) {
+      function getFloorMaterialByStyle(styleKey, repeatX = 34, repeatY = 30, elevated = false) {
+        if (styleKey === 'marble') return getMarbleTileFloorMaterial(repeatX, repeatY, elevated);
+        if (styleKey === 'wood') return getWarmWoodFloorMaterial(repeatX, repeatY, elevated);
+        return getTerrazzoTileFloorMaterial(repeatX, repeatY, elevated);
+      }
+
+      function getAcousticCeilingMaterial(repeatX = 24, repeatY = 20) {
         const key = `ceil_grid_${repeatX}_${repeatY}`;
         if (cache[key]) return cache[key];
 
@@ -636,13 +830,9 @@
         const cells = 8;
         const cell = size / cells;
 
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.22)';
-        for (let i = 0; i < 1800; i++) {
-          ctx.fillRect(Math.random() * size, Math.random() * size, 2, 2);
-        }
-
-        ctx.strokeStyle = '#cbd5e1';
-        ctx.lineWidth = 3;
+        // 柔和低對比輕鋼架線條，防止遠景摩爾紋閃頻
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.42)';
+        ctx.lineWidth = 2.5;
         for (let i = 0; i <= cells; i++) {
           const p = i * cell;
           ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, size); ctx.stroke();
@@ -656,50 +846,34 @@
           [3, 7], [7, 7]
         ];
         ledPositions.forEach(([cx, cy]) => {
-          const lx = cx * cell + 6;
-          const ly = cy * cell + 6;
-          const lw = cell - 12;
-          const lh = cell - 12;
+          const lx = cx * cell + 8;
+          const ly = cy * cell + 8;
+          const lw = cell - 16;
+          const lh = cell - 16;
 
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(lx, ly, lw, lh);
-          ctx.strokeStyle = '#94a3b8';
-          ctx.lineWidth = 3;
+          ctx.strokeStyle = '#cbd5e1';
+          ctx.lineWidth = 2;
           ctx.strokeRect(lx, ly, lw, lh);
 
           ectx.fillStyle = '#fffbeb';
           ectx.fillRect(lx + 2, ly + 2, lw - 4, lh - 4);
         });
 
-        [[3, 1], [7, 5]].forEach(([ax, ay]) => {
-          const x = ax * cell + 14;
-          const y = ay * cell + 14;
-          const w = cell - 28;
-          ctx.fillStyle = '#e2e8f0';
-          ctx.fillRect(x, y, w, w);
-          ctx.strokeStyle = '#64748b';
-          ctx.lineWidth = 2;
-          for (let inset = 6; inset < w / 2; inset += 8) {
-            ctx.strokeRect(x + inset, y + inset, w - inset * 2, w - inset * 2);
-          }
-        });
-
         const mapTex = new THREE.CanvasTexture(canvas);
-        mapTex.wrapS = mapTex.wrapT = THREE.RepeatWrapping;
-        mapTex.repeat.set(repeatX, repeatY);
-        mapTex.anisotropy = 4;
+        applyAntiAliasingFilter(mapTex, repeatX, repeatY);
 
         const emTex = new THREE.CanvasTexture(emCanvas);
-        emTex.wrapS = emTex.wrapT = THREE.RepeatWrapping;
-        emTex.repeat.set(repeatX, repeatY);
+        applyAntiAliasingFilter(emTex, repeatX, repeatY);
 
         const mat = new THREE.MeshStandardMaterial({
           map: mapTex,
           emissive: new THREE.Color(0xfffbeb),
           emissiveMap: emTex,
-          emissiveIntensity: 0.92,
+          emissiveIntensity: 0.88,
           roughness: 0.72,
-          side: THREE.DoubleSide
+          side: THREE.FrontSide
         });
         cache[key] = mat;
         return mat;
@@ -726,7 +900,7 @@
           ctx.fillStyle = '#c88d88';
           ctx.fillRect(0, h * 0.56, w, h * 0.38);
 
-          ctx.strokeStyle = 'rgba(92, 46, 44, 0.28)';
+          ctx.strokeStyle = 'rgba(92, 46, 44, 0.22)';
           ctx.lineWidth = 2;
           for (let x = 0; x < w; x += 64) {
             ctx.beginPath(); ctx.moveTo(x, h * 0.56); ctx.lineTo(x, h * 0.94); ctx.stroke();
@@ -742,7 +916,7 @@
         } else if (style === 'nursing') {
           ctx.fillStyle = '#d4a373';
           ctx.fillRect(0, 0, w, h);
-          ctx.strokeStyle = 'rgba(101, 62, 28, 0.22)';
+          ctx.strokeStyle = 'rgba(101, 62, 28, 0.18)';
           ctx.lineWidth = 2;
           for (let x = 0; x < w; x += 16) {
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
@@ -782,7 +956,7 @@
         } else {
           ctx.fillStyle = '#efe8da';
           ctx.fillRect(0, 0, w, h);
-          ctx.strokeStyle = 'rgba(168, 154, 132, 0.38)';
+          ctx.strokeStyle = 'rgba(168, 154, 132, 0.32)';
           ctx.lineWidth = 2;
           for (let y = 0; y <= h; y += 64) {
             ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
@@ -798,12 +972,12 @@
         tex.wrapS = THREE.RepeatWrapping;
         tex.wrapT = THREE.ClampToEdgeWrapping;
         tex.repeat.set(repeatX, 1);
-        tex.anisotropy = 4;
+        tex.generateMipmaps = true;
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
+        tex.anisotropy = 8;
 
         const mat = new THREE.MeshStandardMaterial({
           map: tex,
-          bumpMap: tex,
-          bumpScale: 0.01,
           roughness: 0.55,
           metalness: 0.05
         });
@@ -845,6 +1019,7 @@
           opacity: 0.88,
           roughness: 0.22,
           metalness: 0.35,
+          depthWrite: false,
           side: THREE.DoubleSide
         });
         cache['frosted_glass'] = mat;
@@ -852,12 +1027,41 @@
       }
 
       return {
-        getWarmWoodFloorMaterial,
+        getFloorMaterialByStyle,
         getAcousticCeilingMaterial,
         getWallMaterial,
         getFrostedBandGlassMaterial
       };
     })();
+
+    /**
+     * 註冊可動態切換材質的地坪網格，並在切換時即時套用至全院 1F ~ 5F
+     */
+    function registerFloorSurface(mesh, repeatX, repeatY, elevated = false) {
+      floorSurfaceRegistry.push({ mesh, repeatX, repeatY, elevated });
+    }
+
+    function applyFloorStyle(styleIdx) {
+      currentFloorStyleIdx = styleIdx % FLOOR_STYLES.length;
+      const styleObj = FLOOR_STYLES[currentFloorStyleIdx];
+
+      floorSurfaceRegistry.forEach((entry) => {
+        entry.mesh.material = ArchitecturalMaterials.getFloorMaterialByStyle(
+          styleObj.key,
+          entry.repeatX,
+          entry.repeatY,
+          entry.elevated
+        );
+        entry.mesh.material.needsUpdate = true;
+      });
+
+      floorInlayMaterials.forEach((mat) => {
+        mat.color.setHex(styleObj.inlayColor);
+      });
+
+      const badge = document.getElementById('floor-style-badge');
+      if (badge) badge.textContent = styleObj.label;
+    }
 
     function createSignTexture(title, subtitle = '', bgColor = '#0f4c5c', accentColor = '#2dd4bf') {
       const canvas = document.createElement('canvas');
@@ -888,7 +1092,9 @@
       }
 
       const tex = new THREE.CanvasTexture(canvas);
-      tex.anisotropy = 4;
+      tex.generateMipmaps = true;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.anisotropy = 8;
       return tex;
     }
 
@@ -910,7 +1116,7 @@
     }
 
     /**
-     * 註冊電梯自動接觸感應區並生成地面發光感應墊（開啟 polygonOffset 防止遠景閃爍）
+     * 註冊電梯自動接觸感應區並生成靜態穩定發光感應墊（無閃頻、depthWrite: false）
      */
     function addTransportTriggerZone(opts) {
       transportTriggers.push(opts);
@@ -919,20 +1125,20 @@
       const d = opts.maxZ - opts.minZ;
       const cx = (opts.minX + opts.maxX) * 0.5;
       const cz = (opts.minZ + opts.maxZ) * 0.5;
-      const colorHex = 0x38bdf8;
 
       const padMat = new THREE.MeshBasicMaterial({
-        color: colorHex,
+        color: 0x0ea5e9,
         transparent: true,
-        opacity: 0.26,
-        side: THREE.DoubleSide,
+        opacity: 0.24,
+        depthWrite: false,
+        side: THREE.FrontSide,
         polygonOffset: true,
         polygonOffsetFactor: -4,
         polygonOffsetUnits: -4
       });
       const pad = new THREE.Mesh(new THREE.PlaneGeometry(w, d), padMat);
       pad.rotation.x = -Math.PI / 2;
-      pad.position.set(cx, opts.baseY + 0.032, cz);
+      pad.position.set(cx, opts.baseY + 0.045, cz);
       scene.add(pad);
       transportPadMeshes.push(pad);
     }
@@ -1328,7 +1534,7 @@
 
       const privacyCurtain = new THREE.Mesh(
         new THREE.BoxGeometry(1.15, 2.35, 0.04),
-        new THREE.MeshStandardMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.72, roughness: 0.8 })
+        new THREE.MeshStandardMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.72, roughness: 0.8, depthWrite: false })
       );
       privacyCurtain.position.set(cx + roomW * 0.5 - 1.35, f5Y + 1.35, -33.2);
       scene.add(privacyCurtain);
@@ -1585,12 +1791,12 @@
     }
 
     // --------------------------------------------------------------------------
-    // 6. 建構 1F、2F、3F 與 5F 實景級內部牆壁、天花板與全面溫潤木質地板
-    //    （嚴格切割各樓板交界，徹底杜絕共面 Z-fighting 深度衝突閃爍）
+    // 6. 建構 1F、2F、3F 與 5F 實景級內部牆壁、天花板與全面水磨石醫療磁磚地板
+    //    （嚴格保留水平微間隙，徹底杜絕共面 Z-fighting 深度衝突閃爍）
     // --------------------------------------------------------------------------
     function buildHospital1FInterior() {
-      const floorMat = ArchitecturalMaterials.getWarmWoodFloorMaterial(38, 34);
-      const ceilMat = ArchitecturalMaterials.getAcousticCeilingMaterial(28, 24);
+      const floorMat = ArchitecturalMaterials.getFloorMaterialByStyle('terrazzo', 36, 32, false);
+      const ceilMat = ArchitecturalMaterials.getAcousticCeilingMaterial(24, 20);
       const frostedGlassMat = ArchitecturalMaterials.getFrostedBandGlassMaterial();
       const darkFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.6 });
       const counterWoodMat = new THREE.MeshStandardMaterial({ color: 0x9c6644, roughness: 0.48 });
@@ -1600,6 +1806,7 @@
       ground1F.rotation.x = -Math.PI / 2;
       ground1F.receiveShadow = true;
       scene.add(ground1F);
+      registerFloorSurface(ground1F, 36, 32, false);
 
       const ceil1F = new THREE.Mesh(new THREE.PlaneGeometry(110, 96), ceilMat);
       ceil1F.rotation.x = Math.PI / 2;
@@ -1760,22 +1967,25 @@
      */
     function buildHospital2FInterior(frostedGlassMat, darkFrameMat, counterWoodMat) {
       const f2Y = 4.6;
-      const slabMat = ArchitecturalMaterials.getWarmWoodFloorMaterial(36, 18);
-      const ceilMat = ArchitecturalMaterials.getAcousticCeilingMaterial(28, 24);
+      const ceilMat = ArchitecturalMaterials.getAcousticCeilingMaterial(24, 20);
 
       const addFloorSlab2F = (cx, cz, w, d) => {
+        const repX = Math.max(4, Math.round(w / 3.0));
+        const repY = Math.max(4, Math.round(d / 3.0));
+        const slabMat = ArchitecturalMaterials.getFloorMaterialByStyle('terrazzo', repX, repY, false);
         const slab = new THREE.Mesh(new THREE.BoxGeometry(w, 0.22, d), slabMat);
         slab.position.set(cx, f2Y - 0.11, cz);
         slab.receiveShadow = true;
         scene.add(slab);
+        registerFloorSurface(slab, repX, repY, false);
       };
 
-      // 嚴格切割前後樓板與中庭/兩側連通道邊界，避免共面 Z-fighting
-      addFloorSlab2F(0, -25.5, 107, 44);   // Z: -47.5 ~ -3.5
-      addFloorSlab2F(0, 25.5, 107, 38);    // Z: 6.5 ~ 44.5
-      addFloorSlab2F(0, 1.5, 25, 10);      // Z: -3.5 ~ 6.5 (中庭電梯通道)
-      addFloorSlab2F(-43.5, 1.5, 20, 10);  // Z: -3.5 ~ 6.5 (西側連通道)
-      addFloorSlab2F(43.5, 1.5, 20, 10);   // Z: -3.5 ~ 6.5 (東側連通道)
+      // 嚴格保留 0.04 水平微間隙，零共面重疊
+      addFloorSlab2F(0, -25.52, 107, 43.96);   // Z: -47.5 ~ -3.54
+      addFloorSlab2F(0, 25.52, 107, 37.96);    // Z: 6.54 ~ 44.5
+      addFloorSlab2F(0, 1.5, 25, 9.92);        // Z: -3.46 ~ 6.46
+      addFloorSlab2F(-43.5, 1.5, 20, 9.92);
+      addFloorSlab2F(43.5, 1.5, 20, 9.92);
 
       [-22, 22].forEach((ax) => {
         addWall(ax, -3.5, 19.0, 0.2, 1.25, frostedGlassMat, '2F 挑空玻璃護欄', 2, f2Y, 'glass');
@@ -1830,21 +2040,24 @@
      */
     function buildHospital3FInterior(frostedGlassMat) {
       const f3Y = 9.2;
-      const slabMat = ArchitecturalMaterials.getWarmWoodFloorMaterial(36, 18);
-      const ceilMat = ArchitecturalMaterials.getAcousticCeilingMaterial(28, 24);
+      const ceilMat = ArchitecturalMaterials.getAcousticCeilingMaterial(24, 20);
       const counterWoodMat = new THREE.MeshStandardMaterial({ color: 0x9c6644, roughness: 0.48 });
 
       const addFloorSlab3F = (cx, cz, w, d) => {
+        const repX = Math.max(4, Math.round(w / 3.0));
+        const repY = Math.max(4, Math.round(d / 3.0));
+        const slabMat = ArchitecturalMaterials.getFloorMaterialByStyle('terrazzo', repX, repY, false);
         const slab = new THREE.Mesh(new THREE.BoxGeometry(w, 0.22, d), slabMat);
         slab.position.set(cx, f3Y - 0.11, cz);
         slab.receiveShadow = true;
         scene.add(slab);
+        registerFloorSurface(slab, repX, repY, false);
       };
 
-      // 精準切割 3F 前後樓板與中庭連通道，確保接縫不重疊
-      addFloorSlab3F(0, -25.5, 107, 44);   // Z: -47.5 ~ -3.5
-      addFloorSlab3F(0, 27.0, 107, 35);    // Z: 9.5 ~ 44.5
-      addFloorSlab3F(0, 3.0, 24, 13);      // Z: -3.5 ~ 9.5 (中庭連通道)
+      // 嚴格保留 0.04 水平微間隙，零共面重疊
+      addFloorSlab3F(0, -25.52, 107, 43.96);   // Z: -47.5 ~ -3.54
+      addFloorSlab3F(0, 27.02, 107, 34.96);    // Z: 9.54 ~ 44.5
+      addFloorSlab3F(0, 3.0, 24, 12.92);       // Z: -3.46 ~ 9.46
 
       const ceil3F = new THREE.Mesh(new THREE.PlaneGeometry(108, 94), ceilMat);
       ceil3F.rotation.x = Math.PI / 2;
@@ -1888,36 +2101,42 @@
      */
     function buildHospital5FInterior(frostedGlassMat, darkFrameMat, counterWoodMat) {
       const f5Y = 13.8;
-      const woodFloorMat = ArchitecturalMaterials.getWarmWoodFloorMaterial(42, 22);
-      const rotundaWoodMat = ArchitecturalMaterials.getWarmWoodFloorMaterial(12, 12);
-      const ceilMat = ArchitecturalMaterials.getAcousticCeilingMaterial(28, 16);
+      const ceilMat = ArchitecturalMaterials.getAcousticCeilingMaterial(24, 14);
       const stationWoodMat = ArchitecturalMaterials.getWallMaterial('nursing', 4);
       const counterTopMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.22, metalness: 0.12 });
 
-      const addFloorSlab5F = (cx, cz, w, d, customMat = woodFloorMat, yOffset = 0) => {
-        const slab = new THREE.Mesh(new THREE.BoxGeometry(w, 0.22, d), customMat);
+      const addFloorSlab5F = (cx, cz, w, d, yOffset = 0, elevated = false) => {
+        const repX = Math.max(4, Math.round(w / 3.0));
+        const repY = Math.max(4, Math.round(d / 3.0));
+        const slabMat = ArchitecturalMaterials.getFloorMaterialByStyle('terrazzo', repX, repY, elevated);
+        const slab = new THREE.Mesh(new THREE.BoxGeometry(w, 0.22, d), slabMat);
         slab.position.set(cx, f5Y - 0.11 + yOffset, cz);
         slab.receiveShadow = true;
         scene.add(slab);
+        registerFloorSurface(slab, repX, repY, elevated);
       };
 
-      // 嚴格切割北、中、南三塊主樓板（Z: -47.2 ~ -3.5, -3.5 ~ 23.0, 23.0 ~ 44.5），消除共面 Z-fighting
-      addFloorSlab5F(0, -25.35, 107, 43.7, woodFloorMat, 0);
-      addFloorSlab5F(0, 9.75, 36.0, 26.5, woodFloorMat, 0);
-      addFloorSlab5F(0, 33.75, 42.0, 21.5, woodFloorMat, 0);
+      // 嚴格切割北、中、南三塊主樓板（Z: -47.2 ~ -3.52, -3.48 ~ 22.98, 23.02 ~ 44.5），杜絕任何共面 Z-fighting
+      addFloorSlab5F(0, -25.36, 107, 43.68, 0, false);
+      addFloorSlab5F(0, 9.75, 36.0, 26.46, 0, false);
+      addFloorSlab5F(0, 33.76, 42.0, 21.48, 0, false);
 
-      // 走廊木質收邊壓條：墊高 +0.022 並開啟 polygonOffset 防止遠景閃爍
+      // 走廊深灰岩板金屬收邊壓條：墊高 +0.025 並開啟 depthWrite: false 防止遠景閃頻
       const inlayBorderMat = new THREE.MeshStandardMaterial({
-        color: 0x7c4d2b,
-        roughness: 0.36,
+        color: 0x64748b,
+        roughness: 0.32,
+        metalness: 0.25,
+        depthWrite: false,
         polygonOffset: true,
         polygonOffsetFactor: -3,
         polygonOffsetUnits: -3
       });
+      floorInlayMaterials.push(inlayBorderMat);
+
       const addFloorInlay = (cx, cz, w, d) => {
         const strip = new THREE.Mesh(new THREE.PlaneGeometry(w, d), inlayBorderMat);
         strip.rotation.x = -Math.PI / 2;
-        strip.position.set(cx, f5Y + 0.022, cz);
+        strip.position.set(cx, f5Y + 0.025, cz);
         strip.receiveShadow = true;
         scene.add(strip);
       };
@@ -2057,6 +2276,7 @@
           color: 0xe0f2fe,
           transparent: true,
           opacity: 0.42,
+          depthWrite: false,
           roughness: 0.1
         });
         const pcBodyMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.28 });
@@ -2216,19 +2436,14 @@
       buildCurvedNursingIsland(-23.5, -18.5, false);
       buildCurvedNursingIsland(23.5, -18.5, true);
 
-      // 6. 中央護理站 A、祈禱室 / 神明廳（已完全移除所有手扶梯平台與結構，走廊木地板暢通）
+      // 6. 中央護理站 A、祈禱室 / 神明廳
       addWall(0, -18.5, 13.5, 4.6, 4.4, null, '5F 中央護理站 A 與中央電梯核心', 5, f5Y, 'clinical_blue');
       addWall(-8.5, -18.5, 2.8, 1.15, 1.08, counterWoodMat, '西側護理站 A 櫃檯', 5, f5Y);
       addWall(8.5, -18.5, 2.8, 1.15, 1.08, counterWoodMat, '東側護理站 A 櫃檯', 5, f5Y);
       addHangingSign(0, f5Y + 3.65, -21.2, 6.8, 0.88, '5F 中央護理站 A・輪椅停放區', 'CENTRAL NURSING STATION A & WHEELCHAIR BAY', '#1d4ed8', '#93c5fd');
 
-      // 祈禱室與神明廳局部地板墊高 +0.035 並開啟 polygonOffset，避免與中庭主樓板產生深度衝突
-      const elevatedWoodMat = rotundaWoodMat.clone();
-      elevatedWoodMat.polygonOffset = true;
-      elevatedWoodMat.polygonOffsetFactor = -2;
-      elevatedWoodMat.polygonOffsetUnits = -2;
-
-      addFloorSlab5F(0, -6.8, 11.4, 5.4, elevatedWoodMat, 0.035);
+      // 祈禱室與神明廳局部地板墊高 +0.038 並開啟 polygonOffset，避免與中庭主樓板產生深度衝突
+      addFloorSlab5F(0, -6.8, 11.4, 5.4, 0.038, true);
       addWall(-3.2, -6.8, 5.6, 5.2, 4.4, null, '5F 祈禱室 (Prayer Room)', 5, f5Y, 'clinical_mint');
       addWall(3.2, -6.8, 5.6, 5.2, 4.4, null, '5F 神明廳 (Shrine Hall)', 5, f5Y, 'nursing');
       addHangingSign(0, f5Y + 3.65, -9.8, 7.2, 0.88, '祈禱室・神明廳・點滴庫房', 'PRAYER ROOM・SHRINE HALL・SPIRITUAL CARE', '#b45309', '#fde047', Math.PI);
@@ -2272,14 +2487,16 @@
       rotunda5FCurve.position.set(0, f5Y + 2.2, 34.5);
       scene.add(rotunda5FCurve);
 
-      // 南側半圓弧展望廳圓形地板頂部墊高至 f5Y + 0.035（中心 Y = f5Y - 0.085），徹底消除與下方方形樓板的 Z-fighting
+      // 南側半圓弧展望廳圓形地板頂部墊高至 f5Y + 0.038，徹底消除與下方方形樓板的 Z-fighting
+      const rotundaFloorMat = ArchitecturalMaterials.getFloorMaterialByStyle('terrazzo', 10, 10, true);
       const rotunda5FFloor = new THREE.Mesh(
         new THREE.CylinderGeometry(11.2, 11.2, 0.24, 36, 1, false, -Math.PI * 0.5, Math.PI),
-        elevatedWoodMat
+        rotundaFloorMat
       );
-      rotunda5FFloor.position.set(0, f5Y - 0.085, 34.5);
+      rotunda5FFloor.position.set(0, f5Y - 0.082, 34.5);
       rotunda5FFloor.receiveShadow = true;
       scene.add(rotunda5FFloor);
+      registerFloorSurface(rotunda5FFloor, 10, 10, true);
 
       const rotundaRingCeiling = new THREE.Mesh(
         new THREE.TorusGeometry(7.2, 0.32, 12, 36, Math.PI),
@@ -2520,7 +2737,7 @@
         skinColor: 0xf1c29b
       });
 
-      const auraMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0 });
+      const auraMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0, depthWrite: false });
       const rightFistAura = new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 10), auraMat);
       rightFistAura.position.y = -0.27;
       rig.rightElbow.add(rightFistAura);
@@ -2664,7 +2881,7 @@
           speed: 0,
           yaw: Math.PI / 2,
           isBedridden: true,
-          dialogue: '謝謝你來 520 病房看我！護理師剛剛幫我調整好點滴滴速，病房的木質地板跟窗外風景讓人心情很平靜。',
+          dialogue: '謝謝你來 520 病房看我！護理師剛剛幫我調整好點滴滴速，病房的亮面水磨石防滑磁磚地坪跟窗外風景讓人心情很平靜。',
           options: []
         },
         {
@@ -2680,7 +2897,7 @@
           speed: 0,
           yaw: Math.PI / 2,
           isBedridden: true,
-          dialogue: '醫師早上巡房說我恢復得很順利，點滴打完這瓶就可以下床在木地板走廊散步復健了！',
+          dialogue: '醫師早上巡房說我恢復得很順利，點滴打完這瓶就可以下床在防滑磁磚走廊散步復健了！',
           options: []
         },
         {
@@ -2865,7 +3082,7 @@
             new THREE.Vector3(26.5, f5Y, -23.2)
           ],
           speed: 1.15,
-          dialogue: '您好！歡迎來到彰濱秀傳 5F 住院病房樓層，全區皆採用防滑溫潤木質地板與開放式環形護理站，520、519、525、558 與 537 病房皆可直接走入探視！',
+          dialogue: '您好！歡迎來到彰濱秀傳 5F 住院病房樓層，全區已全面升級防滑水磨石醫療磁磚地板與開放式環形護理站，520、519、525、558 與 537 病房皆可直接走入探視！',
           options: [
             {
               label: '立即開啟全院醫療電梯樓層選單 (B1 ~ 8F)',
@@ -2917,7 +3134,7 @@
           appearance: { coatColor: 0xec4899, pantsColor: 0x1e293b },
           waypoints: [new THREE.Vector3(-3.5, f5Y, 33.5), new THREE.Vector3(3.5, f5Y, 33.5)],
           speed: 1.1,
-          dialogue: '5F 南側的半圓弧玻璃展望大廳鋪設了溫潤木質地板，視野超棒，兩側就有電梯可以直達 B1 美食街或其他樓層！',
+          dialogue: '5F 南側的半圓弧玻璃展望大廳換上亮面水磨石醫療磁磚後更加寬敞明亮，兩側就有電梯可以直達 B1 美食街或其他樓層！',
           options: []
         },
         {
@@ -2971,10 +3188,10 @@
 
         const aggroRing = new THREE.Mesh(
           new THREE.RingGeometry(0.45, 0.62, 24),
-          new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
+          new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.FrontSide, transparent: true, opacity: 0.85, depthWrite: false })
         );
         aggroRing.rotation.x = -Math.PI / 2;
-        aggroRing.position.y = 0.03;
+        aggroRing.position.y = 0.04;
         aggroRing.visible = false;
         if (!def.isBedridden) {
           rig.group.add(aggroRing);
@@ -3087,7 +3304,8 @@
         color: colorHex,
         side: THREE.DoubleSide,
         transparent: true,
-        opacity: 0.85
+        opacity: 0.85,
+        depthWrite: false
       });
       const mesh = new THREE.Mesh(arcGeom, arcMat);
       mesh.rotation.x = -Math.PI / 2;
@@ -3222,10 +3440,11 @@
       document.getElementById('hud-hp-bar').style.width = `${(player.hp / player.maxHp) * 100}%`;
       document.getElementById('hud-armor-bar').style.width = `${player.armor}%`;
 
+      // 穩定常亮警星，無高頻閃爍動畫
       const starsEl = document.getElementById('hud-wanted-stars');
       const spans = starsEl.querySelectorAll('span');
       spans.forEach((sp, i) => {
-        sp.className = i < player.wantedStars ? 'text-amber-400 animate-pulse' : 'text-slate-600';
+        sp.className = i < player.wantedStars ? 'text-amber-400' : 'text-slate-600';
       });
 
       const hostileCount = npcs.filter((n) => n.isHostile && n.floor === getFloorNumber(player.pos.y)).length;
@@ -3576,7 +3795,6 @@
         }
 
         if (npc.isHostile && npc.floor === pFloor && !activeTalkNpc) {
-          npc.aggroRing.scale.setScalar(1 + Math.sin(npc.walkCycle * 2) * 0.12);
           const toPlayerX = player.pos.x - npc.pos.x;
           const toPlayerZ = player.pos.z - npc.pos.z;
           const distToPlayer = Math.hypot(toPlayerX, toPlayerZ);
@@ -3618,115 +3836,103 @@
             npc.rig.rightShoulder.rotation.x = 0.45;
             if (npc.aiAttackTimer <= 0) {
               npc.aiAttackState = 'cooldown';
-              npc.aiAttackTimer = 0.65;
-              npc.rig.rightShoulder.rotation.x = 0;
-              npc.rig.rightElbow.rotation.x = 0;
+              npc.aiAttackTimer = 0.72;
             }
           } else if (npc.aiAttackState === 'cooldown') {
             npc.aiAttackTimer -= dt;
-            if (npc.aiAttackTimer <= 0) npc.aiAttackState = 'idle';
+            npc.rig.rightShoulder.rotation.x *= 0.85;
+            npc.rig.rightElbow.rotation.x *= 0.85;
+            if (npc.aiAttackTimer <= 0) {
+              npc.aiAttackState = 'idle';
+            }
           }
         } else if (npc.speed > 0 && npc.waypoints.length > 1) {
           const targetWp = npc.waypoints[npc.wpIndex];
           const dx = targetWp.x - npc.pos.x;
           const dz = targetWp.z - npc.pos.z;
           const dist = Math.hypot(dx, dz);
+
           if (dist < 0.35) {
             npc.wpIndex = (npc.wpIndex + 1) % npc.waypoints.length;
           } else {
-            npc.yaw = Math.atan2(dx, dz);
             npc.pos.x += (dx / dist) * npc.speed * dt;
             npc.pos.z += (dz / dist) * npc.speed * dt;
+            npc.yaw = Math.atan2(dx, dz);
             resolveCircleAllAABBs(npc.pos, npc.radius, npc.floor);
-            const swing = Math.sin(npc.walkCycle * 1.6) * 0.45;
+
+            const swing = Math.sin(npc.walkCycle * 1.6) * 0.42;
             npc.rig.leftHip.rotation.x = swing;
             npc.rig.rightHip.rotation.x = -swing;
-            npc.rig.leftShoulder.rotation.x = -swing * 0.65;
-            npc.rig.rightShoulder.rotation.x = swing * 0.65;
+            if (!npc.appearance.hasCart) {
+              npc.rig.leftShoulder.rotation.x = -swing * 0.65;
+              npc.rig.rightShoulder.rotation.x = swing * 0.65;
+            }
           }
         } else if (npc.isOperatingCart) {
-          npc.rig.rightShoulder.rotation.x = -0.92 + Math.sin(npc.walkCycle * 1.8) * 0.08;
-          npc.rig.leftShoulder.rotation.x = -0.85 + Math.cos(npc.walkCycle * 1.5) * 0.06;
-          npc.rig.headGroup.rotation.y = Math.sin(npc.walkCycle * 0.7) * 0.12;
+          npc.rig.rightShoulder.rotation.x = -0.92 + Math.sin(npc.walkCycle * 1.4) * 0.08;
+          npc.rig.leftShoulder.rotation.x = -0.85 + Math.cos(npc.walkCycle * 1.1) * 0.06;
+          npc.rig.headGroup.rotation.y = Math.sin(npc.walkCycle * 0.6) * 0.14;
         } else if (npc.isCheckingPatient) {
-          npc.rig.rightShoulder.rotation.x = -1.15 + Math.sin(npc.walkCycle * 1.1) * 0.1;
-          npc.rig.headGroup.rotation.y = Math.sin(npc.walkCycle * 0.6) * 0.16;
-        } else {
-          npc.rig.headGroup.rotation.y = Math.sin(npc.walkCycle * 0.5) * 0.14;
+          npc.rig.rightShoulder.rotation.x = -1.15 + Math.sin(npc.walkCycle * 1.2) * 0.12;
+          npc.rig.headGroup.rotation.y = Math.sin(npc.walkCycle * 0.7) * 0.16;
         }
 
         npc.mesh.rotation.y = npc.yaw;
 
         if (npc.floor === pFloor) {
-          separateCircles(player.pos, player.radius, npc.pos, npc.radius, 0.62);
-          resolveCircleAllAABBs(player.pos, player.radius, pFloor);
-          resolveCircleAllAABBs(npc.pos, npc.radius, npc.floor);
-
-          if (!npc.isHostile) {
-            const dToPlayer = player.pos.distanceTo(npc.pos);
-            if (dToPlayer < minTalkDist) {
-              minTalkDist = dToPlayer;
-              closestNpc = npc;
-            }
+          separateCircles(player.pos, player.radius, npc.pos, npc.radius, 0.72);
+          const dToPlayer = Math.hypot(player.pos.x - npc.pos.x, player.pos.z - npc.pos.z);
+          if (dToPlayer < minTalkDist && !npc.isHostile) {
+            minTalkDist = dToPlayer;
+            closestNpc = npc;
           }
         }
       });
 
-      for (let i = 0; i < npcs.length; i++) {
-        for (let j = i + 1; j < npcs.length; j++) {
-          if (npcs[i].floor === npcs[j].floor && !npcs[i].isBedridden && !npcs[j].isBedridden) {
-            separateCircles(npcs[i].pos, npcs[i].radius, npcs[j].pos, npcs[j].radius, 0.5);
-          }
-        }
-      }
-
-      // ------------------ D. 人物接觸電梯自動感應偵測 ------------------
-      const pulseAlpha = 0.20 + Math.sin(clock.elapsedTime * 3.6) * 0.08;
-      transportPadMeshes.forEach((pad) => {
-        pad.material.opacity = pulseAlpha;
-      });
-
-      let detectedZone = null;
+      // ------------------ D. 接觸電梯門廳自動詢問樓層並連結 HTML ------------------
+      let insideTransport = null;
       for (let i = 0; i < transportTriggers.length; i++) {
         const tz = transportTriggers[i];
         if (tz.floor !== pFloor) continue;
         if (
-          player.pos.x >= tz.minX - 0.15 &&
-          player.pos.x <= tz.maxX + 0.15 &&
-          player.pos.z >= tz.minZ - 0.15 &&
-          player.pos.z <= tz.maxZ + 0.15
+          player.pos.x >= tz.minX &&
+          player.pos.x <= tz.maxX &&
+          player.pos.z >= tz.minZ &&
+          player.pos.z <= tz.maxZ
         ) {
-          detectedZone = tz;
+          insideTransport = tz;
           break;
         }
       }
 
-      activeTransportZone = detectedZone;
-      if (detectedZone) {
+      if (insideTransport) {
+        activeTransportZone = insideTransport;
         if (!transportLockout && !activeTalkNpc) {
-          openFloorTransportModal(detectedZone.type, detectedZone.name);
+          openFloorTransportModal(insideTransport.type, insideTransport.name);
         }
       } else {
-        transportLockout = false;
+        activeTransportZone = null;
+        if (!activeTalkNpc) {
+          transportLockout = false;
+        }
       }
 
+      // 更新互動提示橫幅
       const talkPrompt = document.getElementById('talk-prompt');
-      if (activeTransportZone && !activeTalkNpc) {
-        talkPrompt.innerHTML = `🛗 已進入 <span class="text-amber-300">${activeTransportZone.name}</span> ・按 <span class="px-2 py-0.5 mx-1 rounded bg-sky-400 text-slate-950 font-black">E</span> 選擇前往 B1 ~ 8F`;
+      if (!activeTalkNpc && activeTransportZone) {
+        talkPrompt.innerHTML = `按 <span class="px-2 py-0.5 mx-1 rounded bg-sky-400 text-slate-950 font-black">E</span> 開啟 <span class="text-teal-300">${activeTransportZone.name}</span>（前往 B1~8F）`;
         talkPrompt.classList.remove('hidden');
-        talkPrompt.dataset.mode = 'transport';
-      } else if (closestNpc && !activeTalkNpc) {
+        talkPrompt.onclick = () => openFloorTransportModal(activeTransportZone.type, activeTransportZone.name);
+      } else if (!activeTalkNpc && closestNpc) {
         talkPrompt.innerHTML = `按 <span class="px-2 py-0.5 mx-1 rounded bg-amber-400 text-slate-950 font-black">E</span> 與 <span class="text-teal-300">${closestNpc.name}</span> 對話`;
         talkPrompt.classList.remove('hidden');
-        talkPrompt.dataset.mode = 'npc';
-        talkPrompt._npc = closestNpc;
+        talkPrompt.onclick = () => openDialogue(closestNpc);
       } else {
         talkPrompt.classList.add('hidden');
+        talkPrompt.onclick = null;
       }
 
-      updateCurrentZoneHUD();
-
-      // ------------------ E. 特效與平滑相機位置更新 ------------------
+      // ------------------ E. 特效與相機更新 ------------------
       for (let i = slashEffects.length - 1; i >= 0; i--) {
         const ef = slashEffects[i];
         ef.life -= dt;
@@ -3750,9 +3956,9 @@
         }
       }
 
+      const eyePos = new THREE.Vector3(player.pos.x, player.pos.y + 1.58, player.pos.z);
       if (firstPersonMode) {
         player.mesh.visible = false;
-        const eyePos = new THREE.Vector3(player.pos.x, player.pos.y + 1.68, player.pos.z);
         camera.position.copy(eyePos);
         const lookDir = new THREE.Vector3(
           -Math.sin(camState.yaw) * Math.cos(camState.pitch),
@@ -3762,8 +3968,8 @@
         camera.lookAt(eyePos.clone().add(lookDir));
       } else {
         player.mesh.visible = true;
-        const desiredTarget = new THREE.Vector3(player.pos.x, player.pos.y + 1.45, player.pos.z);
-        camState.targetPos.lerp(desiredTarget, 1 - Math.exp(-18 * dt));
+        const desiredLookAt = new THREE.Vector3(player.pos.x, player.pos.y + 1.45, player.pos.z);
+        camState.targetPos.lerp(desiredLookAt, 1 - Math.exp(-20 * dt));
 
         const offsetX = Math.sin(camState.yaw) * Math.cos(camState.pitch) * camState.distance;
         const offsetY = Math.sin(camState.pitch) * camState.distance;
@@ -3771,341 +3977,250 @@
 
         const desiredCamPos = new THREE.Vector3(
           camState.targetPos.x + offsetX,
-          Math.max(player.pos.y + 0.55, camState.targetPos.y + offsetY),
+          Math.max(player.pos.y + 0.45, camState.targetPos.y + offsetY),
           camState.targetPos.z + offsetZ
         );
+
+        const wallBounds = pFloor === 5 && player.pos.z > -3.5
+          ? { minX: -20.2, maxX: 20.2, minZ: -46.8, maxZ: 44.2 }
+          : { minX: -52.8, maxX: 52.8, minZ: -46.8, maxZ: 43.8 };
+
+        desiredCamPos.x = THREE.MathUtils.clamp(desiredCamPos.x, wallBounds.minX, wallBounds.maxX);
+        desiredCamPos.z = THREE.MathUtils.clamp(desiredCamPos.z, wallBounds.minZ, wallBounds.maxZ);
+        desiredCamPos.y = Math.min(desiredCamPos.y, groundY + 4.35);
+
         camera.position.copy(desiredCamPos);
         camera.lookAt(camState.targetPos);
       }
+
+      updateCurrentZoneHUD(pFloor);
     }
 
-    function updateCurrentZoneHUD() {
-      const { x, y, z } = player.pos;
-      const pFloor = getFloorNumber(y);
-      let zoneText = '1F 中央門診大廳';
+    function updateCurrentZoneHUD(pFloor) {
+      const x = player.pos.x;
+      const z = player.pos.z;
+      let label = '5F 東側護理站 B・520 病房區';
 
       if (pFloor === 5) {
-        if (z > 24) zoneText = '5F 南側・半圓弧玻璃展望大廳';
-        else if (z > 2) zoneText = '5F 中央醫療電梯轉乘廳';
-        else if (z > -11 && Math.abs(x) < 12) zoneText = '5F 中央護理站 A・祈禱室・神明廳';
-        else if (x < -41 && z < -3) zoneText = '5F 537 正壓隔離病房內部';
-        else if (z < -29.2 && x >= 13.4 && x <= 19.6) zoneText = '5F 520 雙人住院病房內部（薄荷綠病床・點滴架）';
-        else if (z < -29.2 && x >= 19.9 && x <= 26.1) zoneText = '5F 519 雙人住院病房內部';
-        else if (z < -29.2 && x >= 6.9 && x <= 13.1) zoneText = '5F 525 雙人住院病房內部';
-        else if (z < -29.2 && x >= -25.6 && x <= -19.4) zoneText = '5F 558 雙人住院病房內部';
-        else if (z < -29.2 && x >= -19.1 && x <= -12.9) zoneText = '5F 560 雙人住院病房內部';
-        else if (x < -12) zoneText = '5F 西側護理站 B/C・E化行動護理車 / 558 病房區';
-        else if (x > 12) zoneText = '5F 東側護理站 B/C・E化行動護理車 / 520 病房區';
-        else zoneText = '5F 中央住院病房主走廊';
+        if (z < -29.0 && x > 13.4 && x < 19.6) label = '5F 520 雙人住院病房內部（薄荷綠病床・點滴架）';
+        else if (z < -29.0 && x > 6.9 && x < 13.1) label = '5F 525 雙人住院病房內部';
+        else if (z < -29.0 && x > 19.9 && x < 26.1) label = '5F 519 雙人住院病房內部';
+        else if (z < -29.0 && x < -19.4 && x > -25.6) label = '5F 558 雙人住院病房內部';
+        else if (z < -29.0 && x < -12.9 && x > -19.1) label = '5F 560 雙人住院病房內部';
+        else if (z < -10.3 && x > 10 && x < 38) label = '5F 東側護理站 B / C・E化行動護理車・517~527 病房';
+        else if (z < -10.3 && x < -10 && x > -38) label = '5F 西側護理站 B / C・E化行動護理車・553~563 病房';
+        else if (z > -10.3 && z < -4.2 && x < -42.0) label = '5F 537 正壓隔離病房內部（無菌負/正壓照護區）';
+        else if (x <= -38) label = '5F 西側病房區 (552~538)・西側電梯廳';
+        else if (x >= 38) label = '5F 東側病房區・東側電梯廳';
+        else if (z >= -12 && z <= -3 && Math.abs(x) <= 8) label = '5F 祈禱室・神明廳・點滴庫房';
+        else if (z > -3 && z <= 14) label = '5F 中央電梯轉乘大廳 (可往 B1~8F)';
+        else if (z > 24) label = '5F 南側半圓弧玻璃展望大廳';
+        else label = '5F 中央護理站 A・住院病房主走廊';
       } else if (pFloor === 3) {
-        if (z > 26 && Math.abs(x) < 16) zoneText = '3F 南側・中央圓弧玻璃展望廳';
-        else if (x < -12 && z < -10) zoneText = '3F 西北側・睡眠中心 & 婦產科 VIP 病房';
-        else if (x > 12 && z < -10) zoneText = '3F 東北側・睡眠特別門診 & 行政品管中心';
-        else if (x < -15 && z > 18) zoneText = '3F 西南側・一般慢性病房 (367~377)';
-        else if (x > 15 && z > 18) zoneText = '3F 東南側・班廷俱樂部 & 眼科部';
-        else zoneText = '3F 中央醫療連通走廊';
+        if (z > 22 && Math.abs(x) < 16) label = '3F 南側・中央圓弧玻璃展望廳';
+        else if (z < -18 && x < -5) label = '3F 西北側・睡眠中心 (353~363)';
+        else if (z >= -18 && z < -5 && x < -12) label = '3F 西側・婦產科 VIP 病房 & 嬰兒室';
+        else if (z < -6 && x >= 5) label = '3F 東北側・行政處 / 社工 / 品管中心';
+        else if (z > 18 && x <= -16) label = '3F 西南側・一般慢性病房 (367~377) & 陽光室';
+        else if (z > 18 && x >= 16) label = '3F 東南側・班廷俱樂部 & 眼科部';
+        else label = '3F 中央醫療大廳・醫師辦公室';
       } else if (pFloor === 2) {
-        if (x > 25 && z < -16) zoneText = '2F 東北側・2F 洗腎室 (腎臟科 李文清醫師)';
-        else if (x > 2 && z < -14) zoneText = '2F 中北側・開刀房 (OR-1 ~ OR-9)';
-        else if (x < -3 && z < -14) zoneText = '2F 西北側・心導管室 & 內外科 ICU';
-        else if (x < -12 && z > 16) zoneText = '2F 西南側・婦產科 & 211 LDR 產房';
-        else if (x > 18 && z > 16) zoneText = '2F 東南側・牙科部 (221~232診)';
-        else zoneText = '2F 中央挑空迴廊大廳';
+        if (z < -16 && x > 26) label = '2F 洗腎室 / CAPD 中心 (腎臟科 李文清醫師)';
+        else if (z < -14 && x >= 0 && x <= 26) label = '2F 開刀房 (OR-1~OR-9) / 麻醉恢復室';
+        else if (z < -14 && x < 0) label = '2F 心導管室 / 外科 ICU / 內科 ICU';
+        else if (z > 16 && x < -14) label = '2F 婦產科 / 211 LDR / NICU / PICU';
+        else if (z > 16 && x >= 20) label = '2F 牙科部 (221~232診間)';
+        else label = '2F 中央大廳迴廊';
       } else {
-        if (z > 35) zoneText = '1F 南側入口門廳・自動玻璃門';
-        else if (z > 5 && Math.abs(x) < 14) zoneText = '1F 中央大廳・批價掛號櫃檯';
-        else if (x < -16 && z > 14) zoneText = '1F 西南側・門診區 (15~27診) & 人文館';
-        else if (x > 16 && z > 14) zoneText = '1F 東南側・門診區 (1~12診) & 國際會議廳';
-        else if (x < -12 && z < -12) zoneText = '1F 西北側・放射科 (MRI / CT)';
-        else if (x > 4 && z < -10 && x < 26) zoneText = '1F 中北側・急診室 & 急救區';
-        else if (x >= 26 && z < -20) zoneText = '1F 東北側・1F 洗腎室';
+        if (z > 32 && Math.abs(x) < 12) label = '1F 南側入口門廳・疏散看板';
+        else if (z > 5 && z <= 16 && Math.abs(x) < 14) label = '1F 中央大廳・批價掛號櫃檯';
+        else if (z > 16 && x <= -15) label = '1F 西側門診區 / 義美 / 7-ELEVEN';
+        else if (z > 16 && x >= 15) label = '1F 東側門診區 / 85度C / 國際會議廳';
+        else if (z < -10 && x < -10) label = '1F 放射科 (MRI / 64切 CT)';
+        else if (z < -10 && x >= 4 && x <= 26) label = '1F 急診室與急救區';
+        else if (z < -24 && x > 26) label = '1F 血液透析中心 (1F 洗腎室)';
+        else label = '1F 中央醫療大廳';
       }
 
-      document.getElementById('current-zone-label').textContent = zoneText;
-      document.getElementById('minimap-floor-label').textContent = `${pFloor}F 平面圖雷達`;
+      document.getElementById('current-zone-label').textContent = label;
     }
 
     // --------------------------------------------------------------------------
-    // 12. 2D Canvas 緊急疏散平面圖同色系圓形雷達小地圖渲染器 renderMinimap()
+    // 12. 圓形 1F ~ 5F 緊急疏散平面圖同色系雷達小地圖
     // --------------------------------------------------------------------------
     function renderMinimap() {
-      const miniCanvas = document.getElementById('minimap-canvas');
-      if (!miniCanvas) return;
-      const ctx = miniCanvas.getContext('2d');
-      const w = miniCanvas.width;
-      const h = miniCanvas.height;
-      const cx = w * 0.5;
-      const cy = h * 0.5;
-      const radius = w * 0.5;
-
+      const canvas = document.getElementById('minimap-canvas');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width;
+      const H = canvas.height;
+      const cx = W / 2;
+      const cy = H / 2;
+      const scale = 2.6;
       const pFloor = getFloorNumber(player.pos.y);
-      const scale = 2.45;
 
-      ctx.clearRect(0, 0, w, h);
+      document.getElementById('minimap-floor-label').textContent = `${pFloor}F 平面圖雷達`;
 
+      ctx.clearRect(0, 0, W, H);
       ctx.save();
       ctx.beginPath();
-      ctx.arc(cx, cy, radius - 2, 0, Math.PI * 2);
+      ctx.arc(cx, cy, W / 2 - 2, 0, Math.PI * 2);
       ctx.clip();
 
-      ctx.fillStyle = '#fef3c7';
-      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#fefce8';
+      ctx.fillRect(0, 0, W, H);
 
-      ctx.save();
       ctx.translate(cx, cy);
+      ctx.rotate(camState.yaw);
 
-      const toMapX = (wx) => (wx - player.pos.x) * scale;
-      const toMapY = (wz) => (wz - player.pos.z) * scale;
-
-      const drawZoneRect = (x, z, rw, rd, fill, stroke = '#78350f', lineW = 1.2) => {
-        const mx = toMapX(x - rw * 0.5);
-        const my = toMapY(z - rd * 0.5);
-        const mw = rw * scale;
-        const mh = rd * scale;
-        ctx.fillStyle = fill;
-        ctx.fillRect(mx, my, mw, mh);
-        if (stroke) {
-          ctx.strokeStyle = stroke;
-          ctx.lineWidth = lineW;
-          ctx.strokeRect(mx, my, mw, mh);
-        }
-      };
-
-      const drawMapTag = (x, z, text, color = '#0f172a') => {
-        const mx = toMapX(x);
-        const my = toMapY(z);
-        if (Math.hypot(mx, my) > radius + 16) return;
+      const drawZoneRect = (wx, wz, ww, wd, color) => {
+        const sx = (wx - player.pos.x) * scale;
+        const sy = (wz - player.pos.z) * scale;
         ctx.fillStyle = color;
-        ctx.font = 'bold 8.5px "Noto Sans TC", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(text, mx, my);
+        ctx.fillRect(sx - (ww * scale) / 2, sy - (wd * scale) / 2, ww * scale, wd * scale);
       };
-
-      drawZoneRect(0, -1.5, 107, 92, 'rgba(253, 230, 138, 0.35)', '#92400e', 2);
 
       if (pFloor === 5) {
-        drawZoneRect(0, -25.0, 84, 7.6, '#fde68a', null);
-        drawZoneRect(0, 9.5, 36, 26, '#fde68a', null);
-        drawZoneRect(0, 33.5, 42, 21, '#fde68a', null);
-
-        drawZoneRect(0, -33.4, 80, 8.6, '#fbcfe8', '#9d174d', 1.2);
-        drawZoneRect(16.5, -33.1, 6.2, 8.2, '#f472b6', '#be185d', 1.5);
-        drawZoneRect(-22.5, -33.1, 6.2, 8.2, '#f9a8d4', '#be185d', 1.3);
-        drawMapTag(16.5, -33.1, '520病房', '#831843');
-        drawMapTag(-22.5, -33.1, '558病房', '#831843');
-        drawMapTag(32.5, -33.1, '517~518', '#831843');
-
-        drawZoneRect(-47.5, -24.5, 10.5, 22, '#fbcfe8', '#9d174d', 1.2);
-        drawZoneRect(47.5, -24.5, 10.5, 22, '#fbcfe8', '#9d174d', 1.2);
-        drawZoneRect(-26.5, -7.2, 31, 6.2, '#fbcfe8', '#9d174d', 1.2);
-        drawZoneRect(-46.5, -7.2, 9.2, 6.2, '#bae6fd', '#0369a1', 1.4);
-        drawMapTag(-46.5, -7.2, '537正壓', '#0c4a6e');
-        drawZoneRect(31.5, -7.2, 41, 6.2, '#fbcfe8', '#9d174d', 1.2);
-
-        drawZoneRect(-23.5, -18.5, 13.8, 4.8, '#fdba74', '#9a3412', 1.5);
-        drawMapTag(-23.5, -18.5, '西側護理站', '#7c2d12');
-        drawZoneRect(23.5, -18.5, 13.8, 4.8, '#fdba74', '#9a3412', 1.5);
-        drawMapTag(23.5, -18.5, '東側護理站', '#7c2d12');
-
-        drawZoneRect(0, -18.5, 13.5, 4.6, '#93c5fd', '#1d4ed8', 1.3);
-        drawMapTag(0, -18.5, '中央護理站A', '#1e3a8a');
-        drawZoneRect(-3.2, -6.8, 5.6, 5.2, '#a7f3d0', '#047857', 1.2);
-        drawMapTag(-3.2, -6.8, '祈禱室', '#065f46');
-        drawZoneRect(3.2, -6.8, 5.6, 5.2, '#fde047', '#b45309', 1.2);
-        drawMapTag(3.2, -6.8, '神明廳', '#78350f');
-
-        ctx.beginPath();
-        ctx.arc(toMapX(0), toMapY(34.5), 11.2 * scale, 0, Math.PI);
-        ctx.fillStyle = '#bae6fd';
-        ctx.fill();
-        ctx.strokeStyle = '#0284c7';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-        drawMapTag(0, 38.5, '半圓弧展望廳', '#0369a1');
+        drawZoneRect(-23.5, -18.5, 13.8, 5.2, '#fde68a');
+        drawZoneRect(23.5, -18.5, 13.8, 5.2, '#fde68a');
+        drawZoneRect(16.5, -33.1, 6.2, 8.2, '#86efac');
+        drawZoneRect(23.0, -33.1, 6.2, 8.2, '#a7f3d0');
+        drawZoneRect(10.0, -33.1, 6.2, 8.2, '#a7f3d0');
+        drawZoneRect(-22.5, -33.1, 6.2, 8.2, '#a7f3d0');
+        drawZoneRect(-16.0, -33.1, 6.2, 8.2, '#a7f3d0');
+        drawZoneRect(-32.3, -33.4, 13.3, 8.7, '#fbcfe8');
+        drawZoneRect(32.6, -33.4, 12.8, 8.7, '#fbcfe8');
+        drawZoneRect(-46.5, -7.2, 9.6, 6.4, '#93c5fd');
+        drawZoneRect(-26.5, -7.2, 31.0, 6.2, '#fbcfe8');
+        drawZoneRect(31.5, -7.2, 41.0, 6.2, '#fbcfe8');
+        drawZoneRect(0, -18.5, 13.5, 4.6, '#bae6fd');
+        drawZoneRect(-3.2, -6.8, 5.6, 5.2, '#a7f3d0');
+        drawZoneRect(3.2, -6.8, 5.6, 5.2, '#fde047');
+        drawZoneRect(0, 34.5, 22.0, 14.0, '#bae6fd');
       } else if (pFloor === 3) {
-        drawZoneRect(-21.5, -34.5, 38, 12.5, '#bfdbfe', '#1d4ed8', 1.2);
-        drawMapTag(-21.5, -34.5, '3F 睡眠中心', '#1e3a8a');
-        drawZoneRect(-32.5, -12.5, 26, 7.5, '#fbcfe8', '#be185d', 1.2);
-        drawMapTag(-32.5, -12.5, '婦產VIP病房', '#831843');
-        drawZoneRect(24.5, -23.5, 34, 24, '#fde68a', '#b45309', 1.2);
-        drawMapTag(24.5, -23.5, '行政/品管中心', '#78350f');
-        drawZoneRect(-33.5, 31.5, 28, 14.5, '#a7f3d0', '#047857', 1.2);
-        drawMapTag(-33.5, 31.5, '慢性病房', '#065f46');
-        drawZoneRect(33.5, 31.5, 28, 14.5, '#fbcfe8', '#be123c', 1.2);
-        drawMapTag(33.5, 31.5, '班廷/眼科', '#881337');
+        drawZoneRect(-21.5, -34.5, 38.0, 12.5, '#bae6fd');
+        drawZoneRect(-32.5, -12.5, 26.0, 7.5, '#fbcfe8');
+        drawZoneRect(24.5, -34.5, 34.0, 12.5, '#fed7aa');
+        drawZoneRect(24.5, -12.5, 34.0, 7.5, '#a7f3d0');
+        drawZoneRect(-33.5, 31.5, 28.0, 14.5, '#fbcfe8');
+        drawZoneRect(33.5, 31.5, 28.0, 14.5, '#fbcfe8');
+        drawZoneRect(0, 36.5, 22.0, 14.0, '#bae6fd');
       } else if (pFloor === 2) {
-        drawZoneRect(38.5, -36.5, 22, 18, '#fbcfe8', '#be185d', 1.4);
-        drawMapTag(38.5, -36.5, '2F 洗腎室', '#831843');
-        drawZoneRect(14.5, -26.5, 22, 17.5, '#a7f3d0', '#047857', 1.2);
-        drawMapTag(14.5, -26.5, '開刀房 OR', '#065f46');
-        drawZoneRect(-16.5, -26.5, 28, 17.5, '#bfdbfe', '#1d4ed8', 1.2);
-        drawMapTag(-16.5, -26.5, '心導管/ICU', '#1e3a8a');
-        drawZoneRect(-26.5, 29.5, 24, 14.5, '#fbcfe8', '#be185d', 1.2);
-        drawMapTag(-26.5, 29.5, '婦產科/LDR', '#831843');
-        drawZoneRect(36.5, 28.5, 22, 16.5, '#e9d5ff', '#7e22ce', 1.2);
-        drawMapTag(36.5, 28.5, '2F 牙科部', '#581c87');
+        drawZoneRect(38.5, -36.5, 22.0, 18.0, '#fbcfe8');
+        drawZoneRect(14.5, -26.5, 22.0, 17.5, '#a7f3d0');
+        drawZoneRect(-16.5, -26.5, 28.0, 17.5, '#bae6fd');
+        drawZoneRect(-26.5, 29.5, 24.0, 14.5, '#fbcfe8');
+        drawZoneRect(-44.5, 26.5, 14.0, 18.0, '#bae6fd');
+        drawZoneRect(36.5, 28.5, 22.0, 16.5, '#fbcfe8');
       } else {
-        drawZoneRect(0, 7.3, 15.5, 2.2, '#fdba74', '#9a3412', 1.3);
-        drawMapTag(0, 8.8, '批價掛號', '#7c2d12');
-        drawZoneRect(-26.5, -6.5, 19.5, 8.5, '#a7f3d0', '#0f766e', 1.2);
-        drawMapTag(-26.5, -6.5, '檢驗科', '#115e59');
-        drawZoneRect(24.5, -6.5, 18.5, 8.5, '#a7f3d0', '#065f46', 1.2);
-        drawMapTag(24.5, -6.5, '藥劑科', '#064e3b');
-        drawZoneRect(-24.5, -24.5, 24, 14.5, '#bfdbfe', '#1d4ed8', 1.2);
-        drawMapTag(-24.5, -24.5, '放射科 MRI/CT', '#1e3a8a');
-        drawZoneRect(14.5, -24.5, 22, 14.5, '#fecdd3', '#be123c', 1.3);
-        drawMapTag(14.5, -24.5, '1F 急診室', '#881337');
-        drawZoneRect(38.5, -36.5, 22, 18, '#fbcfe8', '#9d174d', 1.2);
-        drawMapTag(38.5, -36.5, '1F 洗腎室', '#831843');
+        drawZoneRect(-23.5, 27.5, 10.5, 15.5, '#fbcfe8');
+        drawZoneRect(23.5, 27.5, 10.5, 15.5, '#fbcfe8');
+        drawZoneRect(-11.5, 29.5, 7.5, 11.5, '#fed7aa');
+        drawZoneRect(11.5, 29.5, 7.5, 11.5, '#fed7aa');
+        drawZoneRect(-26.5, -6.5, 19.5, 8.5, '#a7f3d0');
+        drawZoneRect(24.5, -6.5, 18.5, 8.5, '#a7f3d0');
+        drawZoneRect(-24.5, -24.5, 24.0, 14.5, '#bae6fd');
+        drawZoneRect(14.5, -24.5, 22.0, 14.5, '#fecdd3');
+        drawZoneRect(38.5, -36.5, 22.0, 18.0, '#fbcfe8');
       }
 
       transportTriggers.forEach((tz) => {
         if (tz.floor !== pFloor) return;
-        const wEl = tz.maxX - tz.minX;
-        const dEl = tz.maxZ - tz.minZ;
-        const cxEl = (tz.minX + tz.maxX) * 0.5;
-        const czEl = (tz.minZ + tz.maxZ) * 0.5;
-        drawZoneRect(cxEl, czEl, wEl, dEl, 'rgba(56, 189, 248, 0.45)', '#0284c7', 1.5);
-        drawMapTag(cxEl, czEl, '🛗電梯', '#0c4a6e');
+        const tx = ((tz.minX + tz.maxX) * 0.5 - player.pos.x) * scale;
+        const ty = ((tz.minZ + tz.maxZ) * 0.5 - player.pos.z) * scale;
+        ctx.fillStyle = '#0ea5e9';
+        ctx.fillRect(tx - 4.5, ty - 4.5, 9, 9);
       });
 
       npcs.forEach((npc) => {
         if (npc.floor !== pFloor) return;
-        const nx = toMapX(npc.pos.x);
-        const ny = toMapY(npc.pos.z);
-        if (Math.hypot(nx, ny) > radius) return;
-
+        const nx = (npc.pos.x - player.pos.x) * scale;
+        const ny = (npc.pos.z - player.pos.z) * scale;
+        ctx.fillStyle = npc.isHostile ? '#ef4444' : npc.isBedridden ? '#f59e0b' : npc.type === 'security' ? '#2563eb' : '#0d9488';
         ctx.beginPath();
-        ctx.arc(nx, ny, npc.isBedridden ? 3.2 : 4.2, 0, Math.PI * 2);
-        ctx.fillStyle = npc.isHostile
-          ? '#ef4444'
-          : npc.type === 'security'
-            ? '#2563eb'
-            : npc.type === 'patient'
-              ? '#f59e0b'
-              : '#10b981';
+        ctx.arc(nx, ny, 3.6, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
       });
 
       ctx.restore();
 
       ctx.save();
       ctx.translate(cx, cy);
-      const mapAngle = Math.atan2(Math.sin(player.yaw), Math.cos(player.yaw));
-      ctx.rotate(-mapAngle + Math.PI);
-
-      const fovGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, 34);
-      fovGrad.addColorStop(0, 'rgba(14, 165, 233, 0.42)');
-      fovGrad.addColorStop(1, 'rgba(14, 165, 233, 0)');
+      ctx.fillStyle = '#0f172a';
       ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.arc(0, 0, 34, -Math.PI * 0.5 - 0.55, -Math.PI * 0.5 + 0.55);
+      ctx.moveTo(0, -8);
+      ctx.lineTo(6, 7);
+      ctx.lineTo(0, 4);
+      ctx.lineTo(-6, 7);
       ctx.closePath();
-      ctx.fillStyle = fovGrad;
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.moveTo(0, -8.5);
-      ctx.lineTo(6.2, 6.5);
-      ctx.lineTo(0, 3.2);
-      ctx.lineTo(-6.2, 6.5);
-      ctx.closePath();
-      ctx.fillStyle = '#0284c7';
       ctx.fill();
       ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1.6;
+      ctx.lineWidth = 1.5;
       ctx.stroke();
-      ctx.restore();
-
-      ctx.strokeStyle = 'rgba(15, 23, 42, 0.16)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius * 0.48, 0, Math.PI * 2);
-      ctx.stroke();
-
       ctx.restore();
     }
 
     // --------------------------------------------------------------------------
-    // 13. 場景初始化、燈光系統與無須鎖定滑鼠之控制綁定
+    // 13. 事件監聽綁定 (免鎖定滑鼠拖曳轉向 + 單擊近戰 + 鍵盤樓層快捷鍵)
     // --------------------------------------------------------------------------
-    function initSceneAndLights() {
-      const canvas = document.getElementById('game-canvas');
-      renderer = new THREE.WebGLRenderer({
-        canvas,
-        antialias: true,
-        powerPreference: 'high-performance',
-        logarithmicDepthBuffer: true
-      });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.15;
-
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xdbeafe);
-      scene.fog = new THREE.FogExp2(0xdbeafe, 0.0055);
-
-      camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.35, 220);
-
-      const hemiLight = new THREE.HemisphereLight(0xfffbeb, 0xd4a373, 1.08);
-      hemiLight.position.set(0, 26, 0);
-      scene.add(hemiLight);
-
-      const dirLight = new THREE.DirectionalLight(0xfffaf0, 0.88);
-      dirLight.position.set(28, 42, 26);
-      dirLight.castShadow = true;
-      dirLight.shadow.mapSize.set(2048, 2048);
-      dirLight.shadow.bias = -0.0005;
-      dirLight.shadow.camera.near = 2;
-      dirLight.shadow.camera.far = 130;
-      const d = 58;
-      dirLight.shadow.camera.left = -d;
-      dirLight.shadow.camera.right = d;
-      dirLight.shadow.camera.top = d;
-      dirLight.shadow.camera.bottom = -d;
-      scene.add(dirLight);
-
-      // 1F ~ 5F 室內均勻暖白補光點光源
-      [
-        [0, 3.8, 22], [0, 3.8, -14], [-25, 3.8, 12], [25, 3.8, 12],
-        [0, 8.4, 22], [35, 8.4, -22], [-22, 8.4, -18],
-        [0, 13.0, 25], [-22, 13.0, -24], [25, 13.0, 25],
-        [-23.5, 17.4, -22], [23.5, 17.4, -22], [0, 17.4, -15], [0, 17.4, 34],
-        [16.5, 17.2, -33.2], [23.0, 17.2, -33.2], [-22.5, 17.2, -33.2], [-46.5, 17.2, -6.6]
-      ].forEach(([lx, ly, lz]) => {
-        const pt = new THREE.PointLight(0xfff7ed, 0.48, 38);
-        pt.position.set(lx, ly, lz);
-        scene.add(pt);
-      });
-    }
-
-    function bindEvents() {
+    function setupInputsAndUI() {
       const canvas = document.getElementById('game-canvas');
 
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+      window.addEventListener('keydown', (e) => {
+        if (e.code === 'Escape') {
+          if (activeTalkNpc) closeDialogue();
+          return;
+        }
+
+        if (activeTalkNpc && activeTalkNpc.isTransport) {
+          const digitMap = {
+            Digit0: 'B1', Numpad0: 'B1',
+            Digit1: '1F', Numpad1: '1F',
+            Digit2: '2F', Numpad2: '2F',
+            Digit3: '3F', Numpad3: '3F',
+            Digit5: '5F', Numpad5: '5F',
+            Digit6: '6F', Numpad6: '6F',
+            Digit7: '7F', Numpad7: '7F',
+            Digit8: '8F', Numpad8: '8F'
+          };
+          const code = digitMap[e.code];
+          if (code) {
+            const targetItem = FLOOR_LINKS.find((f) => f.code === code);
+            if (targetItem) navigateToFloorHtml(targetItem, '醫療電梯');
+            return;
+          }
+        }
+
+        keys[e.code] = true;
+
+        if (e.code === 'KeyE') {
+          const promptBtn = document.getElementById('talk-prompt');
+          if (!promptBtn.classList.contains('hidden') && promptBtn.onclick) {
+            promptBtn.onclick();
+          }
+        } else if (e.code === 'KeyJ' || e.code === 'KeyZ') {
+          triggerPlayerAttack('light');
+        } else if (e.code === 'KeyK' || e.code === 'KeyX') {
+          triggerPlayerAttack('heavy');
+        } else if (e.code === 'KeyC') {
+          clearWantedAndHeal();
+        }
       });
 
-      const sensSlider = document.getElementById('mouse-sens-slider');
-      const sensVal = document.getElementById('mouse-sens-val');
-      if (sensSlider) {
-        sensSlider.addEventListener('input', (e) => {
-          camState.sensitivity = parseFloat(e.target.value);
-          sensVal.textContent = `${camState.sensitivity.toFixed(1)}x`;
-        });
-      }
+      window.addEventListener('keyup', (e) => {
+        keys[e.code] = false;
+      });
 
-      // 無須鎖定滑鼠 (No Pointer Lock)：滑鼠左鍵或右鍵拖曳旋轉視角、單擊攻擊
-      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+      window.addEventListener('blur', () => {
+        Object.keys(keys).forEach((k) => { keys[k] = false; });
+        camState.isRightDragging = false;
+        camState.isLeftDragging = false;
+        camState.lastClientX = null;
+        camState.lastClientY = null;
+      });
+
+      document.addEventListener('contextmenu', (e) => {
+        if (e.target === canvas) e.preventDefault();
+      });
 
       canvas.addEventListener('mousedown', (e) => {
         if (activeTalkNpc) return;
@@ -4120,62 +4235,45 @@
         }
       });
 
+      window.addEventListener('mousemove', (e) => {
+        if (activeTalkNpc) return;
+        if (!camState.isLeftDragging && !camState.isRightDragging) return;
+
+        if (camState.lastClientX === null) {
+          camState.lastClientX = e.clientX;
+          camState.lastClientY = e.clientY;
+          return;
+        }
+
+        const dx = e.clientX - camState.lastClientX;
+        const dy = e.clientY - camState.lastClientY;
+        camState.lastClientX = e.clientX;
+        camState.lastClientY = e.clientY;
+        camState.dragMovedDist += Math.hypot(dx, dy);
+
+        const sens = 0.0042 * camState.sensitivity;
+        camState.targetYaw -= dx * sens;
+        const maxPitch = firstPersonMode ? 0.72 : 0.82;
+        const minPitch = firstPersonMode ? -0.62 : -0.18;
+        camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * sens, minPitch, maxPitch);
+      });
+
       window.addEventListener('mouseup', (e) => {
         if (e.button === 0) {
-          const wasQuickClick = camState.isLeftDragging && camState.dragMovedDist < 6;
-          camState.isLeftDragging = false;
-          if (wasQuickClick && !activeTalkNpc) {
+          if (camState.isLeftDragging && camState.dragMovedDist < 6 && !activeTalkNpc) {
             triggerPlayerAttack('light');
           }
-        }
-        if (e.button === 2) {
+          camState.isLeftDragging = false;
+        } else if (e.button === 2) {
           camState.isRightDragging = false;
         }
       });
 
-      window.addEventListener('mousemove', (e) => {
-        if (activeTalkNpc) return;
-
-        let dx = 0;
-        let dy = 0;
-        if (camState.lastClientX !== null && camState.lastClientY !== null) {
-          dx = e.clientX - camState.lastClientX;
-          dy = e.clientY - camState.lastClientY;
-        }
-        camState.lastClientX = e.clientX;
-        camState.lastClientY = e.clientY;
-
-        if (camState.isRightDragging || camState.isLeftDragging) {
-          camState.dragMovedDist += Math.hypot(dx, dy);
-          const rotFactor = 0.0048 * camState.sensitivity;
-          camState.targetYaw -= dx * rotFactor;
-          camState.targetPitch = THREE.MathUtils.clamp(
-            camState.targetPitch + dy * rotFactor * 0.85,
-            -0.32,
-            1.15
-          );
-        }
-      });
-
-      window.addEventListener('blur', () => {
-        camState.isRightDragging = false;
-        camState.isLeftDragging = false;
-        Object.keys(keys).forEach((k) => { keys[k] = false; });
-      });
-
-      // 滑鼠滾輪平順縮放相機視距
       canvas.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        if (!firstPersonMode) {
-          camState.targetDistance = THREE.MathUtils.clamp(
-            camState.targetDistance + e.deltaY * 0.0038,
-            1.8,
-            10.5
-          );
-        }
-      }, { passive: false });
+        if (firstPersonMode) return;
+        camState.targetDistance = THREE.MathUtils.clamp(camState.targetDistance + e.deltaY * 0.0038, 1.8, 11.5);
+      }, { passive: true });
 
-      // 觸控單指滑動旋轉視角
       let lastTouchX = null;
       let lastTouchY = null;
       canvas.addEventListener('touchstart', (e) => {
@@ -4184,83 +4282,47 @@
           lastTouchY = e.touches[0].clientY;
         }
       }, { passive: true });
+
       canvas.addEventListener('touchmove', (e) => {
         if (e.touches.length === 1 && lastTouchX !== null) {
           const dx = e.touches[0].clientX - lastTouchX;
           const dy = e.touches[0].clientY - lastTouchY;
           lastTouchX = e.touches[0].clientX;
           lastTouchY = e.touches[0].clientY;
-          const touchFactor = 0.006 * camState.sensitivity;
-          camState.targetYaw -= dx * touchFactor;
-          camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * touchFactor * 0.8, -0.25, 1.1);
+          const sens = 0.005 * camState.sensitivity;
+          camState.targetYaw -= dx * sens;
+          camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * sens, -0.18, 0.82);
         }
       }, { passive: true });
-      canvas.addEventListener('touchend', () => {
-        lastTouchX = null;
-        lastTouchY = null;
+
+      const sensSlider = document.getElementById('mouse-sens-slider');
+      const sensVal = document.getElementById('mouse-sens-val');
+      sensSlider.addEventListener('input', (e) => {
+        camState.sensitivity = parseFloat(e.target.value);
+        sensVal.textContent = `${camState.sensitivity.toFixed(1)}x`;
       });
 
-      // 鍵盤事件
-      window.addEventListener('keydown', (e) => {
-        keys[e.code] = true;
-
-        if (activeTalkNpc && activeTalkNpc.isTransport) {
-          const keyMap = {
-            Digit0: 'B1', Numpad0: 'B1',
-            Digit1: '1F', Numpad1: '1F',
-            Digit2: '2F', Numpad2: '2F',
-            Digit3: '3F', Numpad3: '3F',
-            Digit5: '5F', Numpad5: '5F',
-            Digit6: '6F', Numpad6: '6F',
-            Digit7: '7F', Numpad7: '7F',
-            Digit8: '8F', Numpad8: '8F'
-          };
-          const targetCode = keyMap[e.code];
-          if (targetCode) {
-            const found = FLOOR_LINKS.find((f) => f.code === targetCode);
-            if (found) navigateToFloorHtml(found, '醫療電梯');
-            return;
+      document.querySelectorAll('.tp-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const zoneKey = btn.dataset.zone;
+          const z = ZONES[zoneKey];
+          if (z) {
+            player.pos.copy(z.pos);
+            player.vel.set(0, 0, 0);
+            player.yaw = z.yaw;
+            camState.yaw = camState.targetYaw = z.yaw + Math.PI;
+            camState.pitch = camState.targetPitch = 0.22;
+            camState.targetPos.set(z.pos.x, z.pos.y + 1.45, z.pos.z);
+            updateWantedAndHpHUD();
+            showToast(`📍 已快速前往：${z.label}`);
           }
-        }
-
-        if (e.code === 'Escape' && activeTalkNpc) {
-          closeDialogue();
-          return;
-        }
-        if (e.code === 'KeyE') {
-          if (activeTalkNpc) {
-            closeDialogue();
-          } else {
-            const promptEl = document.getElementById('talk-prompt');
-            if (!promptEl.classList.contains('hidden')) {
-              if (promptEl.dataset.mode === 'transport' && activeTransportZone) {
-                openFloorTransportModal(activeTransportZone.type, activeTransportZone.name);
-              } else if (promptEl._npc) {
-                openDialogue(promptEl._npc);
-              }
-            }
-          }
-        }
-        if (e.code === 'KeyJ') triggerPlayerAttack('light');
-        if (e.code === 'KeyK') triggerPlayerAttack('heavy');
-        if (e.code === 'KeyC') clearWantedAndHeal();
-      });
-
-      window.addEventListener('keyup', (e) => {
-        keys[e.code] = false;
-      });
-
-      // UI 按鈕綁定
-      document.getElementById('btn-toggle-help').addEventListener('click', () => {
-        const body = document.getElementById('help-body');
-        const btn = document.getElementById('btn-toggle-help');
-        const hidden = body.classList.toggle('hidden');
-        btn.textContent = hidden ? '展開' : '收合';
+        });
       });
 
       document.getElementById('btn-toggle-pov').addEventListener('click', (e) => {
         firstPersonMode = !firstPersonMode;
         e.target.textContent = firstPersonMode ? '👁️ 第一人稱視角' : '🎥 第三人稱視角';
+        showToast(firstPersonMode ? '已切換為第一人稱視角（拖曳滑鼠轉向）' : '已切換為第三人稱越肩視角');
       });
 
       document.getElementById('btn-toggle-labels').addEventListener('click', (e) => {
@@ -4270,46 +4332,32 @@
       });
 
       document.getElementById('btn-open-floors').addEventListener('click', () => {
-        openFloorTransportModal('elevator', '彰濱秀傳紀念醫院・全院樓層直達選單');
+        openFloorTransportModal('elevator', '彰濱秀傳紀念醫院・醫療電梯樓層選單');
       });
 
       document.getElementById('btn-clear-wanted').addEventListener('click', clearWantedAndHeal);
-      document.getElementById('dlg-close').addEventListener('click', closeDialogue);
-      document.getElementById('talk-prompt').addEventListener('click', () => {
-        const promptEl = document.getElementById('talk-prompt');
-        if (promptEl.dataset.mode === 'transport' && activeTransportZone) {
-          openFloorTransportModal(activeTransportZone.type, activeTransportZone.name);
-        } else if (promptEl._npc) {
-          openDialogue(promptEl._npc);
-        }
+
+      // 一鍵切換全院地板材質（水磨石醫療磚 / 大理石紋地磚 / 溫潤木紋地板）
+      document.getElementById('btn-cycle-floor').addEventListener('click', () => {
+        const nextIdx = (currentFloorStyleIdx + 1) % FLOOR_STYLES.length;
+        applyFloorStyle(nextIdx);
+        showToast(`🧱 已切換全院地坪為：${FLOOR_STYLES[nextIdx].label}`);
       });
 
+      document.getElementById('btn-toggle-help').addEventListener('click', (e) => {
+        const body = document.getElementById('help-body');
+        body.classList.toggle('hidden');
+        e.target.textContent = body.classList.contains('hidden') ? '展開' : '收合';
+      });
+
+      document.getElementById('dlg-close').addEventListener('click', closeDialogue);
       document.getElementById('btn-attack-light').addEventListener('click', () => triggerPlayerAttack('light'));
       document.getElementById('btn-attack-heavy').addEventListener('click', () => triggerPlayerAttack('heavy'));
 
       document.querySelectorAll('.touch-dir').forEach((btn) => {
-        const code = btn.dataset.key;
-        btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[code] = true; }, { passive: false });
-        btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[code] = false; }, { passive: false });
-      });
-
-      // 頂部區域快速傳送
-      document.querySelectorAll('.tp-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const zKey = btn.dataset.zone;
-          const zone = ZONES[zKey];
-          if (!zone) return;
-          closeDialogue();
-          transportLockout = true;
-          player.pos.copy(zone.pos);
-          player.vel.set(0, 0, 0);
-          player.yaw = zone.yaw;
-          camState.yaw = zone.yaw + Math.PI;
-          camState.targetYaw = camState.yaw;
-          camState.targetPos.set(zone.pos.x, zone.pos.y + 1.45, zone.pos.z);
-          updateWantedAndHpHUD();
-          showToast(`📍 已傳送至：${zone.label}`);
-        });
+        const k = btn.dataset.key;
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[k] = true; });
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[k] = false; });
       });
 
       setInterval(() => {
@@ -4320,33 +4368,94 @@
       }, 1000);
     }
 
+    // --------------------------------------------------------------------------
+    // 14. 初始化 Three.js 場景、抗閃頻渲染器設定與主渲染迴圈
+    // --------------------------------------------------------------------------
+    function initScene() {
+      const canvas = document.getElementById('game-canvas');
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.06;
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0b131e);
+      scene.fog = new THREE.Fog(0x0b131e, 72, 165);
+
+      // 縮窄 near=0.5, far=180 以最大化標準 Z-buffer 深度精度，杜絕遠景閃爍
+      camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.5, 180);
+
+      const hemiLight = new THREE.HemisphereLight(0xfffbeb, 0x94a3b8, 0.92);
+      hemiLight.position.set(0, 26, 0);
+      scene.add(hemiLight);
+
+      const dirLight = new THREE.DirectionalLight(0xfff7ed, 0.72);
+      dirLight.position.set(28, 42, 24);
+      dirLight.castShadow = true;
+      dirLight.shadow.mapSize.width = 2048;
+      dirLight.shadow.mapSize.height = 2048;
+      dirLight.shadow.bias = -0.0005;
+      dirLight.shadow.normalBias = 0.02;
+      dirLight.shadow.camera.near = 5;
+      dirLight.shadow.camera.far = 115;
+      const d = 52;
+      dirLight.shadow.camera.left = -d;
+      dirLight.shadow.camera.right = d;
+      dirLight.shadow.camera.top = d;
+      dirLight.shadow.camera.bottom = -d;
+      scene.add(dirLight);
+
+      const corridorFillCoords = [
+        [0, 16.5, -24.5],
+        [-23.5, 16.5, -24.5],
+        [23.5, 16.5, -24.5],
+        [16.5, 16.5, -33.0],
+        [-22.5, 16.5, -33.0],
+        [0, 16.5, 34.5]
+      ];
+      corridorFillCoords.forEach(([lx, ly, lz]) => {
+        const ptLight = new THREE.PointLight(0xfff7ed, 0.55, 28, 1.5);
+        ptLight.position.set(lx, ly, lz);
+        scene.add(ptLight);
+      });
+
+      buildHospital1FInterior();
+      createPlayableCharacter();
+      spawnAllNpcs();
+      setupInputsAndUI();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      const overlay = document.getElementById('loading-overlay');
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.remove(), 550);
+
+      showToast('🏥 已進入 5F 住院病房・高級亮面水磨石醫療防滑磁磚地坪（無閃頻穩定版）！');
+    }
+
     function animate() {
       requestAnimationFrame(animate);
       const dt = Math.min(clock.getDelta(), 0.05);
       updateSimulation(dt);
-      renderer.render(scene, camera);
       renderMinimap();
+      renderer.render(scene, camera);
     }
 
-    window.onload = function () {
-      initSceneAndLights();
-      buildHospital1FInterior();
-      createPlayableCharacter();
-      spawnAllNpcs();
-      bindEvents();
-      updateWantedAndHpHUD();
-
-      setTimeout(() => {
-        const loader = document.getElementById('loading-overlay');
-        if (loader) {
-          loader.style.opacity = '0';
-          setTimeout(() => loader.remove(), 500);
-        }
-        showToast('🏥 已抵達彰濱秀傳 5F 住院病房層（無須鎖定滑鼠・拖曳轉向）！');
-      }, 450);
-
+    window.addEventListener('DOMContentLoaded', () => {
+      initScene();
       animate();
-    };
+    });
   </script>
 </body>
 </html>
