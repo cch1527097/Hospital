@@ -32,8 +32,11 @@
       display: block;
       width: 100%;
       height: 100%;
-      cursor: crosshair;
+      cursor: grab;
       touch-action: none;
+    }
+    #game-canvas.dragging {
+      cursor: grabbing;
     }
     .gta-font {
       font-family: 'Chakra Petch', 'Noto Sans TC', sans-serif;
@@ -90,29 +93,21 @@
   <!-- 受擊螢幕邊緣紅光閃爍遮罩 -->
   <div id="damage-vignette" class="fixed inset-0 z-10 pointer-events-none opacity-0"></div>
 
-  <!-- 視角鎖定中央準心 -->
-  <div id="center-crosshair" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none opacity-45 transition-opacity">
-    <div class="relative w-7 h-7 flex items-center justify-center">
-      <span class="w-1.5 h-1.5 rounded-full bg-teal-300 shadow-[0_0_8px_#2dd4bf]"></span>
-      <span class="absolute top-0 w-0.5 h-2 bg-white/85"></span>
-      <span class="absolute bottom-0 w-0.5 h-2 bg-white/85"></span>
-      <span class="absolute left-0 h-0.5 w-2 bg-white/85"></span>
-      <span class="absolute right-0 h-0.5 w-2 bg-white/85"></span>
-    </div>
-  </div>
-
-  <!-- 樓層 HTML 自動跳轉轉場遮罩 -->
+  <!-- 樓層 HTML 自動跳轉 / 預覽環境模擬轉場遮罩 -->
   <div id="floor-transfer-overlay" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-md text-white text-center px-6">
-    <div class="w-14 h-14 border-4 border-teal-400 border-t-amber-300 rounded-full animate-spin mb-4"></div>
+    <div id="transfer-spinner" class="w-14 h-14 border-4 border-teal-400 border-t-amber-300 rounded-full animate-spin mb-4"></div>
     <div class="px-3.5 py-1 rounded-full bg-teal-500/25 border border-teal-400/50 text-teal-200 text-xs font-bold tracking-widest mb-2">
       ELEVATOR &amp; ESCALATOR TRANSFER
     </div>
     <h2 id="transfer-title" class="text-2xl sm:text-4xl font-black text-amber-300 gta-shadow mb-1.5">
       正在前往目標樓層...
     </h2>
-    <p id="transfer-sub" class="text-xs sm:text-sm text-slate-300">
+    <p id="transfer-sub" class="text-xs sm:text-sm text-slate-300 max-w-md">
       即將自動連結至對應樓層頁面
     </p>
+    <button id="transfer-cancel-btn" class="hidden mt-5 px-5 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg transition">
+      🔙 留在目前 B1 實境大廳
+    </button>
   </div>
 
   <!-- 載入遮罩 -->
@@ -153,7 +148,7 @@
   <!-- 操作提示膠囊 -->
   <div class="fixed top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-max max-w-[95vw]">
     <div class="hud-glass px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-teal-200 border border-teal-400/35 shadow-lg text-center">
-      🖱️ 點擊鎖定準心（或右鍵拖曳環視）｜ 按 L 切換燈光情境 ｜ 左鍵/J 三連擊 ｜ 靠近病患醫護按 E 對話 ｜ 接觸手扶梯/電梯選樓層
+      🖱️ 按住滑鼠左鍵拖曳轉動視角 ｜ 點擊地面自動行走（或 WASD 移動）｜ 按 L 切換燈光 ｜ J / 右鍵 攻擊 ｜ 靠近按 E 對話
     </div>
   </div>
 
@@ -163,7 +158,7 @@
       <div class="flex items-center justify-between gap-2">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-teal-400 shadow-[0_0_8px_#2dd4bf]"></span>
-          <span class="font-bold text-xs sm:text-sm text-teal-200">彰濱秀傳 B1 實境・牆壁燈光重製版</span>
+          <span class="font-bold text-xs sm:text-sm text-teal-200">彰濱秀傳 B1 實境・自由游標版</span>
         </div>
         <button id="btn-toggle-help" class="px-2 py-0.5 text-[11px] rounded bg-white/10 hover:bg-white/20 text-slate-200">
           收合
@@ -222,11 +217,11 @@
       </div>
 
       <div id="help-body" class="mt-2 pt-2 border-t border-white/10 text-[11px] text-slate-200 space-y-1">
-        <div class="flex justify-between"><span class="text-slate-400">行走 / 衝刺閃避</span><span class="font-bold text-amber-300">WASD / 方向鍵 / Shift</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">跳躍</span><span class="font-bold text-amber-300">Space 空白鍵</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">靈活轉動視角</span><span class="font-bold text-teal-300">點擊鎖定 / 右鍵拖曳 / 滾輪縮放</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">轉動視角（免鎖定）</span><span class="font-bold text-teal-300">按住滑鼠左鍵拖曳 / 滾輪縮放</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">地面點擊 / 鍵盤移動</span><span class="font-bold text-amber-300">左鍵點地面自動走 / WASD / Shift</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">跳躍 / 鏡頭回正</span><span class="font-bold text-amber-300">Space 跳躍 / R 回正</span></div>
         <div class="flex justify-between"><span class="text-slate-400">燈光情境循環切換</span><span class="font-bold text-amber-300">L 鍵（日間 / 暖金 / 夜間）</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">近戰三連擊 / 昇龍重擊</span><span class="font-bold text-rose-300">左鍵(J) / 右鍵(K)</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">近戰三連擊 / 昇龍重擊</span><span class="font-bold text-rose-300">右鍵點擊(J) / K 鍵</span></div>
         <div class="flex justify-between"><span class="text-slate-400">與病患醫護交談 / 電梯</span><span class="font-bold text-emerald-300">靠近按 E 鍵</span></div>
       </div>
     </div>
@@ -280,8 +275,8 @@
     按 <span class="px-2 py-0.5 mx-1 rounded bg-emerald-400 text-slate-950 font-black">E</span> 與 <span id="prompt-npc-name" class="text-amber-300">候診民眾</span> 交談
   </button>
 
-  <!-- NPC 對話 / 手扶梯・電梯樓層選擇視窗 Modal -->
-  <div id="dialogue-modal" class="hidden fixed inset-0 z-40 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+  <!-- NPC 對話 / 手扶梯・電梯樓層選擇視窗 Modal (修正 backdrop-blur-xs 為標準 backdrop-blur-sm) -->
+  <div id="dialogue-modal" class="hidden fixed inset-0 z-40 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
     <div class="hud-glass w-full max-w-xl rounded-2xl p-5 text-white border border-teal-400/45 shadow-2xl">
       <div class="flex items-center justify-between gap-3 pb-3 border-b border-white/15">
         <div class="flex items-center gap-3">
@@ -323,10 +318,10 @@
   <div class="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 z-20 flex flex-col items-end gap-2">
     <div class="flex items-center gap-2">
       <button id="btn-action-heavy" class="px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-xs sm:text-sm shadow-[0_6px_20px_rgba(245,158,11,0.5)] border border-amber-200/60 active:scale-95 transition">
-        💥 重擊 (右鍵/K)
+        💥 重擊 (K)
       </button>
       <button id="btn-action-attack" class="px-4 py-2.5 sm:px-5 sm:py-3 rounded-2xl bg-gradient-to-br from-rose-500 to-red-700 hover:from-rose-400 hover:to-red-600 text-white font-black text-xs sm:text-sm shadow-[0_6px_20px_rgba(225,29,72,0.55)] border border-rose-300/60 active:scale-95 transition">
-        👊 攻擊 (左鍵/J)
+        👊 攻擊 (J / 右鍵)
       </button>
     </div>
 
@@ -347,6 +342,31 @@
   </div>
 
   <script>
+    // ==========================================
+    // 0. 2D Canvas roundRect 跨瀏覽器 Polyfill 相容性強化
+    // ==========================================
+    (function ensureCanvasRoundRect() {
+      if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
+        CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, radii) {
+          let r = 0;
+          if (typeof radii === 'number') {
+            r = radii;
+          } else if (Array.isArray(radii) && radii.length > 0) {
+            r = radii[0];
+          }
+          r = Math.min(r, Math.abs(w) / 2, Math.abs(h) / 2);
+          this.beginPath();
+          this.moveTo(x + r, y);
+          this.arcTo(x + w, y, x + w, y + h, r);
+          this.arcTo(x + w, y + h, x, y + h, r);
+          this.arcTo(x, y + h, x, y, r);
+          this.arcTo(x, y, x + w, y, r);
+          this.closePath();
+          return this;
+        };
+      }
+    })();
+
     let scene, camera, renderer;
     const clock = new THREE.Clock();
     let gameClockMinutes = 10 * 60 + 35;
@@ -394,6 +414,15 @@
     const hitParticles = [];
     const escalatorSteps = [];
 
+    // 點擊地面自動行走的 3D 射線投射與目標波紋光圈
+    const raycaster = new THREE.Raycaster();
+    const pointerNDC = new THREE.Vector2();
+    const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -FLOOR_Y.B1);
+    let moveMarkerGroup = null;
+    let moveMarkerOuterRing = null;
+    let moveMarkerInnerRing = null;
+    let moveMarkerPulse = 0;
+
     function getFloorKey() {
       return 'B1';
     }
@@ -428,7 +457,9 @@
       comboResetTimer: 0,
       hitRegisteredThisSwing: false,
       hurtCooldown: 0,
-      lastTriggeredTransportId: null
+      lastTriggeredTransportId: null,
+      autoMoveTarget: null,
+      stuckTimer: 0
     };
 
     const camState = {
@@ -440,7 +471,7 @@
       targetDistance: 5.0,
       sensitivity: 1.0,
       targetPos: new THREE.Vector3(-8.5, -3.15, -2.5),
-      isPointerLocked: false,
+      leftMouseDragging: false,
       rightMouseDragging: false,
       dragMovedDist: 0,
       lastClientX: null,
@@ -460,11 +491,15 @@
     const SoundFX = (() => {
       let ctx = null;
       function ensureCtx() {
-        if (!ctx) {
-          const AudioCtx = window.AudioContext || window.webkitAudioContext;
-          if (AudioCtx) ctx = new AudioCtx();
+        try {
+          if (!ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) ctx = new AudioCtx();
+          }
+          if (ctx && ctx.state === 'suspended') ctx.resume();
+        } catch (e) {
+          // 忽略自動播放政策限制
         }
-        if (ctx && ctx.state === 'suspended') ctx.resume();
         return ctx;
       }
       function playSwing(isHeavy = false) {
@@ -544,6 +579,64 @@
       }
       return { playSwing, playImpact, playPlayerHurt, playAlert, playSwitchClick };
     })();
+
+    function createMoveTargetMarker() {
+      moveMarkerGroup = new THREE.Group();
+      moveMarkerGroup.visible = false;
+
+      moveMarkerOuterRing = new THREE.Mesh(
+        new THREE.RingGeometry(0.42, 0.56, 32),
+        new THREE.MeshBasicMaterial({
+          color: 0x2dd4bf,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.9
+        })
+      );
+      moveMarkerOuterRing.rotation.x = -Math.PI / 2;
+
+      moveMarkerInnerRing = new THREE.Mesh(
+        new THREE.RingGeometry(0.12, 0.24, 24),
+        new THREE.MeshBasicMaterial({
+          color: 0xfde047,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.95
+        })
+      );
+      moveMarkerInnerRing.rotation.x = -Math.PI / 2;
+      moveMarkerInnerRing.position.y = 0.005;
+
+      moveMarkerGroup.add(moveMarkerOuterRing, moveMarkerInnerRing);
+      scene.add(moveMarkerGroup);
+    }
+
+    function setAutoMoveDestination(clientX, clientY) {
+      if (activeTalkNpc) return;
+      pointerNDC.x = (clientX / window.innerWidth) * 2 - 1;
+      pointerNDC.y = -(clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(pointerNDC, camera);
+
+      const hitPoint = new THREE.Vector3();
+      if (raycaster.ray.intersectPlane(groundPlane, hitPoint)) {
+        const clampedX = THREE.MathUtils.clamp(hitPoint.x, -51.5, 51.5);
+        const clampedZ = THREE.MathUtils.clamp(hitPoint.z, -45.5, 42.5);
+        player.autoMoveTarget = new THREE.Vector3(clampedX, FLOOR_Y.B1, clampedZ);
+        player.stuckTimer = 0;
+
+        if (moveMarkerGroup) {
+          moveMarkerGroup.position.set(clampedX, FLOOR_Y.B1 + 0.03, clampedZ);
+          moveMarkerGroup.visible = true;
+          moveMarkerPulse = 0;
+        }
+      }
+    }
+
+    function clearAutoMoveDestination() {
+      player.autoMoveTarget = null;
+      player.stuckTimer = 0;
+      if (moveMarkerGroup) moveMarkerGroup.visible = false;
+    }
 
     function createSmoothCapsuleGeometry(radius, length, capSegments = 10, radialSegments = 16) {
       const halfLen = Math.max(0.001, length * 0.5);
@@ -708,12 +801,23 @@
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.encoding = THREE.sRGBEncoding;
       tex.anisotropy = 4;
+      tex.needsUpdate = true;
       return tex;
     }
 
+    // ==========================================
+    // 1. 修復 THREE.js CanvasTexture 紋理複製問題：
+    // 先確保 baseTex.needsUpdate = true 再呼叫 .clone()，並加上 tex.image 安全檢查
+    // ==========================================
     function createScaledWallMaterial(baseTex, width, repeatY = 1) {
+      if (!baseTex) {
+        return new THREE.MeshStandardMaterial({ color: 0xf1ece1, roughness: 0.65 });
+      }
+      baseTex.needsUpdate = true;
       const tex = baseTex.clone();
-      tex.needsUpdate = true;
+      if (tex.image) {
+        tex.needsUpdate = true;
+      }
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.ClampToEdgeWrapping;
       tex.repeat.set(Math.max(1, width / 4.4), repeatY);
@@ -766,6 +870,7 @@
       tex.repeat.set(16, 14);
       tex.encoding = THREE.sRGBEncoding;
       tex.anisotropy = 4;
+      tex.needsUpdate = true;
       return tex;
     }
 
@@ -805,6 +910,7 @@
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.RepeatWrapping;
       tex.encoding = THREE.sRGBEncoding;
+      tex.needsUpdate = true;
       return tex;
     }
 
@@ -857,6 +963,7 @@
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.encoding = THREE.sRGBEncoding;
+      tex.needsUpdate = true;
       return tex;
     }
 
@@ -906,6 +1013,7 @@
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.encoding = THREE.sRGBEncoding;
+      tex.needsUpdate = true;
       return tex;
     }
 
@@ -940,6 +1048,7 @@
       const tex = new THREE.CanvasTexture(canvas);
       tex.encoding = THREE.sRGBEncoding;
       tex.anisotropy = 4;
+      tex.needsUpdate = true;
       return tex;
     }
 
@@ -983,6 +1092,7 @@
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.encoding = THREE.sRGBEncoding;
+      tex.needsUpdate = true;
       return tex;
     }
 
@@ -1115,6 +1225,7 @@
 
       const haloTex = new THREE.CanvasTexture(haloCanvas);
       haloTex.encoding = THREE.sRGBEncoding;
+      haloTex.needsUpdate = true;
       const haloMat = new THREE.MeshBasicMaterial({
         map: haloTex,
         transparent: true,
@@ -1148,6 +1259,7 @@
       hctx.fillRect(0, 0, 128, 128);
       const haloTex = new THREE.CanvasTexture(haloCanvas);
       haloTex.encoding = THREE.sRGBEncoding;
+      haloTex.needsUpdate = true;
 
       for (let lx = -36; lx <= 36; lx += 12) {
         for (let lz = -30; lz <= 30; lz += 12) {
@@ -1746,7 +1858,7 @@
       buildWallSconce(-52.95, b1Y + 2.25, 2.0, Math.PI / 2, 0xffedd5);
       buildWallSconce(52.95, b1Y + 2.25, -6.0, -Math.PI / 2, 0xffedd5);
 
-      // A. 中央電梯核心 & 橫向雙向平行手扶梯（東西向，一上一下動態運作，無懸掛招牌）
+      // A. 中央電梯核心 & 橫向雙向平行手扶梯
       addWall(-6.5, -19.5, 8.5, 4.8, 4.4, texCleanTealWall, 'B1 中央電梯核心', 'B1', b1Y);
       addCorridorHandrail(-10.5, -17.0, -2.5, -17.0, b1Y);
       buildWallSconce(-10.2, b1Y + 2.25, -17.02, 0, 0x99f6e4);
@@ -1778,7 +1890,7 @@
         maxZ: -14.8
       });
 
-      // 橫向雙向平行手扶梯（東西向，同個方向一上一下：北側上行 UP、南側下行 DOWN，無懸掛招牌）
+      // 橫向雙向平行手扶梯
       const escSpanX = 9.0;
       const escRiseY = 4.6;
       const escLength = Math.hypot(escSpanX, escRiseY);
@@ -1789,8 +1901,8 @@
       const rubberRailMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35, metalness: 0.15 });
 
       const escLanes = [
-        { laneZ: -1.15, dir: 1, indicatorColor: 0x10b981 },  // 北側車道：同向往上 (West -> East 上行)
-        { laneZ: 1.15,  dir: -1, indicatorColor: 0xf59e0b }  // 南側車道：同向往下 (East -> West 下行)
+        { laneZ: -1.15, dir: 1, indicatorColor: 0x10b981 },
+        { laneZ: 1.15,  dir: -1, indicatorColor: 0xf59e0b }
       ];
 
       escLanes.forEach((lane) => {
@@ -1859,6 +1971,7 @@
         actx.fill();
         const arrowTex = new THREE.CanvasTexture(arrowCanvas);
         arrowTex.encoding = THREE.sRGBEncoding;
+        arrowTex.needsUpdate = true;
 
         const arrowBadge = new THREE.Mesh(
           new THREE.PlaneGeometry(0.46, 0.46),
@@ -2291,6 +2404,7 @@
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.encoding = THREE.sRGBEncoding;
+      tex.needsUpdate = true;
       const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
       const sprite = new THREE.Sprite(mat);
       sprite.scale.set(2.35, 0.58, 1);
@@ -2957,6 +3071,7 @@
       if (activeTalkNpc) return;
       if (player.isAttacking) return;
 
+      clearAutoMoveDestination();
       player.yaw = camState.yaw + Math.PI;
       player.isAttacking = true;
       player.attackType = type;
@@ -3032,6 +3147,7 @@
       if (player.hp <= 0) {
         showToast('🚑 生命值歸零！已由秀傳急診團隊緊急救護並恢復滿血！');
         clearWantedAndHeal();
+        clearAutoMoveDestination();
         player.pos.set(-8.5, FLOOR_Y.B1, -2.5);
         player.yaw = Math.PI;
         camState.yaw = camState.targetYaw = Math.PI;
@@ -3084,28 +3200,74 @@
       toastTimer = setTimeout(() => el.classList.add('hidden'), 3200);
     }
 
+    // ==========================================
+    // 4. 安全樓層直連處理：在預覽環境下不會因找不到外部檔案 (1F.html 等) 而報錯
+    // ==========================================
+    let transferTimeout = null;
     function navigateToFloorHtml(floorItem) {
       closeDialogue();
-      if (document.pointerLockElement) document.exitPointerLock();
+      clearAutoMoveDestination();
 
       const overlay = document.getElementById('floor-transfer-overlay');
-      document.getElementById('transfer-title').textContent = `正在前往 ${floorItem.name}...`;
-      document.getElementById('transfer-sub').textContent = `自動連結至 ${floorItem.file}（${floorItem.desc}）`;
+      const spinner = document.getElementById('transfer-spinner');
+      const titleEl = document.getElementById('transfer-title');
+      const subEl = document.getElementById('transfer-sub');
+      const cancelBtn = document.getElementById('transfer-cancel-btn');
+
+      if (floorItem.id === 'B1') {
+        showToast('📍 您目前已經位於 B1 地下一樓實境大廳！');
+        return;
+      }
+
+      spinner.classList.remove('hidden');
+      cancelBtn.classList.add('hidden');
+      titleEl.textContent = `正在呼叫電梯前往 ${floorItem.name}...`;
+      subEl.textContent = `目標檔案：${floorItem.file}（${floorItem.desc}）`;
       overlay.classList.remove('hidden');
 
-      setTimeout(() => {
-        window.location.href = floorItem.file;
-      }, 280);
+      clearTimeout(transferTimeout);
+
+      // 檢測是否處於沙盒 / srcdoc / blob 單頁預覽環境，避免外部檔案不存在導致畫面空白報錯
+      const isSandboxedPreview =
+        window.location.protocol === 'about:' ||
+        window.location.protocol === 'blob:' ||
+        window.location.protocol === 'data:' ||
+        window.frameElement !== null;
+
+      if (isSandboxedPreview) {
+        transferTimeout = setTimeout(() => {
+          spinner.classList.add('hidden');
+          titleEl.textContent = `🛗 已抵達 ${floorItem.name} 樓層指引站`;
+          subEl.textContent = `目前處於單頁預覽模式（未掛載獨立外部檔案 ${floorItem.file}），系統已安全攔截跳轉以避免 404 頁面中斷。`;
+          cancelBtn.classList.remove('hidden');
+        }, 650);
+      } else {
+        // 本機或正式伺服器環境：先以 fetch 探測檔案是否存在，存在才跳轉
+        fetch(floorItem.file, { method: 'HEAD' })
+          .then((res) => {
+            if (res.ok) {
+              window.location.href = floorItem.file;
+            } else {
+              throw new Error('File not found');
+            }
+          })
+          .catch(() => {
+            spinner.classList.add('hidden');
+            titleEl.textContent = `🛗 尚未偵測到 ${floorItem.file}`;
+            subEl.textContent = `同目錄下尚未放置 ${floorItem.file}（${floorItem.desc}），已為您安全保留目前 B1 遊戲進度。`;
+            cancelBtn.classList.remove('hidden');
+          });
+      }
     }
 
     function openTransportModal(transportLabel = '手扶梯 / 電梯') {
       activeTalkNpc = { isTransportModal: true };
-      if (document.pointerLockElement) document.exitPointerLock();
+      clearAutoMoveDestination();
 
       document.getElementById('dlg-avatar').textContent = '🛗';
       document.getElementById('dlg-name').textContent = `彰濱秀傳 ${transportLabel}・樓層選擇`;
       document.getElementById('dlg-role').textContent = '目前所在樓層：B1 地下一樓醫療與美食街';
-      document.getElementById('dlg-text').textContent = `您已接觸到${transportLabel}！請問要去哪一個樓層？（點擊按鈕或按對應數字鍵，將自動連結 B1 ~ 8F 的 HTML 頁面）`;
+      document.getElementById('dlg-text').textContent = `您已接觸到${transportLabel}！請問要去哪一個樓層？（點擊按鈕或按對應數字鍵，將安全連結或顯示 B1 ~ 8F 樓層資訊）`;
 
       const optContainer = document.getElementById('dlg-options');
       optContainer.innerHTML = '';
@@ -3139,7 +3301,7 @@
 
     function openDialogue(npc) {
       activeTalkNpc = npc;
-      if (document.pointerLockElement) document.exitPointerLock();
+      clearAutoMoveDestination();
 
       document.getElementById('dlg-avatar').textContent = npc.avatar || '👩‍⚕️';
       document.getElementById('dlg-name').textContent = npc.name;
@@ -3193,21 +3355,46 @@
         if (keys['KeyA'] || keys['ArrowLeft']) rightInput -= 1;
       }
 
+      const hasManualInput = forwardInput !== 0 || rightInput !== 0;
+      if (hasManualInput && player.autoMoveTarget) {
+        clearAutoMoveDestination();
+      }
+
       const isSprinting = keys['ShiftLeft'] || keys['ShiftRight'];
       const moveSpeed = isSprinting ? 8.2 : 4.6;
 
-      const camForwardX = -Math.sin(camState.yaw);
-      const camForwardZ = -Math.cos(camState.yaw);
-      const camRightX = Math.cos(camState.yaw);
-      const camRightZ = -Math.sin(camState.yaw);
+      let moveX = 0;
+      let moveZ = 0;
+      let moveLen = 0;
 
-      let moveX = camForwardX * forwardInput + camRightX * rightInput;
-      let moveZ = camForwardZ * forwardInput + camRightZ * rightInput;
-      const moveLen = Math.hypot(moveX, moveZ);
+      if (hasManualInput) {
+        const camForwardX = -Math.sin(camState.yaw);
+        const camForwardZ = -Math.cos(camState.yaw);
+        const camRightX = Math.cos(camState.yaw);
+        const camRightZ = -Math.sin(camState.yaw);
+
+        moveX = camForwardX * forwardInput + camRightX * rightInput;
+        moveZ = camForwardZ * forwardInput + camRightZ * rightInput;
+        moveLen = Math.hypot(moveX, moveZ);
+        if (moveLen > 0.001) {
+          moveX /= moveLen;
+          moveZ /= moveLen;
+        }
+      } else if (!activeTalkNpc && player.autoMoveTarget) {
+        const dx = player.autoMoveTarget.x - player.pos.x;
+        const dz = player.autoMoveTarget.z - player.pos.z;
+        const distToTarget = Math.hypot(dx, dz);
+
+        if (distToTarget < 0.25) {
+          clearAutoMoveDestination();
+        } else {
+          moveX = dx / distToTarget;
+          moveZ = dz / distToTarget;
+          moveLen = 1;
+        }
+      }
 
       if (moveLen > 0.001) {
-        moveX /= moveLen;
-        moveZ /= moveLen;
         const targetYaw = Math.atan2(moveX, moveZ);
         let diff = targetYaw - player.yaw;
         while (diff > Math.PI) diff -= Math.PI * 2;
@@ -3217,6 +3404,9 @@
         player.yaw = camState.yaw + Math.PI;
       }
 
+      const prevPosX = player.pos.x;
+      const prevPosZ = player.pos.z;
+
       const subSteps = 4;
       const stepDt = dt / subSteps;
       for (let s = 0; s < subSteps; s++) {
@@ -3225,6 +3415,26 @@
           player.pos.z += moveZ * moveSpeed * stepDt;
         }
         resolveCircleAllAABBs(player.pos, player.radius, pFloor);
+      }
+
+      // 若點擊尋路遇到障礙物無法前進超過 0.65 秒則自動停止目標圈
+      if (player.autoMoveTarget && moveLen > 0.001) {
+        const actualMoved = Math.hypot(player.pos.x - prevPosX, player.pos.z - prevPosZ);
+        if (actualMoved < moveSpeed * dt * 0.18) {
+          player.stuckTimer += dt;
+          if (player.stuckTimer > 0.65) {
+            clearAutoMoveDestination();
+          }
+        } else {
+          player.stuckTimer = 0;
+        }
+      }
+
+      if (moveMarkerGroup && moveMarkerGroup.visible) {
+        moveMarkerPulse += dt * 4.5;
+        const s = 1 + Math.sin(moveMarkerPulse) * 0.16;
+        moveMarkerOuterRing.scale.set(s, s, 1);
+        moveMarkerInnerRing.rotation.z += dt * 3.0;
       }
 
       if (!activeTalkNpc && keys['Space'] && player.onGround) {
@@ -3478,7 +3688,7 @@
 
       updateCurrentZoneHUD();
 
-      // 橫向雙向手扶梯踏階循環動畫（一上一下）
+      // 橫向雙向手扶梯踏階循環動畫
       for (let i = 0; i < escalatorSteps.length; i++) {
         const st = escalatorSteps[i];
         st.t = (st.t + dt * 0.14 * st.dir + 1) % 1;
@@ -3656,6 +3866,13 @@
         mctx.fill();
       });
 
+      if (player.autoMoveTarget) {
+        mctx.beginPath();
+        mctx.arc(player.autoMoveTarget.x * scale, player.autoMoveTarget.z * scale, 3.6, 0, Math.PI * 2);
+        mctx.fillStyle = '#0d9488';
+        mctx.fill();
+      }
+
       mctx.restore();
 
       mctx.save();
@@ -3686,9 +3903,16 @@
       window.addEventListener('keydown', (e) => {
         keys[e.code] = true;
 
-        if (e.code === 'Escape' && activeTalkNpc) {
-          closeDialogue();
-          return;
+        if (e.code === 'Escape') {
+          const transferOverlay = document.getElementById('floor-transfer-overlay');
+          if (!transferOverlay.classList.contains('hidden')) {
+            transferOverlay.classList.add('hidden');
+            return;
+          }
+          if (activeTalkNpc) {
+            closeDialogue();
+            return;
+          }
         }
 
         if (activeTalkNpc && activeTalkNpc.isTransportModal) {
@@ -3741,56 +3965,80 @@
 
       canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
+      // ==========================================
+      // 4. 修復滑鼠右鍵拖拽時誤觸發攻擊或視角卡住的問題：
+      // 分離左鍵拖拽距離 (leftDragDist) 與右鍵拖拽距離 (rightDragDist)，並在 window blur 時重置拖曳狀態
+      // ==========================================
+      let leftDragDist = 0;
+      let rightDragDist = 0;
+
+      function resetMouseDragStates() {
+        camState.leftMouseDragging = false;
+        camState.rightMouseDragging = false;
+        camState.lastClientX = null;
+        camState.lastClientY = null;
+        leftDragDist = 0;
+        rightDragDist = 0;
+        canvas.classList.remove('dragging');
+      }
+
+      window.addEventListener('blur', resetMouseDragStates);
+
       canvas.addEventListener('mousedown', (e) => {
         if (activeTalkNpc) return;
 
         if (e.button === 0) {
-          if (!document.pointerLockElement && canvas.requestPointerLock) {
-            canvas.requestPointerLock();
-          }
-          triggerPlayerAttack('light');
-        } else if (e.button === 2) {
-          camState.rightMouseDragging = true;
-          camState.dragMovedDist = 0;
+          camState.leftMouseDragging = true;
+          leftDragDist = 0;
           camState.lastClientX = e.clientX;
           camState.lastClientY = e.clientY;
+          canvas.classList.add('dragging');
+        } else if (e.button === 2) {
+          e.preventDefault();
+          camState.rightMouseDragging = true;
+          rightDragDist = 0;
+          camState.lastClientX = e.clientX;
+          camState.lastClientY = e.clientY;
+          canvas.classList.add('dragging');
         }
       });
 
       window.addEventListener('mouseup', (e) => {
-        if (e.button === 2) {
-          if (camState.rightMouseDragging && camState.dragMovedDist < 6 && !activeTalkNpc) {
-            triggerPlayerAttack('heavy');
+        if (e.button === 0) {
+          if (camState.leftMouseDragging && leftDragDist < 6 && !activeTalkNpc) {
+            setAutoMoveDestination(e.clientX, e.clientY);
+          }
+          camState.leftMouseDragging = false;
+          leftDragDist = 0;
+        } else if (e.button === 2) {
+          // 僅在右鍵未拖曳（移動距離 < 4px）時才觸發近戰攻擊，避免拖曳視角誤觸發攻擊
+          if (camState.rightMouseDragging && rightDragDist < 4 && !activeTalkNpc) {
+            triggerPlayerAttack('light');
           }
           camState.rightMouseDragging = false;
+          rightDragDist = 0;
+        }
+
+        if (!camState.leftMouseDragging && !camState.rightMouseDragging) {
           camState.lastClientX = null;
           camState.lastClientY = null;
+          canvas.classList.remove('dragging');
         }
-      });
-
-      document.addEventListener('pointerlockchange', () => {
-        camState.isPointerLocked = document.pointerLockElement === canvas;
-        const ch = document.getElementById('center-crosshair');
-        if (ch) ch.style.opacity = camState.isPointerLocked ? '0.9' : '0.45';
       });
 
       window.addEventListener('mousemove', (e) => {
         if (activeTalkNpc) return;
-        const sensFactor = 0.0026 * camState.sensitivity;
+        const sensFactor = 0.0028 * camState.sensitivity;
 
-        if (camState.isPointerLocked) {
-          camState.targetYaw -= e.movementX * sensFactor;
-          camState.targetPitch = THREE.MathUtils.clamp(
-            camState.targetPitch + e.movementY * sensFactor * 0.85,
-            firstPersonMode ? -1.1 : -0.35,
-            firstPersonMode ? 1.1 : 1.15
-          );
-        } else if (camState.rightMouseDragging) {
-          const dx = e.movementX !== undefined ? e.movementX : e.clientX - (camState.lastClientX ?? e.clientX);
-          const dy = e.movementY !== undefined ? e.movementY : e.clientY - (camState.lastClientY ?? e.clientY);
+        if (camState.leftMouseDragging || camState.rightMouseDragging) {
+          const dx = e.clientX - (camState.lastClientX ?? e.clientX);
+          const dy = e.clientY - (camState.lastClientY ?? e.clientY);
           camState.lastClientX = e.clientX;
           camState.lastClientY = e.clientY;
-          camState.dragMovedDist += Math.hypot(dx, dy);
+
+          const stepDist = Math.hypot(dx, dy);
+          if (camState.leftMouseDragging) leftDragDist += stepDist;
+          if (camState.rightMouseDragging) rightDragDist += stepDist;
 
           camState.targetYaw -= dx * sensFactor * 1.25;
           camState.targetPitch = THREE.MathUtils.clamp(
@@ -3809,21 +4057,35 @@
 
       let lastTouchX = null;
       let lastTouchY = null;
+      let touchMovedDist = 0;
       canvas.addEventListener('touchstart', (e) => {
         if (e.touches.length === 1) {
           lastTouchX = e.touches[0].clientX;
           lastTouchY = e.touches[0].clientY;
+          touchMovedDist = 0;
         }
       }, { passive: true });
       canvas.addEventListener('touchmove', (e) => {
         if (e.touches.length === 1 && lastTouchX !== null) {
           const dx = e.touches[0].clientX - lastTouchX;
           const dy = e.touches[0].clientY - lastTouchY;
+          touchMovedDist += Math.hypot(dx, dy);
           lastTouchX = e.touches[0].clientX;
           lastTouchY = e.touches[0].clientY;
           camState.targetYaw -= dx * 0.005 * camState.sensitivity;
           camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * 0.004, -0.35, 1.15);
         }
+      }, { passive: true });
+      canvas.addEventListener('touchend', () => {
+        if (touchMovedDist < 8 && lastTouchX !== null && !activeTalkNpc) {
+          setAutoMoveDestination(lastTouchX, lastTouchY);
+        }
+        lastTouchX = null;
+        lastTouchY = null;
+      }, { passive: true });
+      canvas.addEventListener('touchcancel', () => {
+        lastTouchX = null;
+        lastTouchY = null;
       }, { passive: true });
 
       const sensSlider = document.getElementById('mouse-sens-slider');
@@ -3843,6 +4105,7 @@
           const zoneKey = btn.dataset.zone;
           const z = ZONES[zoneKey];
           if (!z) return;
+          clearAutoMoveDestination();
           player.pos.copy(z.pos);
           player.vel.set(0, 0, 0);
           player.yaw = z.yaw;
@@ -3856,9 +4119,16 @@
         btn.addEventListener('click', () => {
           const href = btn.dataset.href;
           const matched = FLOOR_LINKS.find((f) => f.file === href);
-          if (matched) navigateToFloorHtml(matched);
-          else window.location.href = href;
+          if (matched) {
+            navigateToFloorHtml(matched);
+          } else {
+            navigateToFloorHtml({ id: href, file: href, name: href, desc: '院區樓層頁面' });
+          }
         });
+      });
+
+      document.getElementById('transfer-cancel-btn').addEventListener('click', () => {
+        document.getElementById('floor-transfer-overlay').classList.add('hidden');
       });
 
       document.getElementById('btn-open-elevator').addEventListener('click', () => {
@@ -3898,61 +4168,67 @@
         const code = btn.dataset.key;
         btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[code] = true; }, { passive: false });
         btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[code] = false; }, { passive: false });
+        btn.addEventListener('touchcancel', (e) => { e.preventDefault(); keys[code] = false; }, { passive: false });
       });
+
       document.getElementById('btn-touch-jump').addEventListener('touchstart', (e) => {
         e.preventDefault();
-        keys['Space'] = true;
-        setTimeout(() => (keys['Space'] = false), 120);
+        if (player.onGround) {
+          player.vel.y = 6.2;
+          player.onGround = false;
+        }
       }, { passive: false });
-      document.getElementById('btn-touch-talk').addEventListener('click', () => {
+
+      document.getElementById('btn-touch-talk').addEventListener('touchstart', (e) => {
+        e.preventDefault();
         const p = document.getElementById('npc-talk-prompt');
         if (!p.classList.contains('hidden')) {
-          if (p.dataset.mode === 'transport') openTransportModal('手扶梯 / 電梯');
+          if (p.dataset.mode === 'transport') openTransportModal(currentTransportZone ? currentTransportZone.transportType : '手扶梯 / 電梯');
           else if (p._npc) openDialogue(p._npc);
         } else {
-          openTransportModal('手扶梯 / 電梯');
+          openTransportModal('中央手扶梯 / 電梯');
         }
-      });
+      }, { passive: false });
+    }
+
+    function init() {
+      const canvas = document.getElementById('game-canvas');
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.08;
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0b131e);
+      scene.fog = new THREE.FogExp2(0x1e293b, 0.0052);
+      scene.add(floorGroups.B1);
+
+      camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.15, 220);
+
+      setupZonalLightingSystem();
+      buildHospitalB1Interior();
+      createMoveTargetMarker();
+      createPlayableCharacter();
+      spawnAllNpcs();
+      applyLightingPreset('day', true);
+      setupUIAndInputs();
 
       window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
-    }
-
-    function init() {
-      const canvas = document.getElementById('game-canvas');
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x0b131e);
-      scene.fog = new THREE.Fog(0x1e293b, 35, 118);
-
-      camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 200);
-      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.08;
-      renderer.outputEncoding = THREE.sRGBEncoding;
-
-      setupZonalLightingSystem();
-
-      scene.add(floorGroups.B1);
-      buildHospitalB1Interior();
-      createPlayableCharacter();
-      spawnAllNpcs();
-      setupUIAndInputs();
-
-      applyLightingPreset('day', true);
 
       setTimeout(() => {
         const loader = document.getElementById('loading-overlay');
-        loader.style.opacity = '0';
-        setTimeout(() => loader.remove(), 500);
-        showToast('💡 歡迎來到彰濱秀傳 B1 牆壁燈光重製版！可按 L 鍵切換三種建築燈光氛圍');
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(() => loader.remove(), 500);
+        }
       }, 450);
 
       animate();
@@ -3960,13 +4236,13 @@
 
     function animate() {
       requestAnimationFrame(animate);
-      const dt = Math.min(clock.getDelta(), 0.05);
+      const dt = Math.min(0.05, clock.getDelta());
       updateSimulation(dt);
-      renderMinimap();
       renderer.render(scene, camera);
+      renderMinimap();
     }
 
-    window.addEventListener('DOMContentLoaded', init);
+    window.onload = init;
   </script>
 </body>
 </html>
