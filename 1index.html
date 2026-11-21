@@ -610,28 +610,34 @@
     // 3D 揮擊光弧特效列表
     const slashEffects = [];
 
-    const player = {
-      mesh: null,
-      headGroup: null,
-      upperBodyGroup: null,
-      leftArm: null,
-      rightArm: null,
-      leftLeg: null,
-      rightLeg: null,
-      materials: {},
-      accessories: {},
-      pos: new THREE.Vector3(48.5, 0, 18.95), // ◀ 原本是 (0.0, 0, 8.8)，改為彰濱天后宮天公爐前方廣場
-      vel: new THREE.Vector3(0, 0, 0),
-      yaw: Math.PI, // 面朝北方（正對天公爐與媽祖廟大門）
-      radius: 0.45,
-      height: 1.85,
-      onGround: true,
-      walkCycle: 0,
-      inVehicle: null,
-      attackCooldown: 0,
-      attackAnimTimer: 0,
-      hitFlashTimer: 0
-    };
+    // 判斷是否從室內 1F 急診室 (?from=er) 走出來
+const urlParams = new URLSearchParams(window.location.search);
+const isFromER = (urlParams.get('from') || urlParams.get('entry') || '').toLowerCase() === 'er';
+
+const player = {
+  mesh: null,
+  headGroup: null,
+  upperBodyGroup: null,
+  leftArm: null,
+  rightArm: null,
+  leftLeg: null,
+  rightLeg: null,
+  materials: {},
+  accessories: {},
+  pos: isFromER
+    ? emergencyDept.doorDropPos.clone()      // 從 111F.html 急診出來 -> 站在戶外急診電動門外側 (46.0, 0, -35.8)
+    : new THREE.Vector3(48.5, 0, 18.95),     // 預設：彰濱天后宮天公爐前方廣場
+  vel: new THREE.Vector3(0, 0, 0),
+  yaw: isFromER ? 0 : Math.PI,               // 從急診出來面朝南方（戶外車道），預設則面朝北方（媽祖廟大門）
+  radius: 0.45,
+  height: 1.85,
+  onGround: true,
+  walkCycle: 0,
+  inVehicle: null,
+  attackCooldown: 0,
+  attackAnimTimer: 0,
+  hitFlashTimer: 0
+};
 
     const vehicles = [];
     let ambulanceSirenOn = true;
