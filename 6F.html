@@ -1569,7 +1569,7 @@
       const northFrontZ = -23.75;
       const northMidZ = (northBackZ + northFrontZ) * 0.5;
 
-      addWall(0, northBackZ, totalNorthW, 0.35, 4.4, null, '6F 北排病房外牆', 6, f6Y, 'ward_room', false);
+      addWall(0, northBackZ, totalNorthW, 0.35, 4.4, null, '北排病房外牆', 6, f6Y, 'ward_room', false);
 
       northWardRooms.forEach((rm, idx) => {
         const roomLeftX = -totalNorthW / 2 + idx * roomStepW;
@@ -1600,7 +1600,7 @@
         }
       });
 
-      const herePadTex = createSignTexture('6F 現在位置 YOU ARE HERE', '620 病房（可直接走入參觀）・東側護理站 B 前', '#9d174d', '#f9a8d4');
+      const herePadTex = createSignTexture('6F 現在位置 YOU ARE HERE', '620 病房・東側護理站', '#9d174d', '#f9a8d4');
       const herePad = new THREE.Mesh(
         new THREE.PlaneGeometry(3.8, 1.1),
         new THREE.MeshStandardMaterial({ map: herePadTex, roughness: 0.4 })
@@ -1609,11 +1609,11 @@
       herePad.position.set(24.5, f6Y + 0.015, -18.2);
       activeBuildGroup.add(herePad);
 
-      addHangingSign(24.5, f6Y + 3.65, -23.2, 6.8, 0.88, '6F 住院病房 (617 ~ 627 病房)', 'INPATIENT WARDS・可走入病房參觀', '#0f4c5c', '#2dd4bf');
-      addHangingSign(-22.5, f6Y + 3.65, -23.2, 6.8, 0.88, '6F 住院病房 (653 ~ 663 病房)', 'INPATIENT WARDS・綜合外科病房', '#0f4c5c', '#2dd4bf');
+      addHangingSign(24.5, f6Y + 3.65, -23.2, 6.8, 0.88, '住院病房 (617 ~ 627 病房)', 'INPATIENT WARDS', '#0f4c5c', '#2dd4bf');
+      addHangingSign(-22.5, f6Y + 3.65, -23.2, 6.8, 0.88, '住院病房 (653 ~ 663 病房)', 'INPATIENT WARDS', '#0f4c5c', '#2dd4bf');
 
       const nwRooms = ['652', '651', '650', '639', '638'];
-      addWall(-47.8, -19.5, 10.5, 21.0, 4.4, null, '6F 西北翼住院病房 (652~638)', 6, f6Y, 'ward');
+      addWall(-47.8, -19.5, 10.5, 21.0, 4.4, null, '住院病房 (652~638)', 6, f6Y, 'ward');
       nwRooms.forEach((rm, idx) => {
         const rz = -27.5 + idx * 4.0;
         const plaqueTex = createSignTexture(`${rm} 病房`, 'NW WING', '#0f4c5c', '#2dd4bf');
@@ -1624,12 +1624,12 @@
         plaque.position.set(-42.5, f6Y + 2.55, rz);
         activeBuildGroup.add(plaque);
       });
-      addWall(-47.8, -38.5, 10.5, 14.0, 4.4, null, '6F 西北洗衣間・無障礙廁所・西北電梯安全梯', 6, f6Y, 'clinical_mint');
-      addHangingSign(-42.0, f6Y + 3.55, -34.5, 5.2, 0.82, '西北電梯梯廳・洗衣間・無障礙廁所', 'NW ELEVATOR & STAIR', '#065f46', '#6ee7b7', Math.PI / 2);
-      addTransportSensorZone('f6_nw_elev', 6, f6Y, -40.2, -34.5, 2.3, '電梯', '6F 西北電梯梯廳', 0x38bdf8);
+      addWall(-47.8, -38.5, 10.5, 14.0, 4.4, null, '電梯安全梯', 6, f6Y, 'clinical_mint');
+      addHangingSign(-42.0, f6Y + 3.55, -34.5, 5.2, 0.82, '電梯梯廳', 'NW ELEVATOR & STAIR', '#065f46', '#6ee7b7', Math.PI / 2);
+      addTransportSensorZone('f6_nw_elev', 6, f6Y, -40.2, -34.5, 2.3, '電梯', '電梯梯廳', 0x38bdf8);
 
       const neRooms = ['616', '615', '613', '612', '611'];
-      addWall(47.8, -19.5, 10.5, 21.0, 4.4, null, '6F 東北翼住院病房 (616~611)', 6, f6Y, 'ward');
+      addWall(47.8, -19.5, 10.5, 21.0, 4.4, null, '住院病房 (616~611)', 6, f6Y, 'ward');
       neRooms.forEach((rm, idx) => {
         const rz = -27.5 + idx * 4.0;
         const plaqueTex = createSignTexture(`${rm} 病房`, 'NE WING', '#0f4c5c', '#2dd4bf');
@@ -1640,16 +1640,16 @@
         plaque.position.set(42.5, f6Y + 2.55, rz);
         activeBuildGroup.add(plaque);
       });
-      addWall(47.8, -38.5, 10.5, 14.0, 4.4, null, '6F 東北洗衣間・廁所・東北電梯安全梯', 6, f6Y, 'clinical_mint');
-      addHangingSign(42.0, f6Y + 3.55, -34.5, 5.2, 0.82, '東北電梯梯廳・洗衣間・緊急出口', 'NE ELEVATOR & STAIR', '#065f46', '#6ee7b7', -Math.PI / 2);
-      addTransportSensorZone('f6_ne_elev', 6, f6Y, 40.2, -34.5, 2.3, '電梯', '6F 東北電梯梯廳', 0x38bdf8);
+      addWall(47.8, -38.5, 10.5, 14.0, 4.4, null, '洗衣間・電梯安全梯', 6, f6Y, 'clinical_mint');
+      addHangingSign(42.0, f6Y + 3.55, -34.5, 5.2, 0.82, '電梯廳・緊急出口', 'NE ELEVATOR & STAIR', '#065f46', '#6ee7b7', -Math.PI / 2);
+      addTransportSensorZone('f6_ne_elev', 6, f6Y, 40.2, -34.5, 2.3, '電梯', '電梯梯廳', 0x38bdf8);
 
       buildRoundedNursingIsland(-23.5, -12.5, 6, f6Y, false);
       buildRoundedNursingIsland(23.5, -12.5, 6, f6Y, true);
 
-      addWall(0, -12.5, 13.5, 4.6, 4.4, null, '6F 中央護理站 A 與電梯核心', 6, f6Y, 'clinical_mint');
-      addHangingSign(0, f6Y + 3.65, -15.2, 6.8, 0.88, '6F 護理站 A・中央電梯廳・輪椅區', 'NURSING STATION A & CENTRAL ELEVATORS', '#065f46', '#6ee7b7');
-      addTransportSensorZone('f6_station_a_elev', 6, f6Y, 0.0, -16.2, 2.4, '電梯', '6F 護理站 A 中央電梯廳', 0x2dd4bf);
+      addWall(0, -12.5, 13.5, 4.6, 4.4, null, '中央護理站', 6, f6Y, 'clinical_mint');
+      addHangingSign(0, f6Y + 3.65, -15.2, 6.8, 0.88, '中央電梯廳', 'NURSING STATION A & CENTRAL ELEVATORS', '#065f46', '#6ee7b7');
+      addTransportSensorZone('f6_station_a_elev', 6, f6Y, 0.0, -16.2, 2.4, '電梯', '護理站', 0x2dd4bf);
 
       [-7.4, 7.4].forEach((wx) => {
         const wcGroup = new THREE.Group();
@@ -1674,7 +1674,7 @@
       const southBackZ = -0.6;
       const southMidZ = (southFrontZ + southBackZ) * 0.5;
 
-      addWall(-25.4, southBackZ, 34.4, 0.35, 4.4, null, '6F 南西排病房後牆', 6, f6Y, 'ward_room', false);
+      addWall(-25.4, southBackZ, 34.4, 0.35, 4.4, null, '南西排病房後牆', 6, f6Y, 'ward_room', false);
       const southWestDefs = [
         { code: '637', cx: -39.5, w: 6.2, posP: true },
         { code: '635', cx: -32.9, w: 7.0, posP: false },
@@ -1691,17 +1691,17 @@
         const rW = rightX - (doorX + 0.85);
         if (lW > 0.15) addWall(leftX + lW * 0.5, southFrontZ, lW, 0.28, 4.4, rm.posP ? posPressureMat : null, `${rm.code} 前牆左`, 6, f6Y, rm.posP ? null : 'ward', true);
         if (rW > 0.15) addWall(rightX - rW * 0.5, southFrontZ, rW, 0.28, 4.4, rm.posP ? posPressureMat : null, `${rm.code} 前牆右`, 6, f6Y, rm.posP ? null : 'ward', true);
-        addOpenWardDoorwayFacade(doorX, southFrontZ, rm.posP ? `${rm.code} 正壓病房` : `${rm.code} 病房`, f6Y, false, rm.posP, rm.posP);
+        addOpenWardDoorwayFacade(doorX, southFrontZ, rm.posP ? `${rm.code} 負壓病房` : `${rm.code} 病房`, f6Y, false, rm.posP, rm.posP);
         buildHospitalBedWithIV(rm.cx + 1.15, southMidZ + 0.45, f6Y, 0, true, `${rm.code} 病房病床`);
       });
-      addHangingSign(-39.5, f6Y + 3.55, -6.2, 4.2, 0.78, '637 正壓隔離病房', 'POSITIVE PRESSURE ISOLATION', '#b45309', '#fde047', Math.PI);
+      addHangingSign(-39.5, f6Y + 3.55, -6.2, 4.2, 0.78, '637 負壓隔離病房', 'POSITIVE PRESSURE ISOLATION', '#b45309', '#fde047', Math.PI);
 
-      addWall(-6.4, -3.2, 3.2, 5.2, 4.4, null, '6F 西側點滴庫房', 6, f6Y, 'clinical_blue');
-      addWall(0, -3.2, 4.2, 5.2, 4.4, null, '6F 中央緊急安全梯', 6, f6Y, 'clinical_mint');
+      addWall(-6.4, -3.2, 3.2, 5.2, 4.4, null, '西側點滴庫房', 6, f6Y, 'clinical_blue');
+      addWall(0, -3.2, 4.2, 5.2, 4.4, null, '中央緊急安全梯', 6, f6Y, 'clinical_mint');
       addHangingSign(0, f6Y + 3.65, -6.1, 4.4, 0.8, '中央安全梯・緊急出口', 'EMERGENCY STAIRCASE', '#065f46', '#6ee7b7', Math.PI);
-      addWall(6.4, -3.2, 3.2, 5.2, 4.4, null, '6F 東側點滴庫房', 6, f6Y, 'clinical_blue');
+      addWall(6.4, -3.2, 3.2, 5.2, 4.4, null, '東側點滴庫房', 6, f6Y, 'clinical_blue');
 
-      addWall(25.4, southBackZ, 34.4, 0.35, 4.4, null, '6F 南東排病房後牆', 6, f6Y, 'ward_room', false);
+      addWall(25.4, southBackZ, 34.4, 0.35, 4.4, null, '南東排病房後牆', 6, f6Y, 'ward_room', false);
       const southEastDefs = [
         { code: '601', cx: 11.9, w: 7.0, posP: false },
         { code: '603', cx: 18.9, w: 7.0, posP: false },
@@ -1718,18 +1718,18 @@
         const rW = rightX - (doorX + 0.85);
         if (lW > 0.15) addWall(leftX + lW * 0.5, southFrontZ, lW, 0.28, 4.4, rm.posP ? posPressureMat : null, `${rm.code} 前牆左`, 6, f6Y, rm.posP ? null : 'ward', true);
         if (rW > 0.15) addWall(rightX - rW * 0.5, southFrontZ, rW, 0.28, 4.4, rm.posP ? posPressureMat : null, `${rm.code} 前牆右`, 6, f6Y, rm.posP ? null : 'ward', true);
-        addOpenWardDoorwayFacade(doorX, southFrontZ, rm.posP ? `${rm.code} 正壓病房` : `${rm.code} 病房`, f6Y, false, rm.posP, rm.posP);
+        addOpenWardDoorwayFacade(doorX, southFrontZ, rm.posP ? `${rm.code} 負壓病房` : `${rm.code} 病房`, f6Y, false, rm.posP, rm.posP);
         buildHospitalBedWithIV(rm.cx + 1.15, southMidZ + 0.45, f6Y, 0, true, `${rm.code} 病房病床`);
       });
-      addHangingSign(39.5, f6Y + 3.55, -6.2, 4.2, 0.78, '610 正壓隔離病房', 'POSITIVE PRESSURE ISOLATION', '#b45309', '#fde047', Math.PI);
+      addHangingSign(39.5, f6Y + 3.55, -6.2, 4.2, 0.78, '610 負壓隔離病房', 'POSITIVE PRESSURE ISOLATION', '#b45309', '#fde047', Math.PI);
 
       buildENursingCart(21.2, -19.2, f6Y, -Math.PI * 0.35);
       buildENursingCart(-21.8, -19.2, f6Y, Math.PI * 0.35);
       buildENursingCart(19.5, -7.2, f6Y, Math.PI * 0.85);
       buildENursingCart(-19.5, -7.2, f6Y, -Math.PI * 0.85);
 
-      addWall(-8.5, 4.5, 3.6, 5.5, 4.4, null, '6F 空中連通道西側電梯核心', 6, f6Y, 'clinical_mint');
-      addWall(8.5, 4.5, 3.6, 5.5, 4.4, null, '6F 空中連通道東側電梯核心', 6, f6Y, 'clinical_mint');
+      addWall(-8.5, 4.5, 3.6, 5.5, 4.4, null, '空中連通道西側電梯核心', 6, f6Y, 'clinical_mint');
+      addWall(8.5, 4.5, 3.6, 5.5, 4.4, null, '空中連通道東側電梯核心', 6, f6Y, 'clinical_mint');
       [-5.8, 5.8].forEach((elX, idx) => {
         const doorFrame = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.45, 2.2), darkFrameMat);
         doorFrame.position.set(elX > 0 ? 6.65 : -6.65, f6Y + 1.22, 4.5);
@@ -1742,13 +1742,13 @@
         addHangingSign(elX, f6Y + 2.85, 4.5, 2.4, 0.48, `6F 電梯廳 ${idx + 1}`, '靠近自動詢問樓層', '#0f172a', '#2dd4bf', elX > 0 ? -Math.PI / 2 : Math.PI / 2);
       });
 
-      addTransportSensorZone('f6_link_elev_w', 6, f6Y, -4.8, 4.5, 2.3, '電梯', '6F 西側中央電梯廳', 0x2dd4bf);
-      addTransportSensorZone('f6_link_elev_e', 6, f6Y, 4.8, 4.5, 2.3, '電梯', '6F 東側中央電梯廳', 0x2dd4bf);
+      addTransportSensorZone('f6_link_elev_w', 6, f6Y, -4.8, 4.5, 2.3, '電梯', '西側中央電梯廳', 0x2dd4bf);
+      addTransportSensorZone('f6_link_elev_e', 6, f6Y, 4.8, 4.5, 2.3, '電梯', '東側中央電梯廳', 0x2dd4bf);
 
-      addWall(-12.5, 13.5, 7.2, 9.0, 4.4, null, '6F 展望廳西側電梯安全梯塔樓', 6, f6Y, 'clinical_blue');
-      addWall(12.5, 13.5, 7.2, 9.0, 4.4, null, '6F 展望廳東側電梯安全梯塔樓', 6, f6Y, 'clinical_blue');
-      addTransportSensorZone('f6_pav_elev_w', 6, f6Y, -8.2, 13.5, 2.2, '電梯', '6F 展望廳西側電梯塔樓', 0x38bdf8);
-      addTransportSensorZone('f6_pav_elev_e', 6, f6Y, 8.2, 13.5, 2.2, '電梯', '6F 展望廳東側電梯塔樓', 0x38bdf8);
+      addWall(-12.5, 13.5, 7.2, 9.0, 4.4, null, '展望廳西側電梯安全梯', 6, f6Y, 'clinical_blue');
+      addWall(12.5, 13.5, 7.2, 9.0, 4.4, null, '展望廳東側電梯安全梯', 6, f6Y, 'clinical_blue');
+      addTransportSensorZone('f6_pav_elev_w', 6, f6Y, -8.2, 13.5, 2.2, '電梯', '展望廳西側電梯', 0x38bdf8);
+      addTransportSensorZone('f6_pav_elev_e', 6, f6Y, 8.2, 13.5, 2.2, '電梯', '展望廳東側電梯', 0x38bdf8);
 
       const pavRadius = 17.5;
       const pavCenterZ = 18.0;
@@ -1848,7 +1848,7 @@
         colliders.push({ minX: sx * 1.45 - 0.75, maxX: sx * 1.45 + 0.75, minZ: 20.75, maxZ: 22.25, floor: 6, label: '室內景觀植栽' });
       });
 
-      addHangingSign(0, f6Y + 3.65, 19.5, 7.6, 0.92, '6F 南側半圓弧空中展望廳', 'SHOW CHWAN 6F SKY PAVILION・全木質地板休憩區', '#0f4c5c', '#2dd4bf', Math.PI);
+      addHangingSign(0, f6Y + 3.65, 19.5, 7.6, 0.92, '南側半圓弧空中展望廳', 'SHOW CHWAN SKY PAVILION', '#0f4c5c', '#2dd4bf', Math.PI);
 
       addFireHydrantCabinet(-4.2, -5.85, Math.PI, f6Y);
       addFireHydrantCabinet(4.2, -5.85, Math.PI, f6Y);
@@ -2237,7 +2237,7 @@
         },
 
         {
-          name: '林佳慧 床邊照護護理師',
+          name: '林佳慧 照護護理師',
           role: '6F 620 病房・病床點滴與生命徵象照護',
           avatar: '👩‍⚕️',
           type: 'staff',
@@ -2253,7 +2253,7 @@
           options: []
         },
         {
-          name: '吳欣怡 床邊護理師',
+          name: '吳欣怡 護理師',
           role: '6F 658 病房・病床點滴更換照護',
           avatar: '💉',
           type: 'staff',
@@ -2269,7 +2269,7 @@
           options: []
         },
         {
-          name: '陳珮琪 床邊護理師',
+          name: '陳珮琪 護理師',
           role: '6F 605 病房・術後病床照護護理師',
           avatar: '🩹',
           type: 'staff',
@@ -2286,7 +2286,7 @@
         },
 
         {
-          name: '周佳穎 E化車操作護理師',
+          name: '周佳穎 護理師',
           role: '6F 東側走道・E化護理工作車條碼給藥',
           avatar: '💻',
           type: 'staff',
@@ -2304,7 +2304,7 @@
           ]
         },
         {
-          name: '蔡佩珊 E化車操作護理師',
+          name: '蔡佩珊 護理師',
           role: '6F 西側走道・E化護理工作車巡房核對',
           avatar: '💻',
           type: 'staff',
@@ -2320,7 +2320,7 @@
           options: []
         },
         {
-          name: '鄭雅婷 E化車操作護理師',
+          name: '鄭雅婷 護理師',
           role: '6F 南東走道・E化護理工作車電子病歷紀錄',
           avatar: '🖥️',
           type: 'staff',
@@ -2336,7 +2336,7 @@
           options: []
         },
         {
-          name: '洪詩涵 E化車操作護理師',
+          name: '洪詩涵 護理師',
           role: '6F 南西走道・E化護理工作車給藥準備',
           avatar: '🖥️',
           type: 'staff',
@@ -2368,7 +2368,7 @@
           options: []
         },
         {
-          name: '陳怡君 護理站 A 護理師',
+          name: '陳怡君 護理師',
           role: '6F 中央護理站 A・住院照護組',
           avatar: '💉',
           type: 'staff',
@@ -2383,7 +2383,7 @@
           options: []
         },
         {
-          name: '王思涵 護理站 C 護理師',
+          name: '王思涵 護理師',
           role: '6F 西側圓弧護理站島 (護理站 C)',
           avatar: '👩‍⚕️',
           type: 'staff',
