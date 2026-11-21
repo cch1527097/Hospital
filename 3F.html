@@ -3101,15 +3101,15 @@
         buildHospitalBedUnit(bx, -29.2, 0x38bdf8, true, 3, f3Y);
       });
 
-      addWall(18.5, -34.5, 34.0, 6.8, 4.4, wardBeigeMat, '睡眠特別門診與行政處/社工辦公室', 3, f3Y);
+      addWall(18.5, -34.5, 34.0, 6.8, 4.4, wardBeigeMat, '總務課收發處/社工辦公室', 3, f3Y);
       addWall(44.5, -23.5, 11.5, 12.0, 4.4, wardBeigeMat, '東側病房', 3, f3Y);
-      addWall(23.5, -11.5, 28.0, 5.5, 4.4, wallBlueMat, '社工/總務處勞安課/品管中心', 3, f3Y);
+      addWall(23.5, -11.5, 28.0, 5.5, 4.4, wallBlueMat, '總務處勞安課/品管中心', 3, f3Y);
 
       [14.5, 22.5, 30.5].forEach((dx, idx) => addClinicDoorSet(dx, f3Y, -31.05, 0, `門診 ${312 + idx * 4}`));
       addGalleryArtwork(18.5, f3Y + 2.15, -14.3, Math.PI, 1);
       addGalleryArtwork(29.5, f3Y + 2.15, -14.3, Math.PI, 2);
 
-      addHangingSign(21.5, f3Y + 3.65, -27.5, 7.2, 0.88, '行政處・社工辦公室', '績效組・醫療委員會', '#1d4ed8', '#93c5fd');
+      addHangingSign(21.5, f3Y + 3.65, -27.5, 7.2, 0.88, '總務課收發處・社工辦公室', '績效組・醫療委員會', '#1d4ed8', '#93c5fd');
       addHangingSign(23.5, f3Y + 3.65, -15.5, 7.2, 0.88, '總務處勞安課・品管中心', '社工辦公室・志工室', '#0f766e', '#5eead4');
 
       addWall(-2.5, 15.5, 7.2, 9.2, 4.4, wallMintMat, '小兒科醫師辦公室', 3, f3Y);
@@ -3966,7 +3966,7 @@
         {
           id: 'ward367_iv_nurse',
           name: '周佳穎',
-          title: '367病房 吊點滴專責護理師',
+          title: '367病房 專責護理師',
           floorTag: '3F',
           baseY: 9.2,
           avatar: '💉',
@@ -4027,7 +4027,7 @@
         {
           id: 'ward369_iv_nurse',
           name: '賴雅筑',
-          title: '369病房 吊點滴專責護理師',
+          title: '369病房 專責護理師',
           floorTag: '3F',
           baseY: 9.2,
           avatar: '💉',
@@ -4251,7 +4251,7 @@
             new THREE.Vector3(28.6, 9.2, 24.45),
             new THREE.Vector3(28.6, 9.2, 26.05)
           ],
-          greeting: '您好！歡迎來到 3F 糖尿病衛教室，我是糖尿病衛教師林詩涵。現在正為王伯伯進行一對一血糖機操作與胰島素筆注射衛教。',
+          greeting: '您好！歡迎來到糖尿病衛教室，我是糖尿病衛教師林詩涵。現在正為王伯伯進行一對一血糖機操作與胰島素筆注射衛教。',
           options: [
             { label: '學習「餐前餐後配對血糖」與胰島素保存技巧', reply: '林詩涵衛教師：「建議每天記錄空腹與餐後 2 小時血糖，未開封胰島素放 2~8°C 冷藏，開封後室溫陰涼處可放 28 天喔！」' },
             { label: '進行免費指尖血糖與糖化血色素 (HbA1c) 檢測 (+100 HP)', reply: '檢測結果：空腹血糖 96 mg/dL、HbA1c 5.6%，控制得非常標準！體力已為您補滿！', action: 'heal' }
@@ -4279,7 +4279,7 @@
         {
           id: 'dm_educator_f3_2',
           name: '許佳玲',
-          title: '糖尿病個案管理師',
+          title: '糖尿病衛教師 (CDE)',
           floorTag: '3F',
           baseY: 9.2,
           avatar: '👩‍⚕️',
@@ -4292,7 +4292,7 @@
             new THREE.Vector3(35.2, 9.2, 24.45),
             new THREE.Vector3(35.2, 9.2, 26.05)
           ],
-          greeting: '您好！我是糖尿病個案管理師許佳玲，協助糖友安排眼底鏡檢查、足部神經病變篩檢與腎功能定期追蹤。',
+          greeting: '您好！我是糖尿病衛教師許佳玲，協助糖友安排眼底鏡檢查、足部神經病變篩檢與腎功能定期追蹤。',
           options: [
             { label: '詢問糖尿病「ABCDE」年度併發症篩檢', reply: '許佳玲個管師：「每年至少做一次散瞳眼底檢查、足部脈搏與單股尼龍絲神經檢查，以及尿液微量白蛋白篩檢喔！」' }
           ]
@@ -4390,7 +4390,7 @@
         {
           id: 'nursery_nurse_f3',
           name: '謝依琳',
-          title: '3F 產房與婦產科 VIP 病房護理長',
+          title: 'VIP 病房護理長',
           floorTag: '3F',
           baseY: 9.2,
           avatar: '🍼',
@@ -4403,7 +4403,7 @@
             new THREE.Vector3(-28.0, 9.2, -18.15),
             new THREE.Vector3(-19.5, 9.2, -18.15)
           ],
-          greeting: '歡迎來到 3F 產房與婦產科 VIP 病房走廊！牆面特別彩繪了童趣「HAPPY BIRTHDAY」慶生壁畫，陪伴每位新手爸媽迎接寶寶誕生。',
+          greeting: '歡迎來到VIP 病房走廊！牆面特別彩繪了童趣「HAPPY BIRTHDAY」慶生壁畫，陪伴每位新手爸媽迎接寶寶誕生。',
           options: [
             { label: '了解產房與嬰兒室母嬰親善照護', reply: '謝依琳護理長：「我們提供 24 小時彈性母嬰同室與一對一哺乳指導，讓媽咪與寶寶在溫馨安全的環境中成長。」' }
           ]
@@ -4411,7 +4411,7 @@
         {
           id: 'ward_nurse_f3',
           name: '楊雅婷',
-          title: '3F 睡眠中心與一般病房護理長',
+          title: '睡眠中心與病房護理長',
           floorTag: '3F',
           baseY: 9.2,
           avatar: '👩‍⚕️',
@@ -4423,7 +4423,7 @@
             new THREE.Vector3(-12.0, 9.2, 32.5),
             new THREE.Vector3(6.5, 9.2, 32.5)
           ],
-          greeting: '您好！這裡是 3F 醫療樓層，東側有糖尿病衛教室、班廷俱樂部、營養/心血管衛教室與眼科門診，中段有護理部，西側則有 367/369 木質地板雙人病房！',
+          greeting: '您好！這裡是醫療樓層，東側有糖尿病衛教室、班廷俱樂部、營養/心血管衛教室與眼科門診，中段有護理部，西側則有 367/369 木質地板雙人病房！',
           options: [
             { label: '詢問 3F 樓層空間導覽', reply: '楊雅婷護理長：「您可以往西走進 367/369 雙人病房探視臥床患者與點滴照護，或到 3F 護理部拜訪陳淑芬主任與 8 位督導！」' },
             { label: '病房休憩與體力恢復 (+100 HP)', reply: '體力與護甲已完全恢復！', action: 'heal' }
@@ -4432,7 +4432,7 @@
         {
           id: 'rotunda_guide_f3',
           name: '林佳勳',
-          title: '3F 圓弧展望廳 護理導覽員',
+          title: '護理導覽員',
           floorTag: '3F',
           baseY: 9.2,
           avatar: '🔭',
@@ -4453,7 +4453,7 @@
         {
           id: 'elevator_attendant_f3',
           name: '黃志偉',
-          title: '3F 中央電梯廳 跨樓層服務員',
+          title: '中央電梯廳服務員',
           floorTag: '3F',
           baseY: 9.2,
           avatar: '🛗',
@@ -4464,7 +4464,7 @@
             new THREE.Vector3(-4.2, 9.2, 5.8),
             new THREE.Vector3(4.2, 9.2, 5.8)
           ],
-          greeting: '您好！這裡是 3F 中央電梯廳，走進發光感應區或按下數字鍵 0~8，即可搭乘電梯直達 B1 ~ 8F 各專屬樓層頁面！',
+          greeting: '您好！這裡是中央電梯廳，走進發光感應區或按下數字鍵 0~8，即可搭乘電梯直達 B1 ~ 8F 各專屬樓層頁面！',
           options: [
             { label: '開啟 B1 ~ 8F 全院電梯樓層選單', reply: '正在為您開啟全院電梯樓層面板...', action: 'open_elevator' }
           ]
