@@ -2436,7 +2436,7 @@
       addTransportSensorPad(0, 0, 4.9, 19.6, 1.8, 0x2dd4bf);
       addTransportSensorPad(0, 4.6, 4.9, 19.6, 1.8, 0x2dd4bf);
       addTransportSensorPad(0, 9.2, 4.9, 19.6, 1.8, 0x2dd4bf);
-      addHangingSign(0, 9.2 + 3.65, 4.4, 7.6, 0.85, '3F 中央電梯廳 (B1 ~ 8F 全院直達)', 'ELEVATORS・人物接觸自動詢問樓層', '#0f4c5c', '#fbbf24');
+      addHangingSign(0, 9.2 + 3.65, 4.4, 7.6, 0.85, '3F 中央電梯廳', 'ELEVATORS', '#0f4c5c', '#fbbf24');
 
       [-8.5, -2.8, 2.8, 8.5].forEach((elX, idx) => {
         const doorFrame = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.45, 0.15), darkFrameMat);
@@ -2727,7 +2727,7 @@
       addWall(38.0, -28.6, 26.0, 0.5, 4.4, wallPinkMat, '2F 洗腎室南牆', 2, f2Y);
       addWall(43.5, -36.5, 14.5, 0.45, 4.4, wallBlueMat, 'CAPD 腹膜透析室隔間', 2, f2Y);
       addHangingSign(37.5, f2Y + 3.6, -28.6, 6.8, 0.88, '2F 洗腎室・CAPD 腹膜透析中心', '腎臟科 李文清醫師・血液透析區・RO機房', '#be123c', '#fda4af');
-      addHangingSign(35.0, f2Y + 3.3, -35.8, 4.6, 0.68, '腎臟科 李文清 醫師診療區', 'NEPHROLOGY & HEMODIALYSIS', '#0369a1', '#7dd3fc');
+      addHangingSign(35.0, f2Y + 3.3, -35.8, 4.6, 0.68, '血液透析中心', 'NEPHROLOGY & HEMODIALYSIS', '#0369a1', '#7dd3fc');
       addClinicDoorSet(28.5, f2Y, -28.6, 0, '洗腎室入口');
 
       for (let row = 0; row < 2; row++) {
@@ -2859,8 +2859,8 @@
       rotundaCeiling.position.set(0, f3Y + 4.45, 44.5);
       scene.add(rotundaCeiling);
 
-      addWall(0, 49.8, 7.5, 0.5, 4.4, glassMat, '3F 圓弧展望廳南側玻璃牆', 3, f3Y, false);
-      addHangingSign(0, f3Y + 3.65, 43.2, 6.4, 0.88, '3F 中央圓弧玻璃展望廳', 'SHOW CHWAN 3F PANORAMIC LOUNGE', '#0f4c5c', '#2dd4bf');
+      addWall(0, 49.8, 7.5, 0.5, 4.4, glassMat, '圓弧展望廳南側玻璃牆', 3, f3Y, false);
+      addHangingSign(0, f3Y + 3.65, 43.2, 6.4, 0.88, '中央圓弧玻璃展望廳', 'SHOW CHWAN PANORAMIC LOUNGE', '#0f4c5c', '#2dd4bf');
 
       [-2.4, 2.4].forEach((sx) => {
         const sofa = new THREE.Mesh(
@@ -2873,11 +2873,11 @@
         colliders.push({ minX: sx - 1.1, maxX: sx + 1.1, minZ: 44.7, maxZ: 45.7, floor: 3, label: '展望廳休憩沙發' });
       });
 
-      addWall(-21.5, -34.5, 38.0, 6.8, 4.4, wardBeigeMat, '3F 睡眠中心檢查室 (353~363)', 3, f3Y);
-      addWall(-44.5, -24.5, 11.5, 16.5, 4.4, wardBeigeMat, '3F 西側 VIP 病房 (338~352)', 3, f3Y);
-      addWall(-23.5, -22.5, 22.0, 5.2, 4.4, wallMintMat, '3F 睡眠中心護理站與醫材供應室', 3, f3Y);
-      addWall(-26.5, -14.8, 26.0, 3.2, 4.4, wardBeigeMat, '3F 婦產科 VIP 病房 (328~337)', 3, f3Y);
-      addWall(-11.2, -14.8, 3.8, 3.2, 4.4, wallBlueMat, '3F 嬰兒室與產房', 3, f3Y);
+      addWall(-21.5, -34.5, 38.0, 6.8, 4.4, wardBeigeMat, '睡眠中心檢查室', 3, f3Y);
+      addWall(-44.5, -24.5, 11.5, 16.5, 4.4, wardBeigeMat, '西側 VIP 病房', 3, f3Y);
+      addWall(-23.5, -22.5, 22.0, 5.2, 4.4, wallMintMat, '睡眠中心護理站與醫材供應室', 3, f3Y);
+      addWall(-26.5, -14.8, 26.0, 3.2, 4.4, wardBeigeMat, '婦產科 VIP 病房', 3, f3Y);
+      addWall(-11.2, -14.8, 3.8, 3.2, 4.4, wallBlueMat, '嬰兒室與產房', 3, f3Y);
 
       const muralNorth = new THREE.Mesh(new THREE.PlaneGeometry(18.0, 1.55), ArchMaterials.nurseryMuralLeft);
       muralNorth.position.set(-23.5, f3Y + 1.85, -19.86);
@@ -2899,26 +2899,26 @@
       [-33.5, -25.5, -17.5].forEach((dx, idx) => addClinicDoorSet(dx, f3Y, -31.05, 0, `睡眠 ${353 + idx * 3}`));
       [-33.5, -25.5, -17.5].forEach((dx, idx) => addClinicDoorSet(dx, f3Y, -13.15, 0, `VIP ${328 + idx * 3}`));
 
-      addHangingSign(-22.5, f3Y + 3.65, -27.5, 6.8, 0.88, '3F 睡眠中心 (353~363 檢查室)', 'SLEEP CENTER・多導睡眠生理檢查 (PSG)', '#0369a1', '#7dd3fc');
-      addHangingSign(-23.5, f3Y + 3.65, -18.15, 6.8, 0.88, '產房 Delivery Room・婦產科 VIP 病房', 'OB/GYN VIP WARDS & NURSERY・母嬰親善走廊', '#be185d', '#f9a8d4');
+      addHangingSign(-22.5, f3Y + 3.65, -27.5, 6.8, 0.88, '睡眠中心', 'SLEEP CENTER・多導睡眠生理檢查 (PSG)', '#0369a1', '#7dd3fc');
+      addHangingSign(-23.5, f3Y + 3.65, -18.15, 6.8, 0.88, '產房・婦產科 VIP 病房', 'OB/GYN VIP WARDS & NURSERY', '#be185d', '#f9a8d4');
 
       [-31.5, -24.5, -17.5].forEach((bx) => {
         buildHospitalBedUnit(bx, -29.2, 0x38bdf8, true, 3, f3Y);
       });
 
-      addWall(18.5, -34.5, 34.0, 6.8, 4.4, wardBeigeMat, '3F 睡眠特別門診與行政處/社工辦公室 (312~321)', 3, f3Y);
-      addWall(44.5, -23.5, 11.5, 12.0, 4.4, wardBeigeMat, '3F 東側病房 (310~311)', 3, f3Y);
-      addWall(23.5, -11.5, 28.0, 5.5, 4.4, wallBlueMat, '3F 社工/人事/總務處勞安課/品管中心 (301~309)', 3, f3Y);
+      addWall(18.5, -34.5, 34.0, 6.8, 4.4, wardBeigeMat, '睡眠特別門診與行政處/社工辦公室', 3, f3Y);
+      addWall(44.5, -23.5, 11.5, 12.0, 4.4, wardBeigeMat, '東側病房', 3, f3Y);
+      addWall(23.5, -11.5, 28.0, 5.5, 4.4, wallBlueMat, '社工/總務處勞安課/品管中心', 3, f3Y);
 
       [14.5, 22.5, 30.5].forEach((dx, idx) => addClinicDoorSet(dx, f3Y, -31.05, 0, `門診 ${312 + idx * 4}`));
       addGalleryArtwork(18.5, f3Y + 2.15, -14.3, Math.PI, 1);
       addGalleryArtwork(29.5, f3Y + 2.15, -14.3, Math.PI, 2);
 
-      addHangingSign(21.5, f3Y + 3.65, -27.5, 7.2, 0.88, '睡眠特別門診 (320)・行政處・社工辦公室', '績效組・醫療委員會 (312~321)', '#1d4ed8', '#93c5fd');
-      addHangingSign(23.5, f3Y + 3.65, -15.5, 7.2, 0.88, '人事處・總務處勞安課・品管中心 (301~309)', '社工辦公室・志工室', '#0f766e', '#5eead4');
+      addHangingSign(21.5, f3Y + 3.65, -27.5, 7.2, 0.88, '睡眠特別門診・行政處・社工辦公室', '績效組・醫療委員會', '#1d4ed8', '#93c5fd');
+      addHangingSign(23.5, f3Y + 3.65, -15.5, 7.2, 0.88, '總務處勞安課・品管中心', '社工辦公室・志工室', '#0f766e', '#5eead4');
 
-      addWall(-2.5, 15.5, 7.2, 9.2, 4.4, wallMintMat, '3F 內科/婦產及兒科/小兒科醫師辦公室', 3, f3Y);
-      addWall(7.5, 16.5, 3.6, 11.5, 4.4, wallBlueMat, '3F 醫師值班室與出院準備服務', 3, f3Y);
+      addWall(-2.5, 15.5, 7.2, 9.2, 4.4, wallMintMat, '內科/婦產及兒科/小兒科醫師辦公室', 3, f3Y);
+      addWall(7.5, 16.5, 3.6, 11.5, 4.4, wallBlueMat, '醫師值班室與出院準備服務', 3, f3Y);
       addHangingSign(-2.5, f3Y + 3.65, 21.2, 6.8, 0.88, '內科 / 婦產及兒科 / 小兒科醫師辦公室', '醫師值班室・出院準備服務', '#065f46', '#6ee7b7');
 
       build3FNursingDepartmentWing(f3Y, wallCreamMat, wallMintMat, ArchMaterials.wallLavender, glassMat);
@@ -2934,7 +2934,7 @@
     }
 
     function build3FRealistWardWing(f3Y, wallCreamMat, wallMintMat) {
-      addWall(-32.0, 23.4, 18.0, 0.36, 4.4, wallCreamMat, '3F 雙人病房北向窗牆', 3, f3Y, false);
+      addWall(-32.0, 23.4, 18.0, 0.36, 4.4, wallCreamMat, '雙人病房北向窗牆', 3, f3Y, false);
       addWall(-41.0, 26.8, 0.36, 6.8, 4.4, wallCreamMat, '367 病房西牆', 3, f3Y, false);
       addWall(-32.0, 26.8, 0.36, 6.8, 4.4, wallCreamMat, '367 與 369 病房隔牆', 3, f3Y, false);
       addWall(-23.0, 26.8, 0.36, 6.8, 4.4, wallCreamMat, '369 病房東牆', 3, f3Y, false);
@@ -2982,7 +2982,7 @@
         scene.add(botBand, midBand, topBand, rail);
       });
 
-      addWall(-32.0, 35.0, 18.0, 0.42, 4.4, wallMintMat, '3F 慢性病房南側走廊牆', 3, f3Y, false);
+      addWall(-32.0, 35.0, 18.0, 0.42, 4.4, wallMintMat, '慢性病房南側走廊牆', 3, f3Y, false);
       const southBot = new THREE.Mesh(new THREE.BoxGeometry(18.0, 1.05, 0.05), ArchMaterials.wardSalmonWainscot);
       southBot.position.set(-32.0, f3Y + 0.525, 34.76);
       const southMid = new THREE.Mesh(new THREE.BoxGeometry(18.0, 0.65, 0.05), ArchMaterials.wardTerracottaBand);
@@ -3008,7 +3008,7 @@
       buildShowChwanDoubleWardRoom(-36.5, f3Y, 26.8, '367');
       buildShowChwanDoubleWardRoom(-27.5, f3Y, 26.8, '369');
 
-      addHangingSign(-32.0, f3Y + 3.65, 32.6, 7.2, 0.88, '3F 一般慢性病房 (367 / 369 雙人病房)', 'WOODEN FLOOR WARDS・臥床患者與護理師吊點滴照護區', '#b45309', '#fde047');
+      addHangingSign(-32.0, f3Y + 3.65, 32.6, 7.2, 0.88, '一般慢性病房', 'WOODEN FLOOR WARDS・臥床患者與護理師吊點滴照護區', '#b45309', '#fde047');
     }
 
     function build3FNursingDepartmentWing(f3Y, wallCreamMat, wallMintMat, wallLavenderMat, glassMat) {
@@ -3087,8 +3087,8 @@
       addComputerWorkstation(2.35, f3Y, 26.62, {
         rotY: 0,
         isExecutive: true,
-        screenTitle: '彰濱秀傳全院護理部決策儀表板',
-        screenSub: '陳淑芬 主任・全院 8 大督導群與護病比總覽',
+        screenTitle: '幸運草醫院護理部決策儀表板',
+        screenSub: '陳淑芬 主任・全院督導群與護病比總覽',
         nameplateText: '護理部主任 陳淑芬'
       });
 
@@ -3211,7 +3211,7 @@
       dmDoorOpen.rotation.y = Math.PI * 0.48;
       scene.add(dmDoorOpen);
 
-      addHangingSign(32.0, f3Y + 3.45, 28.35, 4.8, 0.78, '糖尿病衛教室', 'DIABETES EDUCATION ROOM・一對一控糖衛教中', '#156b46', '#86efac');
+      addHangingSign(32.0, f3Y + 3.45, 28.35, 4.8, 0.78, '糖尿病衛教室', 'DIABETES EDUCATION ROOM', '#156b46', '#86efac');
       addCorridorFlagSign(30.0, f3Y + 2.68, 28.18, '糖尿病衛教室', false, 1);
 
       addEducationDeskWithProps(28.6, f3Y, 25.25, 'diabetes', 0);
