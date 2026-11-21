@@ -2228,23 +2228,23 @@
         addHospitalWardDoor(wx, -10.3, f5Y, `${536 - idx * 2} 病房`, true, false, false);
       });
 
-      addWall(-50.8, -7.2, 1.4, 6.4, 4.4, null, '537 正壓病房西牆', 5, f5Y, 'clinical_blue', false);
-      addWall(-42.2, -7.2, 1.2, 6.4, 4.4, null, '537 正壓病房東牆', 5, f5Y, 'clinical_blue', false);
-      addWall(-46.5, -4.1, 9.6, 0.4, 4.4, null, '537 正壓病房南牆', 5, f5Y, 'clinical_blue', false);
-      addWall(-49.0, -10.3, 3.2, 0.24, 4.4, null, '537 正壓病房門側牆', 5, f5Y, 'clinical_blue', true);
-      addWall(-44.0, -10.3, 3.2, 0.24, 4.4, null, '537 正壓病房門側牆', 5, f5Y, 'clinical_blue', true);
-      addHospitalWardDoor(-46.5, -10.3, f5Y, '537 正壓病房', true, true, true);
+      addWall(-50.8, -7.2, 1.4, 6.4, 4.4, null, '537 負壓病房西牆', 5, f5Y, 'clinical_blue', false);
+      addWall(-42.2, -7.2, 1.2, 6.4, 4.4, null, '537 負壓病房東牆', 5, f5Y, 'clinical_blue', false);
+      addWall(-46.5, -4.1, 9.6, 0.4, 4.4, null, '537 負壓病房南牆', 5, f5Y, 'clinical_blue', false);
+      addWall(-49.0, -10.3, 3.2, 0.24, 4.4, null, '537 負壓病房門側牆', 5, f5Y, 'clinical_blue', true);
+      addWall(-44.0, -10.3, 3.2, 0.24, 4.4, null, '537 負壓病房門側牆', 5, f5Y, 'clinical_blue', true);
+      addHospitalWardDoor(-46.5, -10.3, f5Y, '537 負壓病房', true, true, true);
       buildInpatientHospitalBed(-46.5, -6.6, f5Y, 0, {
         roomName: '537正壓隔離病房',
         hasPatient: true,
         ivSide: 1
       });
-      addHangingSign(-46.5, f5Y + 3.6, -10.6, 5.2, 0.85, '537 正壓隔離病房 (可走入)', 'POSITIVE PRESSURE ISOLATION WARD', '#1d4ed8', '#93c5fd', Math.PI);
+      addHangingSign(-46.5, f5Y + 3.6, -10.6, 5.2, 0.85, '537 負壓隔離病房', 'POSITIVE PRESSURE ISOLATION WARD', '#1d4ed8', '#93c5fd', Math.PI);
       addHangingSign(-25.5, f5Y + 3.6, -10.6, 6.4, 0.85, '536 ～ 528 住院病房', 'INPATIENT WARDS (528-536)', '#0f766e', '#5eead4', Math.PI);
 
       // 3. 東翼病房區 & 東側電梯廳接觸感應區
-      addWall(47.5, -24.5, 10.5, 22.0, 4.4, null, '5F 東側病房與污物/洗衣間', 5, f5Y, 'ward');
-      addHangingSign(41.8, f5Y + 3.55, -24.5, 5.4, 0.82, '5F 東側病房區・東側電梯廳', '接觸電梯門自動選擇 B1 ~ 8F', '#0369a1', '#7dd3fc', -Math.PI / 2);
+      addWall(47.5, -24.5, 10.5, 22.0, 4.4, null, '東側病房與污物', 5, f5Y, 'ward');
+      addHangingSign(41.8, f5Y + 3.55, -24.5, 5.4, 0.82, '東側病房區・東側電梯廳', '接觸電梯門自動選擇 B1 ~ 8F', '#0369a1', '#7dd3fc', -Math.PI / 2);
       addTransportTriggerZone({
         type: 'elevator',
         name: '5F 東側病房電梯廳',
@@ -2256,11 +2256,11 @@
         maxZ: -22.2
       });
 
-      addWall(31.5, -7.2, 41.0, 6.2, 4.4, null, '5F 南東側住院病房與點滴庫房', 5, f5Y, 'ward');
+      addWall(31.5, -7.2, 41.0, 6.2, 4.4, null, '南東側住院病房與點滴庫房', 5, f5Y, 'ward');
       [15.0, 22.5, 30.0, 37.5].forEach((wx, idx) => {
         addHospitalWardDoor(wx, -10.3, f5Y, `${516 - idx} 病房`, true, false, false);
       });
-      addHangingSign(28.5, f5Y + 3.6, -10.6, 6.4, 0.85, '5F 南東側住院病房・點滴庫房', 'IV FLUID STORAGE & INPATIENT WARDS', '#0f766e', '#5eead4', Math.PI);
+      addHangingSign(28.5, f5Y + 3.6, -10.6, 6.4, 0.85, '南東側住院病房・點滴庫房', 'IV FLUID STORAGE & INPATIENT WARDS', '#0f766e', '#5eead4', Math.PI);
 
       // 4. 5F 走道 E 化行動護理工作車 (E-Cart) 陣列
       buildMedicalECart(14.0, -25.2, f5Y, Math.PI * 0.15);
@@ -2425,11 +2425,11 @@
         colliders.push({ minX: cx - 2.2, maxX: cx + 2.2, minZ: cz - 0.65, maxZ: cz + 0.65, floor: 5, label: `${stationLabel}備藥中島` });
 
         if (isEastSide) {
-          addHangingSign(cx, f5Y + 3.55, cz - 2.35, 6.8, 0.84, '東側護理站 B / C・醫材供應・討論室', 'NURSING STATION B & C・MEDICAL SUPPLY', '#065f46', '#6ee7b7');
-          addHangingSign(cx, f5Y + 3.55, cz + 2.35, 6.8, 0.84, '護理站 D・護理長室・治療室・書記室・值班室', 'HEAD NURSE・TREATMENT ROOM・ON-CALL', '#0f766e', '#5eead4', Math.PI);
+          addHangingSign(cx, f5Y + 3.55, cz - 2.35, 6.8, 0.84, '東側護理站・醫材供應・討論室', 'NURSING STATION B & C・MEDICAL SUPPLY', '#065f46', '#6ee7b7');
+          addHangingSign(cx, f5Y + 3.55, cz + 2.35, 6.8, 0.84, '護理站・護理長室・治療室・書記室・值班室', 'HEAD NURSE・TREATMENT ROOM・ON-CALL', '#0f766e', '#5eead4', Math.PI);
         } else {
-          addHangingSign(cx, f5Y + 3.55, cz - 2.35, 6.8, 0.84, '西側護理站 B / C・討論室・醫材供應', 'NURSING STATION B & C・CONFERENCE ROOM', '#065f46', '#6ee7b7');
-          addHangingSign(cx, f5Y + 3.55, cz + 2.35, 6.8, 0.84, '5231 值班室・護理站 D・治療室・護理長室', '5231 ON-CALL・TREATMENT・HEAD NURSE', '#0f766e', '#5eead4', Math.PI);
+          addHangingSign(cx, f5Y + 3.55, cz - 2.35, 6.8, 0.84, '西側護理站・討論室・醫材供應', 'NURSING STATION B & C・CONFERENCE ROOM', '#065f46', '#6ee7b7');
+          addHangingSign(cx, f5Y + 3.55, cz + 2.35, 6.8, 0.84, '值班室・護理站・治療室・護理長室', '5231 ON-CALL・TREATMENT・HEAD NURSE', '#0f766e', '#5eead4', Math.PI);
         }
       }
 
@@ -2437,16 +2437,16 @@
       buildCurvedNursingIsland(23.5, -18.5, true);
 
       // 6. 中央護理站 A、祈禱室 / 神明廳
-      addWall(0, -18.5, 13.5, 4.6, 4.4, null, '5F 中央護理站 A 與中央電梯核心', 5, f5Y, 'clinical_blue');
-      addWall(-8.5, -18.5, 2.8, 1.15, 1.08, counterWoodMat, '西側護理站 A 櫃檯', 5, f5Y);
-      addWall(8.5, -18.5, 2.8, 1.15, 1.08, counterWoodMat, '東側護理站 A 櫃檯', 5, f5Y);
-      addHangingSign(0, f5Y + 3.65, -21.2, 6.8, 0.88, '5F 中央護理站 A・輪椅停放區', 'CENTRAL NURSING STATION A & WHEELCHAIR BAY', '#1d4ed8', '#93c5fd');
+      addWall(0, -18.5, 13.5, 4.6, 4.4, null, '中央護理站', 5, f5Y, 'clinical_blue');
+      addWall(-8.5, -18.5, 2.8, 1.15, 1.08, counterWoodMat, '西側護理站櫃檯', 5, f5Y);
+      addWall(8.5, -18.5, 2.8, 1.15, 1.08, counterWoodMat, '東側護理站櫃檯', 5, f5Y);
+      addHangingSign(0, f5Y + 3.65, -21.2, 6.8, 0.88, '中央護理站・輪椅停放區', 'CENTRAL NURSING STATION A & WHEELCHAIR BAY', '#1d4ed8', '#93c5fd');
 
       // 祈禱室與神明廳局部地板墊高 +0.038 並開啟 polygonOffset，避免與中庭主樓板產生深度衝突
       addFloorSlab5F(0, -6.8, 11.4, 5.4, 0.038, true);
-      addWall(-3.2, -6.8, 5.6, 5.2, 4.4, null, '5F 祈禱室 (Prayer Room)', 5, f5Y, 'clinical_mint');
-      addWall(3.2, -6.8, 5.6, 5.2, 4.4, null, '5F 神明廳 (Shrine Hall)', 5, f5Y, 'nursing');
-      addHangingSign(0, f5Y + 3.65, -9.8, 7.2, 0.88, '祈禱室・神明廳・點滴庫房', 'PRAYER ROOM・SHRINE HALL・SPIRITUAL CARE', '#b45309', '#fde047', Math.PI);
+      addWall(-3.2, -6.8, 5.6, 5.2, 4.4, null, '祈禱室 (Prayer Room)', 5, f5Y, 'clinical_mint');
+      addWall(3.2, -6.8, 5.6, 5.2, 4.4, null, '神明廳 (Shrine Hall)', 5, f5Y, 'nursing');
+      addHangingSign(0, f5Y + 3.65, -9.8, 7.2, 0.88, '祈禱室・神明廳', 'PRAYER ROOM・SHRINE HALL・SPIRITUAL CARE', '#b45309', '#fde047', Math.PI);
 
       const kioskStand = new THREE.Mesh(
         new THREE.BoxGeometry(1.15, 1.85, 0.16),
