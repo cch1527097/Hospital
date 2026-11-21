@@ -622,59 +622,62 @@
     // 入口來源偵測系統（急診門口進入 vs 南側大門進入）
     // --------------------------------------------------------------------------
     function resolveInitialEntryPoint() {
-      let rawEntry = '';
-      try {
-        const params = new URLSearchParams(window.location.search);
-        rawEntry =
-          params.get('entry') ||
-          params.get('from') ||
-          params.get('spawn') ||
-          params.get('door') ||
-          '';
+  let rawEntry = '';
+  try {
+    const params = new URLSearchParams(window.location.search);
+    rawEntry =
+      params.get('entry') ||
+      params.get('from') ||
+      params.get('spawn') ||
+      params.get('door') ||
+      '';
 
-        if (!rawEntry && window.location.hash) {
-          rawEntry = window.location.hash.replace(/^#/, '');
-        }
-
-        if (!rawEntry) {
-          rawEntry = sessionStorage.getItem('hospitalEntry') || localStorage.getItem('hospitalEntry') || '';
-        }
-      } catch (err) {
-        // 忽略沙盒環境 Storage 讀取限制
-      }
-
-      const normalized = String(rawEntry).trim().toLowerCase();
-      const isEmergencyEntry =
-        normalized === 'er' ||
-        normalized === 'emergency' ||
-        normalized === 'erdoor' ||
-        normalized === 'er_door' ||
-        normalized === 'er_entrance' ||
-        normalized === '急診' ||
-        normalized === '急診門口';
-
-      if (isEmergencyEntry) {
-        // 從急診門口進去 -> 人直接出現在急診室門口內側 (24.5, 0, -15.2)，面向急診 CPR 急救區
-        return {
-          type: 'er',
-          pos: new THREE.Vector3(24.5, 0, -15.2),
-          yaw: Math.PI,
-          camYaw: 0,
-          camPitch: 0.16,
-          notice: '🚑 已從急診門口進入急診室'
-        };
-      }
-
-      // 預設：從大門進去 -> 人出現在南側大門內側 (0, 0, 41.2)，面向挑空鋼琴大廳
-      return {
-        type: 'entrance',
-        pos: new THREE.Vector3(0, 0, 41.2),
-        yaw: Math.PI,
-        camYaw: 0,
-        camPitch: 0.14,
-        notice: '🚪 已從南側正門進入大廳'
-      };
+    if (!rawEntry && window.location.hash) {
+      rawEntry = window.location.hash.replace(/^#/, '');
     }
+
+    // 只有當網址完全沒給參數時，才參考 sessionStorage
+    if (!rawEntry) {
+      rawEntry = sessionStorage.getItem('hospitalEntry') || '';
+    }
+  } catch (err) {}
+
+  const normalized = String(rawEntry).trim().toLowerCase();
+
+  // 明確指定從大門進去 -> 鋼琴挑高大廳
+  if (normalized === 'gate' || normalized === 'entrance' || normalized === 'lobby' || normalized === 'main') {
+    return {
+      type: 'entrance',
+      pos: new THREE.Vector3(0, 0, 39.5), // 直接站在挑空鋼琴大廳入口，正對鋼琴與蓮花主燈
+      yaw: Math.PI,
+      camYaw: 0,
+      camPitch: 0.14,
+      notice: '🚪 已從大門進入挑空鋼琴大廳'
+    };
+  }
+
+  // 指定從急診門口進去 -> 直接定位在「急診批價掛號 / 檢傷休息區」
+  if (normalized === 'er' || normalized === 'emergency' || normalized === 'erdoor' || normalized === 'er_door') {
+    return {
+      type: 'er',
+      pos: new THREE.Vector3(41.5, 0, -10.8), // 對齊 ZONES.erTriage 急診批價掛號區
+      yaw: 0,                                  // 0 為面朝南方（急診批價掛號櫃檯方向），若櫃檯在北側請改為 Math.PI
+      camYaw: Math.PI,                         // 攝影機跟隨在玩家身後
+      camPitch: 0.16,
+      notice: '🩺 已從急診門口進入【急診批價掛號處】'
+    };
+  }
+
+  // 預設全部從大門進入鋼琴挑高大廳
+  return {
+    type: 'entrance',
+    pos: new THREE.Vector3(0, 0, 39.5),
+    yaw: Math.PI,
+    camYaw: 0,
+    camPitch: 0.14,
+    notice: '🚪 已從大門進入挑空鋼琴大廳'
+  };
+}
 
     function applyEntrySpawnPoint(entryConfig, showToast = true) {
       player.pos.copy(entryConfig.pos);
@@ -4400,7 +4403,7 @@
       });
 
       // 5. 放射科藍色吊牌改掛於東側門口上方，正面朝向東側走廊（rotY = Math.PI / 2）
-      addHangingSign(-11.6, 3.68, -20.5, 5.8, 0.86, '放射科 (MRI / CT / X光)', 'RADIOLOGY・自動感應鉛屏蔽門', '#1e40af', '#93c5fd', Math.PI / 2);
+      addHangingSign(-11.6, 3.68, -20.5, 5.8, 0.86, '放射科', 'RADIOLOGY・自動感應鉛屏蔽門', '#1e40af', '#93c5fd', Math.PI / 2);
 
       const whiteShellMat = getCachedStandardMat(0xf8fafc, 0.25, 0.12);
       const skyAccentMat = getCachedStandardMat(0x0284c7, 0.3, 0.2);
@@ -4681,7 +4684,7 @@
       scene.add(crashCart, cartTop, monitorHousing, monitorScreen);
       colliders.push({ minX: 16.2, maxX: 17.0, minZ: -22.55, maxZ: -21.85, label: '急救車與生理監視器' });
 
-      addHangingSign(18.2, 3.55, -21.2, 4.6, 0.62, 'CPR 急救搶救區 (Resuscitation)', 'ACLS EMERGENCY BAY', '#be123c', '#fde047', Math.PI / 2);
+      addHangingSign(18.2, 3.55, -21.2, 4.6, 0.62, '急救搶救區', 'ACLS EMERGENCY BAY', '#be123c', '#fde047', Math.PI / 2);
 
       // 急診留觀病床 1 & 2（留觀床 1 中心在 x = 11.5, z = -24.5）
       buildEmergencyBed(11.5, -24.5, false);
@@ -5386,6 +5389,58 @@
             { label: '詢問批價掛號處方向', reply: '沿著中央大理石拼花走道直直往北走（穿過手扶梯旁），正前方就是批價掛號處與「幸運草醫院」形象牆。' }
           ]
         },
+        // [新增門診事件 NPC A] 門診候診區咆哮鬧事男子（持續指罵護理師「我還要等多久！」）
+        {
+          id: 'opd_yeller',
+          name: '劉姓家屬 (批價掛號鬧事者)',
+          role: '批價掛號區・大聲咆哮辱罵中',
+          avatar: '🤬',
+          plateClass: 'amber-plate',
+          pos: new THREE.Vector3(-12.5, 0, -4.5),
+          yaw: Math.PI / 2,
+          patrolRadius: 0,
+          isOpdYeller: true,
+          yellTargetId: 'opd_scolded_nurse',
+          skinColor: 0xfed7aa,
+          hairColor: 0x1e293b,
+          shirtColor: 0x7f1d1d, // 深紅憤怒色系上衣
+          shirtAccent: 0x991b1b,
+          shirtTrim: 0xfbbf24,
+          uniformStyle: 'casual',
+          pantsColor: 0x1e293b,
+          shoeColor: 0x0f172a,
+          greeting: '（指著護理師鼻子破口大罵）我還要等多久？！批價還要讓我等多久？你們櫃台都在裡面吹冷氣聊天嗎！',
+          options: [
+            { label: '上前制止他辱罵醫護人員', reply: '（瞪大眼睛吼道）關你什麼事！我花錢批價最大，叫你們院長出來！' },
+            { label: '勸導他遵守看診順序與醫療禮儀', reply: '（不耐煩地揮手）少囉嗦！再不輪到我，我就把這裡的櫃台給砸了！' }
+          ]
+        },
+        // [新增門診事件 NPC B] 遭受辱罵仍保持專業安撫的門診跟診護理師
+        {
+          id: 'opd_scolded_nurse',
+          name: '林雅婷 批價掛號事務員',
+          role: '批價掛號區・遭言語辱罵安撫中',
+          avatar: '😥',
+          plateClass: 'pink-plate',
+          pos: new THREE.Vector3(-11.2, 0, -4.5),
+          yaw: -Math.PI / 2,
+          patrolRadius: 0,
+          isOpdScoldedNurse: true,
+          skinColor: 0xffedd5,
+          hairColor: 0x3b2314,
+          shirtColor: 0xfce7f3,
+          shirtAccent: 0xfbcfe8,
+          shirtTrim: 0xec4899,
+          uniformStyle: 'nurse',
+          pantsColor: 0xfce7f3,
+          shoeColor: 0xffffff,
+          isFemale: true,
+          hasNurseCap: true,
+          greeting: '（委屈但語氣溫和）先生真的很抱歉，我們的系統發生了點問題，請您不要大聲咆哮與辱罵，影響其他病患看診...',
+          options: [
+            { label: '替護理師出頭並教訓鬧事者', reply: '謝謝你的聲援！言語暴力也是醫療暴力的一種，請幫我們請他冷靜一點！' }
+          ]
+        },
         {
           id: 'referral_nurse',
           name: '許雅雯 專員',
@@ -5409,6 +5464,57 @@
           options: [
             { label: '我要辦理轉診報到', reply: '沒問題！請出示您的轉診單與健保卡，我立即為您安排今日對應專科門診。' },
             { label: '請問義美食品與星巴克在哪？', reply: '大廳左側玻璃門進去就是「義美食品 I-MEI」，大廳右側則是「STARBUCKS 星巴克」，西南側還有 7-ELEVEN 喔！' }
+          ]
+        },
+        // [新增急診事件 NPC A] 急診暴力鬧事男子（持續揮拳攻擊護理師）
+        {
+          id: 'er_brawler',
+          name: '張姓醉漢 (急診鬧事者)',
+          role: '急診室・酒醉鬧事揮拳中',
+          avatar: '💢',
+          plateClass: 'amber-plate',
+          pos: new THREE.Vector3(24.2, 0, -20.5),
+          yaw: Math.PI / 2,
+          patrolRadius: 0,
+          isErBrawler: true,
+          brawlTargetId: 'er_victim_nurse',
+          skinColor: 0xfca5a5, // 泛紅酒醉膚色
+          hairColor: 0x1e293b,
+          shirtColor: 0x334155,
+          shirtAccent: 0x0f172a,
+          shirtTrim: 0xf43f5e,
+          uniformStyle: 'casual',
+          pantsColor: 0x1e293b,
+          shoeColor: 0x090d16,
+          greeting: '（滿身酒氣大聲咆哮）為什麼不先幫我打止痛針！我等了十分鐘了！',
+          options: [
+            { label: '喝止他的暴力行為！', reply: '（被你的氣勢震懾，稍微往後退了一步）你、你想幹嘛？！' }
+          ]
+        },
+        // [新增急診事件 NPC B] 遭受攻擊閃避防禦的急診護理師
+        {
+          id: 'er_victim_nurse',
+          name: '蘇怡君 急診護理師',
+          role: '急診室・檢傷區遭受攻擊中',
+          avatar: '🆘',
+          plateClass: 'pink-plate',
+          pos: new THREE.Vector3(25.3, 0, -20.5),
+          yaw: -Math.PI / 2,
+          patrolRadius: 0,
+          isErVictim: true,
+          skinColor: 0xffedd5,
+          hairColor: 0x451a03,
+          shirtColor: 0xfce7f3,
+          shirtAccent: 0xfbcfe8,
+          shirtTrim: 0xec4899,
+          uniformStyle: 'nurse',
+          pantsColor: 0xfce7f3,
+          shoeColor: 0xffffff,
+          isFemale: true,
+          hasNurseCap: true,
+          greeting: '（雙手護頭後退）先生請冷靜！急診是依檢傷分級看診，請不要動手打人！警衛快來幫忙！',
+          options: [
+            { label: '上前保護護理師並制伏鬧事者', reply: '太感謝你了！你可以直接用拳腳教訓他（按 J 或滑鼠左鍵），或按 C 鍵呼叫警衛支援！' }
           ]
         },
         {
@@ -5526,6 +5632,135 @@
           greeting: '早安！歡迎來到星巴克幸運草醫院門市，今天想來杯經典那堤、冷萃咖啡，還是季節限定星冰樂呢？',
           options: [
             { label: '來一杯大杯冰那堤', reply: '好的！大杯冰那堤馬上為您現萃濃縮咖啡製作，在旁稍候一下喔！' }
+          ]
+        },
+        // [新增東側門診暴力事件 NPC A] 精神科患者在診間走廊失控毆打護理師
+        {
+          id: 'east_psych_attacker',
+          name: '王姓男子 (失控就診患者)',
+          role: '東側門診走廊・情緒失控揮拳毆打中',
+          avatar: '💢',
+          plateClass: 'amber-plate',
+          pos: new THREE.Vector3(20.2, 0, 27.6),
+          yaw: Math.PI / 2,
+          patrolRadius: 0,
+          isErBrawler: true, // 直接復用揮拳攻擊動畫與見義勇為判定（不加通緝星數＋獎勵護甲）
+          isPsychAttacker: true,
+          brawlTargetId: 'east_attacked_nurse',
+          skinColor: 0xfed7aa,
+          hairColor: 0x1e293b,
+          shirtColor: 0x475569, // 病患服/休閒上衣
+          shirtAccent: 0x334155,
+          shirtTrim: 0xf43f5e,
+          uniformStyle: 'casual',
+          pantsColor: 0x1e293b,
+          shoeColor: 0x0f172a,
+          greeting: '（眼神渙散、情緒激動揮舞雙拳）不要靠近我！你們都在監視我！快把藥拿開！',
+          options: [
+            { label: '上前制止並架開他的攻擊！', reply: '（劇烈掙扎大喊）放開我！別碰我！' },
+            { label: '呼叫保全與精神科醫療團隊支援', reply: '（持續在走廊揮拳咆哮，護理師急需你出手相助！）' }
+          ]
+        },
+        // [新增東側門診暴力事件 NPC B] 遭受攻擊閃避防禦的門診護理師
+        {
+          id: 'east_attacked_nurse',
+          name: '張芸瑄 門診護理師',
+          role: '東側門診走廊・遭患者攻擊防禦中',
+          avatar: '🆘',
+          plateClass: 'pink-plate',
+          pos: new THREE.Vector3(21.3, 0, 27.6),
+          yaw: -Math.PI / 2,
+          patrolRadius: 0,
+          isErVictim: true, // 直接復用雙手護頭防禦與受擊後仰動作
+          skinColor: 0xffedd5,
+          hairColor: 0x3b2314,
+          shirtColor: 0xfce7f3,
+          shirtAccent: 0xfbcfe8,
+          shirtTrim: 0xec4899,
+          uniformStyle: 'nurse',
+          pantsColor: 0xfce7f3,
+          shoeColor: 0xffffff,
+          isFemale: true,
+          hasNurseCap: true,
+          greeting: '（雙手護住頭部往後退）王先生冷靜一點！我們只是要幫您量血壓和確認用藥，請不要動手——救命啊！',
+          options: [
+            { label: '立刻出手制伏暴走患者保護護理師', reply: '小心他的拳頭！拜託幫我們先制止他，避免傷到其他候診長輩！' }
+          ]
+        },
+        {
+          id: 'entrance_wheelchair_1',
+          name: '林阿嬤 (輪椅就診民眾)',
+          role: '南側大門入口・剛借用愛心輪椅',
+          avatar: '♿',
+          plateClass: 'amber-plate',
+          pos: new THREE.Vector3(4.2, 0, 41.5),
+          yaw: -Math.PI * 0.75,
+          patrolRadius: 0,
+          isWheelchair: true,
+          isFemale: true,
+          skinColor: 0xffedd5,
+          hairColor: 0x94a3b8,
+          shirtColor: 0x0d9488,
+          shirtAccent: 0x0f766e,
+          shirtTrim: 0x99f6e4,
+          uniformStyle: 'casual',
+          pantsColor: 0x334155,
+          shoeColor: 0x1e293b,
+          greeting: '年輕人早安！一進大門警衛先生就熱心幫我推來了這台愛心輪椅，醫院的無障礙動線真的很貼心！',
+          options: [
+            { label: '詢問需要幫忙推去掛號處嗎？', reply: '謝謝你的好意！我孫子停好車馬上就進來推我去批價掛號處了，祝你今天一切順心！' },
+            { label: '提醒大廳地板平滑小心慢行', reply: '好喔，謝謝提醒！這裡的地板很平穩，輪椅推起來一點都不顛簸。' }
+          ]
+        },
+        // 西側門診候診區鬧事者與護理師（位於西側診間門前走道）
+        {
+          id: 'west_opd_yeller',
+          name: '劉姓家屬 (西側門診鬧事者)',
+          role: '西側門診候診區・大聲咆哮辱罵中',
+          avatar: '🤬',
+          plateClass: 'amber-plate',
+          pos: new THREE.Vector3(-19.6, 0, 30.8),
+          yaw: Math.PI / 2,
+          patrolRadius: 0,
+          isOpdYeller: true,
+          yellTargetId: 'west_opd_scolded_nurse',
+          skinColor: 0xfed7aa,
+          hairColor: 0x1e293b,
+          shirtColor: 0x7f1d1d,
+          shirtAccent: 0x991b1b,
+          shirtTrim: 0xfbbf24,
+          uniformStyle: 'casual',
+          pantsColor: 0x1e293b,
+          shoeColor: 0x0f172a,
+          greeting: '（指著護理師鼻子破口大罵）我還要等多久？！復健骨科掛號等了兩個小時是死了沒有？你們醫護人員都在裡面吹冷氣聊天嗎！',
+          options: [
+            { label: '上前制止他辱罵醫護人員', reply: '（瞪大眼睛吼道）關你什麼事！我花錢掛號最大，叫你們院長出來！' },
+            { label: '勸導他遵守看診順序與醫療禮儀', reply: '（不耐煩地揮手）少囉嗦！再不輪到我，我就把這裡的叫號機砸了！' }
+          ]
+        },
+        {
+          id: 'west_opd_scolded_nurse',
+          name: '王惠美 門診護理師',
+          role: '西側門診・遭言語辱罵安撫中',
+          avatar: '😥',
+          plateClass: 'pink-plate',
+          pos: new THREE.Vector3(-19.6, 0, 32.1),
+          yaw: Math.PI,
+          patrolRadius: 0,
+          isOpdScoldedNurse: true,
+          skinColor: 0xffedd5,
+          hairColor: 0x3b2314,
+          shirtColor: 0xfce7f3,
+          shirtAccent: 0xfbcfe8,
+          shirtTrim: 0xec4899,
+          uniformStyle: 'nurse',
+          pantsColor: 0xfce7f3,
+          shoeColor: 0xffffff,
+          isFemale: true,
+          hasNurseCap: true,
+          greeting: '（委屈但語氣溫和）先生真的很抱歉，前面有幾位長輩需要做詳細評估，請您不要大聲咆哮與辱罵，影響其他病患看診...',
+          options: [
+            { label: '替護理師出頭並教訓鬧事者', reply: '謝謝你的聲援！言語暴力也是醫療暴力的一種，請幫我們請他冷靜一點！' }
           ]
         },
         {
@@ -6353,6 +6588,25 @@
         const knockForce = isHeavy ? 9.5 : 4.2;
         npc.knockbackVel.copy(toNpc).multiplyScalar(knockForce);
 
+        if (npc.isErBrawler || npc.isOpdYeller) {
+          // 制止急診暴力或門診言語辱罵屬於見義勇為，不增加通緝星數並獎勵護甲
+          player.armor = Math.min(100, player.armor + 5);
+          updateHealthArmorBarsUI();
+          if (npc.hp <= 0) {
+            const msg = npc.isOpdYeller
+              ? '🛡️ 制止門診咆哮！守護醫護人員尊嚴！'
+              : '🛡️ 見義勇為！成功保護醫護人員！';
+            spawnFloatingText(player.pos, msg, 'text-emerald-300');
+          }
+        } else {
+          const prevStars = player.wantedStars;
+          player.wantedStars = Math.min(5, Math.max(player.wantedStars, npc.isGuard ? 3 : 1 + Math.floor(player.totalHitsLanded / 4)));
+          if (player.wantedStars > prevStars) {
+            SoundFX.playSirenChirp();
+            updateWantedStarsUI();
+          }
+        }
+
         if (npc.hp <= 0) {
           npc.state = 'ko';
           npc.stateTimer = 6.0;
@@ -6717,6 +6971,59 @@
           npc.knockbackVel.multiplyScalar(Math.max(0, 1 - 10 * dt));
         }
 
+        // 門診候診區鬧事者：激動指罵、雙手插腰跺腳，並定時跳出「我還要等多久！」漂浮字
+        if (npc.isOpdYeller) {
+          const rantCycle = (nowTime * 2.2) % 1;
+          const jab = Math.sin(rantCycle * Math.PI);
+
+          const targetNurse = npcs.find((n) => n.id === npc.yellTargetId);
+          if (targetNurse && targetNurse.state !== 'ko') {
+            npc.yaw = Math.atan2(targetNurse.pos.x - npc.pos.x, targetNurse.pos.z - npc.pos.z);
+          }
+
+          // 右手激動往前指罵，左手插腰，身體前傾跺腳
+          npc.rightShoulder.rotation.x = -1.45 - 0.35 * jab;
+          npc.rightElbow.rotation.x = -0.15 * (1 - jab);
+          npc.leftShoulder.rotation.z = 0.45;
+          npc.leftElbow.rotation.x = -1.1;
+          npc.bodyRoot.rotation.x = 0.14 + 0.06 * jab;
+          npc.headPivot.rotation.x = -0.1 * jab;
+          npc.bodyRoot.position.y = Math.abs(Math.sin(nowTime * 6.5)) * 0.025;
+
+          // 每 2.8 秒在頭頂跳出辱罵與抱怨台詞（玩家靠近 18 公尺內可見）
+          if (!npc.lastRantTime || nowTime - npc.lastRantTime > 2.8) {
+            npc.lastRantTime = nowTime;
+            if (targetNurse && targetNurse.state !== 'ko') {
+              const rants = [
+                '🤬「我還要等多久？！你們都在混嗎！」',
+                '💢「看個病要等這麼久，會不會看病啊！」',
+                '🗣️「叫你們醫生快點！別浪費我時間！」'
+              ];
+              npc.rantIdx = ((npc.rantIdx || 0) + 1) % rants.length;
+              if (Math.hypot(player.pos.x - npc.pos.x, player.pos.z - npc.pos.z) < 18) {
+                spawnFloatingText(npc.pos, rants[npc.rantIdx], 'text-amber-300');
+              }
+            }
+          }
+
+          npc.mesh.position.copy(npc.pos);
+          npc.mesh.rotation.y = npc.yaw;
+          continue;
+        }
+
+        // 遭辱罵的門診護理師：雙手交握在身前安撫、無奈搖頭微幅點頭致歉
+        if (npc.isOpdScoldedNurse) {
+          npc.leftShoulder.rotation.x = -0.55;
+          npc.rightShoulder.rotation.x = -0.55;
+          npc.leftElbow.rotation.x = -0.95;
+          npc.rightElbow.rotation.x = -0.95;
+          npc.headPivot.rotation.x = 0.08 + Math.sin(nowTime * 3.0) * 0.06;
+          npc.headPivot.rotation.y = Math.sin(nowTime * 1.8) * 0.1;
+          npc.mesh.position.copy(npc.pos);
+          npc.mesh.rotation.y = npc.yaw;
+          continue;
+        }
+
         if (npc.state === 'ko') {
           npc.stateTimer -= dt;
           npc.bodyRoot.rotation.x = THREE.MathUtils.lerp(npc.bodyRoot.rotation.x, -Math.PI / 2, 10 * dt);
@@ -6796,6 +7103,76 @@
           npc.bodyRoot.position.y = 0.21 + Math.sin(nowTime * 2.2) * 0.008;
           npc.mesh.position.copy(npc.pos);
           continue;
+        }
+
+        // 急診鬧事者：持續左右揮拳攻擊護理師並產生衝擊火花
+        if (npc.isErBrawler) {
+          const punchCycle = (nowTime * 2.6) % 1;
+          const swing = Math.sin(punchCycle * Math.PI);
+          const isLeftPunch = Math.floor(nowTime * 2.6) % 2 === 0;
+
+          const targetNurse = npcs.find((n) => n.id === npc.brawlTargetId);
+          if (targetNurse && targetNurse.state !== 'ko') {
+            npc.yaw = Math.atan2(targetNurse.pos.x - npc.pos.x, targetNurse.pos.z - npc.pos.z);
+          }
+
+          if (isLeftPunch) {
+            npc.leftShoulder.rotation.x = -1.75 * swing;
+            npc.leftElbow.rotation.x = -0.3 * (1 - swing);
+            npc.rightShoulder.rotation.x = -0.5;
+            npc.bodyRoot.rotation.y = -0.35 * swing;
+          } else {
+            npc.rightShoulder.rotation.x = -1.85 * swing;
+            npc.rightElbow.rotation.x = -0.4 * (1 - swing);
+            npc.leftShoulder.rotation.x = -0.5;
+            npc.bodyRoot.rotation.y = 0.35 * swing;
+          }
+          npc.bodyRoot.position.y = Math.abs(Math.sin(nowTime * 5.2)) * 0.03;
+
+          // 揮拳命中瞬間觸發火花與漂浮字（冷卻 0.38 秒避免重複觸發）
+          if (punchCycle > 0.45 && punchCycle < 0.55 && (!npc.lastBrawlFx || nowTime - npc.lastBrawlFx > 0.38)) {
+            npc.lastBrawlFx = nowTime;
+            if (targetNurse && targetNurse.state !== 'ko') {
+              spawnImpactSparks(targetNurse.pos, 0xf43f5e, 5);
+              if (Math.hypot(player.pos.x - npc.pos.x, player.pos.z - npc.pos.z) < 16) {
+                spawnFloatingText(targetNurse.pos, '💢 醫療暴力！快制止他！', 'text-rose-400');
+              }
+            }
+          }
+
+          npc.mesh.position.copy(npc.pos);
+          npc.mesh.rotation.y = npc.yaw;
+          continue;
+        }
+
+        // 受攻擊的急診護理師：雙手護頭防禦與受擊後仰
+        if (npc.isErVictim) {
+          const flinch = Math.max(0, Math.sin((nowTime * 2.6) * Math.PI));
+          npc.leftShoulder.rotation.x = -1.45;
+          npc.rightShoulder.rotation.x = -1.45;
+          npc.leftElbow.rotation.x = -1.35;
+          npc.rightElbow.rotation.x = -1.35;
+          npc.bodyRoot.rotation.x = -0.22 * flinch;
+          npc.headPivot.rotation.z = Math.sin(nowTime * 12) * 0.08 * flinch;
+          npc.mesh.position.copy(npc.pos);
+          npc.mesh.rotation.y = npc.yaw;
+          continue;
+        }
+
+        if (npc.isErBrawler) {
+          // 制止急診暴力屬於見義勇為，不增加通緝星數並獎勵護甲
+          player.armor = Math.min(100, player.armor + 5);
+          updateHealthArmorBarsUI();
+          if (npc.hp <= 0) {
+            spawnFloatingText(player.pos, '🛡️ 見義勇為！成功保護醫護人員！', 'text-emerald-300');
+          }
+        } else {
+          const prevStars = player.wantedStars;
+          player.wantedStars = Math.min(5, Math.max(player.wantedStars, npc.isGuard ? 3 : 1 + Math.floor(player.totalHitsLanded / 4)));
+          if (player.wantedStars > prevStars) {
+            SoundFX.playSirenChirp();
+            updateWantedStarsUI();
+          }
         }
 
         if (npc.isSeated || npc.isWheelchair || npc.patrolRadius === 0) {
