@@ -5926,28 +5926,30 @@ const player = {
       const linkEl = document.getElementById('enter-lobby-link');
 
       if (isEmergency) {
-        titleEl.textContent = '正在進入 急診室 1F 檢傷分流大廳';
-        titleEl.className = 'text-xl sm:text-2xl font-black tracking-wide text-rose-400 mb-1';
-        descEl.innerHTML = '已感應急診自動電動門，自動連接至 <span class="font-mono text-amber-300">1F.html?entry=er</span> ...';
-        linkEl.href = '1F.html?entry=er';
-      } else {
-        titleEl.textContent = `正在進入 ${sourceName}`;
-        titleEl.className = 'text-xl sm:text-2xl font-black tracking-wide text-emerald-400 mb-1';
-        descEl.innerHTML = '已感應自動電動門，自動連接至 <span class="font-mono text-amber-300">1F.html</span> ...';
-        linkEl.href = '1F.html';
-      }
+  sessionStorage.setItem('hospitalEntry', 'er');
+  titleEl.textContent = '正在進入 急診室 1F 檢傷分流大廳';
+  titleEl.className = 'text-xl sm:text-2xl font-black tracking-wide text-rose-400 mb-1';
+  descEl.innerHTML = '已感應急診自動電動門，自動連接至 <span class="font-mono text-amber-300">1F.html?entry=er</span> ...';
+  linkEl.href = '1F.html?entry=er';
+} else {
+  sessionStorage.setItem('hospitalEntry', 'gate');
+  titleEl.textContent = `正在進入 ${sourceName}`;
+  titleEl.className = 'text-xl sm:text-2xl font-black tracking-wide text-emerald-400 mb-1';
+  descEl.innerHTML = '已感應自動電動門，自動連接至 <span class="font-mono text-amber-300">1F.html?entry=gate</span> ...';
+  linkEl.href = '1F.html?entry=gate';
+}
 
-      overlay.classList.remove('hidden');
-      overlay.classList.add('flex');
-      requestAnimationFrame(() => {
-        overlay.classList.remove('opacity-0');
-        overlay.classList.add('opacity-100');
-      });
+overlay.classList.remove('hidden');
+overlay.classList.add('flex');
+requestAnimationFrame(() => {
+  overlay.classList.remove('opacity-0');
+  overlay.classList.add('opacity-100');
+});
 
-      setTimeout(() => {
-        window.location.href = isEmergency ? '1F.html?entry=er' : '1F.html';
-      }, 950);
-    }
+setTimeout(() => {
+  window.location.href = isEmergency ? '1F.html?entry=er' : '1F.html?entry=gate';
+}, 950);
+}
 
     function triggerEmergencyAmbulanceTransfer(reasonText = '緊急醫療處置後送') {
       if (emergencyDept.isRescuing) return;
