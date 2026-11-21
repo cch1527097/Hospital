@@ -4516,13 +4516,62 @@
 
       // 3. 急診管制電動門（x = 37.2, z = -8.2, openingWidth = 3.4 => 門洞 z = -9.90 ~ -6.50）
       //    北段隔間牆：從北牆 z = -32.80 完整延伸連接到電動門北門框 z = -9.90（消除原本兩大斷裂缺口！）
-      addWall(37.2, -21.35, 0.6, 22.9, 4.4, wallMat, '急診與檢傷區北隔間牆');
+      // [修改] 將北隔間牆拆為兩段，在 z = -20.5 處留出 3.6m 門洞（z = -22.30 ~ -18.70）直通急診室！
+      addWall(37.2, -27.55, 0.6, 10.5, 4.4, wallMat, '急診與檢傷區北隔間牆北段'); // z: -32.80 -> -22.30
+      addWall(37.2, -14.30, 0.6, 8.8, 4.4, wallMat, '急診與檢傷區北隔間牆中段');  // z: -18.70 -> -9.90
+
+      // [新增] 急診批價櫃檯旁・直通急診室自動感應電動門
+      addAutoSlidingDoorUnit({
+        x: 37.2,
+        z: -20.5,
+        axis: 'z',
+        openingWidth: 3.6,
+        doorHeight: 2.85,
+        wallMat,
+        glassMat,
+        darkFrameMat,
+        sensorColor: 0xf43f5e,
+        triggerRadius: 4.5,
+        slideDist: 1.45
+      });
+
+      // [新增] 門上方壁掛標示牌（面向休息區朝東，rotY = Math.PI / 2）
+      addWallMountedSign(37.54, 3.68, -20.5, 4.6, 0.85, '急診診療區', 'EMERGENCY TREATMENT', '#881337', '#fda4af', Math.PI / 2);
       //    南段隔間牆：從電動門南門框 z = -6.50 完整延伸連接到急診休息區南外牆 z = 2.20（消除電動門右側懸空！）
       addWall(37.2, -2.15, 0.6, 8.7, 4.4, wallMat, '急診與檢傷區南隔間牆');
 
       // 4. 急診批價掛號與檢傷休息區外圍閉合牆（東側接 x = 53.5 東側外牆）
       addWall(45.35, -32.8, 16.3, 0.6, 4.4, wallMat, '急診批價區北牆');      // x: 37.20 -> 53.50
-      addWall(45.35, 2.2, 16.3, 0.6, 4.4, wallMat, '急診休息區南外牆');     // x: 37.20 -> 53.50 (閉合南側，完全不懸空！)
+
+      // [替換原本的急診休息區南外牆] 拆為左右兩段，中央 x = 45.35 留出 3.8m 急診電動門出入口
+      addWall(40.325, 2.2, 6.25, 0.6, 4.4, wallMat, '急診休息區南外牆西段'); // x: 37.20 -> 43.45
+      addWall(50.375, 2.2, 6.25, 0.6, 4.4, wallMat, '急診休息區南外牆東段'); // x: 47.25 -> 53.50
+
+      // 新增急診自動感應玻璃雙開門
+      addAutoSlidingDoorUnit({
+        x: 45.35,
+        z: 2.2,
+        axis: 'x',
+        openingWidth: 3.8,
+        doorHeight: 2.85,
+        wallMat,
+        glassMat,
+        darkFrameMat,
+        sensorColor: 0xf43f5e,
+        triggerRadius: 4.8,
+        slideDist: 1.5
+      });
+
+      // 門上方壁掛標示牌（正面朝向休息區內部）
+      addWallMountedSign(45.35, 3.68, 1.84, 5.2, 0.88, 'EMERGENCY EXIT', '', '#881337', '#fda4af', Math.PI);
+
+      // 門前紅色止滑腳踏墊
+      const erExitMat = new THREE.Mesh(
+        getCachedBoxGeom(3.6, 0.03, 1.4),
+        getCachedStandardMat(0xbe123c, 0.85, 0.05)
+      );
+      erExitMat.position.set(45.35, 0.015, 1.3);
+      scene.add(erExitMat);
 
       addAutoSlidingDoorUnit({
         x: 24.5,
@@ -4632,7 +4681,7 @@
       scene.add(crashCart, cartTop, monitorHousing, monitorScreen);
       colliders.push({ minX: 16.2, maxX: 17.0, minZ: -22.55, maxZ: -21.85, label: '急救車與生理監視器' });
 
-      addHangingSign(18.2, 3.55, -21.2, 3.8, 0.62, 'CPR 急救搶救區 (Resuscitation)', 'ACLS EMERGENCY BAY', '#be123c', '#fde047');
+      addHangingSign(18.2, 3.55, -21.2, 4.6, 0.62, 'CPR 急救搶救區 (Resuscitation)', 'ACLS EMERGENCY BAY', '#be123c', '#fde047', Math.PI / 2);
 
       // 急診留觀病床 1 & 2（留觀床 1 中心在 x = 11.5, z = -24.5）
       buildEmergencyBed(11.5, -24.5, false);
@@ -5317,7 +5366,7 @@
           role: '挑空鋼琴大廳・鋼琴演奏',
           avatar: '🎹',
           plateClass: 'teal-plate',
-          pos: new THREE.Vector3(-0.72, 0, 32.95),
+          pos: new THREE.Vector3(0.72, 0, 32.97),
           yaw: 3.66,
           patrolRadius: 0,
           isSeated: true,
@@ -6448,6 +6497,16 @@
           '1index.html',
           '🚪 已走出醫院南側大門',
           '正在自動連結回戶外園區 1index.html ...'
+        );
+        return;
+      }
+
+      // 走出急診南側電動門出入口（z >= 2.0 且 x 位於 43.45 ~ 47.25）
+      if (player.pos.z >= 2.0 && player.pos.z <= 3.2 && player.pos.x >= 43.45 && player.pos.x <= 47.25) {
+        navigateToHtml(
+          '1index.html?from=er',
+          '🚑 已走出急診電動門出入口',
+          '正在自動連結至戶外急診車道 1index.html ...'
         );
         return;
       }
