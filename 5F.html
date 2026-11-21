@@ -2425,11 +2425,11 @@
         colliders.push({ minX: cx - 2.2, maxX: cx + 2.2, minZ: cz - 0.65, maxZ: cz + 0.65, floor: 5, label: `${stationLabel}備藥中島` });
 
         if (isEastSide) {
-          addHangingSign(cx, f5Y + 3.55, cz - 2.35, 6.8, 0.84, '東側護理站・醫材供應・討論室', 'NURSING STATION B & C・MEDICAL SUPPLY', '#065f46', '#6ee7b7');
-          addHangingSign(cx, f5Y + 3.55, cz + 2.35, 6.8, 0.84, '護理站・護理長室・治療室・書記室・值班室', 'HEAD NURSE・TREATMENT ROOM・ON-CALL', '#0f766e', '#5eead4', Math.PI);
+          addHangingSign(cx, f5Y + 3.55, cz - 2.35, 6.8, 0.84, '東側護理站', 'NURSING STATION', '#065f46', '#6ee7b7');
+          addHangingSign(cx, f5Y + 3.55, cz + 2.35, 6.8, 0.84, '護理站・護理長室', 'HEAD NURSE・TREATMENT ROOM', '#0f766e', '#5eead4', Math.PI);
         } else {
-          addHangingSign(cx, f5Y + 3.55, cz - 2.35, 6.8, 0.84, '西側護理站・討論室・醫材供應', 'NURSING STATION B & C・CONFERENCE ROOM', '#065f46', '#6ee7b7');
-          addHangingSign(cx, f5Y + 3.55, cz + 2.35, 6.8, 0.84, '值班室・護理站・治療室・護理長室', '5231 ON-CALL・TREATMENT・HEAD NURSE', '#0f766e', '#5eead4', Math.PI);
+          addHangingSign(cx, f5Y + 3.55, cz - 2.35, 6.8, 0.84, '西側護理站', 'NURSING STATION', '#065f46', '#6ee7b7');
+          addHangingSign(cx, f5Y + 3.55, cz + 2.35, 6.8, 0.84, '護理站・護理長室', 'HEAD NURSE・TREATMENT ROOM', '#0f766e', '#5eead4', Math.PI);
         }
       }
 
@@ -2446,7 +2446,7 @@
       addFloorSlab5F(0, -6.8, 11.4, 5.4, 0.038, true);
       addWall(-3.2, -6.8, 5.6, 5.2, 4.4, null, '祈禱室 (Prayer Room)', 5, f5Y, 'clinical_mint');
       addWall(3.2, -6.8, 5.6, 5.2, 4.4, null, '神明廳 (Shrine Hall)', 5, f5Y, 'nursing');
-      addHangingSign(0, f5Y + 3.65, -9.8, 7.2, 0.88, '祈禱室・神明廳', 'PRAYER ROOM・SHRINE HALL・SPIRITUAL CARE', '#b45309', '#fde047', Math.PI);
+      addHangingSign(0, f5Y + 3.65, -9.8, 7.2, 0.88, '祈禱室・神明廳', 'PRAYER ROOM・SHRINE HALL', '#b45309', '#fde047', Math.PI);
 
       const kioskStand = new THREE.Mesh(
         new THREE.BoxGeometry(1.15, 1.85, 0.16),
@@ -2457,8 +2457,8 @@
       colliders.push({ minX: 11.5, maxX: 12.9, minZ: -21.7, maxZ: -21.1, floor: 5, label: '5F 疏散平面圖導覽立牌' });
 
       // 7. 5F 南側半圓弧玻璃展望大廳
-      addWall(-11.5, 30.5, 4.8, 7.5, 4.4, null, '5F 南西側電梯與樓梯核心', 5, f5Y, 'stone');
-      addWall(11.5, 30.5, 4.8, 7.5, 4.4, null, '5F 南東側電梯與樓梯核心', 5, f5Y, 'stone');
+      addWall(-11.5, 30.5, 4.8, 7.5, 4.4, null, '5F 南西側電梯', 5, f5Y, 'stone');
+      addWall(11.5, 30.5, 4.8, 7.5, 4.4, null, '5F 南東側電梯', 5, f5Y, 'stone');
       addTransportTriggerZone({
         type: 'elevator',
         name: '5F 南西側電梯廳',
@@ -2512,8 +2512,8 @@
       rotundaGlowRing.position.set(0, f5Y + 4.28, 34.5);
       scene.add(rotundaRingCeiling, rotundaGlowRing);
 
-      addWall(0, 45.4, 14.5, 0.5, 4.4, frostedGlassMat, '5F 圓弧展望廳南側玻璃幕牆', 5, f5Y, 'glass');
-      addHangingSign(0, f5Y + 3.65, 27.5, 7.2, 0.9, '5F 南側半圓弧玻璃展望大廳', '5F PANORAMIC ATRIUM LOUNGE・家屬休憩空間', '#0f4c5c', '#fbbf24');
+      addWall(0, 45.4, 14.5, 0.5, 4.4, frostedGlassMat, '圓弧展望廳', 5, f5Y, 'glass');
+      addHangingSign(0, f5Y + 3.65, 27.5, 7.2, 0.9, '南側半圓弧玻璃展望大廳', '5F PANORAMIC ATRIUM LOUNGE・家屬休憩空間', '#0f4c5c', '#fbbf24');
 
       [
         [-11.8, -21.8], [11.8, -21.8],
