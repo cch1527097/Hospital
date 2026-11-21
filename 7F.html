@@ -1798,8 +1798,8 @@
       }
 
       // 3. 西北角安全梯/洗衣間/無障礙廁所/西北電梯廳
-      addWall(-47.5, -39.5, 11.5, 14.5, 4.4, wallMintMat, '7F 西北安全梯・洗衣間・無障礙廁所', 7, f7Y);
-      addWall(-47.5, -29.5, 11.5, 5.0, 4.4, wallBlueMat, '7F 西北電梯廳', 7, f7Y);
+      addWall(-47.5, -39.5, 11.5, 14.5, 4.4, wallMintMat, '西北安全梯', 7, f7Y);
+      addWall(-47.5, -29.5, 11.5, 5.0, 4.4, wallBlueMat, '西北電梯廳', 7, f7Y);
 
       const nwElevDoor = new THREE.Mesh(
         new THREE.BoxGeometry(0.18, 2.4, 2.2),
@@ -1877,7 +1877,7 @@
       herePad.position.set(-33.5, f7Y + 0.015, 1.5);
       activeBuildGroup.add(herePad);
 
-      addHangingSign(-33.5, f7Y + 3.65, -4.5, 6.4, 0.88, '7F VIP 尊榮病房區 (感應式電動門)', 'EXECUTIVE VIP SUITES WING・走近自動開門', '#581c87', '#fde047', -Math.PI / 2);
+      addHangingSign(-33.5, f7Y + 3.65, -4.5, 6.4, 0.88, '7F VIP 尊榮病房區', 'EXECUTIVE VIP SUITES WING', '#581c87', '#fde047', -Math.PI / 2);
 
       // VIP 尊榮病房管制區主入口雙開感應電動玻璃門
       buildVipAutomaticDoor({
@@ -1964,9 +1964,9 @@
       });
 
       // 8. 中央核心區：護理站 A、中央四座電梯門立面與接觸感應區（已完整移除手扶梯）
-      addWall(0.5, -12.5, 13.5, 4.8, 4.4, wallMintMat, '7F 中央護理站 A 與四座電梯核心', 7, f7Y);
+      addWall(0.5, -12.5, 13.5, 4.8, 4.4, wallMintMat, '中央護理站・四座電梯核心', 7, f7Y);
       addCorridorHandrail(-5.8, -14.95, 6.8, -14.95, f7Y, false);
-      addHangingSign(0.5, f7Y + 3.65, -15.4, 7.0, 0.88, '7F 護理站 A・中央四座電梯廳', 'CENTRAL ELEVATORS・接觸電梯門自動選擇樓層', '#065f46', '#6ee7b7');
+      addHangingSign(0.5, f7Y + 3.65, -15.4, 7.0, 0.88, '護理站・中央四座電梯廳', 'CENTRAL ELEVATORS', '#065f46', '#6ee7b7');
 
       [-4.2, -1.4, 1.4, 4.2].forEach((elX, idx) => {
         const frame = new THREE.Mesh(new THREE.BoxGeometry(2.05, 2.45, 0.14), darkFrameMat);
@@ -2004,11 +2004,11 @@
       });
 
       // 9. 西側 VIP 服務與行政島
-      addWall(-19.5, -12.5, 18.0, 5.2, 4.4, vipWallMat, '7F 西側 VIP 服務與行政島', 7, f7Y);
+      addWall(-19.5, -12.5, 18.0, 5.2, 4.4, vipWallMat, 'VIP 服務中心', 7, f7Y);
       addCorridorHandrail(-28.0, -15.15, -11.0, -15.15, f7Y, true);
       addCorridorHandrail(-28.0, -9.85, -11.0, -9.85, f7Y, true);
-      addHangingSign(-19.5, f7Y + 3.65, -15.4, 8.2, 0.88, '懇談室・醫師值班・主任辦公室・會議室', 'VIP FAMILY LOUNGE & CONFERENCE ROOM', '#0369a1', '#7dd3fc');
-      addHangingSign(-19.5, f7Y + 3.65, -9.6, 8.2, 0.88, '懇談室・VIP 洗髮室・庫房・VIP 護理站・辦公室', 'VIP HAIR SALON & NURSING STATION', '#6b21a8', '#f0abfc', Math.PI);
+      addHangingSign(-19.5, f7Y + 3.65, -15.4, 8.2, 0.88, '懇談室・主任辦公室・會議室', 'VIP FAMILY LOUNGE & CONFERENCE ROOM', '#0369a1', '#7dd3fc');
+      addHangingSign(-19.5, f7Y + 3.65, -9.6, 8.2, 0.88, '懇談室・VIP 洗髮室・VIP 護理站', 'VIP HAIR SALON & NURSING STATION', '#6b21a8', '#f0abfc', Math.PI);
 
       // 10. 東側圓弧實木石英石護理站島
       buildRoundedNursingIsland(25.0, -12.5, 7, f7Y, true);
@@ -2029,7 +2029,7 @@
       });
 
       addWall(-11.0, 6.8, 7.6, 6.2, 4.4, loungeBlueMat, '7F 商務中心 (Business Center)', 7, f7Y);
-      addHangingSign(-11.0, f7Y + 3.55, 3.4, 5.2, 0.82, '7F 商務中心', 'BUSINESS CENTER・商務辦公與電腦查詢區', '#0369a1', '#7dd3fc', Math.PI);
+      addHangingSign(-11.0, f7Y + 3.55, 3.4, 5.2, 0.82, '7F 商務中心', 'BUSINESS CENTER', '#0369a1', '#7dd3fc', Math.PI);
 
       // 13. 中央安全梯、儲藏室與南側全景「交誼廳」（人字拼胡桃木地板）
       addWall(-1.2, 5.2, 3.6, 4.2, 4.4, wallMintMat, '7F 中央緊急安全梯', 7, f7Y);
@@ -2068,14 +2068,14 @@
       buildWalkInDoubleWard(17.15, 7.9, f7Y, '701', false);
 
       const seGenRooms = ['702', '703', '705', '706', '707', '708', '709'];
-      addWall(33.0, 6.8, 24.5, 6.2, 4.4, coralCorridorMat, '7F 南東一般病房群 (702~709)', 7, f7Y);
+      addWall(33.0, 6.8, 24.5, 6.2, 4.4, coralCorridorMat, '一般病房 (702~709)', 7, f7Y);
       addCorridorHandrail(20.8, 3.68, 45.2, 3.68, f7Y, false);
       addWallSanitizerDispenser(21.0, 3.68, Math.PI, f7Y);
       seGenRooms.forEach((rm, idx) => {
         const rx = 20.75 + (idx + 0.5) * 3.5;
         addWardDoorFacade(rx, 3.68, `${rm} 病房`, f7Y, false, false);
       });
-      addHangingSign(32.5, f7Y + 3.65, 3.4, 7.2, 0.88, '7F 南東一般病房 (701 雙人房・702 ~ 709 病房)', 'SOUTH-EAST INPATIENT WARDS', '#0f4c5c', '#2dd4bf', Math.PI);
+      addHangingSign(32.5, f7Y + 3.65, 3.4, 7.2, 0.88, '一般病房 (701 雙人房・702 ~ 709 病房)', 'SOUTH-EAST INPATIENT WARDS', '#0f4c5c', '#2dd4bf', Math.PI);
 
       addFireHydrantCabinet(-36.5, 3.65, Math.PI, f7Y);
       addFireHydrantCabinet(46.5, 3.65, Math.PI, f7Y);
@@ -2329,8 +2329,8 @@
       const npcDefinitions = [
         // ==================== 醫師、專員與志工 ====================
         {
-          name: '吳政宏 7F VIP 病房主任醫師',
-          role: '7F VIP 尊榮病房・主任辦公室 / 733 套房',
+          name: '吳政宏 VIP 病房主任醫師',
+          role: 'VIP 尊榮病房・主任辦公室 / 733 套房',
           avatar: '🩺',
           type: 'staff',
           floor: 7,
@@ -2347,8 +2347,8 @@
           ]
         },
         {
-          name: '周子涵 7F 住院醫師',
-          role: '7F 727 雙人病房 / 東翼病房巡房醫師',
+          name: '周子涵 住院醫師',
+          role: '727 雙人病房 / 東翼病房巡房醫師',
           avatar: '📋',
           type: 'staff',
           floor: 7,
@@ -2365,7 +2365,7 @@
         },
         {
           name: '陳柏宇 國際醫療中心專員',
-          role: '7F 商務中心 (Business Center)',
+          role: '商務中心 (Business Center)',
           avatar: '💼',
           type: 'staff',
           floor: 7,
@@ -2375,12 +2375,12 @@
           waypoints: [new THREE.Vector3(-11.0, FLOOR_Y[7], 1.8)],
           speed: 0,
           yaw: Math.PI,
-          dialogue: '您好！這裡是 7F 商務中心，提供高速光纖網路、事務機與國際醫療貴賓禮賓翻譯服務！',
+          dialogue: '您好！這裡是商務中心，提供高速光纖網路、事務機與國際醫療貴賓禮賓翻譯服務！',
           options: []
         },
         {
           name: '張淑娟 交誼廳關懷志工',
-          role: '7F 全景交誼廳 (Sky Social Lounge)',
+          role: '全景交誼廳 (Sky Social Lounge)',
           avatar: '☕',
           type: 'staff',
           floor: 7,
@@ -2392,12 +2392,12 @@
             new THREE.Vector3(5.5, FLOOR_Y[7], 12.5)
           ],
           speed: 1.0,
-          dialogue: '歡迎來到 7F 全景交誼廳！人字拼胡桃木實木地板搭配落地景觀窗，非常溫馨舒適呢。',
+          dialogue: '歡迎來到全景交誼廳！人字拼胡桃木實木地板搭配落地景觀窗，非常溫馨舒適呢。',
           options: []
         },
         {
-          name: '鄭國華 7F 駐衛警',
-          role: '7F 中央電梯廳・VIP 樓層安全維護',
+          name: '鄭國華 駐衛警',
+          role: '中央電梯廳・VIP 樓層安全維護',
           avatar: '👮',
           type: 'security',
           floor: 7,
@@ -2409,14 +2409,14 @@
             new THREE.Vector3(12.0, FLOOR_Y[7], -18.5)
           ],
           speed: 1.35,
-          dialogue: '您好！我是 7F VIP 與住院病房樓層駐衛警，走近中央電梯廳就會自動詢問您要前往 B1 ~ 8F！',
+          dialogue: '您好！我是 VIP 與住院病房樓層駐衛警，走近中央電梯廳就會自動詢問您要前往 B1 ~ 8F！',
           options: []
         },
 
         // ==================== 8 位專業護理師陣容 ====================
         {
-          name: '林佳穎 7F 護理長',
-          role: '7F 中央護理站 A / 東側護理站 B 總督導',
+          name: '林佳穎 護理長',
+          role: '中央護理站督導',
           avatar: '👩‍⚕️',
           type: 'staff',
           floor: 7,
@@ -2428,12 +2428,12 @@
             new THREE.Vector3(18.5, FLOOR_Y[7], -16.2)
           ],
           speed: 1.15,
-          dialogue: '早安！我是 7F 護理長林佳穎，全層 8 位護理師正推著走道 E 化護理工作車為各病房貴賓量測生命徵象！',
+          dialogue: '早安！我是護理長林佳穎，全層 8 位護理師正推著走道 E 化護理工作車為各病房貴賓量測生命徵象！',
           options: []
         },
         {
-          name: '許雅雯 VIP 專責護理師',
-          role: '7F 733 / 732 VIP 尊榮病房・一對一護理師',
+          name: '許雅雯 專責護理師',
+          role: '733 / 732 VIP 尊榮病房',
           avatar: '👩‍⚕️',
           type: 'staff',
           floor: 7,
@@ -2449,8 +2449,8 @@
           options: []
         },
         {
-          name: '黃雅婷 護理站 B 資深護理師',
-          role: '7F 727 雙人病房 / 護理站 B 責任護理師',
+          name: '黃雅婷 資深護理師',
+          role: '727 雙人病房責任護理師',
           avatar: '💉',
           type: 'staff',
           floor: 7,
@@ -2464,8 +2464,8 @@
           options: []
         },
         {
-          name: '陳思妤 護理站 C 臨床護理師',
-          role: '7F 東側圓弧護理站島 (護理站 C)',
+          name: '陳思妤 臨床護理師',
+          role: '東側圓弧護理站島 (護理站 C)',
           avatar: '🩺',
           type: 'staff',
           floor: 7,
@@ -2481,8 +2481,8 @@
           options: []
         },
         {
-          name: '謝佩珊 護理站 D 傷口照護護理師',
-          role: '7F 東側護理站 D / 3 號 E 化工作車',
+          name: '謝佩珊 傷口照護護理師',
+          role: '東側護理站 3 號 E 化工作車',
           avatar: '🩹',
           type: 'staff',
           floor: 7,
@@ -2499,7 +2499,7 @@
         },
         {
           name: '張家瑜 國際醫療禮賓護理師',
-          role: '7F VIP 護理站 / 商務中心禮賓護理',
+          role: 'VIP 護理站 / 商務中心禮賓護理',
           avatar: '🌸',
           type: 'staff',
           floor: 7,
@@ -2516,7 +2516,7 @@
         },
         {
           name: '李欣怡 出院準備與衛教護理師',
-          role: '7F 中央護理站 A・出院衛教諮詢台',
+          role: '中央護理站 A・出院衛教諮詢台',
           avatar: '📑',
           type: 'staff',
           floor: 7,
@@ -2530,8 +2530,8 @@
           options: []
         },
         {
-          name: '曾郁婷 巡房給藥護理師',
-          role: '7F 701 雙人病房 / 南東病房責任護理師',
+          name: '曾郁婷 護理師',
+          role: '701 雙人病房責任護理師',
           avatar: '💊',
           type: 'staff',
           floor: 7,
@@ -2550,7 +2550,7 @@
         // ==================== 8 位住院與 VIP 健檢患者陣容 ====================
         {
           name: '劉董事長 (733 VIP 尊榮病房貴賓)',
-          role: '7F 733 VIP 尊榮病房・健康管理貴賓',
+          role: '733 VIP 尊榮病房・健康管理貴賓',
           avatar: '🤵',
           type: 'patient',
           floor: 7,
@@ -2567,7 +2567,7 @@
         },
         {
           name: '王女士 (732 VIP 尊榮病房健檢患者)',
-          role: '7F 732 VIP 尊榮病房・精密健檢貴賓',
+          role: '732 VIP 尊榮病房・精密健檢貴賓',
           avatar: '👩',
           type: 'patient',
           floor: 7,
@@ -2584,7 +2584,7 @@
         },
         {
           name: '林先生 (727 雙人病房住院患者)',
-          role: '7F 727 實景雙人病房・1號病床患者',
+          role: '727 實景雙人病房・1號病床患者',
           avatar: '🧑',
           type: 'patient',
           floor: 7,
@@ -2601,7 +2601,7 @@
         },
         {
           name: '黃小姐 (729 VIP 病房產後休養貴賓)',
-          role: '7F 全景交誼廳・VIP 休養貴賓',
+          role: '全景交誼廳・VIP 休養貴賓',
           avatar: '🤱',
           type: 'patient',
           floor: 7,
@@ -2618,7 +2618,7 @@
         },
         {
           name: '蔡阿嬤 (720 病房住院長輩)',
-          role: '7F 720 病房・復健休養病患',
+          role: '720 病房・復健休養病患',
           avatar: '👵',
           type: 'patient',
           floor: 7,
@@ -2633,7 +2633,7 @@
         },
         {
           name: '陳伯伯 (718 病房骨科復健患者)',
-          role: '7F 718 病房・輪椅復健散步患者',
+          role: '718 病房・輪椅復健散步患者',
           avatar: '👴',
           type: 'patient',
           floor: 7,
@@ -2648,7 +2648,7 @@
         },
         {
           name: '張先生 (701 雙人病房內科患者)',
-          role: '7F 701 實景雙人病房・調養患者',
+          role: '701 實景雙人病房・調養患者',
           avatar: '🧔',
           type: 'patient',
           floor: 7,
@@ -2665,7 +2665,7 @@
         },
         {
           name: '吳奶奶 (712 病房銀髮休養患者)',
-          role: '7F 712 病房・極東翼散步患者',
+          role: '712 病房・極東翼散步患者',
           avatar: '👵',
           type: 'patient',
           floor: 7,
