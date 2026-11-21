@@ -2145,12 +2145,12 @@
       addFloorInlay(-5.6, 6.0, 0.18, 34.0);
       addFloorInlay(5.6, 6.0, 0.18, 34.0);
 
-      addWall(-17.8, 9.75, 0.22, 26.5, 1.35, frostedGlassMat, '5F 西側空中露台玻璃護欄', 5, f5Y, 'glass');
-      addWall(17.8, 9.75, 0.22, 26.5, 1.35, frostedGlassMat, '5F 東側空中露台玻璃護欄', 5, f5Y, 'glass');
-      addWall(-20.8, 33.75, 0.22, 21.5, 1.35, frostedGlassMat, '5F 南側西露台玻璃護欄', 5, f5Y, 'glass');
-      addWall(20.8, 33.75, 0.22, 21.5, 1.35, frostedGlassMat, '5F 南側東露台玻璃護欄', 5, f5Y, 'glass');
-      addWall(-35.5, -3.6, 35.5, 0.22, 1.35, frostedGlassMat, '5F 西翼南側玻璃護欄', 5, f5Y, 'glass');
-      addWall(35.5, -3.6, 35.5, 0.22, 1.35, frostedGlassMat, '5F 東翼南側玻璃護欄', 5, f5Y, 'glass');
+      addWall(-17.8, 9.75, 0.22, 26.5, 1.35, frostedGlassMat, '西側空中露台玻璃護欄', 5, f5Y, 'glass');
+      addWall(17.8, 9.75, 0.22, 26.5, 1.35, frostedGlassMat, '東側空中露台玻璃護欄', 5, f5Y, 'glass');
+      addWall(-20.8, 33.75, 0.22, 21.5, 1.35, frostedGlassMat, '南側西露台玻璃護欄', 5, f5Y, 'glass');
+      addWall(20.8, 33.75, 0.22, 21.5, 1.35, frostedGlassMat, '南側東露台玻璃護欄', 5, f5Y, 'glass');
+      addWall(-35.5, -3.6, 35.5, 0.22, 1.35, frostedGlassMat, '西翼南側玻璃護欄', 5, f5Y, 'glass');
+      addWall(35.5, -3.6, 35.5, 0.22, 1.35, frostedGlassMat, '東翼南側玻璃護欄', 5, f5Y, 'glass');
 
       const ceil5FNorth = new THREE.Mesh(new THREE.PlaneGeometry(108, 45), ceilMat);
       ceil5FNorth.rotation.x = Math.PI / 2;
@@ -2182,7 +2182,7 @@
       });
 
       // 1. 北排住院病房區
-      addWall(0, -42.5, 82.0, 9.5, 4.4, null, '5F 北側病房外牆緩衝區', 5, f5Y, 'ward');
+      addWall(0, -42.5, 82.0, 9.5, 4.4, null, '北側病房外牆緩衝區', 5, f5Y, 'ward');
 
       buildWalkInWardRoom(-16.0, -33.1, f5Y, '560', { bed1Patient: true, bed2Patient: false });
       buildWalkInWardRoom(-22.5, -33.1, f5Y, '558', { bed1Patient: false, bed2Patient: true });
@@ -2205,11 +2205,11 @@
       addHospitalWardDoor(29.5, -29.05, f5Y, '518 病房', false, false, false);
       addHospitalWardDoor(35.5, -29.05, f5Y, '517 病房', false, false, false);
 
-      addHangingSign(-21.5, f5Y + 3.65, -28.6, 7.6, 0.88, '5F 住院病房 (553 ～ 562 病房)', '558・560 病房門已敞開・可直接走入探視', '#0f4c5c', '#2dd4bf');
-      addHangingSign(18.5, f5Y + 3.65, -28.6, 7.8, 0.88, '5F 住院病房 (525・520・519 病房)', '520 病房門已敞開・內設薄荷綠病床與點滴架', '#be185d', '#f9a8d4');
+      addHangingSign(-21.5, f5Y + 3.65, -28.6, 7.6, 0.88, '5F 住院病房 (553 ～ 562 病房)', '558・560', '#0f4c5c', '#2dd4bf');
+      addHangingSign(18.5, f5Y + 3.65, -28.6, 7.8, 0.88, '5F 住院病房 (525・520・519 病房)', '520', '#be185d', '#f9a8d4');
 
       // 2. 西翼病房區 (552 ~ 538) & 西側電梯廳接觸感應區
-      addWall(-47.5, -24.5, 10.5, 22.0, 4.4, null, '5F 西側病房 (552~538) 與污物/洗衣間', 5, f5Y, 'ward');
+      addWall(-47.5, -24.5, 10.5, 22.0, 4.4, null, '西側病房 (552~538)', 5, f5Y, 'ward');
       addHangingSign(-41.8, f5Y + 3.55, -24.5, 5.4, 0.82, '552 ～ 538 病房區・西側電梯廳', '接觸電梯門自動選擇 B1 ~ 8F', '#0369a1', '#7dd3fc', Math.PI / 2);
       addTransportTriggerZone({
         type: 'elevator',
@@ -2223,7 +2223,7 @@
       });
 
       // 南側病房與可走入式 537 正壓隔離病房
-      addWall(-26.5, -7.2, 31.0, 6.2, 4.4, null, '5F 536~528 住院病房', 5, f5Y, 'ward');
+      addWall(-26.5, -7.2, 31.0, 6.2, 4.4, null, '536~528 住院病房', 5, f5Y, 'ward');
       [-35.0, -28.0, -21.0, -14.5].forEach((wx, idx) => {
         addHospitalWardDoor(wx, -10.3, f5Y, `${536 - idx * 2} 病房`, true, false, false);
       });
@@ -2235,7 +2235,7 @@
       addWall(-44.0, -10.3, 3.2, 0.24, 4.4, null, '537 負壓病房門側牆', 5, f5Y, 'clinical_blue', true);
       addHospitalWardDoor(-46.5, -10.3, f5Y, '537 負壓病房', true, true, true);
       buildInpatientHospitalBed(-46.5, -6.6, f5Y, 0, {
-        roomName: '537正壓隔離病房',
+        roomName: '537負壓隔離病房',
         hasPatient: true,
         ivSide: 1
       });
@@ -2243,7 +2243,7 @@
       addHangingSign(-25.5, f5Y + 3.6, -10.6, 6.4, 0.85, '536 ～ 528 住院病房', 'INPATIENT WARDS (528-536)', '#0f766e', '#5eead4', Math.PI);
 
       // 3. 東翼病房區 & 東側電梯廳接觸感應區
-      addWall(47.5, -24.5, 10.5, 22.0, 4.4, null, '東側病房與污物', 5, f5Y, 'ward');
+      addWall(47.5, -24.5, 10.5, 22.0, 4.4, null, '東側病房', 5, f5Y, 'ward');
       addHangingSign(41.8, f5Y + 3.55, -24.5, 5.4, 0.82, '東側病房區・東側電梯廳', '接觸電梯門自動選擇 B1 ~ 8F', '#0369a1', '#7dd3fc', -Math.PI / 2);
       addTransportTriggerZone({
         type: 'elevator',
@@ -2457,8 +2457,8 @@
       colliders.push({ minX: 11.5, maxX: 12.9, minZ: -21.7, maxZ: -21.1, floor: 5, label: '5F 疏散平面圖導覽立牌' });
 
       // 7. 5F 南側半圓弧玻璃展望大廳
-      addWall(-11.5, 30.5, 4.8, 7.5, 4.4, null, '5F 南西側電梯', 5, f5Y, 'stone');
-      addWall(11.5, 30.5, 4.8, 7.5, 4.4, null, '5F 南東側電梯', 5, f5Y, 'stone');
+      addWall(-11.5, 30.5, 4.8, 7.5, 4.4, null, '南西側電梯', 5, f5Y, 'stone');
+      addWall(11.5, 30.5, 4.8, 7.5, 4.4, null, '南東側電梯', 5, f5Y, 'stone');
       addTransportTriggerZone({
         type: 'elevator',
         name: '5F 南西側電梯廳',
@@ -2513,7 +2513,7 @@
       scene.add(rotundaRingCeiling, rotundaGlowRing);
 
       addWall(0, 45.4, 14.5, 0.5, 4.4, frostedGlassMat, '圓弧展望廳', 5, f5Y, 'glass');
-      addHangingSign(0, f5Y + 3.65, 27.5, 7.2, 0.9, '南側半圓弧玻璃展望大廳', '5F PANORAMIC ATRIUM LOUNGE・家屬休憩空間', '#0f4c5c', '#fbbf24');
+      addHangingSign(0, f5Y + 3.65, 27.5, 7.2, 0.9, '南側半圓弧玻璃展望大廳', 'PANORAMIC ATRIUM LOUNGE', '#0f4c5c', '#fbbf24');
 
       [
         [-11.8, -21.8], [11.8, -21.8],
@@ -2531,7 +2531,7 @@
         sofa.rotation.z = Math.PI / 2;
         sofa.position.set(sx, f5Y + 0.45, 38.5);
         scene.add(sofa);
-        colliders.push({ minX: sx - 1.2, maxX: sx + 1.2, minZ: 38.0, maxZ: 39.0, floor: 5, label: '5F 展望廳沙發' });
+        colliders.push({ minX: sx - 1.2, maxX: sx + 1.2, minZ: 38.0, maxZ: 39.0, floor: 5, label: '展望廳沙發' });
       });
     }
 
@@ -2785,7 +2785,7 @@
           options: []
         },
         {
-          name: '王美玲 巡迴護理師',
+          name: '王美玲 護理師',
           role: '1F 中央大廳・巡迴護理推車',
           avatar: '💉',
           type: 'staff',
@@ -2799,7 +2799,7 @@
           options: []
         },
         {
-          name: '趙隊長 1F 駐衛警',
+          name: '趙隊長 駐衛警',
           role: '1F 南側入口門廳保全',
           avatar: '👮',
           type: 'security',
@@ -2838,7 +2838,7 @@
           ]
         },
         {
-          name: '高志明 2F 駐衛警',
+          name: '高志明 駐衛警',
           role: '2F 中央大廳迴廊保全',
           avatar: '👮',
           type: 'security',
@@ -2934,7 +2934,7 @@
         },
         {
           name: '張先生 (負壓隔離病房病患)',
-          role: '5F 負壓病房・無菌正壓保護照護中',
+          role: '負壓病房・無菌正壓保護照護中',
           avatar: '😷',
           type: 'patient',
           floor: 5,
@@ -2952,7 +2952,7 @@
         // 5F 病床旁照護護理師 NPC
         {
           name: '劉怡君 專責護理師',
-          role: '5F 520 病房床邊照護・點滴與生命徵象監測',
+          role: '520 病房床邊照護・點滴與生命徵象監測',
           avatar: '👩‍⚕️',
           type: 'staff',
           floor: 5,
@@ -2968,7 +2968,7 @@
         },
         {
           name: '吳佩珊 專責護理師',
-          role: '5F 558 病房床邊照護・點滴更換作業',
+          role: '558 病房床邊照護・點滴更換作業',
           avatar: '💉',
           type: 'staff',
           floor: 5,
@@ -2984,7 +2984,7 @@
         },
         {
           name: '鄭雅文 負壓病房護理師',
-          role: '5F 537 負壓隔離病房・床邊專責照護',
+          role: '537 負壓隔離病房・床邊專責照護',
           avatar: '🛡️',
           type: 'staff',
           floor: 5,
@@ -3002,7 +3002,7 @@
         // 5F 走道操作 E 化行動護理工作車 (E-Cart) 的護理師 NPC
         {
           name: '陳佳穎 護理師',
-          role: '5F 東側走道・E化行動護理車給藥作業中',
+          role: 'E化行動護理車給藥作業中',
           avatar: '💻',
           type: 'staff',
           floor: 5,
@@ -3018,7 +3018,7 @@
         },
         {
           name: '周怡君 護理師',
-          role: '5F 西側走道・E化行動護理車病歷紀錄中',
+          role: 'E化行動護理車病歷紀錄中',
           avatar: '💻',
           type: 'staff',
           floor: 5,
@@ -3035,8 +3035,8 @@
 
         // 5F 開放式護理站內部值勤護理師 NPC
         {
-          name: '黃雅雯 護理站值班護理師',
-          role: '5F 東側護理站 B/C・櫃檯與電腦總控',
+          name: '黃雅雯 值班護理師',
+          role: '東側護理站 B/C・櫃檯與電腦總控',
           avatar: '👩‍⚕️',
           type: 'staff',
           floor: 5,
@@ -3052,7 +3052,7 @@
         },
         {
           name: '林詩涵 護理站書記／護理師',
-          role: '5F 西側護理站 B/C・櫃檯接待與醫囑處理',
+          role: '西側護理站 B/C・櫃檯接待與醫囑處理',
           avatar: '👩‍⚕️',
           type: 'staff',
           floor: 5,
@@ -3070,7 +3070,7 @@
         // 5F 護理長、醫師、志工與駐衛警
         {
           name: '林淑芬 護理長',
-          role: '5F 東側護理站 B / 護理長室',
+          role: '東側護理站 B / 護理長室',
           avatar: '👩‍⚕️',
           type: 'staff',
           floor: 5,
@@ -3092,7 +3092,7 @@
         },
         {
           name: '陳建銘 住院部主治醫師',
-          role: '5F 537 正壓病房・553~563 住院病房區',
+          role: '537 負壓病房・553~563 住院病房區',
           avatar: '🩺',
           type: 'staff',
           floor: 5,
@@ -3106,12 +3106,12 @@
             new THREE.Vector3(-22.5, f5Y, -12.5)
           ],
           speed: 1.2,
-          dialogue: '您好！我剛完成 537 正壓病房與西側住院病房的晨間查房，護理人員正透過走道上的 E化行動護理車執行精準給藥與點滴照護。',
+          dialogue: '您好！我剛完成 537 負壓病房與西側住院病房的晨間查房，護理人員正透過走道上的 E化行動護理車執行精準給藥與點滴照護。',
           options: []
         },
         {
           name: '王美珍 院牧關懷志工',
-          role: '5F 祈禱室・神明廳心靈關懷站',
+          role: '祈禱室・神明廳心靈關懷站',
           avatar: '🙏',
           type: 'staff',
           floor: 5,
@@ -3125,7 +3125,7 @@
         },
         {
           name: '周小姐 (探病家屬)',
-          role: '5F 南側半圓弧玻璃展望大廳',
+          role: '南側半圓弧玻璃展望大廳',
           avatar: '👩',
           type: 'patient',
           floor: 5,
@@ -3139,7 +3139,7 @@
         },
         {
           name: '郭明德 駐衛警',
-          role: '5F 住院病房層・門禁安全維護',
+          role: '住院病房層・門禁安全維護',
           avatar: '👮',
           type: 'security',
           floor: 5,
