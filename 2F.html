@@ -393,7 +393,7 @@
       </div>
 
       <p id="dlg-text" class="mt-4 text-sm sm:text-base leading-relaxed text-slate-100">
-        您好！歡迎來到彰濱秀傳紀念醫院。
+        您好！歡迎來到幸運草醫院。
       </p>
 
       <div id="dlg-options" class="mt-4 flex flex-col gap-2"></div>
@@ -1708,7 +1708,7 @@
       ceil2FCenter.position.set(0, 9.0, 15.5);
       scene.add(ceil2FCenter);
 
-      addHangingSign(0, f2Y + 3.65, 7.6, 6.8, 0.88, '彰濱秀傳紀念醫院 2F 醫療樓層', '產房・嬰兒室・婦產科病房・護理站・開刀房・ICU・洗腎室・牙科', '#0f4c5c', '#fbbf24');
+      addHangingSign(0, f2Y + 3.65, 7.6, 6.8, 0.88, '幸運草醫院 2F 醫療樓層', '產房・嬰兒室・婦產科病房・護理站・開刀房・ICU・洗腎室・牙科', '#0f4c5c', '#fbbf24');
 
       // 1. 2F 東北側：2F 血液透析中心 & CAPD 腹膜透析中心 (李文清醫師 + 許麗美醫師)
       addWall(25.2, -37.5, 0.5, 18.0, 4.4, wallPinkMat, '2F 血液透析中心西牆', 2, f2Y);
@@ -1819,7 +1819,7 @@
       // 4. 2F 西北側：醫師辦公室 / RT 辦公室
       addWall(-26.2, -37.5, 0.5, 18.0, 4.4, wallCreamMat, '2F 醫師辦公室東牆', 2, f2Y);
       addWall(-38.5, -28.6, 25.0, 0.5, 4.4, wallCreamMat, '2F 醫師辦公室南牆', 2, f2Y);
-      addHangingSign(-37.5, f2Y + 3.55, -28.6, 5.6, 0.85, '醫師辦公室・RT 呼吸治療室', 'MEDICAL STAFF OFFICES & CONFERENCE', '#334155', '#fbbf24');
+      addHangingSign(-37.5, f2Y + 3.55, -28.6, 5.6, 0.85, '醫師辦公室・呼吸治療室', 'MEDICAL STAFF OFFICES & CONFERENCE', '#334155', '#fbbf24');
       addClinicDoorSet(-31.5, f2Y, -28.6, 0, '醫師辦公室');
 
       // 5. ★ 2F 南側西翼重構：嬰兒室（透明玻璃觀察櫥窗）＋ 產房（Delivery Room）＋ 婦產科病房（201~210）＋ 護理站
@@ -1934,7 +1934,7 @@
       badgeReader.position.set(-50.5, f2Y + 1.45, 24.22);
       scene.add(badgeReader);
 
-      addHangingSign(-43.5, f2Y + 3.65, 22.8, 6.2, 0.88, '嬰兒室・NICU / PICU 新生兒照護中心', 'BABY ROOM & NURSERY・透明玻璃觀察櫥窗', '#0369a1', '#7dd3fc');
+      addHangingSign(-43.5, f2Y + 3.65, 22.8, 6.2, 0.88, '嬰兒室・新生兒照護中心', 'BABY ROOM & NURSERY', '#0369a1', '#7dd3fc');
 
       // 嬰兒室內部：透明新生兒保溫箱與恆溫照護燈
       const clearIncubatorGlassMat = new THREE.MeshStandardMaterial({
@@ -2078,7 +2078,7 @@
       nsGroup.position.set(-15.8, f2Y, 23.8);
       scene.add(nsGroup);
       colliders.push({ minX: -18.5, maxX: -13.1, minZ: 23.2, maxZ: 24.9, floor: 2, label: '婦產科護理站櫃檯' });
-      addHangingSign(-15.8, f2Y + 3.65, 22.8, 5.2, 0.85, '婦產科護理站 (N/S)', 'OB/GYN & MATERNITY NURSING STATION', '#be185d', '#f9a8d4');
+      addHangingSign(-15.8, f2Y + 3.65, 22.8, 5.2, 0.85, '婦產科護理站', 'MATERNITY NURSING STATION', '#be185d', '#f9a8d4');
 
       // ---------------- D. 婦產科病房（201 ~ 210 病房與紅色沙發交誼廳）----------------
       addWall(-9.2, 34.5, 0.45, 17.5, 4.4, stripedWallMat, '婦產科病房東側走廊牆', 2, f2Y);
@@ -2116,7 +2116,7 @@
 
       const bookRack = new THREE.Mesh(new THREE.BoxGeometry(0.45, 1.85, 1.35), ArchMaterials.woodCabinet);
       bookRack.position.set(-9.65, f2Y + 0.92, 35.5);
-      const ledTickerTex = createSignTexture('婦產科病房 (201~210)・探病時間 10:00~20:00', '', '#0f172a', '#f43f5e');
+      const ledTickerTex = createSignTexture('婦產科病房', '', '#0f172a', '#f43f5e');
       const ledTicker = new THREE.Mesh(
         new THREE.BoxGeometry(1.4, 0.32, 0.22),
         new THREE.MeshStandardMaterial({ map: ledTickerTex, emissive: 0xffffff, emissiveMap: ledTickerTex, emissiveIntensity: 0.55 })
@@ -2164,7 +2164,7 @@
       addWall(18.0, 32.5, 0.5, 21.5, 4.4, wallPinkMat, '牙科部西牆', 2, f2Y);
       addWall(37.5, 32.5, 0.5, 21.5, 4.4, wallCreamMat, '牙科 227~231 診間牆', 2, f2Y);
 
-      addHangingSign(27.5, f2Y + 3.65, 21.8, 6.8, 0.88, '牙科部・牙科掛號櫃檯・候診等待區', 'DENTISTRY・口腔外科・221~232 診療室・牙科 X-RAY', '#9d174d', '#f9a8d4');
+      addHangingSign(27.5, f2Y + 3.65, 21.8, 6.8, 0.88, '牙科部', 'DENTISTRY', '#9d174d', '#f9a8d4');
 
       // 牙科專屬掛號報到櫃檯（X: 19.2 ~ 24.8, Z: 24.5）
       addWall(22.0, 24.5, 5.4, 1.05, 1.08, ArchMaterials.woodWainscot, '牙科掛號報到櫃檯', 2, f2Y, false);
@@ -2173,7 +2173,7 @@
       const dentalShield = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.82, 0.06), glassMat);
       dentalShield.position.set(22.0, f2Y + 1.56, 24.95);
       scene.add(dentalTop, dentalShield);
-      addHangingSign(22.0, f2Y + 2.95, 24.5, 4.2, 0.58, '牙科掛號・報到服務櫃檯', 'DENTAL REGISTRATION', '#be185d', '#fbcfe8');
+      addHangingSign(22.0, f2Y + 2.95, 24.5, 4.2, 0.58, '牙科部', 'DENTISTRY', '#be185d', '#fbcfe8');
 
       // 牙科候診等待區（雙排軟墊候診椅 + 叫號螢幕，X: 19.5 ~ 25.5, Z: 28.5 ~ 33.5）
       const waitSeatMat = new THREE.MeshStandardMaterial({ color: 0xa855f7, roughness: 0.45 });
@@ -2803,8 +2803,8 @@
       const npcDefinitions = [
         // ==================== ★ 搭乘東西向橫向手扶梯上下樓的 NPC 護士與患者 ★ ====================
         {
-          name: '許芷晴 機動支援護理師',
-          role: '橫向手扶梯・1F ↔ 2F 跨樓層支援',
+          name: '許芷晴 護理師',
+          role: '跨樓層支援',
           avatar: '👩‍⚕️',
           type: 'staff',
           floor: 0,
