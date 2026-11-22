@@ -117,49 +117,15 @@
 
   <!-- 頂部橫向：7F 區域傳送 + B1 ~ 8F 全院樓層 HTML 直達列 -->
   <div class="fixed top-2.5 left-1/2 -translate-x-1/2 z-20 w-[97vw] max-w-6xl">
-    <div class="hud-glass rounded-full px-2.5 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-xl">
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-purple-500/30 border border-purple-400/60 text-[11px] font-black text-purple-200">
-        👑 7F 導覽
-      </span>
-      <button data-zone="f7_here" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-purple-400/95 hover:bg-purple-300 text-slate-950 transition">📍 733 VIP 電動門</button>
-      <button data-zone="f7_ward727" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/30 hover:bg-emerald-400 hover:text-slate-950 text-emerald-200 border border-emerald-400/40 transition">🛏️ 727 實景雙人病房</button>
-      <button data-zone="f7_elevator" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-teal-500/30 hover:bg-teal-400 hover:text-slate-950 text-teal-200 border border-teal-400/40 transition">🛗 中央電梯廳</button>
-      <button data-zone="f7_lounge" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-sky-500 hover:text-slate-950 text-sky-200 transition">🛋️ 交誼廳/商務中心</button>
-      <button data-zone="f7_east" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-500 hover:text-slate-950 text-amber-200 transition">🏥 東翼病房/E化車走道</button>
-
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-amber-500/25 border border-amber-400/50 text-[11px] font-bold text-amber-300 ml-1">
-        樓層直連
-      </span>
-      <button data-href="B1.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-slate-200 transition">B1</button>
-      <button data-href="1F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-sky-400 hover:text-slate-950 text-sky-200 transition">1F</button>
-      <button data-href="2F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-200 transition">2F</button>
-      <button data-href="3F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-pink-400 hover:text-slate-950 text-pink-200 transition">3F</button>
-      <button data-href="5F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-emerald-400 hover:text-slate-950 text-emerald-200 transition">5F</button>
-      <button data-href="6F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-400 hover:text-slate-950 text-teal-200 transition">6F</button>
-      <button data-href="7F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-purple-500/40 border border-purple-300/60 text-purple-100 transition">7F</button>
-      <button data-href="8F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-indigo-400 hover:text-slate-950 text-indigo-200 transition">8F</button>
-    </div>
   </div>
 
   <!-- 操作提示膠囊 -->
   <div class="fixed top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-max max-w-[95vw]">
-    <div id="control-hint-pill" class="hud-glass px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-amber-200 border border-amber-400/35 shadow-lg text-center">
-      🖱️ 無須鎖定滑鼠・按住滑鼠左鍵拖曳移動視角 ｜ 🚪 走進 VIP / 雙人病房 ｜ 💻 走近 E 化護理車按 E 鍵操作
-    </div>
   </div>
 
   <!-- 左上角：功能開關、滑鼠靈敏度與操作說明面板 -->
   <div class="fixed top-20 left-3 sm:left-4 z-20 flex flex-col gap-2 max-w-[308px]">
-    <div class="hud-glass rounded-xl p-3 text-white shadow-xl">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24]"></span>
-          <span class="font-bold text-xs sm:text-sm text-amber-200">幸運草醫院-模擬人生</span>
-        </div>
-        <button id="btn-toggle-help" class="px-2 py-0.5 text-[11px] rounded bg-white/10 hover:bg-white/20 text-slate-200">
-          收合
-        </button>
-      </div>
+  </div>
 
       <!-- 核心互動功能按鈕列 -->
       <div class="mt-2.5 grid grid-cols-1 gap-1.5">
@@ -204,7 +170,7 @@
   </div>
 
   <!-- 右上角：GTA 風格狀態欄 -->
-  <div class="fixed top-20 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
+  <div class="fixed top-3 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
     <div id="hud-clock" class="gta-font gta-shadow text-xl sm:text-2xl font-bold text-white leading-none">
       14:20
     </div>
@@ -238,7 +204,7 @@
     <!-- 目前所在空間徽章 -->
     <div class="mt-1.5 px-3 py-1 rounded-xl hud-glass border-l-4 border-amber-500 text-right shadow-lg">
       <div class="text-[10px] text-slate-400 font-medium">現在位置 You Are Here</div>
-      <div id="current-zone-label" class="text-xs sm:text-sm font-black text-white">7F 733 / 732 VIP 尊榮病房電動門前</div>
+      <div id="current-zone-label" class="text-xs sm:text-sm font-black text-white">7F 733 / 732 VIP 尊榮病房</div>
     </div>
   </div>
 
@@ -380,7 +346,7 @@
       return 7;
     }
 
-    // 玩家角色狀態 (初始出生於 7F 733 / 732 VIP 尊榮病房電動門前)
+    // 玩家角色狀態 (初始出生於 7F 733 / 732 VIP 尊榮病房)
     const player = {
       mesh: null,
       bodyRoot: null,
@@ -442,7 +408,7 @@
 
     // 7F 內部快速傳送座標表
     const ZONES = {
-      f7_here:     { label: '7F 現在位置・733 / 732 VIP 尊榮病房電動門前', pos: new THREE.Vector3(-33.5, 23.0, 1.5), yaw: -Math.PI * 0.5 },
+      f7_here:     { label: '7F 現在位置・733 / 732 VIP 尊榮病房', pos: new THREE.Vector3(-33.5, 23.0, 1.5), yaw: -Math.PI * 0.5 },
       f7_ward727:  { label: '7F 727 實景雙人病房（電動病床・點滴架・木櫃）', pos: new THREE.Vector3(9.5, 23.0, -22.5), yaw: Math.PI },
       f7_elevator: { label: '7F 中央電梯廳・護理站 A (往 B1 ~ 8F)', pos: new THREE.Vector3(-1.5, 23.0, -7.2), yaw: 0 },
       f7_lounge:   { label: '7F 全景交誼廳 / 商務中心', pos: new THREE.Vector3(2.0, 23.0, 11.5), yaw: 0 },
@@ -1532,11 +1498,11 @@
       });
 
       const northTitle = isEast
-        ? '東側護理站 B・護理站 C・醫材供應・討論室'
-        : '西側護理站 C・討論室・護理站 B・醫材供應';
+        ? '護理站・醫材供應・討論室'
+        : '護理站・醫材供應・討論室';
       const southTitle = isEast
-        ? '書記室・護理長室・治療室・護理站 D・值班室'
-        : '值班室・護理站 D・治療室・護理長室・書記室';
+        ? '護理長室・護理站・值班室'
+        : '護理長室・護理站・值班室';
 
       addHangingSign(cx, baseY + 3.55, cz - radius - 0.1, 8.6, 0.85, northTitle, `${floorNum}F NURSING STATION ISLAND`, '#0f766e', '#5eead4', 0);
       addHangingSign(cx, baseY + 3.55, cz + radius + 0.1, 8.6, 0.85, southTitle, `${floorNum}F STAFF & TREATMENT ROOMS`, '#0369a1', '#7dd3fc', Math.PI);
@@ -1819,7 +1785,7 @@
         minZ: -32.2,
         maxZ: -26.8
       });
-      addHangingSign(-40.8, f7Y + 3.55, -29.5, 5.2, 0.82, '7F 西北電梯廳 (接觸自動選樓層)', 'NW ELEVATOR・往 B1 ~ 8F', '#065f46', '#6ee7b7', Math.PI / 2);
+      addHangingSign(-40.8, f7Y + 3.55, -29.5, 5.2, 0.82, '7F 西北電梯廳', 'NW ELEVATOR', '#065f46', '#6ee7b7', Math.PI / 2);
 
       // 4. 極西側可走入式豪華 VIP 套房（733 VIP & 732 VIP）：感應電動滑門 + 內部電動病床與木櫃
       // 733 VIP 尊榮病房（可走入內部參觀電動病床）
@@ -1868,7 +1834,7 @@
       });
 
       // 「現在位置 You Are Here」地面銘牌
-      const herePadTex = createSignTexture('7F 現在位置 YOU ARE HERE', '733 / 732 VIP 尊榮病房電動門前', '#6b21a8', '#fde047');
+      const herePadTex = createSignTexture('7F 現在位置 YOU ARE HERE', '733 / 732 VIP 尊榮病房', '#6b21a8', '#fde047');
       const herePad = new THREE.Mesh(
         new THREE.PlaneGeometry(3.8, 1.15),
         new THREE.MeshStandardMaterial({ map: herePadTex, roughness: 0.35 })
@@ -1888,7 +1854,7 @@
         totalWidth: 9.4,
         openingWidth: 3.2,
         roomCode: '7F VIP 尊榮區主入口',
-        subLabel: 'VIP EXECUTIVE ZONE・感應式電動玻璃門',
+        subLabel: 'VIP EXECUTIVE ZONE',
         isPortal: true,
         triggerRadius: 4.4
       });
@@ -1900,7 +1866,7 @@
         totalWidth: 13.4,
         openingWidth: 3.4,
         roomCode: '7F VIP 尊榮服務區',
-        subLabel: 'VIP LOUNGE & SUITES・感應式電動玻璃門',
+        subLabel: 'VIP LOUNGE & SUITES',
         isPortal: true,
         triggerRadius: 4.4
       });
@@ -1912,13 +1878,13 @@
         const rx = -29.0 + (idx + 0.5) * 3.5;
         addWardDoorFacade(rx, -24.7, `${rm} VIP`, f7Y, true, true);
       });
-      addHangingSign(-11.5, f7Y + 3.65, -23.6, 7.4, 0.88, '7F 北西 VIP 尊榮病房 (735 ~ 755)', 'VIP PRIVATE SUITES・獨立電動門套房', '#6b21a8', '#fde047');
+      addHangingSign(-11.5, f7Y + 3.65, -23.6, 7.4, 0.88, '7F 北西 VIP 尊榮病房 (735 ~ 755)', 'VIP PRIVATE SUITES・獨立套房', '#6b21a8', '#fde047');
 
       // 6. 北東側可走入式「727 實景雙人病房」＋「726~717 一般病房群」
       buildWalkInDoubleWard(9.4, -29.0, f7Y, '727', true);
 
       const neGenRooms = ['726', '725', '723', '722', '721', '720', '719', '718'];
-      addWall(27.0, -29.0, 28.0, 8.5, 4.4, coralCorridorMat, '7F 北東一般病房群 (726~718)', 7, f7Y);
+      addWall(27.0, -29.0, 28.0, 8.5, 4.4, coralCorridorMat, '北東一般病房群 (726~718)', 7, f7Y);
       addCorridorHandrail(13.2, -24.7, 40.8, -24.7, f7Y, false);
       addWallSanitizerDispenser(13.4, -24.7, 0, f7Y);
       addWallSanitizerDispenser(27.0, -24.7, 0, f7Y);
@@ -1926,10 +1892,10 @@
         const rx = 13.0 + (idx + 0.5) * 3.5;
         addWardDoorFacade(rx, -24.7, `${rm} 病房`, f7Y, true, false);
       });
-      addHangingSign(27.0, f7Y + 3.65, -23.6, 7.2, 0.88, '7F 東北翼一般病房 (727 雙人房・726 ~ 718 病房)', 'CORAL CORRIDOR & INPATIENT WARDS', '#0f4c5c', '#2dd4bf');
+      addHangingSign(27.0, f7Y + 3.65, -23.6, 7.2, 0.88, '一般病房 (727・726 ~ 718)', 'CORAL CORRIDOR & INPATIENT WARDS', '#0f4c5c', '#2dd4bf');
 
       // 7. 極東翼病房 (716~711) 與東北安全梯/電梯/洗衣間
-      addWall(47.5, -39.5, 11.0, 14.5, 4.4, wallMintMat, '7F 東北安全梯・電梯・洗衣間', 7, f7Y);
+      addWall(47.5, -39.5, 11.0, 14.5, 4.4, wallMintMat, '東北安全梯・電梯・洗衣間', 7, f7Y);
       const neElevDoor = new THREE.Mesh(
         new THREE.BoxGeometry(0.18, 2.4, 2.2),
         new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.78, roughness: 0.25 })
@@ -2008,7 +1974,7 @@
       addCorridorHandrail(-28.0, -15.15, -11.0, -15.15, f7Y, true);
       addCorridorHandrail(-28.0, -9.85, -11.0, -9.85, f7Y, true);
       addHangingSign(-19.5, f7Y + 3.65, -15.4, 8.2, 0.88, '懇談室・主任辦公室・會議室', 'VIP FAMILY LOUNGE & CONFERENCE ROOM', '#0369a1', '#7dd3fc');
-      addHangingSign(-19.5, f7Y + 3.65, -9.6, 8.2, 0.88, '懇談室・VIP 洗髮室・VIP 護理站', 'VIP HAIR SALON & NURSING STATION', '#6b21a8', '#f0abfc', Math.PI);
+      addHangingSign(-19.5, f7Y + 3.65, -9.6, 8.2, 0.88, '懇談室・洗髮室・護理站', 'HAIR SALON & NURSING STATION', '#6b21a8', '#f0abfc', Math.PI);
 
       // 10. 東側圓弧實木石英石護理站島
       buildRoundedNursingIsland(25.0, -12.5, 7, f7Y, true);
@@ -2075,7 +2041,7 @@
         const rx = 20.75 + (idx + 0.5) * 3.5;
         addWardDoorFacade(rx, 3.68, `${rm} 病房`, f7Y, false, false);
       });
-      addHangingSign(32.5, f7Y + 3.65, 3.4, 7.2, 0.88, '一般病房 (701 雙人房・702 ~ 709 病房)', 'SOUTH-EAST INPATIENT WARDS', '#0f4c5c', '#2dd4bf', Math.PI);
+      addHangingSign(32.5, f7Y + 3.65, 3.4, 7.2, 0.88, '一般病房 (701・702 ~ 709)', 'SOUTH-EAST INPATIENT WARDS', '#0f4c5c', '#2dd4bf', Math.PI);
 
       addFireHydrantCabinet(-36.5, 3.65, Math.PI, f7Y);
       addFireHydrantCabinet(46.5, 3.65, Math.PI, f7Y);
@@ -2340,7 +2306,7 @@
           waypoints: [new THREE.Vector3(-33.5, FLOOR_Y[7], -4.2)],
           speed: 0,
           yaw: Math.PI * 0.5,
-          dialogue: '您好！歡迎蒞臨彰濱秀傳 7F VIP 與住院病房樓層！全樓層均已鋪設溫潤實木地板，並配置可走入參觀的 733/732 VIP 套房與 727/701 雙人病房喔！',
+          dialogue: '您好！歡迎蒞臨 7F VIP 與住院病房樓層！全樓層均已鋪設溫潤實木地板，並配置可走入參觀的 733/732 VIP 套房與 727/701 雙人病房喔！',
           options: [
             { label: '請問走道上的 E 化護理工作車有什麼功能？', reply: '我們在病房走道配置了 5 台 E 化行動護理工作車（Mobile E-Cart），護理師推車巡房時可直接掃描條碼執行三讀五對給藥與電子病歷記錄！' },
             { label: '請問 727 實景雙人病房在哪裡？', reply: '往東走至北側 727 病房即可直接走入參觀，房內配有淺薄荷綠電動病床、木質高櫃、點滴架與景觀窗簾！' }
@@ -2445,7 +2411,7 @@
             new THREE.Vector3(-25.0, FLOOR_Y[7], -21.2)
           ],
           speed: 1.1,
-          dialogue: '您好！我是 VIP 尊榮病房專責護理師許雅雯，733 與 732 VIP 電動門走近就會自動滑開，歡迎進去看看電動病床設備！',
+          dialogue: '您好！我是 VIP 尊榮病房專責護理師許雅雯，733 與 732 VIP ，歡迎進去看看電動病床設備！',
           options: []
         },
         {
@@ -2562,7 +2528,7 @@
             new THREE.Vector3(-35.0, FLOOR_Y[7], -6.5)
           ],
           speed: 0.95,
-          dialogue: '733 VIP 套房換了溫潤人字拼胡桃木地板，電動門一走近就自動打開，裡面的電動病床睡起來非常舒服！',
+          dialogue: '733 VIP 套房換了溫潤人字拼胡桃木地板，裡面的電動病床睡起來非常舒服！',
           options: []
         },
         {
@@ -2613,7 +2579,7 @@
             new THREE.Vector3(6.5, FLOOR_Y[7], 11.2)
           ],
           speed: 0.85,
-          dialogue: '交誼廳整面落地窗採光真好，從 729 VIP 電動門走出來散步心情特別放鬆！',
+          dialogue: '交誼廳整面落地窗採光真好，從 729 VIP 走出來散步心情特別放鬆！',
           options: []
         },
         {
@@ -3102,10 +3068,10 @@
       SoundFX.playAlert();
 
       document.getElementById('dlg-avatar').textContent = '💻';
-      document.getElementById('dlg-name').textContent = `彰濱秀傳 E 化行動護理工作車 (Mobile E-Cart)`;
+      document.getElementById('dlg-name').textContent = `幸運草醫院 E 化行動護理工作車 (Mobile E-Cart)`;
       document.getElementById('dlg-role').textContent = `${cart.stationName}・NIS 護理資訊系統連線中`;
       document.getElementById('dlg-text').textContent =
-        '已登入秀傳智慧病房 NIS 護理資訊系統！請選擇您要執行的臨床護理作業：';
+        '已登入幸運草智慧病房 NIS 護理資訊系統！請選擇您要執行的臨床護理作業：';
 
       const optContainer = document.getElementById('dlg-options');
       optContainer.innerHTML = '';
@@ -3155,7 +3121,7 @@
       activeTalkNpc = { isTransportModal: true };
 
       document.getElementById('dlg-avatar').textContent = '🛗';
-      document.getElementById('dlg-name').textContent = `彰濱秀傳 ${transportLabel}・樓層選擇`;
+      document.getElementById('dlg-name').textContent = `幸運草醫院 ${transportLabel}・樓層選擇`;
       document.getElementById('dlg-role').textContent = '目前所在樓層：7F VIP 與住院病房樓層';
       document.getElementById('dlg-text').textContent = `您已抵達${transportLabel}廳！請問要去哪一個樓層？（點擊按鈕或按對應數字鍵，將自動連結 B1 ~ 8F 的 HTML 頁面）`;
 
@@ -3222,7 +3188,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 11. 每幀物理、VIP 電動門感應、NPC 巡房與無須鎖定左鍵拖曳相機更新
+    // 11. 每幀物理、VIP 感應、NPC 巡房與無須鎖定左鍵拖曳相機更新
     // --------------------------------------------------------------------------
     function updateSimulation(dt) {
       gameClockMinutes = (gameClockMinutes + dt * 1.5) % (24 * 60);
@@ -3635,7 +3601,7 @@
     function updateCurrentZoneHUD() {
       const x = player.pos.x;
       const z = player.pos.z;
-      let label = '彰濱秀傳 7F 實木地板病房走廊';
+      let label = '幸運草醫院 7F 實木地板病房走廊';
 
       if (currentTransportZone) {
         label = `7F ${currentTransportZone.transportType}感應區（可前往 B1 ~ 8F）`;
@@ -3903,10 +3869,12 @@
 
       const sensSlider = document.getElementById('mouse-sens-slider');
       const sensLabel = document.getElementById('mouse-sens-val');
-      sensSlider.addEventListener('input', (e) => {
-        camState.sensitivity = parseFloat(e.target.value);
-        sensLabel.textContent = `${camState.sensitivity.toFixed(1)}x`;
-      });
+      if (sensSlider && sensLabel) {
+        sensSlider.addEventListener('input', (e) => {
+          camState.sensitivity = parseFloat(e.target.value);
+          sensLabel.textContent = `${camState.sensitivity.toFixed(1)}x`;
+        });
+      }
 
       canvas.addEventListener(
         'touchstart',
@@ -4011,24 +3979,26 @@
         });
       });
 
-      document.getElementById('btn-action-attack').addEventListener('click', () => performPlayerAttack(false));
-      document.getElementById('btn-action-heavy').addEventListener('click', () => performPlayerAttack(true));
+      document.getElementById('btn-action-attack')?.addEventListener('click', () => performPlayerAttack(false));
+      document.getElementById('btn-action-heavy')?.addEventListener('click', () => performPlayerAttack(true));
 
-      document.getElementById('btn-toggle-pov').addEventListener('click', () => {
+      document.getElementById('btn-toggle-pov')?.addEventListener('click', () => {
         player.firstPerson = !player.firstPerson;
-        document.getElementById('btn-toggle-pov').textContent = player.firstPerson ? '👁️ 第一人稱 (V)' : '👁️ 第三人稱 (V)';
+        const povBtn = document.getElementById('btn-toggle-pov');
+        if (povBtn) povBtn.textContent = player.firstPerson ? '👁️ 第一人稱 (V)' : '👁️ 第三人稱 (V)';
       });
 
-      document.getElementById('btn-toggle-labels').addEventListener('click', (e) => {
+      document.getElementById('btn-toggle-labels')?.addEventListener('click', (e) => {
         showNpcLabels = !showNpcLabels;
         e.currentTarget.textContent = showNpcLabels ? '🏷️ NPC 標籤: 開' : '🏷️ NPC 標籤: 關';
       });
 
-      document.getElementById('btn-open-elevator').addEventListener('click', () => openTransportModal('中央電梯'));
-      document.getElementById('btn-clear-wanted').addEventListener('click', clearWantedAndHeal);
+      document.getElementById('btn-open-elevator')?.addEventListener('click', () => openTransportModal('中央電梯'));
+      document.getElementById('btn-clear-wanted')?.addEventListener('click', clearWantedAndHeal);
 
-      document.getElementById('btn-toggle-help').addEventListener('click', (e) => {
+      document.getElementById('btn-toggle-help')?.addEventListener('click', (e) => {
         const body = document.getElementById('help-body');
+        if (!body) return;
         const isHidden = body.classList.toggle('hidden');
         e.currentTarget.textContent = isHidden ? '展開' : '收合';
       });
