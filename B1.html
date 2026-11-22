@@ -119,51 +119,15 @@
 
   <!-- 頂部橫向：B1 各科區域快速傳送 + B1 ~ 8F 樓層 HTML 直連列 -->
   <div class="fixed top-2.5 left-1/2 -translate-x-1/2 z-20 w-[97vw] max-w-6xl">
-    <div class="hud-glass rounded-full px-2.5 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-xl">
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-rose-500/35 border border-rose-400/60 text-[11px] font-black text-rose-200">
-        🔽 B1 導覽
-      </span>
-      <button data-zone="b1_atrium" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-rose-400/95 hover:bg-rose-300 text-slate-950 transition">📍 免疫/中醫・共食區</button>
-      <button data-zone="b1_transport" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-teal-500/30 hover:bg-teal-400 hover:text-slate-950 text-teal-100 border border-teal-400/40 transition">🛗 手扶梯/電梯口</button>
-      <button data-zone="b1_chest" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/30 hover:bg-rose-400 hover:text-slate-950 text-rose-100 border border-rose-400/40 transition">🫁 胸腔科門診(爆滿)</button>
-      <button data-zone="b1_neuro" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-500/30 hover:bg-sky-400 hover:text-slate-950 text-sky-100 border border-sky-400/40 transition">🧠 神內/腦波室(爆滿)</button>
-      <button data-zone="b1_aesthetic" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-pink-400 hover:text-slate-950 text-pink-200 transition">✨ 維納斯醫美/高壓氧</button>
-      <button data-zone="b1_gi" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-400 hover:text-slate-950 text-teal-200 transition">🔬 消化器/耳鼻喉</button>
-      <button data-zone="b1_food" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-200 transition">🍲 湯陽食堂/九龍廣東粥</button>
-
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-amber-500/25 border border-amber-400/50 text-[11px] font-bold text-amber-300 ml-1">
-        樓層直連
-      </span>
-      <button data-href="B1.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-rose-500/40 border border-rose-300/60 text-rose-100 transition">B1</button>
-      <button data-href="1F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-sky-400 hover:text-slate-950 text-sky-200 transition">1F</button>
-      <button data-href="2F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-200 transition">2F</button>
-      <button data-href="3F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-pink-400 hover:text-slate-950 text-pink-200 transition">3F</button>
-      <button data-href="5F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-emerald-400 hover:text-slate-950 text-emerald-200 transition">5F</button>
-      <button data-href="6F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-400 hover:text-slate-950 text-teal-200 transition">6F</button>
-      <button data-href="7F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-purple-400 hover:text-slate-950 text-purple-200 transition">7F</button>
-      <button data-href="8F.html" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-indigo-400 hover:text-slate-950 text-indigo-200 transition">8F</button>
-    </div>
   </div>
 
   <!-- 操作提示膠囊 -->
   <div class="fixed top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-max max-w-[95vw]">
-    <div class="hud-glass px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-teal-200 border border-teal-400/35 shadow-lg text-center">
-      🖱️ 按住滑鼠左鍵拖曳轉動視角 ｜ 點擊地面自動行走（或 WASD 移動）｜ 按 L 切換燈光 ｜ J / 右鍵 攻擊 ｜ 靠近按 E 對話
-    </div>
   </div>
 
   <!-- 左上角：燈光情境切換、功能開關、滑鼠靈敏度與操作說明面板 -->
   <div class="fixed top-20 left-3 sm:left-4 z-20 flex flex-col gap-2 max-w-[318px]">
-    <div class="hud-glass rounded-xl p-3 text-white shadow-xl">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-teal-400 shadow-[0_0_8px_#2dd4bf]"></span>
-          <span class="font-bold text-xs sm:text-sm text-teal-200">幸運草醫院・自由游標版</span>
-        </div>
-        <button id="btn-toggle-help" class="px-2 py-0.5 text-[11px] rounded bg-white/10 hover:bg-white/20 text-slate-200">
-          收合
-        </button>
-      </div>
+  </div>
 
       <!-- 💡 燈光情境切換器 -->
       <div class="mt-2.5 p-2 rounded-lg bg-slate-900/80 border border-amber-400/30">
@@ -228,7 +192,7 @@
   </div>
 
   <!-- 右上角：GTA 風格狀態欄 + 門診爆滿人潮監控 -->
-  <div class="fixed top-20 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
+  <div class="fixed top-3 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
     <div id="hud-clock" class="gta-font gta-shadow text-xl sm:text-2xl font-bold text-white leading-none">
       10:35
     </div>
@@ -3949,9 +3913,10 @@
         if (e.code === 'KeyK') triggerPlayerAttack('heavy');
         if (e.code === 'KeyC') clearWantedAndHeal();
         if (e.code === 'KeyV') {
-          firstPersonMode = !firstPersonMode;
-          document.getElementById('btn-toggle-pov').textContent = firstPersonMode ? '👁️ 第一人稱 (V)' : '🎥 第三人稱 (V)';
-        }
+  firstPersonMode = !firstPersonMode;
+  const povBtn = document.getElementById('btn-toggle-pov');
+  if (povBtn) povBtn.textContent = firstPersonMode ? '👁️ 第一人稱 (V)' : '🎥 第三人稱 (V)';
+}
         if (e.code === 'KeyR') {
           camState.targetYaw = player.yaw + Math.PI;
           camState.targetPitch = 0.24;
@@ -4131,38 +4096,33 @@
         document.getElementById('floor-transfer-overlay').classList.add('hidden');
       });
 
-      document.getElementById('btn-open-elevator').addEventListener('click', () => {
-        openTransportModal('中央手扶梯 / 電梯');
-      });
+      document.getElementById('btn-open-elevator')?.addEventListener('click', () => {
+  openTransportModal('中央手扶梯 / 電梯');
+});
 
-      document.getElementById('btn-toggle-pov').addEventListener('click', () => {
-        firstPersonMode = !firstPersonMode;
-        document.getElementById('btn-toggle-pov').textContent = firstPersonMode ? '👁️ 第一人稱 (V)' : '🎥 第三人稱 (V)';
-      });
+document.getElementById('btn-toggle-pov')?.addEventListener('click', () => {
+  firstPersonMode = !firstPersonMode;
+  const btn = document.getElementById('btn-toggle-pov');
+  if (btn) btn.textContent = firstPersonMode ? '👁️ 第一人稱 (V)' : '🎥 第三人稱 (V)';
+});
 
-      document.getElementById('btn-toggle-labels').addEventListener('click', () => {
-        showNpcLabels = !showNpcLabels;
-        npcSprites.forEach((sp) => (sp.visible = showNpcLabels));
-        document.getElementById('btn-toggle-labels').textContent = showNpcLabels ? '🏷️ 醫護名牌: 開' : '🏷️ 醫護名牌: 關';
-      });
+document.getElementById('btn-toggle-labels')?.addEventListener('click', () => {
+  showNpcLabels = !showNpcLabels;
+  npcSprites.forEach((sp) => (sp.visible = showNpcLabels));
+  const btn = document.getElementById('btn-toggle-labels');
+  if (btn) btn.textContent = showNpcLabels ? '🏷️ 醫護名牌: 開' : '🏷️ 醫護名牌: 關';
+});
 
-      document.getElementById('btn-clear-wanted').addEventListener('click', clearWantedAndHeal);
+document.getElementById('btn-clear-wanted')?.addEventListener('click', clearWantedAndHeal);
 
-      document.getElementById('btn-toggle-help').addEventListener('click', () => {
-        const body = document.getElementById('help-body');
-        const isHidden = body.classList.toggle('hidden');
-        document.getElementById('btn-toggle-help').textContent = isHidden ? '展開' : '收合';
-      });
-
-      document.getElementById('dlg-close').addEventListener('click', closeDialogue);
-      document.getElementById('npc-talk-prompt').addEventListener('click', () => {
-        const p = document.getElementById('npc-talk-prompt');
-        if (p.dataset.mode === 'transport') {
-          openTransportModal(currentTransportZone ? currentTransportZone.transportType : '手扶梯 / 電梯');
-        } else if (p._npc) {
-          openDialogue(p._npc);
-        }
-      });
+document.getElementById('btn-toggle-help')?.addEventListener('click', () => {
+  const body = document.getElementById('help-body');
+  const btn = document.getElementById('btn-toggle-help');
+  if (body && btn) {
+    const isHidden = body.classList.toggle('hidden');
+    btn.textContent = isHidden ? '展開' : '收合';
+  }
+});
 
       document.querySelectorAll('.touch-pad').forEach((btn) => {
         const code = btn.dataset.key;
