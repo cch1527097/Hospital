@@ -79,7 +79,7 @@
   <canvas id="game-canvas"></canvas>
 
   <!-- 非阻塞式系統訊息提示條 -->
-  <div id="toast-banner" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full hud-glass border border-amber-400/60 text-xs sm:text-sm font-bold text-amber-200 shadow-2xl pointer-events-none transition-opacity duration-300">
+  <div id="toast-banner" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full hud-glass border border-amber-400/60 text-xs sm:text-sm font-bold text-amber-200 shadow-2xl pointer-events-none transition-opacity duration-300">
   </div>
 
   <!-- 受擊螢幕邊緣紅光閃爍遮罩 -->
@@ -121,63 +121,19 @@
 
   <!-- 頂部橫向：全院樓層與頂樓各區域快速導覽列 -->
   <div class="fixed top-2.5 left-1/2 -translate-x-1/2 z-20 w-[97vw] max-w-6xl">
-    <div class="hud-glass rounded-full px-2.5 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-xl">
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-indigo-500/35 border border-indigo-400/60 text-[11px] font-black text-indigo-200">
-        🏛️ 頂樓會議/資訊處
-      </span>
-      <button data-zone="f8_here" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-indigo-400/95 hover:bg-indigo-300 text-slate-950 transition">📍 現在位置</button>
-      <button data-zone="f8_round_conf" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-amber-500/45 hover:bg-amber-400 hover:text-slate-950 text-amber-100 border border-amber-300/70 transition">👑 大圓桌會議室 (總裁/執行長/總經理/協理)</button>
-      <button data-zone="f8_medici_1" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-sky-500/40 hover:bg-sky-400 hover:text-slate-950 text-sky-100 border border-sky-300/60 transition">🏛️ 美帝奇會議室一 (U型桌)</button>
-      <button data-zone="f8_medici_2" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-pink-500/40 hover:bg-pink-400 hover:text-slate-950 text-pink-100 border border-pink-300/60 transition">🏛️ 美帝奇會議室二 (U型桌)</button>
-      <button data-zone="f8_large_conf" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-blue-500/35 hover:bg-blue-400 hover:text-slate-950 text-blue-200 border border-blue-400/50 transition">🏢 大型會議室 (U型桌)</button>
-      <button data-zone="f8_pantry_wc" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-emerald-500/35 hover:bg-emerald-400 hover:text-slate-950 text-emerald-200 border border-emerald-400/50 transition">🚻 美蒂琪吧檯</button>
-      <button data-zone="f8_it" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-cyan-500/35 hover:bg-cyan-400 hover:text-slate-950 text-cyan-200 border border-cyan-400/50 transition">🚪 資訊處 (感應電動門進出)</button>
-      <button data-zone="f8_atrium" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/30 hover:bg-amber-400 hover:text-slate-950 text-amber-200 border border-amber-400/40 transition">🛋️ 中央開放交流中庭</button>
-      <button data-zone="f8_elevator" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-teal-500/30 hover:bg-teal-400 hover:text-slate-950 text-teal-200 border border-teal-400/40 transition">🛗 中央電梯廳</button>
-
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-amber-500/25 border border-amber-400/50 text-[11px] font-black text-amber-200 ml-1">
-        🔗 電梯樓層直達
-      </span>
-      <button data-link-floor="B1" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-200 transition">B1</button>
-      <button data-link-floor="1F" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-sky-400 hover:text-slate-950 text-sky-200 transition">1F</button>
-      <button data-link-floor="2F" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-200 transition">2F</button>
-      <button data-link-floor="3F" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-pink-400 hover:text-slate-950 text-pink-200 transition">3F</button>
-      <button data-link-floor="5F" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-emerald-400 hover:text-slate-950 text-emerald-200 transition">5F</button>
-      <button data-link-floor="6F" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-400 hover:text-slate-950 text-teal-200 transition">6F</button>
-      <button data-link-floor="7F" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-purple-400 hover:text-slate-950 text-purple-200 transition">7F</button>
-    </div>
   </div>
 
   <!-- 操作提示膠囊 -->
   <div class="fixed top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-max max-w-[95vw]">
-    <div id="control-hint-pill" class="hud-glass px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-teal-200 border border-teal-400/35 shadow-lg text-center">
-      👑 大圓桌會議室：黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理 ｜ 👊 點擊NPC或按 J / K 直接攻擊全場人員
-    </div>
   </div>
 
   <!-- 左上角：功能開關、滑鼠靈敏度與操作說明面板 -->
   <div class="fixed top-20 left-3 sm:left-4 z-20 flex flex-col gap-2 max-w-[310px]">
-    <div class="hud-glass rounded-xl p-3 text-white shadow-xl">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-teal-400 shadow-[0_0_8px_#2dd4bf]"></span>
-          <span class="font-bold text-xs sm:text-sm text-teal-200">幸運草醫院-模擬人生 頂樓實境控制台</span>
-        </div>
-        <button id="btn-toggle-help" class="px-2 py-0.5 text-[11px] rounded bg-white/10 hover:bg-white/20 text-slate-200">
-          收合
-        </button>
-      </div>
+  </div>
 
       <!-- 核心互動功能按鈕列 -->
       <div class="mt-2.5 grid grid-cols-1 gap-1.5">
-        <div class="grid grid-cols-2 gap-1.5">
-          <button id="btn-toggle-pov" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-sky-700/80 hover:bg-sky-600 border border-sky-400/30 text-white transition">
-            👁️ 第三人稱 (V)
-          </button>
-          <button id="btn-toggle-labels" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-emerald-700/80 hover:bg-emerald-600 border border-emerald-400/30 text-white transition">
-            🏷️ NPC 標籤: 開
-          </button>
-        </div>
+      </div>
 
         <!-- 自由滑鼠模式狀態標示 -->
         <div class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-indigo-900/60 border border-indigo-400/40 text-indigo-100">
@@ -213,18 +169,12 @@
 
       <!-- 按鍵操作表 -->
       <div id="help-body" class="mt-2 pt-2 border-t border-white/10 text-[11px] text-slate-200 space-y-1">
-        <div class="flex justify-between"><span class="text-slate-400">左鍵拖曳移動滑鼠</span><span class="font-bold text-teal-300">360° 自由旋轉視角</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">單擊地板 / 點擊NPC</span><span class="font-bold text-rose-300">自動步行前往 / 直接攻擊</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">鍵盤移動 / 衝刺 / 跳</span><span class="font-bold text-amber-300">WASD / Shift / Space</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">資訊室感應電動門</span><span class="font-bold text-cyan-300">靠近自動滑開進出</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">近戰三連擊 / 重擊</span><span class="font-bold text-rose-300">J 鍵 / K 鍵</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">搭乘電梯選樓層</span><span class="font-bold text-emerald-300">靠近電梯感應區 / E 鍵</span></div>
       </div>
     </div>
   </div>
 
   <!-- 右上角：GTA 風格狀態欄 -->
-  <div class="fixed top-20 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
+  <div class="fixed top-3 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
     <div id="hud-clock" class="gta-font gta-shadow text-xl sm:text-2xl font-bold text-white leading-none">
       14:20
     </div>
@@ -2526,7 +2476,7 @@
       buildITWorkstation(23.2, 11.4, 0, '維護工程師・醫療端末維護', true);
       buildITWorkstation(23.2, 19.6, Math.PI, '維護工程師・硬體伺服器檢修', true);
 
-      const nocTex = createSignTexture('彰濱秀傳 NOC 全院核心網路監控看板', 'CORE SWITCH: 100Gbps OK ｜ HIS/PACS: ACTIVE ｜ FIREWALL: PROTECTED', '#090d16', '#22d3ee');
+      const nocTex = createSignTexture('NOC網路監控看板', 'CORE SWITCH: 100Gbps OK ｜ HIS/PACS: ACTIVE ｜ FIREWALL: PROTECTED', '#090d16', '#22d3ee');
       const nocWallScreen = new THREE.Mesh(
         new THREE.BoxGeometry(0.12, 1.45, 2.85),
         new THREE.MeshStandardMaterial({
@@ -2620,7 +2570,7 @@
       );
       upsBank.position.set(34.5, baseY + 1.05, 22.1);
       target.add(upsBank);
-      addHangingSign(34.5, baseY + 2.55, 22.0, 3.8, 0.52, 'UPS 不斷電系統・FM-200 氣體滅火', '24HR REDUNDANT POWER', '#78350f', '#fde047', Math.PI);
+      addHangingSign(34.5, baseY + 2.55, 22.0, 3.8, 0.52, 'UPS 不斷電系統', '24HR REDUNDANT POWER', '#78350f', '#fde047', Math.PI);
       colliders.push({ minX: 32.3, maxX: 36.7, minZ: 21.5, maxZ: 22.7, floor: 8, label: 'UPS不斷電系統櫃' });
     }
 
@@ -4620,9 +4570,10 @@
             openElevatorModal('中央四座電梯廳');
           }
         } else if (e.code === 'KeyV') {
-          player.firstPerson = !player.firstPerson;
-          document.getElementById('btn-toggle-pov').textContent = player.firstPerson ? '👁️ 第一人稱 (V)' : '👁️ 第三人稱 (V)';
-        } else if (e.code === 'KeyC') {
+  player.firstPerson = !player.firstPerson;
+  const povBtn = document.getElementById('btn-toggle-pov');
+  if (povBtn) povBtn.textContent = player.firstPerson ? '👁️ 第一人稱 (V)' : '👁️ 第三人稱 (V)';
+} else if (e.code === 'KeyC') {
           clearWantedAndHeal();
         }
       });
@@ -4726,43 +4677,6 @@
 
       document.querySelectorAll('.floor-link-btn').forEach((btn) => {
         btn.addEventListener('click', () => redirectToFloorHtml(btn.dataset.linkFloor));
-      });
-
-      document.getElementById('btn-toggle-help').addEventListener('click', (e) => {
-        const body = document.getElementById('help-body');
-        const hidden = body.classList.toggle('hidden');
-        e.target.textContent = hidden ? '展開' : '收合';
-      });
-
-      document.getElementById('btn-toggle-pov').addEventListener('click', (e) => {
-        player.firstPerson = !player.firstPerson;
-        e.target.textContent = player.firstPerson ? '👁️ 第一人稱 (V)' : '👁️ 第三人稱 (V)';
-      });
-
-      document.getElementById('btn-toggle-labels').addEventListener('click', (e) => {
-        showNpcLabels = !showNpcLabels;
-        e.target.textContent = showNpcLabels ? '🏷️ NPC 標籤: 開' : '🏷️ NPC 標籤: 關';
-      });
-
-      document.getElementById('btn-open-elevator').addEventListener('click', () => {
-        openElevatorModal(nearTransportZone ? nearTransportZone.name : '中央四座電梯廳');
-      });
-
-      document.getElementById('btn-clear-wanted').addEventListener('click', clearWantedAndHeal);
-
-      const sensSlider = document.getElementById('mouse-sens-slider');
-      const sensVal = document.getElementById('mouse-sens-value');
-      sensSlider.addEventListener('input', (e) => {
-        camState.sensitivity = parseFloat(e.target.value);
-        sensVal.textContent = `${camState.sensitivity.toFixed(1)}x`;
-      });
-
-      document.getElementById('btn-invert-y').addEventListener('click', (e) => {
-        camState.invertY = !camState.invertY;
-        e.target.textContent = camState.invertY ? '開啟' : '關閉';
-        e.target.className = camState.invertY
-          ? 'px-2 py-0.5 rounded bg-teal-600 text-[10px] font-black text-white border border-teal-300/40 transition'
-          : 'px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-[10px] font-black text-slate-200 border border-white/15 transition';
       });
 
       document.getElementById('btn-action-attack').addEventListener('click', () => performPlayerAttack(false));
