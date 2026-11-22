@@ -1983,12 +1983,12 @@
       });
 
       // B. 北西翼：實景胸腔科門診候診大廳
-      addWall(-29.5, -39.5, 24.0, 10.5, 4.4, texMedBlueGrayWall, 'B1 藥庫 (Pharmacy Warehouse)', 'B1', b1Y);
+      addWall(-29.5, -39.5, 24.0, 10.5, 4.4, texMedBlueGrayWall, '藥庫 (Pharmacy Warehouse)', 'B1', b1Y);
       addCorridorHandrail(-41.0, -34.15, -18.0, -34.15, b1Y);
       addHangingSign(-29.5, b1Y + 3.55, -33.8, 6.4, 0.85, '藥庫・藥品倉儲中心', 'PHARMACY WAREHOUSE', '#1d4ed8', '#93c5fd');
 
-      addWall(-43.5, -26.5, 9.5, 14.5, 4.4, texIvoryWoodWall, 'B1 小兒科與護理長辦公室', 'B1', b1Y);
-      addWall(-35.5, -29.5, 5.5, 6.5, 4.4, texAestheticPinkWall, 'B1 預防注射室', 'B1', b1Y);
+      addWall(-43.5, -26.5, 9.5, 14.5, 4.4, texIvoryWoodWall, '小兒科與護理長辦公室', 'B1', b1Y);
+      addWall(-35.5, -29.5, 5.5, 6.5, 4.4, texAestheticPinkWall, '預防注射室', 'B1', b1Y);
       addCorridorHandrail(-48.0, -19.15, -39.0, -19.15, b1Y);
       buildWallSconce(-43.5, b1Y + 2.25, -19.15, 0, 0xfef3c7);
       addHangingSign(-39.5, b1Y + 3.55, -18.8, 6.8, 0.85, '小兒科・預防注射・護理長辦公室', 'PEDIATRICS & VACCINATION', '#0f766e', '#5eead4');
@@ -2003,7 +2003,7 @@
       const chestFrameTop = new THREE.Mesh(new THREE.BoxGeometry(18.6, 0.22, 0.35), redHighlightMat);
       chestFrameTop.position.set(-24.5, b1Y + 4.25, -23.2);
       activeBuildGroup.add(chestFrameTop);
-      addHangingSign(-24.5, b1Y + 3.65, -22.9, 8.6, 0.92, '胸腔科門診候診大廳 (101~104診・門診大爆滿)', 'PULMONOLOGY & CHEST CLINICS・請依叫號燈入診', '#be123c', '#fde047');
+      addHangingSign(-24.5, b1Y + 3.65, -22.9, 8.6, 0.92, '胸腔科門診候診大廳', 'PULMONOLOGY & CHEST CLINICS', '#be123c', '#fde047');
 
       buildHospitalPillarWithTV(-16.5, -18.5, b1Y, true);
       buildHospitalPillarWithTV(-32.5, -18.5, b1Y, false);
@@ -2019,16 +2019,16 @@
       addHangingSign(-13.8, b1Y + 3.45, -17.8, 3.8, 0.75, '佐綺軒', 'MEDICAL BOUTIQUE', '#b45309', '#fde047');
 
       // C. 免疫/中醫科門診候診區
-      addHangingSign(-13.5, b1Y + 3.65, -5.5, 7.6, 0.92, '免疫風濕科・中醫科門診候診區 (爆滿)', 'IMMUNOLOGY & TRADITIONAL CHINESE MEDICINE', '#be123c', '#fde047');
+      addHangingSign(-13.5, b1Y + 3.65, -5.5, 7.6, 0.92, '免疫風濕科・中醫科', 'IMMUNOLOGY & TRADITIONAL CHINESE MEDICINE', '#be123c', '#fde047');
       allWaitingSeats.push(...buildHospitalWaitingBench(-15.5, -8.8, 0, b1Y));
       allWaitingSeats.push(...buildHospitalWaitingBench(-11.5, -8.8, 0, b1Y));
 
       // D. 北中翼：中央供應室
-      addWall(11.5, -36.5, 22.0, 16.5, 4.4, texCleanTealWall, 'B1 中央供應室 (滅菌品/耗材/無菌區/清潔區)', 'B1', b1Y);
+      addWall(11.5, -36.5, 22.0, 16.5, 4.4, texCleanTealWall, 'B1 中央供應室', 'B1', b1Y);
       addCorridorHandrail(1.0, -28.15, 22.0, -28.15, b1Y);
       buildWallSconce(4.5, b1Y + 2.25, -28.15, 0, 0x99f6e4);
       buildWallSconce(18.5, b1Y + 2.25, -28.15, 0, 0x99f6e4);
-      addHangingSign(11.5, b1Y + 3.65, -27.8, 8.6, 0.9, '滅菌品存放室・耗材存放室・無菌區・清潔區', 'CENTRAL STERILE SUPPLY DEPARTMENT (CSSD)', '#0369a1', '#7dd3fc');
+      addHangingSign(11.5, b1Y + 3.65, -27.8, 8.6, 0.9, '滅菌品存放室', 'CENTRAL STERILE SUPPLY DEPARTMENT (CSSD)', '#0369a1', '#7dd3fc');
 
       // E. 北東翼：實景美食街
       const foodBlueSlab = new THREE.Mesh(
@@ -2081,12 +2081,12 @@
         buildRealFoodCourtStall(st.x, -21.2, st.w, st, marbleMat, b1Y);
       });
 
-      addHangingSign(11.5, b1Y + 3.85, -16.8, 9.2, 0.85, 'B1 地下美食街・湯陽食堂 / 九龍廣東粥 / 龍山赤肉羹 / 弘爺漢堡', 'FOOD COURT・大理石吧檯點餐區', '#7c2d12', '#fde047');
+      addHangingSign(11.5, b1Y + 3.85, -16.8, 9.2, 0.85, '地下美食街', 'FOOD COURT・吧檯用餐區', '#7c2d12', '#fde047');
 
-      addWall(31.5, -31.5, 15.5, 24.0, 4.4, texFoodWalnutMarbleWall, 'B1 員工餐廳 (Staff Cafeteria)', 'B1', b1Y);
+      addWall(31.5, -31.5, 15.5, 24.0, 4.4, texFoodWalnutMarbleWall, '員工餐廳 (Staff Cafeteria)', 'B1', b1Y);
       buildWallSconce(26.5, b1Y + 2.25, -19.4, 0, 0xfde68a);
       buildWallSconce(36.5, b1Y + 2.25, -19.4, 0, 0xfde68a);
-      addHangingSign(31.5, b1Y + 3.65, -19.2, 7.2, 0.92, '員工餐廳・職員膳食中心', 'STAFF CAFETERIA & DINING HALL', '#991b1b', '#fde047');
+      addHangingSign(31.5, b1Y + 3.65, -19.2, 7.2, 0.92, '員工餐廳', 'STAFF CAFETERIA', '#991b1b', '#fde047');
 
       allDiningSeats.push(...buildDiningTableSet(6.5, -10.8, b1Y));
       allDiningSeats.push(...buildDiningTableSet(12.2, -10.8, b1Y));
@@ -2099,18 +2099,18 @@
       addWall(-43.5, 11.5, 14.5, 9.5, 4.4, texCleanTealWall, 'B1 6+2人高壓氧艙中心', 'B1', b1Y);
       addCorridorHandrail(-50.2, 6.65, -36.8, 6.65, b1Y);
       buildWallSconce(-42.5, b1Y + 2.25, 6.65, 0, 0x99f6e4);
-      addHangingSign(-42.5, b1Y + 3.65, 6.5, 6.8, 0.88, '6+2人高壓氧艙・VIP待壓室・清洗室', 'HYPERBARIC OXYGEN THERAPY CENTER', '#047857', '#6ee7b7');
+      addHangingSign(-42.5, b1Y + 3.65, 6.5, 6.8, 0.88, '高壓氧艙', 'HYPERBARIC OXYGEN THERAPY CENTER', '#047857', '#6ee7b7');
       buildHyperbaricChamber(-43.5, 19.5, b1Y);
 
-      addWall(-44.5, 31.5, 13.5, 16.5, 4.4, texMedBlueGrayWall, 'B1 核子醫學部與外傷處理區', 'B1', b1Y);
+      addWall(-44.5, 31.5, 13.5, 16.5, 4.4, texMedBlueGrayWall, '核子醫學部', 'B1', b1Y);
       addCorridorHandrail(-37.65, 24.0, -37.65, 39.0, b1Y);
-      addHangingSign(-37.4, b1Y + 3.55, 31.5, 6.4, 0.85, '核子醫學部・外傷處理區・服務台', 'NUCLEAR MEDICINE & TRAUMA CARE', '#1d4ed8', '#93c5fd', Math.PI / 2);
+      addHangingSign(-37.4, b1Y + 3.55, 31.5, 6.4, 0.85, '核子醫學部', 'NUCLEAR MEDICINE', '#1d4ed8', '#93c5fd', Math.PI / 2);
 
-      addWall(-24.5, 12.5, 17.5, 9.5, 4.4, texAestheticPinkWall, 'B1 維納斯醫學美容中心', 'B1', b1Y);
+      addWall(-24.5, 12.5, 17.5, 9.5, 4.4, texAestheticPinkWall, '維納斯醫學美容中心', 'B1', b1Y);
       addCorridorHandrail(-32.8, 7.65, -16.2, 7.65, b1Y, 0xb45309);
       buildWallSconce(-29.5, b1Y + 2.25, 7.65, 0, 0xfbcfe8);
       buildWallSconce(-19.5, b1Y + 2.25, 7.65, 0, 0xfbcfe8);
-      addHangingSign(-24.5, b1Y + 3.65, 7.5, 8.2, 0.9, '維納斯醫學美容中心・護膚室・雷射脈衝光室', 'VENUS AESTHETIC MEDICINE & LASER CENTER', '#be185d', '#f9a8d4');
+      addHangingSign(-24.5, b1Y + 3.65, 7.5, 8.2, 0.9, '維納斯醫學美容中心', 'VENUS AESTHETIC MEDICINE, '#be185d', '#f9a8d4');
 
       buildClinicWallFacade(-22.5, 33.5, [
         { code: '神內 201診', dept: '神經內科', doctor: '黃柏翰 醫師', queueNum: '0064' },
@@ -2122,7 +2122,7 @@
       const neuroFrameTop = new THREE.Mesh(new THREE.BoxGeometry(19.2, 0.22, 0.35), redHighlightMat);
       neuroFrameTop.position.set(-22.5, b1Y + 4.25, 33.2);
       activeBuildGroup.add(neuroFrameTop);
-      addHangingSign(-22.5, b1Y + 3.65, 32.8, 10.2, 0.96, '神內 / 神外 / 中醫門診・腦波室候診大廳 (201~204診・大爆滿)', 'NEUROLOGY・NEUROSURGERY・TCM・EEG & NCV LAB', '#1e3a8a', '#fde047', Math.PI);
+      addHangingSign(-22.5, b1Y + 3.65, 32.8, 10.2, 0.96, '神內科・中醫科・腦波室', 'NEUROLOGY・NEUROSURGERY・TCM・EEG & NCV LAB', '#1e3a8a', '#fde047', Math.PI);
 
       buildHospitalPillarWithTV(-14.5, 28.0, b1Y, true);
       buildHospitalPillarWithTV(-30.5, 28.0, b1Y, false);
@@ -2137,35 +2137,35 @@
       buildNeuroDiagnosticUnit(-32.5, 21.5, b1Y);
 
       // G. 南中翼
-      addWall(-4.5, 18.5, 13.5, 11.5, 4.4, texAestheticPinkWall, 'B1 耳鼻喉科與眼鏡配選/驗光眼壓/眩暈檢查', 'B1', b1Y);
+      addWall(-4.5, 18.5, 13.5, 11.5, 4.4, texAestheticPinkWall, '耳鼻喉科', 'B1', b1Y);
       addCorridorHandrail(-10.8, 12.65, 1.8, 12.65, b1Y);
       buildWallSconce(-4.5, b1Y + 2.25, 12.65, 0, 0xfbcfe8);
-      addHangingSign(-4.5, b1Y + 3.65, 12.4, 8.4, 0.9, '耳鼻喉科・眼鏡配選・驗光眼壓室・眩暈/聲音檢查', 'ENT・OPTOMETRY・VERTIGO & VOICE LAB', '#9d174d', '#f9a8d4');
+      addHangingSign(-4.5, b1Y + 3.65, 12.4, 8.4, 0.9, '耳鼻喉科', 'ENT・OPTOMETRY・VERTIGO', '#9d174d', '#f9a8d4');
       allWaitingSeats.push(...buildHospitalWaitingBench(-6.5, 11.0, Math.PI, b1Y));
       allWaitingSeats.push(...buildHospitalWaitingBench(-2.5, 11.0, Math.PI, b1Y));
 
-      addWall(5.5, 37.5, 18.5, 11.5, 4.4, texIvoryWoodWall, 'B1 病歷室 (Medical Records Room)', 'B1', b1Y);
+      addWall(5.5, 37.5, 18.5, 11.5, 4.4, texIvoryWoodWall, '病歷室 (Medical Records Room)', 'B1', b1Y);
       addCorridorHandrail(-3.2, 31.65, 14.2, 31.65, b1Y);
-      addHangingSign(5.5, b1Y + 3.55, 31.5, 6.4, 0.85, '病歷室・醫療資訊檔案中心', 'MEDICAL RECORDS ARCHIVES', '#334155', '#38bdf8', Math.PI);
+      addHangingSign(5.5, b1Y + 3.55, 31.5, 6.4, 0.85, '病歷室', 'MEDICAL RECORDS ARCHIVES', '#334155', '#38bdf8', Math.PI);
 
-      addWall(14.5, 20.5, 12.5, 12.5, 4.4, texMedBlueGrayWall, 'B1 消化器中心與超音波室', 'B1', b1Y);
+      addWall(14.5, 20.5, 12.5, 12.5, 4.4, texMedBlueGrayWall, '消化器中心與超音波室', 'B1', b1Y);
       addCorridorHandrail(8.6, 14.15, 20.4, 14.15, b1Y);
       buildWallSconce(14.5, b1Y + 2.25, 14.15, 0, 0xbae6fd);
-      addHangingSign(14.5, b1Y + 3.65, 13.8, 7.4, 0.9, '消化器中心 (五診)・超音波室・胃鏡大腸鏡', 'DIGESTIVE / GI CENTER & ULTRASOUND', '#0369a1', '#7dd3fc');
+      addHangingSign(14.5, b1Y + 3.65, 13.8, 7.4, 0.9, '消化器中心', 'DIGESTIVE / GI CENTER & ULTRASOUND', '#0369a1', '#7dd3fc');
       allWaitingSeats.push(...buildHospitalWaitingBench(12.5, 12.2, Math.PI, b1Y));
       allWaitingSeats.push(...buildHospitalWaitingBench(16.5, 12.2, Math.PI, b1Y));
 
       // H. 南東翼
-      addWall(26.5, 20.5, 7.5, 12.5, 4.4, texCleanTealWall, 'B1 內視鏡中心 (胃鏡/大腸鏡1&2/膽道鏡/恢復室)', 'B1', b1Y);
-      addHangingSign(26.5, b1Y + 3.65, 13.8, 7.2, 0.9, '胃鏡 / 內視鏡・大腸鏡 1 & 2・膽道鏡・恢復室', 'GASTROSCOPY・COLONOSCOPY・ENDOSCOPY SUITE', '#065f46', '#6ee7b7');
+      addWall(26.5, 20.5, 7.5, 12.5, 4.4, texCleanTealWall, '內視鏡中心', 'B1', b1Y);
+      addHangingSign(26.5, b1Y + 3.65, 13.8, 7.2, 0.9, '內視鏡中心', 'GASTROSCOPY・COLONOSCOPY・ENDOSCOPY SUITE', '#065f46', '#6ee7b7');
 
-      addWall(42.5, 12.5, 16.5, 11.5, 4.4, texIvoryWoodWall, 'B1 停車、卸貨區', 'B1', b1Y);
+      addWall(42.5, 12.5, 16.5, 11.5, 4.4, texIvoryWoodWall, '卸貨區', 'B1', b1Y);
       addCorridorHandrail(34.15, 7.2, 34.15, 17.8, b1Y);
-      addHangingSign(33.8, b1Y + 3.55, 12.5, 5.8, 0.85, 'B1 停車・卸貨區', 'PARKING & LOADING DOCK', '#475569', '#fbbf24', -Math.PI / 2);
+      addHangingSign(33.8, b1Y + 3.55, 12.5, 5.8, 0.85, 'B卸貨區', 'PARKING & LOADING DOCK', '#475569', '#fbbf24', -Math.PI / 2);
 
-      addWall(42.5, 32.5, 16.5, 18.5, 4.4, texMedBlueGrayWall, 'B1 會議室・醫工室・書庫', 'B1', b1Y);
+      addWall(42.5, 32.5, 16.5, 18.5, 4.4, texMedBlueGrayWall, '醫工室', 'B1', b1Y);
       addCorridorHandrail(34.15, 24.0, 34.15, 41.0, b1Y);
-      addHangingSign(33.8, b1Y + 3.55, 32.5, 6.2, 0.85, 'B1 會議室・醫工室・書庫・康潔盛休息室', 'CONFERENCE ROOM・BIOMEDICAL ENG・LIBRARY', '#1e40af', '#93c5fd', -Math.PI / 2);
+      addHangingSign(33.8, b1Y + 3.55, 32.5, 6.2, 0.85, '醫工室', 'CONFERENCE ROOM・BIOMEDICAL ENG・LIBRARY', '#1e40af', '#93c5fd', -Math.PI / 2);
 
       activeBuildGroup = null;
     }
@@ -2497,7 +2497,7 @@
           ]
         },
         {
-          name: '陳雅雯 胸腔科跟診護理師',
+          name: '陳雅雯 護理師',
           role: 'B1 胸腔科門診報到處・指引分流',
           avatar: '👩‍⚕️',
           type: 'staff',
@@ -2527,7 +2527,7 @@
           options: []
         },
         {
-          name: '張立德 中醫部主治醫師',
+          name: '張立德 中醫主治醫師',
           role: 'B1 中醫 203診 / 免疫風濕科門診',
           avatar: '🌿',
           type: 'staff',
@@ -2569,7 +2569,7 @@
           options: []
         },
         {
-          name: '許建宏 B1 駐衛警',
+          name: '許建宏 駐衛警',
           role: 'B1 門診大廳人潮疏導・安全巡邏',
           avatar: '👮',
           type: 'security',
@@ -2582,7 +2582,7 @@
           options: []
         },
         {
-          name: '趙國強 B1 駐衛警',
+          name: '趙國強 駐衛警',
           role: 'B1 南翼神內門診大廳・人潮秩序維護',
           avatar: '👮',
           type: 'security',
@@ -2619,7 +2619,7 @@
         '神內跟中醫門診今天人超多，連轉角候診椅都客滿了，醫師跟護理師真的很辛苦！',
         '剛剛去「湯陽食堂」點了一碗熱騰騰的湯麵，大理石櫃檯跟暖金吊燈裝潢得很氣派！',
         '我是來做腦波檢查跟神經傳導的，護理師說今天排檢人數大爆滿，要耐心等叫號。',
-        '秀傳 B1 的動線規劃得很好，地上有湖水藍跟米色引導線，牆壁還有實木防撞扶手。'
+        '幸運草 B1 的動線規劃得很好，地上有湖水藍跟米色引導線，牆壁還有實木防撞扶手。'
       ];
 
       allWaitingSeats.forEach((seat, idx) => {
@@ -2665,7 +2665,7 @@
         { pos: [2.2, -18.5], yaw: Math.PI, text: '「湯陽食堂」的招牌湯麵看起來好好吃，牆上寫著『好吃 好好吃 好好吃飯』真親切！' },
         { pos: [5.8, -18.5], yaw: Math.PI, text: '我正在「九龍廣東粥」排隊點皮蛋瘦肉粥，大理石紋櫃檯與暖金踢腳燈好漂亮！' },
         { pos: [6.4, -17.9], yaw: Math.PI, text: '我看完門診特地來九龍廣東粥買粥給家人吃，生意很好呢！' },
-        { pos: [13.4, -18.5], yaw: Math.PI, text: '來彰濱秀傳一定要喝一碗「龍山赤肉羹」，道地鹿港好味道！' },
+        { pos: [13.4, -18.5], yaw: Math.PI, text: '來幸運草醫院一定要喝一碗「龍山赤肉羹」，道地鹿港好味道！' },
         { pos: [20.6, -18.5], yaw: Math.PI, text: '抽完血空腹一整早，趕快來「弘爺漢堡」買份漢堡配熱咖啡！' }
       ];
 
@@ -3229,7 +3229,7 @@
       clearAutoMoveDestination();
 
       document.getElementById('dlg-avatar').textContent = '🛗';
-      document.getElementById('dlg-name').textContent = `彰濱秀傳 ${transportLabel}・樓層選擇`;
+      document.getElementById('dlg-name').textContent = `幸運草醫院 ${transportLabel}・樓層選擇`;
       document.getElementById('dlg-role').textContent = '目前所在樓層：B1 地下一樓醫療與美食街';
       document.getElementById('dlg-text').textContent = `您已接觸到${transportLabel}！請問要去哪一個樓層？（點擊按鈕或按對應數字鍵，將安全連結或顯示 B1 ~ 8F 樓層資訊）`;
 
