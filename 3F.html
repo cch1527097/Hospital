@@ -140,103 +140,8 @@
     <p class="text-xs sm:text-sm text-slate-300">正在最佳化靜態建築批次合併、烘焙陰影與 3F 實景病房...</p>
   </div>
 
-  <!-- 頂部橫向：全院各樓層 HTML 連結 & 3F 區域快速傳送列 -->
-  <div class="fixed top-2.5 left-1/2 -translate-x-1/2 z-20 w-[97vw] max-w-7xl">
-    <div class="hud-glass rounded-full px-2.5 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-xl">
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-amber-500/25 border border-amber-400/50 text-[11px] font-black text-amber-300">
-        🛗 樓層直達
-      </span>
-      <button data-html="B1.html" data-floor="B1" class="floor-link-btn shrink-0 px-2 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-200 transition">B1</button>
-      <button data-html="1F.html" data-floor="1F" class="floor-link-btn shrink-0 px-2 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-200 transition">1F</button>
-      <button data-html="2F.html" data-floor="2F" class="floor-link-btn shrink-0 px-2 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-200 transition">2F</button>
-      <button data-html="3F.html" data-floor="3F" class="floor-link-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-teal-400 text-slate-950 transition">3F (目前)</button>
-      <button data-html="5F.html" data-floor="5F" class="floor-link-btn shrink-0 px-2 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-200 transition">5F</button>
-      <button data-html="6F.html" data-floor="6F" class="floor-link-btn shrink-0 px-2 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-200 transition">6F</button>
-      <button data-html="7F.html" data-floor="7F" class="floor-link-btn shrink-0 px-2 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-200 transition">7F</button>
-      <button data-html="8F.html" data-floor="8F" class="floor-link-btn shrink-0 px-2 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-200 transition">8F</button>
-
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-teal-500/25 border border-teal-400/50 text-[11px] font-black text-teal-300 ml-1">
-        🏥 3F 導覽
-      </span>
-      <button data-zone="f3_chronic" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-amber-500/45 hover:bg-amber-400 hover:text-slate-950 text-amber-100 border border-amber-400/60 transition">💉 367/369 病房 (臥床患者+護理師吊點滴)</button>
-      <button data-zone="f3_nursing" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-purple-500/45 hover:bg-purple-500 hover:text-white text-purple-100 border border-purple-400/50 transition">👩‍⚕️ 3F 護理部 (8督導+主任)</button>
-      <button data-zone="f3_banting_dm" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-pink-500/40 hover:bg-pink-500 hover:text-white text-pink-100 border border-pink-400/50 transition">🩺 3F 糖尿病衛教室/班廷俱樂部</button>
-      <button data-zone="f3_delivery_corridor" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/35 hover:bg-rose-500 hover:text-white text-rose-100 border border-rose-400/40 transition">🍼 3F 產房壁畫與 VIP 走廊</button>
-      <button data-zone="f3_nutri_cv" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/35 hover:bg-emerald-500 hover:text-slate-950 text-emerald-100 border border-emerald-400/40 transition">🫀 3F 營養科/心血管衛教室</button>
-      <button data-zone="f3_eye" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-rose-500 hover:text-white text-rose-200 transition">👁️ 3F 眼科門診 (3351~3352)</button>
-      <button data-zone="f3_rotunda" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-400 hover:text-slate-950 text-teal-200 transition">🔭 3F 圓弧展望廳</button>
-      <button data-zone="f3_transport" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-500/30 hover:bg-sky-400 hover:text-slate-950 text-sky-200 transition">🛗 3F 中央電梯廳</button>
-    </div>
-  </div>
-
-  <!-- 操作提示膠囊 -->
-  <div class="fixed top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-max max-w-[95vw]">
-    <div id="control-hint-pill" class="hud-glass px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-teal-200 border border-teal-400/35 shadow-lg text-center">
-      ⚡ 已啟用靜態幾何批次合併與樓層視錐剔除｜全區溫潤木質地板・367/369 病房・護理部實景暢玩
-    </div>
-  </div>
-
-  <!-- 左上角：功能開關、即時 FPS 監控、滑鼠靈敏度與操作說明面板 -->
-  <div class="fixed top-20 left-3 sm:left-4 z-20 flex flex-col gap-2 max-w-[310px]">
-    <div class="hud-glass rounded-xl p-3 text-white shadow-xl">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-teal-400 shadow-[0_0_8px_#2dd4bf]"></span>
-          <span class="font-bold text-xs sm:text-sm text-teal-200">幸運草醫院-模擬人生</span>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <!-- 即時 FPS 幀率計數器 -->
-          <span id="fps-counter" class="gta-font px-2 py-0.5 text-[11px] font-bold rounded bg-emerald-500/25 border border-emerald-400/45 text-emerald-300">
-            60 FPS
-          </span>
-          <button id="btn-toggle-help" class="px-2 py-0.5 text-[11px] rounded bg-white/10 hover:bg-white/20 text-slate-200">
-            收合
-          </button>
-        </div>
-      </div>
-
-      <!-- 核心互動功能按鈕列 -->
-      <div class="mt-2.5 grid grid-cols-1 gap-1.5">
-        <div class="grid grid-cols-2 gap-1.5">
-          <button id="btn-toggle-pov" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-sky-700/80 hover:bg-sky-600 border border-sky-400/30 text-white transition">
-            👁️ 第三人稱 (V)
-          </button>
-          <button id="btn-lock-cursor" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-teal-700/85 hover:bg-teal-600 border border-teal-400/35 text-white transition">
-            🎯 鎖定準心 (L)
-          </button>
-        </div>
-
-        <div class="grid grid-cols-2 gap-1.5">
-          <button id="btn-toggle-labels" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-emerald-700/80 hover:bg-emerald-600 border border-emerald-400/30 text-white transition">
-            🏷️ 姓名職位: 開
-          </button>
-          <button id="btn-clear-wanted" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-amber-600/85 hover:bg-amber-500 border border-amber-300/40 text-white transition">
-            🕊️ 急救消星 (C)
-          </button>
-        </div>
-
-        <!-- 滑鼠視角靈敏度微調滑桿 -->
-        <div class="px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 flex items-center justify-between gap-2">
-          <span class="text-[11px] text-slate-300 shrink-0">🖱️ 滑鼠靈敏度</span>
-          <input id="mouse-sens-slider" type="range" min="0.4" max="2.2" step="0.1" value="1.0" class="w-24 accent-teal-400 cursor-pointer" />
-          <span id="mouse-sens-value" class="text-[11px] font-bold text-teal-300 w-8 text-right">1.0x</span>
-        </div>
-      </div>
-
-      <!-- 按鍵操作表 -->
-      <div id="help-body" class="mt-2.5 pt-2 border-t border-white/10 text-[11px] text-slate-200 space-y-1">
-        <div class="flex justify-between"><span class="text-slate-400">行走 / 衝刺 / 跳躍</span><span class="font-bold text-amber-300">WASD / Shift / Space</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">360° 絲滑轉視角</span><span class="font-bold text-teal-300">拖曳滑鼠 / 中鍵鎖定</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">視距縮放 (Zoom)</span><span class="font-bold text-teal-300">滑鼠滾輪</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">三連擊 / 昇龍重擊</span><span class="font-bold text-rose-300">左鍵(J) / 右鍵(K)</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">中央電梯跨樓切換</span><span class="font-bold text-amber-300">接觸自動詢問 (B1~8F)</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">病房/護理部諮詢</span><span class="font-bold text-emerald-300">E 鍵 / V 鍵 / L 鍵</span></div>
-      </div>
-    </div>
-  </div>
-
   <!-- 右上角：GTA 風格狀態欄 -->
-  <div class="fixed top-20 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
+  <div class="fixed top-3 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
     <div id="hud-clock" class="gta-font gta-shadow text-xl sm:text-2xl font-bold text-white leading-none">
       10:25
     </div>
@@ -2558,9 +2463,6 @@
       registerCollider({ minX: x - 0.65, maxX: x + 0.75, minZ: z - 0.85, maxZ: z + 0.85, floor: fl, label: '診療椅單元' });
     }
 
-    // --------------------------------------------------------------------------
-    // 4. 建構「彰濱秀傳紀念醫院 1F ~ 3F 醫療空間」實景級地板、牆壁與天花板
-    // --------------------------------------------------------------------------
     function buildHospital1FInterior() {
       initArchitecturalMaterials();
 
@@ -2607,7 +2509,7 @@
 
       addWall(-5.2, 42.2, 3.4, 3.8, 3.2, wallMintMat, '西側警衛室', 1, 0);
       addWall(5.2, 42.2, 3.4, 3.8, 3.2, wallMintMat, '東側警衛室', 1, 0);
-      addHangingSign(0, 3.75, 42.2, 7.6, 0.9, '彰濱秀傳紀念醫院・入口門廳', 'CHANG BING SHOW CHWAN MEMORIAL HOSPITAL', '#0f4c5c', '#2dd4bf');
+      addHangingSign(0, 3.75, 42.2, 7.6, 0.9, '幸運草醫院・入口門廳', 'CHANG BING SHOW CHWAN MEMORIAL HOSPITAL', '#0f4c5c', '#2dd4bf');
 
       buildTwinAtriums(glassMat, darkFrameMat, ArchMaterials.ceilingGypsum);
 
@@ -2912,7 +2814,7 @@
       ceil2FCenter.position.set(0, 9.0, 15.5);
       addToFloorGroup(ceil2FCenter, 2);
 
-      addHangingSign(0, f2Y + 3.65, 7.6, 6.4, 0.88, '彰濱秀傳紀念醫院 2F 醫療樓層', '2F 洗腎室・開刀房・ICU・婦產科・心血管中心・牙科', '#0f4c5c', '#fbbf24');
+      addHangingSign(0, f2Y + 3.65, 7.6, 6.4, 0.88, '幸運草醫院醫療樓層', '洗腎室・開刀房・ICU・婦產科・心血管中心・牙科', '#0f4c5c', '#fbbf24');
 
       addWall(25.2, -37.5, 0.5, 18.0, 4.4, wallPinkMat, '2F 洗腎室西牆', 2, f2Y);
       addWall(38.0, -28.6, 26.0, 0.5, 4.4, wallPinkMat, '2F 洗腎室南牆', 2, f2Y);
@@ -3066,7 +2968,47 @@
         registerCollider({ minX: sx - 1.1, maxX: sx + 1.1, minZ: 44.7, maxZ: 45.7, floor: 3, label: '展望廳休憩沙發' });
       });
 
-      addWall(-21.5, -34.5, 38.0, 6.8, 4.4, wardBeigeMat, '睡眠中心檢查室', 3, f3Y);
+      addWall(-21.5, -37.7, 38.0, 0.4, 4.4, wardBeigeMat, '睡眠中心北向後牆', 3, f3Y);
+      [-37.5, -29.5, -21.5, -13.5].forEach((wx) => {
+        addWall(wx, -34.4, 0.36, 6.6, 4.4, wardBeigeMat, '睡眠中心病房隔間牆', 3, f3Y);
+      });
+
+      // 2. 南側走廊牆分段（在 x = -33.5, -25.5, -17.5 留出 1.7m 寬門洞讓玩家可以走進去）
+      addWall(-37.42, -31.1, 6.15, 0.36, 4.4, wardBeigeMat, '睡眠353前牆西段', 3, f3Y);
+      addWall(-29.50, -31.1, 6.30, 0.36, 4.4, wardBeigeMat, '睡眠353-356前牆中段', 3, f3Y);
+      addWall(-21.50, -31.1, 6.30, 0.36, 4.4, wardBeigeMat, '睡眠356-359前牆中段', 3, f3Y);
+      addWall(-10.08, -31.1, 13.15, 0.36, 4.4, wardBeigeMat, '睡眠359前牆東段', 3, f3Y);
+
+      // 3. 門洞上方門楣、敞開的門板、房號牌與病房內部病床
+      [-33.5, -25.5, -17.5].forEach((dx, idx) => {
+        // 門洞上方牆楣（避免穿幫）
+        const lintel = new THREE.Mesh(new THREE.BoxGeometry(1.7, 1.98, 0.36), wardBeigeMat);
+        lintel.position.set(dx, f3Y + 3.41, -31.1);
+        addToFloorGroup(lintel, 3);
+
+        const leftPost = new THREE.Mesh(new THREE.BoxGeometry(0.10, 2.35, 0.38), clinicDoorFrameMat);
+        leftPost.position.set(dx - 0.80, f3Y + 1.175, -31.1);
+        const rightPost = new THREE.Mesh(new THREE.BoxGeometry(0.10, 2.35, 0.38), clinicDoorFrameMat);
+        rightPost.position.set(dx + 0.80, f3Y + 1.175, -31.1);
+        const topBeam = new THREE.Mesh(new THREE.BoxGeometry(1.70, 0.10, 0.38), clinicDoorFrameMat);
+        topBeam.position.set(dx, f3Y + 2.37, -31.1);
+        addToFloorGroup(leftPost, 3);
+        addToFloorGroup(rightPost, 3);
+        addToFloorGroup(topBeam, 3);
+
+        // 門上房號牌
+        const plaqueTex = createSignTexture(`睡眠 ${353 + idx * 3}`, '', '#0f4c5c', '#fbbf24');
+        const plaque = new THREE.Mesh(
+          new THREE.BoxGeometry(0.76, 0.22, 0.18),
+          new THREE.MeshStandardMaterial({ map: plaqueTex, emissive: 0xffffff, emissiveMap: plaqueTex, emissiveIntensity: 0.35 })
+        );
+        plaque.position.set(dx, f3Y + 2.52, -30.92);
+        addToFloorGroup(plaque, 3);
+
+        // ✅ 將病床與睡眠監測儀器移入病房內部 (z = -34.6)
+        buildHospitalBedUnit(dx, -34.6, 0x38bdf8, true, 3, f3Y);
+      });
+
       addWall(-44.5, -24.5, 11.5, 16.5, 4.4, wardBeigeMat, '西側 VIP 病房', 3, f3Y);
       addWall(-23.5, -22.5, 22.0, 5.2, 4.4, wallMintMat, '睡眠中心護理站與醫材供應室', 3, f3Y);
       addWall(-26.5, -14.8, 26.0, 3.2, 4.4, wardBeigeMat, '婦產科 VIP 病房', 3, f3Y);
@@ -3090,16 +3032,241 @@
       });
 
       addHangingSign(-32.8, f3Y + 2.65, -18.15, 3.3, 0.62, '產 房', 'Delivery Room', '#f5f0e6', '#0f766e', Math.PI / 2);
+     
+      const thyroidRooms = ['甲狀腺 1診', '甲狀腺 2診', '甲狀腺檢查室'];
+[-33.5, -25.5, -17.5].forEach((dx, idx) => addClinicDoorSet(dx, f3Y, -13.15, 0, thyroidRooms[idx]));
 
-      [-33.5, -25.5, -17.5].forEach((dx, idx) => addClinicDoorSet(dx, f3Y, -31.05, 0, `睡眠 ${353 + idx * 3}`));
-      [-33.5, -25.5, -17.5].forEach((dx, idx) => addClinicDoorSet(dx, f3Y, -13.15, 0, `VIP ${328 + idx * 3}`));
+     const thyroidCanvas = document.createElement('canvas');
+thyroidCanvas.width = 1024;
+thyroidCanvas.height = 160;
+const tCtx = thyroidCanvas.getContext('2d');
+tCtx.fillStyle = '#0f766e'; // 醫療綠底色
+tCtx.fillRect(0, 0, 1024, 160);
+tCtx.strokeStyle = '#ffffff';
+tCtx.lineWidth = 8;
+tCtx.strokeRect(8, 8, 1008, 144);
+tCtx.fillStyle = '#ffffff';
+tCtx.font = 'bold 72px "Microsoft JhengHei", sans-serif';
+tCtx.textAlign = 'center';
+tCtx.textBaseline = 'middle';
+tCtx.fillText('國際甲狀腺中心', 512, 82);
 
-      addHangingSign(-22.5, f3Y + 3.65, -27.5, 6.8, 0.88, '睡眠中心', 'SLEEP CENTER・多導睡眠生理檢查 (PSG)', '#0369a1', '#7dd3fc');
+const thyroidBanner = new THREE.Mesh(
+  new THREE.BoxGeometry(5.6, 0.85, 0.08),
+  new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(thyroidCanvas), roughness: 0.4 })
+);
+thyroidBanner.position.set(-25.5, f3Y + 3.45, -12.95); // 貼齊 z = -13.15 牆面外側並朝向玩家
+addToFloorGroup(thyroidBanner, 3);
+
+[
+  { x: -32.2, clinic: '甲狀腺 1診', num: '018', subText: '目前看診號碼', hint: '請依燈號依序入診' },
+  { x: -24.2, clinic: '甲狀腺 2診', num: '024', subText: '目前看診號碼', hint: '請依燈號依序入診' },
+  { x: -16.2, clinic: '甲狀腺檢查室', num: '011', subText: '超音波 / 穿刺檢查', hint: '請先插健保卡報到' }
+].forEach((item) => {
+  // 1. 叫號機黑色外框
+  const boxFrame = new THREE.Mesh(
+    new THREE.BoxGeometry(0.68, 0.92, 0.08),
+    new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3, metalness: 0.4 })
+  );
+  boxFrame.position.set(item.x, f3Y + 1.85, -12.95);
+  addToFloorGroup(boxFrame, 3);
+
+  // 2. 繪製 LED 叫號螢幕畫面
+  const qCanvas = document.createElement('canvas');
+  qCanvas.width = 256;
+  qCanvas.height = 340;
+  const qCtx = qCanvas.getContext('2d');
+
+  // 螢幕黑底
+  qCtx.fillStyle = '#090d16';
+  qCtx.fillRect(0, 0, 256, 340);
+
+  // 頂部診間名稱綠條（「甲狀腺檢查室」字較多，自動微調字級避免貼邊）
+  qCtx.fillStyle = '#0f766e';
+  qCtx.fillRect(0, 0, 256, 62);
+  qCtx.fillStyle = '#ffffff';
+  qCtx.font = item.clinic.length > 5
+    ? 'bold 24px "Microsoft JhengHei", sans-serif'
+    : 'bold 28px "Microsoft JhengHei", sans-serif';
+  qCtx.textAlign = 'center';
+  qCtx.textBaseline = 'middle';
+  qCtx.fillText(item.clinic, 128, 32);
+
+  // 狀態副標題
+  qCtx.fillStyle = '#94a3b8';
+  qCtx.font = 'bold 20px "Microsoft JhengHei", sans-serif';
+  qCtx.fillText(item.subText, 128, 102);
+
+  // 亮紅色 LED 叫號數字
+  qCtx.fillStyle = '#ff3b30';
+  qCtx.font = 'bold 96px monospace';
+  qCtx.fillText(item.num, 128, 185);
+
+  // 底部提示字
+  qCtx.fillStyle = '#38bdf8';
+  qCtx.font = '20px "Microsoft JhengHei", sans-serif';
+  qCtx.fillText(item.hint, 128, 285);
+
+  const screenMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.6, 0.82),
+    new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(qCanvas) })
+  );
+  screenMesh.position.set(item.x, f3Y + 1.85, -12.905);
+  addToFloorGroup(screenMesh, 3);
+});
+
+// ==========================================
+// 4. 甲狀腺中心門診前候診座椅與一整排患者 NPC
+// ==========================================
+const benchMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.4, metalness: 0.5 }); // 深藍灰坐墊與椅背
+const legMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.25, metalness: 0.8 });   // 不鏽鋼銀色支架
+const skinColors = [0xfde0c8, 0xf5cba7, 0xe8be9e, 0xfad7bd];
+const hairColors = [0x1e293b, 0x3f2e21, 0x64748b, 0x0f172a];
+
+// 三組三人座候診排椅（放置在門前走廊外側 z = -10.8，面朝門診與叫號機 rotation.y = Math.PI）
+const thyroidBenches = [
+  {
+    x: -33.5, // 甲狀腺 1診前方候診區
+    patients: [
+      { slot: -1, shirt: 0x3b82f6, pants: 0x1e293b, mask: true, phone: true },
+      { slot: 0,  shirt: 0xf59e0b, pants: 0x334155, mask: true, phone: false },
+      { slot: 1,  shirt: 0x10b981, pants: 0x1f2937, mask: false, phone: true }
+    ]
+  },
+  {
+    x: -25.5, // 甲狀腺 2診前方候診區
+    patients: [
+      { slot: -1, shirt: 0xec4899, pants: 0x334155, mask: true, phone: false },
+      { slot: 1,  shirt: 0x6366f1, pants: 0x1e293b, mask: true, phone: true }
+    ]
+  },
+  {
+    x: -17.5, // 甲狀腺檢查室前方候診區
+    patients: [
+      { slot: -1, shirt: 0x14b8a6, pants: 0x1e293b, mask: true, phone: true },
+      { slot: 0,  shirt: 0x8b5cf6, pants: 0x334155, mask: true, phone: false },
+      { slot: 1,  shirt: 0xf97316, pants: 0x1f2937, mask: true, phone: false }
+    ]
+  }
+];
+
+thyroidBenches.forEach((b, bIdx) => {
+  const benchGroup = new THREE.Group();
+  benchGroup.position.set(b.x, f3Y, -10.8);
+  benchGroup.rotation.y = Math.PI; // 面朝 -Z（面向門診與叫號機螢幕）
+
+  // 1. 橫向不鏽鋼主樑與兩側椅腳
+  const beam = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.08, 0.1), legMat);
+  beam.position.set(0, 0.36, 0);
+  benchGroup.add(beam);
+
+  [-0.9, 0.9].forEach((lx) => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.38, 0.52), legMat);
+    leg.position.set(lx, 0.19, 0);
+    benchGroup.add(leg);
+  });
+
+  // 2. 三個獨立座位（椅面 + 椅背 + 扶手）
+  [-0.7, 0, 0.7].forEach((sx) => {
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.07, 0.5), benchMat);
+    seat.position.set(sx, 0.43, 0.03);
+    benchGroup.add(seat);
+
+    const back = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.48, 0.07), benchMat);
+    back.position.set(sx, 0.7, -0.2);
+    back.rotation.x = -0.1;
+    benchGroup.add(back);
+  });
+
+  [-1.04, 1.04].forEach((ax) => {
+    const armrest = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.24, 0.46), legMat);
+    armrest.position.set(ax, 0.56, 0.02);
+    benchGroup.add(armrest);
+  });
+
+  // 3. 坐在椅子上的候診患者 NPC
+  b.patients.forEach((p, pIdx) => {
+    const seatX = p.slot * 0.7;
+    const npc = new THREE.Group();
+    npc.position.set(seatX, 0.46, 0.04);
+
+    const skinMat = new THREE.MeshStandardMaterial({ color: skinColors[(bIdx + pIdx) % skinColors.length], roughness: 0.6 });
+    const hairMat = new THREE.MeshStandardMaterial({ color: hairColors[(bIdx * 2 + pIdx) % hairColors.length], roughness: 0.7 });
+    const shirtMat = new THREE.MeshStandardMaterial({ color: p.shirt, roughness: 0.6 });
+    const pantsMat = new THREE.MeshStandardMaterial({ color: p.pants, roughness: 0.7 });
+
+    // 軀幹
+    const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.18, 0.52, 12), shirtMat);
+    torso.position.set(0, 0.28, -0.04);
+    npc.add(torso);
+
+    // 頭部與頭髮
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.145, 16, 16), skinMat);
+    head.position.set(0, 0.68, -0.02);
+    if (p.phone) head.rotation.x = 0.25; // 低頭看手機
+    npc.add(head);
+
+    const hair = new THREE.Mesh(new THREE.SphereGeometry(0.152, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.58), hairMat);
+    hair.position.set(0, 0.69, -0.03);
+    if (p.phone) hair.rotation.x = 0.25;
+    npc.add(hair);
+
+    // 醫療口罩（選配）
+    if (p.mask) {
+      const maskMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(0.17, 0.1, 0.06),
+        new THREE.MeshStandardMaterial({ color: 0xe0f2fe, roughness: 0.5 })
+      );
+      maskMesh.position.set(0, 0.64, 0.11);
+      npc.add(maskMesh);
+    }
+
+    // 坐姿大腿與小腿（往前伸直並往下垂放）
+    [-0.08, 0.08].forEach((legX) => {
+      const thigh = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.06, 0.36, 10), pantsMat);
+      thigh.rotation.x = Math.PI / 2;
+      thigh.position.set(legX, 0.04, 0.16);
+      npc.add(thigh);
+
+      const calf = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.05, 0.42, 10), pantsMat);
+      calf.position.set(legX, -0.18, 0.32);
+      npc.add(calf);
+
+      const shoe = new THREE.Mesh(
+        new THREE.BoxGeometry(0.11, 0.07, 0.2),
+        new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.6 })
+      );
+      shoe.position.set(legX, -0.41, 0.36);
+      npc.add(shoe);
+    });
+
+    // 手臂與手機（在腿上方操作手機或自然放在膝上）
+    [-0.2, 0.2].forEach((armX) => {
+      const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.04, 0.34, 8), shirtMat);
+      arm.position.set(armX, 0.26, 0.08);
+      arm.rotation.x = p.phone ? -0.95 : -0.55;
+      arm.rotation.z = armX > 0 ? 0.2 : -0.2;
+      npc.add(arm);
+    });
+
+    if (p.phone) {
+      const phone = new THREE.Mesh(
+        new THREE.BoxGeometry(0.08, 0.015, 0.14),
+        new THREE.MeshBasicMaterial({ color: 0x7dd3fc }) // 微亮手機螢幕
+      );
+      phone.position.set(0, 0.24, 0.24);
+      phone.rotation.x = 0.35;
+      npc.add(phone);
+    }
+
+    benchGroup.add(npc);
+  });
+
+  addToFloorGroup(benchGroup, 3);
+});
+
+      addHangingSign(-22.5, f3Y + 3.65, -28.0, 5.4, 0.88, '睡眠中心', 'SLEEP CENTER・多導睡眠生理檢查 (PSG)', '#0369a1', '#7dd3fc', Math.PI / 2);
       addHangingSign(-23.5, f3Y + 3.65, -18.15, 6.8, 0.88, '產房・婦產科 VIP 病房', 'OB/GYN VIP WARDS & NURSERY', '#be185d', '#f9a8d4');
-
-      [-31.5, -24.5, -17.5].forEach((bx) => {
-        buildHospitalBedUnit(bx, -29.2, 0x38bdf8, true, 3, f3Y);
-      });
 
       addWall(18.5, -34.5, 34.0, 6.8, 4.4, wardBeigeMat, '總務課收發處/社工辦公室', 3, f3Y);
       addWall(44.5, -23.5, 11.5, 12.0, 4.4, wardBeigeMat, '東側病房', 3, f3Y);
@@ -3876,21 +4043,21 @@
       const rightLeg = createLimbLeg(1);
 
       return {
-        root,
-        bodyRoot,
-        headGroup,
-        leftShoulder: leftArm.shoulder,
-        rightShoulder: rightArm.shoulder,
-        leftElbow: leftArm.elbow,
-        rightElbow: rightArm.elbow,
-        leftFistAura: leftArm.aura,
-        rightFistAura: rightArm.aura,
-        leftHip: leftLeg.hip,
-        rightHip: leftLeg.hip,
-        leftKnee: leftLeg.knee,
-        rightKnee: rightLeg.knee,
-        rightFootAura: rightLeg.footAura
-      };
+  root,
+  bodyRoot,
+  headGroup,
+  leftShoulder: leftArm.shoulder,
+  leftElbow: leftArm.elbow,
+  leftFistAura: leftArm.aura,
+  rightShoulder: rightArm.shoulder,
+  rightElbow: rightArm.elbow,
+  rightFistAura: rightArm.aura,
+  leftHip: leftLeg.hip,
+  leftKnee: leftLeg.knee,
+  rightHip: rightLeg.hip,
+  rightKnee: rightLeg.knee,
+  rightFootAura: rightLeg.footAura
+};
     }
 
     // --------------------------------------------------------------------------
@@ -5038,17 +5205,20 @@
         player.bodyRoot.rotation.set(0, 0, 0);
         if (horizSpeed > 0.35 && player.onGround) {
           player.walkCycle += dt * (isSprinting ? 14.5 : 9.8);
-          const swing = Math.sin(player.walkCycle) * (isSprinting ? 0.78 : 0.52);
+          const amp = isSprinting ? 0.85 : 0.62;
+          const swing = Math.sin(player.walkCycle) * amp;
+
           player.leftHip.rotation.x = swing;
           player.rightHip.rotation.x = -swing;
-          player.leftKnee.rotation.x = Math.max(0, -swing) * 0.65;
-          player.rightKnee.rotation.x = Math.max(0, swing) * 0.65;
+
+          player.leftKnee.rotation.x = Math.max(0, -swing) * 0.85 + Math.max(0, Math.cos(player.walkCycle)) * 0.25;
+          player.rightKnee.rotation.x = Math.max(0, swing) * 0.85 + Math.max(0, -Math.cos(player.walkCycle)) * 0.25;
+
           player.leftShoulder.rotation.x = -swing * 0.75;
           player.rightShoulder.rotation.x = swing * 0.75;
-          player.leftElbow.rotation.x = -0.25;
-          player.rightElbow.rotation.x = -0.25;
-          player.bodyRoot.position.y = 0.90 + Math.abs(Math.cos(player.walkCycle)) * 0.04;
-        } else {
+          player.leftElbow.rotation.x = -0.35 - Math.max(0, swing) * 0.25;
+          player.rightElbow.rotation.x = -0.35 - Math.max(0, -swing) * 0.25;
+
           player.leftHip.rotation.x *= 0.8;
           player.rightHip.rotation.x *= 0.8;
           player.leftKnee.rotation.x *= 0.8;
@@ -5663,9 +5833,8 @@
         keys[e.code] = true;
 
         if (e.code === 'KeyV') {
-          player.firstPerson = !player.firstPerson;
-          document.getElementById('btn-toggle-pov').textContent = player.firstPerson ? '👤 第一人稱 (V)' : '👁️ 第三人稱 (V)';
-        }
+       player.firstPerson = !player.firstPerson;
+     }
         if (e.code === 'KeyL') {
           if (document.pointerLockElement === canvas) {
             document.exitPointerLock();
@@ -5782,12 +5951,10 @@
       }, { passive: false });
 
       document.addEventListener('pointerlockchange', () => {
-        const locked = document.pointerLockElement === canvas;
-        camState.isPointerLocked = locked;
-        document.getElementById('center-crosshair').classList.toggle('hidden', !locked);
-        const lockBtn = document.getElementById('btn-lock-cursor');
-        lockBtn.textContent = locked ? '🔓 解除鎖定 (ESC)' : '🎯 鎖定準心 (L)';
-      });
+     const locked = document.pointerLockElement === canvas;
+     camState.isPointerLocked = locked;
+     document.getElementById('center-crosshair').classList.toggle('hidden', !locked);
+   });
 
       canvas.addEventListener('touchstart', (e) => {
         if (e.touches.length === 1) {
@@ -5812,48 +5979,8 @@
         camState.touchDragging = false;
       });
 
-      const sensSlider = document.getElementById('mouse-sens-slider');
-      const sensValue = document.getElementById('mouse-sens-value');
-      sensSlider.addEventListener('input', (e) => {
-        camState.sensitivity = parseFloat(e.target.value);
-        sensValue.textContent = `${camState.sensitivity.toFixed(1)}x`;
-      });
-
-      document.getElementById('btn-lock-cursor').addEventListener('click', () => {
-        if (document.pointerLockElement === canvas) {
-          document.exitPointerLock();
-        } else if (canvas.requestPointerLock) {
-          canvas.requestPointerLock();
-        }
-      });
-
       document.getElementById('btn-action-attack').addEventListener('click', () => triggerPlayerAttack(1));
       document.getElementById('btn-action-heavy').addEventListener('click', () => triggerPlayerAttack(2));
-
-      document.getElementById('btn-toggle-pov').addEventListener('click', () => {
-        player.firstPerson = !player.firstPerson;
-        document.getElementById('btn-toggle-pov').textContent = player.firstPerson ? '👤 第一人稱 (V)' : '👁️ 第三人稱 (V)';
-      });
-
-      document.getElementById('btn-toggle-labels').addEventListener('click', () => {
-        showNpcLabels = !showNpcLabels;
-        document.getElementById('btn-toggle-labels').textContent = showNpcLabels ? '🏷️ 姓名職位: 開' : '🏷️ 姓名職位: 關';
-      });
-
-      document.getElementById('btn-clear-wanted').addEventListener('click', () => {
-        player.wantedStars = 0;
-        player.totalHitsLanded = 0;
-        player.hp = player.maxHp;
-        player.armor = 100;
-        updateCombatHud();
-      });
-
-      document.getElementById('btn-toggle-help').addEventListener('click', () => {
-        const body = document.getElementById('help-body');
-        const btn = document.getElementById('btn-toggle-help');
-        const hidden = body.classList.toggle('hidden');
-        btn.textContent = hidden ? '展開' : '收合';
-      });
 
       document.getElementById('npc-talk-prompt').addEventListener('click', () => {
         if (nearestNpc) openDialogue(nearestNpc);
