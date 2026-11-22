@@ -151,102 +151,8 @@
     <p class="text-xs sm:text-sm text-slate-300">正在載入 60FPS 高流暢實境：大門/急診雙入口定位、批價掛號處、急診 CPR 與放射科...</p>
   </div>
 
-  <!-- 頂部橫向：全院 1F 快速傳送列 -->
-  <div class="fixed top-2.5 left-1/2 -translate-x-1/2 z-20 w-[96vw] max-w-6xl">
-    <div class="hud-glass rounded-full px-2.5 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-xl">
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-[11px] font-bold text-amber-300">
-        🍀 1F 實景導覽
-      </span>
-      <button data-zone="entrance" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/25 hover:bg-amber-400 hover:text-slate-950 text-amber-200 border border-amber-400/30 transition">🚪 大門入口 / 挑空大廳</button>
-      <button data-zone="registration" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-pink-600/45 hover:bg-pink-500 hover:text-white text-pink-200 border border-pink-400/45 transition">💳 批價掛號處 / 品牌牆</button>
-      <button data-zone="elevatorNorth" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-teal-600/45 hover:bg-teal-400 hover:text-slate-950 text-teal-200 border border-teal-400/45 transition">🛗 北側電梯</button>
-      <button data-zone="er" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-600/45 hover:bg-rose-500 hover:text-white text-rose-200 border border-rose-400/45 transition">🚑 急診門口 / CPR 區</button>
-      <button data-zone="erTriage" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-700/45 hover:bg-rose-500 hover:text-white text-amber-200 border border-rose-400/45 transition">🩺 急診管制電動門 / 批價檢傷</button>
-      <button data-zone="radiology" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-600/45 hover:bg-sky-500 hover:text-slate-950 text-sky-200 border border-sky-400/45 transition">🩻 放射科 MRI/CT</button>
-      <button data-zone="imei" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-orange-600/35 hover:bg-orange-500 hover:text-white text-orange-200 border border-orange-400/40 transition">🥐 義美食品</button>
-      <button data-zone="starbucks" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-700/45 hover:bg-emerald-500 hover:text-slate-950 text-emerald-200 border border-emerald-400/45 transition">☕ STARBUCKS</button>
-      <button data-zone="sevenEleven" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-orange-700/45 hover:bg-orange-500 hover:text-white text-amber-200 border border-orange-400/45 transition">🏪 7-ELEVEN</button>
-      <button data-zone="artGallery" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-700/45 hover:bg-indigo-500 hover:text-white text-indigo-200 border border-indigo-400/45 transition">🖼️ 藝文廳畫展</button>
-      <button data-zone="escalator" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-500 hover:text-slate-950 text-white transition">平行手扶梯</button>
-      <button data-zone="atrium" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-500 hover:text-slate-950 text-white transition">雙挑空採光中庭</button>
-      <button data-zone="westClinics" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-pink-500 hover:text-white text-pink-200 transition">西側門診</button>
-      <button data-zone="eastClinics" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-pink-500 hover:text-white text-pink-200 transition">東側門診/腸胃科</button>
-      <button data-zone="lab" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-cyan-500 hover:text-slate-950 text-cyan-200 transition">檢驗科</button>
-      <button data-zone="pharmacy" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-emerald-500 hover:text-slate-950 text-emerald-200 transition">藥劑科</button>
-      <button data-zone="dialysis" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-500 hover:text-slate-950 text-amber-200 transition">1F 洗腎室</button>
-    </div>
-  </div>
-
-  <!-- 左上角：功能開關與操作說明面板 -->
-  <div class="fixed top-14 left-3 sm:left-4 z-20 flex flex-col gap-2 max-w-[310px]">
-    <div class="hud-glass rounded-xl p-3 text-white shadow-xl">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
-          <span class="font-bold text-xs sm:text-sm text-amber-200">幸運草醫院 1F 挑空大廳</span>
-        </div>
-        <button id="btn-toggle-help" class="px-2 py-0.5 text-[11px] rounded bg-white/10 hover:bg-white/20 text-slate-200">
-          收合
-        </button>
-      </div>
-
-      <!-- 核心互動功能按鈕列 -->
-      <div class="mt-2.5 grid grid-cols-1 gap-1.5">
-        <!-- 入口出生點模擬切換按鈕（預覽模式即時驗證大門進入 vs 急診門口進入） -->
-        <div class="grid grid-cols-2 gap-1.5">
-          <button id="btn-sim-gate-entry" class="py-1.5 px-2 rounded-lg text-[11px] font-black bg-amber-600/85 hover:bg-amber-500 border border-amber-300/45 text-white transition shadow">
-            🚪 模擬大門進入
-          </button>
-          <button id="btn-sim-er-entry" class="py-1.5 px-2 rounded-lg text-[11px] font-black bg-rose-600/85 hover:bg-rose-500 border border-rose-300/45 text-white transition shadow">
-            🚑 模擬急診進入
-          </button>
-        </div>
-
-        <div class="grid grid-cols-2 gap-1.5">
-          <button id="btn-toggle-pov" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-sky-700/80 hover:bg-sky-600 border border-sky-400/30 text-white transition">
-            👁️ 第三人稱 (V)
-          </button>
-          <button id="btn-toggle-mouselock" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-indigo-700/80 hover:bg-indigo-600 border border-indigo-400/30 text-white transition">
-            🖱️ 自由視角 (M)
-          </button>
-        </div>
-
-        <!-- 燈光情境切換按鈕 (L 鍵) -->
-        <button id="btn-cycle-lighting" class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-amber-500/25 hover:bg-amber-500/40 border border-amber-300/45 text-amber-200 transition">
-          <span id="lighting-mode-text">💡 燈光：✨ 挑空暖金</span>
-          <span class="px-1.5 py-0.5 rounded bg-black/35 text-[10px] text-amber-100">L 鍵</span>
-        </button>
-
-        <div class="grid grid-cols-2 gap-1.5">
-          <button id="btn-toggle-labels" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-emerald-700/80 hover:bg-emerald-600 border border-emerald-400/30 text-white transition">
-            🏷️ 標籤: 開
-          </button>
-          <button id="btn-open-floors" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-teal-700/85 hover:bg-teal-600 border border-teal-300/30 text-white transition">
-            🛗 樓層選單
-          </button>
-        </div>
-
-        <button id="btn-clear-wanted" class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-rose-700/75 hover:bg-rose-600 border border-rose-300/35 text-white transition">
-          <span>🕊️ 消除通緝 / 急救治療</span>
-          <span class="px-1.5 py-0.5 rounded bg-black/30 text-[10px]">C 鍵</span>
-        </button>
-      </div>
-
-      <!-- 按鍵操作表 -->
-      <div id="help-body" class="mt-2.5 pt-2 border-t border-white/10 text-[11px] text-slate-200 space-y-1">
-        <div class="flex justify-between"><span class="text-slate-400">行走 / Shift 衝刺</span><span class="font-bold text-amber-300">WASD / 方向鍵 + Shift</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">跳躍</span><span class="font-bold text-amber-300">Space 空白鍵</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">靈活滑鼠視角</span><span class="font-bold text-indigo-300">M 自由視角 / 左·右鍵拖曳</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">近戰連擊 / 重擊</span><span class="font-bold text-rose-300">滑鼠左鍵·J / K 鍵</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">彈鋼琴 / 人物互動</span><span class="font-bold text-emerald-300">靠近接觸 / E 鍵</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">走出南側大門</span><span class="font-bold text-teal-300">自動連結 1index.html</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">入口參數定位</span><span class="font-bold text-rose-300">?entry=er 急診 / ?entry=gate 大門</span></div>
-      </div>
-    </div>
-  </div>
-
   <!-- 右上角：GTA 風格狀態欄 -->
-  <div class="fixed top-14 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
+  <div class="fixed top-3 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
     <div id="hud-clock" class="gta-font gta-shadow text-xl sm:text-2xl font-bold text-white leading-none">
       10:25
     </div>
@@ -4702,7 +4608,7 @@
       const erRegTop = new THREE.Mesh(getCachedBoxGeom(8.4, 0.12, 1.35), bedFrameMat);
       erRegTop.position.set(45.5, 1.18, -26.5);
       scene.add(erRegTop);
-      addHangingSign(45.5, 3.55, -26.5, 5.4, 0.78, '急診批價掛號', 'ER REGISTRATION', '#be185d',);
+      addHangingSign(45.5, 3.55, -26.5, 5.4, 0.78, '急診批價掛號', 'ER REGISTRATION', '#be185d', '#fbcfe8');
 
       // 急診家屬休息等待區排椅
       addWaitingBenchRow(43.8, -14.5, 0, 4);
@@ -6588,11 +6494,28 @@
         const knockForce = isHeavy ? 9.5 : 4.2;
         npc.knockbackVel.copy(toNpc).multiplyScalar(knockForce);
 
+        // [補回] 命中特效、音效與倒地狀態切換
+        const isKO = npc.hp <= 0;
+        SoundFX.playHit(isHeavy, isKO);
+        spawnImpactSparks(npc.pos, isHeavy ? 0xf43f5e : 0xfbbf24, isHeavy ? 14 : 8);
+        spawnFloatingText(npc.pos, isKO ? '💥 K.O.!' : `-${dmg}`, isKO ? 'text-rose-400 text-xl' : 'text-amber-300');
+
+        if (isKO) {
+          npc.state = 'ko';
+          npc.stateTimer = 8.0; // 8 秒後恢復起身
+        } else if (npc.isGuard) {
+          npc.state = 'chase';
+          npc.stateTimer = 12.0;
+        } else if (!npc.isSeated && !npc.isWheelchair && !npc.isDoingCPR && !npc.isMedicalAttending) {
+          npc.state = 'flee';
+          npc.stateTimer = 5.0;
+        }
+
         if (npc.isErBrawler || npc.isOpdYeller) {
           // 制止急診暴力或門診言語辱罵屬於見義勇為，不增加通緝星數並獎勵護甲
           player.armor = Math.min(100, player.armor + 5);
           updateHealthArmorBarsUI();
-          if (npc.hp <= 0) {
+          if (isKO) {
             const msg = npc.isOpdYeller
               ? '🛡️ 制止門診咆哮！守護醫護人員尊嚴！'
               : '🛡️ 見義勇為！成功保護醫護人員！';
@@ -6606,32 +6529,6 @@
             updateWantedStarsUI();
           }
         }
-
-        if (npc.hp <= 0) {
-          npc.state = 'ko';
-          npc.stateTimer = 6.0;
-          spawnFloatingText(npc.pos, `💥 K.O. 急救送醫! -${dmg}`, 'text-rose-400');
-          SoundFX.playHit(true, true);
-        } else {
-          npc.state = npc.isGuard ? 'chase' : 'flee';
-          npc.stateTimer = 8.0;
-          const comboNames = ['左直拳', '右勾拳', '上勾重拳', '旋風重踢'];
-          spawnFloatingText(
-            npc.pos,
-            `${comboNames[player.attackType - 1]} -${dmg} (${player.totalHitsLanded}連擊)`,
-            isHeavy ? 'text-amber-300' : 'text-sky-300'
-          );
-          SoundFX.playHit(isHeavy, false);
-        }
-
-        spawnImpactSparks(npc.pos, isHeavy ? 0xf43f5e : 0xfbbf24, isHeavy ? 12 : 7);
-
-        const prevStars = player.wantedStars;
-        player.wantedStars = Math.min(5, Math.max(player.wantedStars, npc.isGuard ? 3 : 1 + Math.floor(player.totalHitsLanded / 4)));
-        if (player.wantedStars > prevStars) {
-          SoundFX.playSirenChirp();
-          updateWantedStarsUI();
-        }
       });
 
       if (hitCount > 0) {
@@ -6639,6 +6536,15 @@
         hitStopTimer = isHeavy ? 0.055 : 0.025;
         updateComboBadgeUI();
       }
+    } // [修正] 補上 applyMeleeHitCheck 的閉合大括號
+
+    function clearWantedAndHeal() {
+      player.wantedStars = 0;
+      player.hp = player.maxHp;
+      player.armor = 100;
+      updateWantedStarsUI();
+      updateHealthArmorBarsUI();
+      spawnFloatingText(player.pos, '✨ 警衛解除通緝 & 狀態全滿！', 'text-emerald-300');
     }
 
     function updateComboBadgeUI() {
@@ -6661,7 +6567,7 @@
         } else {
           sp.className = 'text-slate-600';
         }
-      });
+      }); // [修正] 補上 forEach 閉合小括號
     }
 
     function updateHealthArmorBarsUI() {
@@ -7724,8 +7630,7 @@
         }
       }, { passive: true });
 
-      // 入口出生點模擬切換按鈕（大門進入 vs 急診進入）
-      document.getElementById('btn-sim-gate-entry').addEventListener('click', () => {
+      document.getElementById('btn-sim-gate-entry')?.addEventListener('click', () => {
         applyEntrySpawnPoint({
           type: 'entrance',
           pos: new THREE.Vector3(0, 0, 41.2),
@@ -7736,7 +7641,7 @@
         }, true);
       });
 
-      document.getElementById('btn-sim-er-entry').addEventListener('click', () => {
+      document.getElementById('btn-sim-er-entry')?.addEventListener('click', () => {
         applyEntrySpawnPoint({
           type: 'er',
           pos: new THREE.Vector3(24.5, 0, -15.2),
@@ -7766,49 +7671,30 @@
         camState.firstPerson = !camState.firstPerson;
         document.getElementById('btn-toggle-pov').textContent = camState.firstPerson ? '👁️ 第一人稱 (V)' : '👁️ 第三人稱 (V)';
       }
-      document.getElementById('btn-toggle-pov').addEventListener('click', toggleFirstPerson);
-      document.getElementById('btn-toggle-mouselock').addEventListener('click', togglePointerLockMode);
-      document.getElementById('btn-cycle-lighting').addEventListener('click', cycleLightingMode);
+      document.getElementById('btn-toggle-pov')?.addEventListener('click', toggleFirstPerson);
+document.getElementById('btn-toggle-mouselock')?.addEventListener('click', togglePointerLockMode);
+document.getElementById('btn-cycle-lighting')?.addEventListener('click', cycleLightingMode);
 
-      document.getElementById('btn-toggle-labels').addEventListener('click', () => {
-        showNpcLabels = !showNpcLabels;
-        document.getElementById('btn-toggle-labels').textContent = showNpcLabels ? '🏷️ 標籤: 開' : '🏷️ 標籤: 關';
-      });
+document.getElementById('btn-toggle-labels')?.addEventListener('click', () => {
+  showNpcLabels = !showNpcLabels;
+  const lblBtn = document.getElementById('btn-toggle-labels');
+  if (lblBtn) lblBtn.textContent = showNpcLabels ? '🏷️ 標籤: 開' : '🏷️ 標籤: 關';
+});
 
-      document.getElementById('btn-open-floors').addEventListener('click', () => {
-        openFloorModal(null);
-      });
+document.getElementById('btn-open-floors')?.addEventListener('click', () => {
+  openFloorModal(null);
+});
 
-      document.getElementById('floor-modal-close').addEventListener('click', () => closeFloorModal(true));
+document.getElementById('btn-clear-wanted')?.addEventListener('click', clearWantedAndHeal);
 
-      document.querySelectorAll('.floor-choice-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const floorKey = btn.getAttribute('data-floor');
-          if (floorKey === '1F') {
-            closeFloorModal(true);
-            spawnFloatingText(player.pos, '您目前已在 1F 一樓大廳！', 'text-teal-300');
-          } else {
-            selectFloorAndRedirect(floorKey);
-          }
-        });
-      });
-
-      function clearWantedAndHeal() {
-        player.wantedStars = 0;
-        player.hp = 100;
-        player.armor = 100;
-        updateWantedStarsUI();
-        updateHealthArmorBarsUI();
-        spawnFloatingText(player.pos, '🕊️ 通緝解除 & 生命全滿!', 'text-emerald-300');
-      }
-      document.getElementById('btn-clear-wanted').addEventListener('click', clearWantedAndHeal);
-
-      document.getElementById('btn-toggle-help').addEventListener('click', () => {
-        const body = document.getElementById('help-body');
-        const btn = document.getElementById('btn-toggle-help');
-        body.classList.toggle('hidden');
-        btn.textContent = body.classList.contains('hidden') ? '展開' : '收合';
-      });
+document.getElementById('btn-toggle-help')?.addEventListener('click', () => {
+  const body = document.getElementById('help-body');
+  const btn = document.getElementById('btn-toggle-help');
+  if (body && btn) {
+    body.classList.toggle('hidden');
+    btn.textContent = body.classList.contains('hidden') ? '展開' : '收合';
+  }
+});
 
       document.getElementById('btn-action-attack').addEventListener('click', () => triggerMeleeCombo(false));
       document.getElementById('btn-action-heavy').addEventListener('click', () => triggerMeleeCombo(true));
@@ -7905,6 +7791,20 @@
       applyEntrySpawnPoint(entrySpawnNotice, false);
 
       setupInputsAndUI();
+
+      // 綁定樓層選擇視窗的關閉按鈕與 B1~8F 樓層按鈕
+      document.getElementById('floor-modal-close')?.addEventListener('click', () => {
+        closeFloorModal(true);
+      });
+
+      document.querySelectorAll('.floor-choice-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const floorKey = btn.getAttribute('data-floor');
+          if (floorKey) {
+            selectFloorAndRedirect(floorKey);
+          }
+        });
+      });
 
       window.addEventListener('resize', () => {
         cachedHalfW = window.innerWidth * 0.5;
