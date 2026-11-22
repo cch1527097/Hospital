@@ -1714,7 +1714,7 @@
       addWall(25.2, -37.5, 0.5, 18.0, 4.4, wallPinkMat, '2F 血液透析中心西牆', 2, f2Y);
       addWall(38.0, -28.6, 26.0, 0.5, 4.4, wallPinkMat, '2F 血液透析中心南牆', 2, f2Y);
       addWall(43.5, -36.5, 14.5, 0.45, 4.4, wallBlueMat, 'CAPD 腹膜透析室隔間', 2, f2Y);
-      addHangingSign(37.5, f2Y + 3.6, -28.6, 7.0, 0.88, '2F 血液透析中心・CAPD 中心', '腎臟科 李文清醫師・許麗美醫師・血液透析區', '#be123c', '#fda4af');
+      addHangingSign(37.5, f2Y + 3.6, -28.6, 7.0, 0.88, '血液透析中心・CAPD 中心', '血液透析區', '#be123c', '#fda4af');
       addHangingSign(35.0, f2Y + 3.3, -35.8, 5.4, 0.72, '血液透析中心', 'HEMODIALYSIS CENTER', '#0369a1', '#7dd3fc');
       addClinicDoorSet(28.5, f2Y, -28.6, 0, '血液透析中心');
 
@@ -1753,7 +1753,7 @@
       scene.add(orAutoDoorL, orAutoDoorR);
 
       addWall(9.5, -12.1, 4.8, 1.05, 1.05, counterWoodMat, '開刀房管制護理站 (N/S)', 2, f2Y, false);
-      addHangingSign(18.5, f2Y + 3.55, -13.15, 7.2, 0.88, '開刀房 (OR-1 ~ OR-9)・自動感應電動門', 'OPERATING ROOMS・無菌管制區・靠近自動感應開門', '#065f46', '#6ee7b7');
+      addHangingSign(18.5, f2Y + 3.55, -13.15, 7.2, 0.88, '開刀房', 'OPERATING ROOMS', '#065f46', '#6ee7b7');
 
       [14.5, 21.0, 27.5].forEach((ox, idx) => {
         buildOperatingTableUnit(ox, -20.8, `OR-${idx + 1}`, f2Y);
@@ -1806,8 +1806,8 @@
       scene.add(cathAutoDoorL, cathAutoDoorR);
 
       addWall(-17.5, -12.1, 4.8, 1.05, 1.05, counterTopMat, 'ICU 加護病房護理站', 2, f2Y, false);
-      addHangingSign(-23.5, f2Y + 3.55, -13.15, 6.8, 0.88, '內科 ICU (25床) / 外科 ICU (19床)・電動門', 'INTENSIVE CARE UNIT・靠近自動感應開門', '#1d4ed8', '#93c5fd');
-      addHangingSign(-9.5, f2Y + 3.55, -13.15, 5.4, 0.85, '心導管室・麻醉恢復室・電動門', 'CATHETERIZATION LAB・無菌管制區', '#be123c', '#fda4af');
+      addHangingSign(-23.5, f2Y + 3.55, -13.15, 6.8, 0.88, 'MICU / SICU', 'INTENSIVE CARE UNIT', '#1d4ed8', '#93c5fd');
+      addHangingSign(-9.5, f2Y + 3.55, -13.15, 5.4, 0.85, '心導管室・麻醉恢復室', 'CATHETERIZATION LAB', '#be123c', '#fda4af');
 
       // ICU 病床（含吊點滴架與輸液點滴袋）與心導管恢復床
       buildHospitalBedUnit(-29.5, -21.2, 0x38bdf8, false, true, 2, f2Y);
@@ -2133,7 +2133,7 @@
       addWall(15.6, 32.0, 0.5, 19.5, 4.4, wallPinkMat, '心血管中心東牆', 2, f2Y);
       addWall(8.7, 36.5, 13.4, 0.45, 4.4, wallCreamMat, '心血管診間後方隔間牆', 2, f2Y);
 
-      addHangingSign(8.7, f2Y + 3.65, 22.2, 6.4, 0.88, '心血管中心・心臟內外科門診', 'CARDIOVASCULAR CENTER・215/216診・心臟超音波・運動心電圖', '#be123c', '#fda4af');
+      addHangingSign(8.7, f2Y + 3.65, 22.2, 6.4, 0.88, '心血管中心・心臟內外科門診', 'CARDIOVASCULAR CENTER・215/216診', '#be123c', '#fda4af');
 
       addClinicDoorSet(4.8, f2Y, 36.3, 0, '215 心臟內科');
       addClinicDoorSet(8.7, f2Y, 36.3, 0, '216 心臟外科');
@@ -3056,7 +3056,7 @@
 
         // ==================== ★ 2F 婦產科護理站、產房 (Delivery Room)、嬰兒室 & 婦產科病房 NPC ★ ====================
         {
-          name: '陳怡君 婦產科護理長',
+          name: '陳怡君 護理長',
           role: '2F 婦產科護理站・資深護理長',
           avatar: '👩‍⚕️',
           type: 'staff',
@@ -3076,7 +3076,7 @@
           ]
         },
         {
-          name: '林佳慧 婦產科護理站護理師',
+          name: '林佳慧 護理師',
           role: '2F 婦產科護理站・住院入院辦理與衛教',
           avatar: '💉',
           type: 'staff',
@@ -3105,7 +3105,7 @@
           options: []
         },
         {
-          name: '黃詩婷 產房專責助產護理師',
+          name: '黃詩婷 專責助產護理師',
           role: '2F 產房 (Delivery Room)・待產與分娩照護',
           avatar: '👩‍⚕️',
           type: 'staff',
@@ -3119,7 +3119,7 @@
           options: []
         },
         {
-          name: '許雅雯 婦產科病房巡房護理師',
+          name: '許雅雯 護理師',
           role: '2F 婦產科病房 (201~210)・產後護理照護',
           avatar: '🍼',
           type: 'staff',
@@ -3138,7 +3138,7 @@
           options: []
         },
         {
-          name: '王婉如 NICU 新生兒護理師',
+          name: '王婉如 護理師',
           role: '2F 嬰兒室觀察窗前・母嬰衛教護理師',
           avatar: '👶',
           type: 'staff',
@@ -3213,7 +3213,7 @@
           options: []
         },
         {
-          name: '鄭雅琪 嬰兒室照護護理師',
+          name: '鄭雅琪 護理師',
           role: '2F 嬰兒室內部・新生兒餵奶與拍嗝照護',
           avatar: '👩‍⚕️',
           type: 'staff',
@@ -3231,7 +3231,7 @@
           options: []
         },
         {
-          name: '蔡佩君 嬰兒室專科護理師',
+          name: '蔡佩君 護理師',
           role: '2F 嬰兒室內部・新生兒沐浴與體溫監測',
           avatar: '💉',
           type: 'staff',
@@ -3249,7 +3249,7 @@
           options: []
         },
         {
-          name: '謝佳玲 新生兒加護護理師',
+          name: '謝佳玲 護理師',
           role: '2F 嬰兒室內部・保溫箱恆溫與感染管制',
           avatar: '👩‍⚕️',
           type: 'staff',
@@ -3282,7 +3282,7 @@
           options: []
         },
         {
-          name: '張雅筑 開刀房刷手護理師',
+          name: '張雅筑 護理師',
           role: '2F 開刀房 (OR-2)・無菌器械傳遞護理師',
           avatar: '💉',
           type: 'staff',
@@ -3311,8 +3311,8 @@
           options: []
         },
         {
-          name: '林慧如 開刀房管制護理師',
-          role: '2F 開刀房電動門外護理站 (N/S)',
+          name: '林慧如 開刀房護理師',
+          role: '2F 開刀房護理站 (N/S)',
           avatar: '👩‍⚕️',
           type: 'staff',
           floor: 2,
@@ -3371,7 +3371,7 @@
           options: []
         },
         {
-          name: '張雅雯 心導管室護理師',
+          name: '張雅雯 護理師',
           role: '2F 心導管室 / 麻醉恢復室・床邊照護',
           avatar: '❤️',
           type: 'staff',
@@ -3433,7 +3433,7 @@
 
         // ==================== ★ 2F 腎臟科（李文清醫師 + 許麗美醫師）★ ====================
         {
-          name: '李文清 主治醫師 (腎臟科)',
+          name: '李文清 主治醫師',
           role: '腎臟科・2F 洗腎室 / CAPD 中心',
           avatar: '🩺',
           type: 'staff',
@@ -3457,7 +3457,7 @@
           ]
         },
         {
-          name: '許麗美 主治醫師 (腎臟科)',
+          name: '許麗美 主治醫師',
           role: '腎臟科・慢性腎臟病衛教 / 2F 洗腎室',
           avatar: '👩‍⚕️',
           type: 'staff',
