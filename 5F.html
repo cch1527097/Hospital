@@ -88,103 +88,14 @@
 
   <!-- 頂部橫向：全院各科區域與電梯快速傳送列 -->
   <div class="fixed top-2.5 left-1/2 -translate-x-1/2 z-20 w-[96vw] max-w-6xl">
-    <div class="hud-glass rounded-full px-2.5 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-xl">
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-sky-500/25 border border-sky-400/50 text-[11px] font-black text-sky-300">
-        🖱️ 無須鎖定滑鼠・拖曳轉向
-      </span>
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-rose-500/25 border border-rose-400/50 text-[11px] font-black text-rose-300">
-        🏥 5F 住院病房
-      </span>
-      <button data-zone="f5_ward_east" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-rose-400/90 hover:bg-rose-300 text-slate-950 transition">📍 5F 東側走道・E化車/520病房</button>
-      <button data-zone="f5_room_520" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-emerald-400/90 hover:bg-emerald-300 text-slate-950 transition">🛏️ 走入 520 病房內部</button>
-      <button data-zone="f5_elevator" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-sky-400/90 hover:bg-sky-300 text-slate-950 transition">🛗 5F 中央電梯廳 (B1~8F)</button>
-      <button data-zone="f5_nursing_west" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-emerald-500 hover:text-slate-950 text-emerald-200 transition">🛡️ 5F 西側護理站/558與537病房</button>
-      <button data-zone="f5_chapel" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-500 hover:text-slate-950 text-amber-200 transition">🙏 5F 祈禱室/神明廳</button>
-      <button data-zone="f5_rotunda" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-sky-500 hover:text-slate-950 text-sky-200 transition">🔭 5F 南側半圓弧展望廳</button>
-
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-teal-500/25 border border-teal-400/50 text-[11px] font-black text-teal-300 ml-1">
-        3F
-      </span>
-      <button data-zone="f3_rotunda" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-500 hover:text-slate-950 text-teal-200 transition">🔭 3F 圓弧展望廳</button>
-      <button data-zone="f3_sleep" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-500 hover:text-slate-950 text-amber-200 transition">😴 3F 睡眠中心</button>
-      <button data-zone="f3_banting" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-rose-500 hover:text-slate-950 text-rose-200 transition">👁️ 3F 班廷俱樂部/眼科</button>
-
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-amber-500/25 border border-amber-400/50 text-[11px] font-black text-amber-300 ml-1">
-        2F
-      </span>
-      <button data-zone="f2_nephrology" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-amber-400/90 hover:bg-amber-300 text-slate-950 transition">👨‍⚕️ 2F 腎臟科(李文清醫師)</button>
-      <button data-zone="f2_or" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-emerald-500 hover:text-slate-950 text-emerald-200 transition">🔪 2F 開刀房/ICU</button>
-
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-sky-500/25 border border-sky-400/50 text-[11px] font-black text-sky-300 ml-1">
-        1F
-      </span>
-      <button data-zone="entrance" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-500 hover:text-slate-950 text-slate-100 transition">🚪 1F 入口門廳</button>
-      <button data-zone="registration" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-slate-100 transition">🎫 1F 批價掛號</button>
-      <button data-zone="er" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-rose-500 hover:text-white text-slate-100 transition">🚑 1F 急診室</button>
-    </div>
   </div>
 
   <!-- 左上角：操作說明、地板材質切換與滑鼠靈敏度控制面板 -->
   <div class="fixed top-14 left-3 sm:left-4 z-20 flex flex-col gap-2 max-w-[305px] sm:max-w-[335px]">
-    <div class="hud-glass rounded-2xl p-3 text-white shadow-xl">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-teal-400 shadow-[0_0_8px_#2dd4bf]"></span>
-          <span class="font-bold text-xs sm:text-sm text-teal-200">幸運草醫院-模擬人生</span>
-        </div>
-        <button id="btn-toggle-help" class="px-2 py-0.5 text-[11px] rounded bg-white/10 hover:bg-white/20 text-slate-200">
-          收合
-        </button>
-      </div>
-
-      <!-- 視角、標籤與快速開啟樓層選單按鈕 -->
-      <div class="mt-2 grid grid-cols-2 gap-1.5">
-        <button id="btn-toggle-pov" class="py-1.5 px-2 rounded-xl text-xs font-bold bg-sky-500/20 border border-sky-400/50 text-sky-200 hover:bg-sky-500/30 transition">
-          🎥 第三人稱視角
-        </button>
-        <button id="btn-toggle-labels" class="py-1.5 px-2 rounded-xl text-xs font-bold bg-amber-500/20 border border-amber-400/50 text-amber-200 hover:bg-amber-500/30 transition">
-          🏷️ NPC 名牌：開
-        </button>
-      </div>
-
-      <div class="mt-1.5 grid grid-cols-2 gap-1.5">
-        <button id="btn-open-floors" class="py-1.5 px-2 rounded-xl text-xs font-bold bg-indigo-500/25 border border-indigo-400/50 text-indigo-200 hover:bg-indigo-500/40 transition">
-          🛗 樓層直達 (B1~8F)
-        </button>
-        <button id="btn-clear-wanted" class="py-1.5 px-2 rounded-xl text-xs font-bold bg-emerald-500/20 border border-emerald-400/50 text-emerald-200 hover:bg-emerald-500/35 transition">
-          🏥 消除通緝/滿血 (C)
-        </button>
-      </div>
-
-      <!-- 全院地板材質即時切換按鈕 -->
-      <div class="mt-1.5">
-        <button id="btn-cycle-floor" class="w-full py-1.5 px-2.5 rounded-xl text-xs font-black bg-teal-500/25 border border-teal-400/55 text-teal-200 hover:bg-teal-500/40 transition flex items-center justify-between">
-          <span>🧱 地板材質切換</span>
-          <span id="floor-style-badge" class="px-2 py-0.5 rounded bg-teal-400/25 text-white font-bold">水磨石醫療磚</span>
-        </button>
-      </div>
-
-      <!-- 滑鼠靈敏度微調滑桿 -->
-      <div class="mt-2 pt-2 border-t border-white/10 flex items-center justify-between gap-2 text-[11px]">
-        <span class="text-sky-300 font-bold shrink-0">🖱️ 滑鼠靈敏度</span>
-        <input id="mouse-sens-slider" type="range" min="0.4" max="2.2" step="0.1" value="1.1"
-               class="w-24 accent-sky-400 cursor-pointer" />
-        <span id="mouse-sens-val" class="font-mono text-slate-200 w-8 text-right">1.1x</span>
-      </div>
-
-      <div id="help-body" class="mt-2 pt-2 border-t border-white/10 text-[11px] text-slate-200 space-y-1">
-        <div class="flex justify-between"><span class="text-slate-400">游標模式</span><span class="font-bold text-amber-300">無須鎖定滑鼠・拖曳轉向</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">移動 / 衝刺 / 跳躍</span><span class="font-bold text-teal-300">W A S D / 方向鍵 / Shift / Space</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">旋轉 / 縮放視角</span><span class="font-bold text-sky-300">左鍵或右鍵拖曳旋轉・滾輪縮放</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">走入病房探視</span><span class="font-bold text-emerald-300">直接走進敞開的 520/558/537 病房</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">接觸電梯門廳</span><span class="font-bold text-amber-300">靠近自動詢問 B1~8F 樓層連結</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">近戰連擊 / 對話</span><span class="font-bold text-rose-300">單擊畫布 / J / K 攻擊・E 對話</span></div>
-      </div>
-    </div>
   </div>
 
   <!-- 右上角：GTA 狀態欄 (時間、通緝警星、生命/護甲條、目前所在區域) -->
-  <div class="fixed top-14 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
+  <div class="fixed top-3 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
     <div id="hud-clock" class="gta-font gta-shadow text-xl sm:text-2xl font-bold text-white leading-none">
       10:25
     </div>
@@ -321,16 +232,6 @@
     let scene, camera, renderer;
     const clock = new THREE.Clock();
 
-    // 追蹤所有地坪網格與走廊壓條網格，支援一鍵即時切換三種地坪材質
-    const floorSurfaceRegistry = [];
-    const floorInlayMaterials = [];
-    const FLOOR_STYLES = [
-      { key: 'terrazzo', label: '水磨石醫療磚', inlayColor: 0x64748b },
-      { key: 'marble',   label: '大理石紋地磚', inlayColor: 0x475569 },
-      { key: 'wood',     label: '溫潤木紋地板', inlayColor: 0x7c4d2b }
-    ];
-    let currentFloorStyleIdx = 0;
-
     // 牆面與大型醫療設施碰撞箱陣列：{ minX, maxX, minZ, maxZ, floor, label }
     const colliders = [];
 
@@ -408,7 +309,7 @@
       f5_ward_east:    { label: '5F 東側護理站 B・E化行動護理車 / 520 病房走廊', pos: new THREE.Vector3(16.5, 13.8, -23.5), yaw: Math.PI },
       f5_room_520:     { label: '5F 520 雙人住院病房內部（薄荷綠病床・點滴架・臥床病患）', pos: new THREE.Vector3(16.5, 13.8, -32.2), yaw: Math.PI },
       f5_elevator:     { label: '5F 中央電梯轉乘廳 (可往 B1 ~ 8F)', pos: new THREE.Vector3(0, 13.8, 8.2), yaw: Math.PI },
-      f5_nursing_west: { label: '5F 西側護理站 B/C・558 病房・537 正壓隔離病房', pos: new THREE.Vector3(-22.5, 13.8, -23.5), yaw: Math.PI },
+      f5_nursing_west: { label: '5F 西側護理站 B/C・558 病房・537 負壓隔離病房', pos: new THREE.Vector3(-22.5, 13.8, -23.5), yaw: Math.PI },
       f5_chapel:       { label: '5F 中央護理站 A・祈禱室・神明廳・點滴庫房', pos: new THREE.Vector3(0, 13.8, -12.5), yaw: 0 },
       f5_rotunda:      { label: '5F 南側・半圓弧玻璃展望大廳', pos: new THREE.Vector3(0, 13.8, 34.5), yaw: 0 },
       f3_rotunda:      { label: '3F 南側・中央圓弧玻璃展望廳', pos: new THREE.Vector3(0, 9.2, 36.5), yaw: Math.PI },
@@ -426,7 +327,7 @@
       { code: '1F', keyHint: '1', file: '1F.html', title: '1F 一樓大廳', desc: '入口門廳・批價掛號・門診區・急診室・放射科・藥局', badgeBg: 'bg-sky-600' },
       { code: '2F', keyHint: '2', file: '2F.html', title: '2F 二樓醫療層', desc: '2F 洗腎室 (腎臟科 李文清醫師)・開刀房・ICU・婦產/牙科', badgeBg: 'bg-amber-600' },
       { code: '3F', keyHint: '3', file: '3F.html', title: '3F 三樓醫療層', desc: '睡眠中心・婦產科 VIP 病房・班廷俱樂部・眼科・慢性病房', badgeBg: 'bg-teal-600' },
-      { code: '5F', keyHint: '5', file: '5F.html', title: '5F 五樓病房層（目前位置）', desc: '517~563 住院病房・537 正壓病房・開放式木質護理站・祈禱室', badgeBg: 'bg-rose-600' },
+      { code: '5F', keyHint: '5', file: '5F.html', title: '5F 五樓病房層（目前位置）', desc: '517~563 住院病房・537 負壓病房・開放式木質護理站・祈禱室', badgeBg: 'bg-rose-600' },
       { code: '6F', keyHint: '6', file: '6F.html', title: '6F 六樓病房層', desc: '綜合內外科住院病房・護理站・家屬休憩區', badgeBg: 'bg-emerald-600' },
       { code: '7F', keyHint: '7', file: '7F.html', title: '7F 七樓病房層', desc: '外科與骨科住院病房・物理/職能復健治療中心', badgeBg: 'bg-indigo-600' },
       { code: '8F', keyHint: '8', file: '8F.html', title: '8F 八樓醫療層', desc: '高級健康管理中心・國際醫療特等病房・空中景觀庭園', badgeBg: 'bg-purple-600' }
@@ -802,8 +703,6 @@
       }
 
       function getFloorMaterialByStyle(styleKey, repeatX = 34, repeatY = 30, elevated = false) {
-        if (styleKey === 'marble') return getMarbleTileFloorMaterial(repeatX, repeatY, elevated);
-        if (styleKey === 'wood') return getWarmWoodFloorMaterial(repeatX, repeatY, elevated);
         return getTerrazzoTileFloorMaterial(repeatX, repeatY, elevated);
       }
 
@@ -1033,35 +932,6 @@
         getFrostedBandGlassMaterial
       };
     })();
-
-    /**
-     * 註冊可動態切換材質的地坪網格，並在切換時即時套用至全院 1F ~ 5F
-     */
-    function registerFloorSurface(mesh, repeatX, repeatY, elevated = false) {
-      floorSurfaceRegistry.push({ mesh, repeatX, repeatY, elevated });
-    }
-
-    function applyFloorStyle(styleIdx) {
-      currentFloorStyleIdx = styleIdx % FLOOR_STYLES.length;
-      const styleObj = FLOOR_STYLES[currentFloorStyleIdx];
-
-      floorSurfaceRegistry.forEach((entry) => {
-        entry.mesh.material = ArchitecturalMaterials.getFloorMaterialByStyle(
-          styleObj.key,
-          entry.repeatX,
-          entry.repeatY,
-          entry.elevated
-        );
-        entry.mesh.material.needsUpdate = true;
-      });
-
-      floorInlayMaterials.forEach((mat) => {
-        mat.color.setHex(styleObj.inlayColor);
-      });
-
-      const badge = document.getElementById('floor-style-badge');
-      if (badge) badge.textContent = styleObj.label;
-    }
 
     function createSignTexture(title, subtitle = '', bgColor = '#0f4c5c', accentColor = '#2dd4bf') {
       const canvas = document.createElement('canvas');
@@ -1806,7 +1676,6 @@
       ground1F.rotation.x = -Math.PI / 2;
       ground1F.receiveShadow = true;
       scene.add(ground1F);
-      registerFloorSurface(ground1F, 36, 32, false);
 
       const ceil1F = new THREE.Mesh(new THREE.PlaneGeometry(110, 96), ceilMat);
       ceil1F.rotation.x = Math.PI / 2;
@@ -1836,7 +1705,7 @@
 
       addWall(-5.2, 42.8, 3.2, 2.8, 4.2, null, '西側警衛室', 1, 0, 'clinical_blue');
       addWall(5.2, 42.8, 3.2, 2.8, 4.2, null, '東側警衛室', 1, 0, 'clinical_blue');
-      addHangingSign(0, 3.85, 42.2, 7.2, 0.9, '彰濱秀傳紀念醫院 1F 入口門廳', 'MAIN ENTRANCE LOBBY・歡迎蒞臨本院', '#0f4c5c', '#2dd4bf');
+      addHangingSign(0, 3.85, 42.2, 7.2, 0.9, '幸運草醫院 1F 入口門廳', 'MAIN ENTRANCE LOBBY・歡迎蒞臨本院', '#0f4c5c', '#2dd4bf');
 
       const kiosk1F = new THREE.Mesh(
         new THREE.BoxGeometry(1.35, 1.95, 0.18),
@@ -1962,9 +1831,6 @@
       buildHospital5FInterior(frostedGlassMat, darkFrameMat, counterWoodMat);
     }
 
-    /**
-     * 建構「彰濱秀傳紀念醫院 2F 醫療樓層」
-     */
     function buildHospital2FInterior(frostedGlassMat, darkFrameMat, counterWoodMat) {
       const f2Y = 4.6;
       const ceilMat = ArchitecturalMaterials.getAcousticCeilingMaterial(24, 20);
@@ -1977,7 +1843,6 @@
         slab.position.set(cx, f2Y - 0.11, cz);
         slab.receiveShadow = true;
         scene.add(slab);
-        registerFloorSurface(slab, repX, repY, false);
       };
 
       // 嚴格保留 0.04 水平微間隙，零共面重疊
@@ -2035,9 +1900,6 @@
       buildDentalChairUnit(34.5, 22.5, f2Y);
     }
 
-    /**
-     * 建構「彰濱秀傳紀念醫院 3F 醫療樓層」
-     */
     function buildHospital3FInterior(frostedGlassMat) {
       const f3Y = 9.2;
       const ceilMat = ArchitecturalMaterials.getAcousticCeilingMaterial(24, 20);
@@ -2051,7 +1913,6 @@
         slab.position.set(cx, f3Y - 0.11, cz);
         slab.receiveShadow = true;
         scene.add(slab);
-        registerFloorSurface(slab, repX, repY, false);
       };
 
       // 嚴格保留 0.04 水平微間隙，零共面重疊
@@ -2096,9 +1957,6 @@
       });
     }
 
-    /**
-     * 建構「彰濱秀傳紀念醫院 5F 住院病房與開放式木質環形護理站樓層」
-     */
     function buildHospital5FInterior(frostedGlassMat, darkFrameMat, counterWoodMat) {
       const f5Y = 13.8;
       const ceilMat = ArchitecturalMaterials.getAcousticCeilingMaterial(24, 14);
@@ -2113,7 +1971,6 @@
         slab.position.set(cx, f5Y - 0.11 + yOffset, cz);
         slab.receiveShadow = true;
         scene.add(slab);
-        registerFloorSurface(slab, repX, repY, elevated);
       };
 
       // 嚴格切割北、中、南三塊主樓板（Z: -47.2 ~ -3.52, -3.48 ~ 22.98, 23.02 ~ 44.5），杜絕任何共面 Z-fighting
@@ -2131,7 +1988,6 @@
         polygonOffsetFactor: -3,
         polygonOffsetUnits: -3
       });
-      floorInlayMaterials.push(inlayBorderMat);
 
       const addFloorInlay = (cx, cz, w, d) => {
         const strip = new THREE.Mesh(new THREE.PlaneGeometry(w, d), inlayBorderMat);
@@ -2187,14 +2043,14 @@
       buildWalkInWardRoom(-16.0, -33.1, f5Y, '560', { bed1Patient: true, bed2Patient: false });
       buildWalkInWardRoom(-22.5, -33.1, f5Y, '558', { bed1Patient: false, bed2Patient: true });
 
-      addWall(-32.35, -33.4, 13.3, 8.7, 4.4, null, '5F 553~556 住院病房', 5, f5Y, 'ward');
+      addWall(-32.35, -33.4, 13.3, 8.7, 4.4, null, '553~556 住院病房', 5, f5Y, 'ward');
       addHospitalWardDoor(-35.5, -29.05, f5Y, '553 病房', false, false, false);
       addHospitalWardDoor(-29.0, -29.05, f5Y, '556 病房', false, false, false);
 
-      addWall(-9.65, -33.4, 6.3, 8.7, 4.4, null, '5F 562 住院病房', 5, f5Y, 'ward');
+      addWall(-9.65, -33.4, 6.3, 8.7, 4.4, null, '562 住院病房', 5, f5Y, 'ward');
       addHospitalWardDoor(-9.5, -29.05, f5Y, '562 病房', false, false, false);
 
-      addWall(0.15, -33.4, 13.3, 8.7, 4.4, null, '5F 配膳室與污物處理室', 5, f5Y, 'ward');
+      addWall(0.15, -33.4, 13.3, 8.7, 4.4, null, '污物處理室', 5, f5Y, 'ward');
       addHospitalWardDoor(4.2, -29.05, f5Y, '527 病房', false, false, false);
 
       buildWalkInWardRoom(10.0, -33.1, f5Y, '525', { bed1Patient: true, bed2Patient: false });
@@ -2205,11 +2061,11 @@
       addHospitalWardDoor(29.5, -29.05, f5Y, '518 病房', false, false, false);
       addHospitalWardDoor(35.5, -29.05, f5Y, '517 病房', false, false, false);
 
-      addHangingSign(-21.5, f5Y + 3.65, -28.6, 7.6, 0.88, '5F 住院病房 (553 ～ 562 病房)', '558・560', '#0f4c5c', '#2dd4bf');
-      addHangingSign(18.5, f5Y + 3.65, -28.6, 7.8, 0.88, '5F 住院病房 (525・520・519 病房)', '520', '#be185d', '#f9a8d4');
+      addHangingSign(-21.5, f5Y + 3.65, -28.6, 7.6, 0.88, '一般病房 (553 ～ 562)', '558・560', '#0f4c5c', '#2dd4bf');
+      addHangingSign(18.5, f5Y + 3.65, -28.6, 7.8, 0.88, '一般病房 (525・520・519)', '520', '#be185d', '#f9a8d4');
 
       // 2. 西翼病房區 (552 ~ 538) & 西側電梯廳接觸感應區
-      addWall(-47.5, -24.5, 10.5, 22.0, 4.4, null, '西側病房 (552~538)', 5, f5Y, 'ward');
+      addWall(-47.5, -24.5, 10.5, 22.0, 4.4, null, '一般病房 (552~538)', 5, f5Y, 'ward');
       addHangingSign(-41.8, f5Y + 3.55, -24.5, 5.4, 0.82, '552 ～ 538 病房區・西側電梯廳', '接觸電梯門自動選擇 B1 ~ 8F', '#0369a1', '#7dd3fc', Math.PI / 2);
       addTransportTriggerZone({
         type: 'elevator',
@@ -2222,8 +2078,7 @@
         maxZ: -22.2
       });
 
-      // 南側病房與可走入式 537 正壓隔離病房
-      addWall(-26.5, -7.2, 31.0, 6.2, 4.4, null, '536~528 住院病房', 5, f5Y, 'ward');
+      addWall(-26.5, -7.2, 31.0, 6.2, 4.4, null, '一般病房 (536 ~ 528)', 5, f5Y, 'ward');
       [-35.0, -28.0, -21.0, -14.5].forEach((wx, idx) => {
         addHospitalWardDoor(wx, -10.3, f5Y, `${536 - idx * 2} 病房`, true, false, false);
       });
@@ -2240,7 +2095,7 @@
         ivSide: 1
       });
       addHangingSign(-46.5, f5Y + 3.6, -10.6, 5.2, 0.85, '537 負壓隔離病房', 'POSITIVE PRESSURE ISOLATION WARD', '#1d4ed8', '#93c5fd', Math.PI);
-      addHangingSign(-25.5, f5Y + 3.6, -10.6, 6.4, 0.85, '536 ～ 528 住院病房', 'INPATIENT WARDS (528-536)', '#0f766e', '#5eead4', Math.PI);
+      addHangingSign(-25.5, f5Y + 3.6, -10.6, 6.4, 0.85, '一般病房 (536 ~ 528)', 'INPATIENT WARDS (528-536)', '#0f766e', '#5eead4', Math.PI);
 
       // 3. 東翼病房區 & 東側電梯廳接觸感應區
       addWall(47.5, -24.5, 10.5, 22.0, 4.4, null, '東側病房', 5, f5Y, 'ward');
@@ -2256,11 +2111,11 @@
         maxZ: -22.2
       });
 
-      addWall(31.5, -7.2, 41.0, 6.2, 4.4, null, '南東側住院病房與點滴庫房', 5, f5Y, 'ward');
+      addWall(31.5, -7.2, 41.0, 6.2, 4.4, null, '一般病房', 5, f5Y, 'ward');
       [15.0, 22.5, 30.0, 37.5].forEach((wx, idx) => {
         addHospitalWardDoor(wx, -10.3, f5Y, `${516 - idx} 病房`, true, false, false);
       });
-      addHangingSign(28.5, f5Y + 3.6, -10.6, 6.4, 0.85, '南東側住院病房・點滴庫房', 'IV FLUID STORAGE & INPATIENT WARDS', '#0f766e', '#5eead4', Math.PI);
+      addHangingSign(28.5, f5Y + 3.6, -10.6, 6.4, 0.85, '一般病房', 'IV FLUID STORAGE & INPATIENT WARDS', '#0f766e', '#5eead4', Math.PI);
 
       // 4. 5F 走道 E 化行動護理工作車 (E-Cart) 陣列
       buildMedicalECart(14.0, -25.2, f5Y, Math.PI * 0.15);
@@ -2426,10 +2281,10 @@
 
         if (isEastSide) {
           addHangingSign(cx, f5Y + 3.55, cz - 2.35, 6.8, 0.84, '東側護理站', 'NURSING STATION', '#065f46', '#6ee7b7');
-          addHangingSign(cx, f5Y + 3.55, cz + 2.35, 6.8, 0.84, '護理站・護理長室', 'HEAD NURSE・TREATMENT ROOM', '#0f766e', '#5eead4', Math.PI);
+          addHangingSign(cx, f5Y + 3.55, cz + 2.35, 6.8, 0.84, '東側護理站', 'NURSING STATION', '#0f766e', '#5eead4', Math.PI);
         } else {
           addHangingSign(cx, f5Y + 3.55, cz - 2.35, 6.8, 0.84, '西側護理站', 'NURSING STATION', '#065f46', '#6ee7b7');
-          addHangingSign(cx, f5Y + 3.55, cz + 2.35, 6.8, 0.84, '護理站・護理長室', 'HEAD NURSE・TREATMENT ROOM', '#0f766e', '#5eead4', Math.PI);
+          addHangingSign(cx, f5Y + 3.55, cz + 2.35, 6.8, 0.84, '西側護理站', 'NURSING STATION', '#0f766e', '#5eead4', Math.PI);
         }
       }
 
@@ -2440,13 +2295,13 @@
       addWall(0, -18.5, 13.5, 4.6, 4.4, null, '中央護理站', 5, f5Y, 'clinical_blue');
       addWall(-8.5, -18.5, 2.8, 1.15, 1.08, counterWoodMat, '西側護理站櫃檯', 5, f5Y);
       addWall(8.5, -18.5, 2.8, 1.15, 1.08, counterWoodMat, '東側護理站櫃檯', 5, f5Y);
-      addHangingSign(0, f5Y + 3.65, -21.2, 6.8, 0.88, '中央護理站・輪椅停放區', 'CENTRAL NURSING STATION A & WHEELCHAIR BAY', '#1d4ed8', '#93c5fd');
+      addHangingSign(0, f5Y + 3.65, -21.2, 6.8, 0.88, '輪椅停放區', 'WHEELCHAIR BAY', '#1d4ed8', '#93c5fd');
 
       // 祈禱室與神明廳局部地板墊高 +0.038 並開啟 polygonOffset，避免與中庭主樓板產生深度衝突
       addFloorSlab5F(0, -6.8, 11.4, 5.4, 0.038, true);
       addWall(-3.2, -6.8, 5.6, 5.2, 4.4, null, '祈禱室 (Prayer Room)', 5, f5Y, 'clinical_mint');
       addWall(3.2, -6.8, 5.6, 5.2, 4.4, null, '神明廳 (Shrine Hall)', 5, f5Y, 'nursing');
-      addHangingSign(0, f5Y + 3.65, -9.8, 7.2, 0.88, '祈禱室・神明廳', 'PRAYER ROOM・SHRINE HALL', '#b45309', '#fde047', Math.PI);
+      addHangingSign(0, f5Y + 3.65, -9.8, 7.2, 0.88, '祈禱室', 'PRAYER ROOM', '#b45309', '#fde047', Math.PI);
 
       const kioskStand = new THREE.Mesh(
         new THREE.BoxGeometry(1.15, 1.85, 0.16),
@@ -2496,7 +2351,6 @@
       rotunda5FFloor.position.set(0, f5Y - 0.082, 34.5);
       rotunda5FFloor.receiveShadow = true;
       scene.add(rotunda5FFloor);
-      registerFloorSurface(rotunda5FFloor, 10, 10, true);
 
       const rotundaRingCeiling = new THREE.Mesh(
         new THREE.TorusGeometry(7.2, 0.32, 12, 36, Math.PI),
@@ -2781,7 +2635,7 @@
           appearance: { coatColor: 0xffffff, pantsColor: 0x1e293b, isDoctor: true },
           waypoints: [new THREE.Vector3(11.5, 0, -14.5), new THREE.Vector3(16.5, 0, -11.5)],
           speed: 1.35,
-          dialogue: '您好！這裡是彰濱秀傳 1F 急診醫學部，我們提供 24 小時全年無休急重症救護服務。',
+          dialogue: '您好！這裡是幸運草醫院 1F 急診醫學部，我們提供 24 小時全年無休急重症救護服務。',
           options: []
         },
         {
@@ -2829,7 +2683,7 @@
             new THREE.Vector3(32.5, 4.6, -21.5)
           ],
           speed: 1.25,
-          dialogue: '您好！我是彰濱秀傳腎臟科 李文清 主治醫師。這裡是 2F 洗腎室與 CAPD 腹膜透析中心，我們致力於慢性腎臟病整合照護、血液透析與居家腹膜透析治療！',
+          dialogue: '您好！我是幸運草醫院腎臟科 李文清 主治醫師。這裡是 2F 洗腎室與 CAPD 腹膜透析中心，我們致力於慢性腎臟病整合照護、血液透析與居家腹膜透析治療！',
           options: [
             {
               label: '請問李醫師，日常該如何預防慢性腎臟病？',
@@ -2913,7 +2767,7 @@
           speed: 0,
           yaw: Math.PI / 2,
           isBedridden: true,
-          dialogue: '護理站的 E化行動護理車都會推到門口精準核對藥物，在秀傳住院非常安心！',
+          dialogue: '護理站的 E化行動護理車都會推到門口精準核對藥物，在幸運草住院非常安心！',
           options: []
         },
         {
@@ -2934,7 +2788,7 @@
         },
         {
           name: '張先生 (負壓隔離病房病患)',
-          role: '負壓病房・無菌正壓保護照護中',
+          role: '負壓病房・無菌負壓保護照護中',
           avatar: '😷',
           type: 'patient',
           floor: 5,
@@ -2995,7 +2849,7 @@
           speed: 0,
           yaw: -Math.PI * 0.45,
           isCheckingPatient: true,
-          dialogue: '537 負壓隔離病房維持室內正壓氣流，我正在床邊確認點滴輸液與血氧濃度監測數據。',
+          dialogue: '537 負壓隔離病房維持室內氣流，我正在床邊確認點滴輸液與血氧濃度監測數據。',
           options: []
         },
 
@@ -3051,7 +2905,7 @@
           options: []
         },
         {
-          name: '林詩涵 護理站書記／護理師',
+          name: '林詩涵 書記',
           role: '西側護理站 B/C・櫃檯接待與醫囑處理',
           avatar: '👩‍⚕️',
           type: 'staff',
@@ -3082,7 +2936,7 @@
             new THREE.Vector3(26.5, f5Y, -23.2)
           ],
           speed: 1.15,
-          dialogue: '您好！歡迎來到彰濱秀傳 5F 住院病房樓層，全區已全面升級防滑水磨石醫療磁磚地板與開放式環形護理站，520、519、525、558 與 537 病房皆可直接走入探視！',
+          dialogue: '您好！歡迎來到幸運草醫院 5F 住院病房樓層，全區已全面升級防滑水磨石醫療磁磚地板與開放式環形護理站，520、519、525、558 與 537 病房皆可直接走入探視！',
           options: [
             {
               label: '立即開啟全院醫療電梯樓層選單 (B1 ~ 8F)',
@@ -3428,7 +3282,7 @@
       updateWantedAndHpHUD();
 
       if (player.hp <= 0) {
-        showToast('🚑 生命值歸零！已由秀傳急診室緊急救護並恢復滿血！');
+        showToast('🚑 生命值歸零！已由幸運草急診室緊急救護並恢復滿血！');
         clearWantedAndHeal();
         player.pos.set(11.5, 0, -14.5);
         player.yaw = Math.PI;
@@ -3517,7 +3371,7 @@
       const transportLabel = '醫療電梯';
 
       document.getElementById('dlg-avatar').textContent = '🛗';
-      document.getElementById('dlg-name').textContent = zoneTitle || `彰濱秀傳紀念醫院・${transportLabel}樓層導覽`;
+      document.getElementById('dlg-name').textContent = zoneTitle || `幸運草醫院・${transportLabel}樓層導覽`;
       document.getElementById('dlg-role').textContent = `目前所在樓層：${getFloorNumber(player.pos.y)}F ・自動連結對應樓層 HTML`;
       document.getElementById('dlg-text').textContent = `您已進入${transportLabel}感應區！請問您要去 B1、1F、2F、3F、5F、6F、7F 還是 8F？（可直接點擊下方按鈕，或按鍵盤 0 / 1~8 鍵）`;
 
@@ -3572,7 +3426,7 @@
           btn.textContent = `💬 ${opt.label}`;
           btn.addEventListener('click', () => {
             if (opt.action === 'openFloors') {
-              openFloorTransportModal('elevator', '彰濱秀傳紀念醫院・全院樓層直達選單');
+              openFloorTransportModal('elevator', '幸運草醫院・全院樓層直達選單');
             } else {
               document.getElementById('dlg-text').textContent = opt.reply;
             }
@@ -4009,7 +3863,7 @@
         else if (z < -29.0 && x < -12.9 && x > -19.1) label = '5F 560 雙人住院病房內部';
         else if (z < -10.3 && x > 10 && x < 38) label = '5F 東側護理站 B / C・E化行動護理車・517~527 病房';
         else if (z < -10.3 && x < -10 && x > -38) label = '5F 西側護理站 B / C・E化行動護理車・553~563 病房';
-        else if (z > -10.3 && z < -4.2 && x < -42.0) label = '5F 537 正壓隔離病房內部（無菌負/正壓照護區）';
+        else if (z > -10.3 && z < -4.2 && x < -42.0) label = '5F 537 負壓隔離病房內部（無菌負/負壓照護區）';
         else if (x <= -38) label = '5F 西側病房區 (552~538)・西側電梯廳';
         else if (x >= 38) label = '5F 東側病房區・東側電梯廳';
         else if (z >= -12 && z <= -3 && Math.abs(x) <= 8) label = '5F 祈禱室・神明廳・點滴庫房';
@@ -4294,61 +4148,6 @@
           camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * sens, -0.18, 0.82);
         }
       }, { passive: true });
-
-      const sensSlider = document.getElementById('mouse-sens-slider');
-      const sensVal = document.getElementById('mouse-sens-val');
-      sensSlider.addEventListener('input', (e) => {
-        camState.sensitivity = parseFloat(e.target.value);
-        sensVal.textContent = `${camState.sensitivity.toFixed(1)}x`;
-      });
-
-      document.querySelectorAll('.tp-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const zoneKey = btn.dataset.zone;
-          const z = ZONES[zoneKey];
-          if (z) {
-            player.pos.copy(z.pos);
-            player.vel.set(0, 0, 0);
-            player.yaw = z.yaw;
-            camState.yaw = camState.targetYaw = z.yaw + Math.PI;
-            camState.pitch = camState.targetPitch = 0.22;
-            camState.targetPos.set(z.pos.x, z.pos.y + 1.45, z.pos.z);
-            updateWantedAndHpHUD();
-            showToast(`📍 已快速前往：${z.label}`);
-          }
-        });
-      });
-
-      document.getElementById('btn-toggle-pov').addEventListener('click', (e) => {
-        firstPersonMode = !firstPersonMode;
-        e.target.textContent = firstPersonMode ? '👁️ 第一人稱視角' : '🎥 第三人稱視角';
-        showToast(firstPersonMode ? '已切換為第一人稱視角（拖曳滑鼠轉向）' : '已切換為第三人稱越肩視角');
-      });
-
-      document.getElementById('btn-toggle-labels').addEventListener('click', (e) => {
-        showNpcLabels = !showNpcLabels;
-        npcSprites.forEach((sp) => (sp.visible = showNpcLabels));
-        e.target.textContent = showNpcLabels ? '🏷️ NPC 名牌：開' : '🏷️ NPC 名牌：關';
-      });
-
-      document.getElementById('btn-open-floors').addEventListener('click', () => {
-        openFloorTransportModal('elevator', '彰濱秀傳紀念醫院・醫療電梯樓層選單');
-      });
-
-      document.getElementById('btn-clear-wanted').addEventListener('click', clearWantedAndHeal);
-
-      // 一鍵切換全院地板材質（水磨石醫療磚 / 大理石紋地磚 / 溫潤木紋地板）
-      document.getElementById('btn-cycle-floor').addEventListener('click', () => {
-        const nextIdx = (currentFloorStyleIdx + 1) % FLOOR_STYLES.length;
-        applyFloorStyle(nextIdx);
-        showToast(`🧱 已切換全院地坪為：${FLOOR_STYLES[nextIdx].label}`);
-      });
-
-      document.getElementById('btn-toggle-help').addEventListener('click', (e) => {
-        const body = document.getElementById('help-body');
-        body.classList.toggle('hidden');
-        e.target.textContent = body.classList.contains('hidden') ? '展開' : '收合';
-      });
 
       document.getElementById('dlg-close').addEventListener('click', closeDialogue);
       document.getElementById('btn-attack-light').addEventListener('click', () => triggerPlayerAttack('light'));
