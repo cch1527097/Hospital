@@ -131,49 +131,15 @@
 
   <!-- 頂部橫向：1F / 2F 全院各科區域一鍵快速傳送列 -->
   <div class="fixed top-2.5 left-1/2 -translate-x-1/2 z-20 w-[96vw] max-w-6xl">
-    <div class="hud-glass rounded-full px-2.5 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-xl">
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-amber-500/25 border border-amber-400/50 text-[11px] font-black text-amber-300">
-        🏥 2F 醫療樓層
-      </span>
-      <button data-zone="f2_atrium" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-500 hover:text-slate-950 text-teal-200 transition">2F 橫向手扶梯 / 電梯廳</button>
-      <button data-zone="f2_nurse_station" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-pink-500/85 hover:bg-pink-400 text-white transition">👩‍⚕️ 2F 婦產科護理站</button>
-      <button data-zone="f2_delivery" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-rose-500/85 hover:bg-rose-400 text-white transition">🤰 2F 產房 (Delivery Room)</button>
-      <button data-zone="f2_nursery" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-black bg-sky-500/85 hover:bg-sky-400 text-slate-950 transition">👶 2F 嬰兒室 (透明櫥窗)</button>
-      <button data-zone="f2_obgyn_ward" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-pink-500 hover:text-white text-pink-200 transition">2F 婦產科病房 (201~210)</button>
-      <button data-zone="f2_renal" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-200 transition">2F 腎臟科 (李文清/許麗美)</button>
-      <button data-zone="f2_or" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-emerald-500 hover:text-slate-950 text-emerald-200 transition">🚪 2F 開刀房 (電動門)</button>
-      <button data-zone="f2_icu" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-rose-500 hover:text-white text-rose-200 transition">🏥 2F ICU/心導管 (電動門)</button>
-      <button data-zone="f2_cardio" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-sky-500 hover:text-slate-950 text-sky-200 transition">❤️ 2F 心血管中心</button>
-      <button data-zone="f2_dental" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-purple-500 hover:text-white text-purple-200 transition">🦷 2F 牙科部 (掛號/候診)</button>
-      <span class="shrink-0 px-2 py-0.5 rounded-full bg-teal-500/20 border border-teal-400/40 text-[11px] font-bold text-teal-300 ml-1">
-        1F 大廳
-      </span>
-      <button data-zone="entrance" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-500 hover:text-slate-950 text-white transition">1F 入口門廳</button>
-      <button data-zone="registration" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-teal-500 hover:text-slate-950 text-white transition">1F 批價掛號</button>
-      <button data-zone="er" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-rose-500 hover:text-white text-rose-200 transition">1F 急診室</button>
-      <button data-zone="radiology" class="tp-btn shrink-0 px-2.5 py-1 rounded-full text-xs font-bold bg-white/10 hover:bg-sky-500 hover:text-slate-950 text-sky-200 transition">1F 放射科</button>
-    </div>
   </div>
 
   <!-- 操作提示膠囊 -->
   <div class="fixed top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-max max-w-[94vw]">
-    <div id="control-hint-pill" class="hud-glass px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-teal-200 border border-teal-400/35 shadow-lg text-center">
-      🖱️ 按住滑鼠左鍵拖曳360°轉向（短按左鍵攻擊） ｜ 靠近開刀房/ICU自動感應電動門 ｜ 走近橫向手扶梯或電梯選樓層
-    </div>
   </div>
 
   <!-- 左上角：功能開關、滑鼠靈敏度與操作說明面板 -->
   <div class="fixed top-20 left-3 sm:left-4 z-20 flex flex-col gap-2 max-w-[305px]">
-    <div class="hud-glass rounded-xl p-3 text-white shadow-xl">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-teal-400 shadow-[0_0_8px_#2dd4bf]"></span>
-          <span class="font-bold text-xs sm:text-sm text-teal-200">幸運草醫院-模擬人生</span>
-        </div>
-        <button id="btn-toggle-help" class="px-2 py-0.5 text-[11px] rounded bg-white/10 hover:bg-white/20 text-slate-200">
-          收合
-        </button>
-      </div>
+  </div>
 
       <!-- 核心互動功能按鈕列 -->
       <div class="mt-2.5 grid grid-cols-1 gap-1.5">
@@ -222,7 +188,7 @@
   </div>
 
   <!-- 右上角：GTA 風格狀態欄 -->
-  <div class="fixed top-20 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
+  <div class="fixed top-3 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
     <div id="hud-clock" class="gta-font gta-shadow text-xl sm:text-2xl font-bold text-white leading-none">
       10:25
     </div>
@@ -1321,9 +1287,6 @@
       transportPads.push(ring);
     }
 
-    // --------------------------------------------------------------------------
-    // 5. 建構「彰濱秀傳紀念醫院 1F & 2F」實景級地板、牆壁與專科區域
-    // --------------------------------------------------------------------------
     function buildHospital1FInterior() {
       initArchitecturalMaterials();
 
@@ -2844,7 +2807,7 @@
             new THREE.Vector3(34.5, 4.6, -39.5)
           ],
           speed: 1.25,
-          dialogue: '您好！我是腎臟科李文清醫師。歡迎來到彰濱秀傳 2F 血液透析中心！我與許麗美醫師共同為腎友提供高品質血液透析與 CAPD 照護。',
+          dialogue: '您好！我是腎臟科李文清醫師。歡迎來到血液透析中心！我與許麗美醫師共同為腎友提供高品質血液透析與 CAPD 照護。',
           options: [
             {
               label: '請問血液透析與 CAPD 腹膜透析有什麼不同？',
@@ -2943,7 +2906,7 @@
           waypoints: [new THREE.Vector3(30.5, 4.6, -33.2)],
           speed: 0,
           yaw: 0,
-          dialogue: '我在彰濱秀傳血液透析中心洗腎好幾年了，李文清醫師、許麗美醫師跟透析護理師都很親切細心！',
+          dialogue: '我在血液透析中心洗腎好幾年了，李文清醫師、許麗美醫師跟透析護理師都很親切細心！',
           options: []
         },
         {
@@ -3448,7 +3411,7 @@
             new THREE.Vector3(34.5, 4.6, -39.5)
           ],
           speed: 1.25,
-          dialogue: '您好！我是腎臟科李文清醫師。歡迎來到彰濱秀傳 2F 血液透析與腹膜透析 (CAPD) 中心！我與許麗美醫師共同為腎友提供全方位腎臟照護。',
+          dialogue: '您好！我是腎臟科李文清醫師。歡迎來到血液透析與腹膜透析 (CAPD) 中心！我與許麗美醫師共同為腎友提供全方位腎臟照護。',
           options: [
             {
               label: '請問血液透析與 CAPD 腹膜透析有什麼不同？',
@@ -3643,7 +3606,7 @@
           appearance: { coatColor: 0x1e3a8a, pantsColor: 0x0f172a, isSecurity: true },
           waypoints: [new THREE.Vector3(-4.2, 0, 38.5), new THREE.Vector3(4.2, 0, 38.5)],
           speed: 1.35,
-          dialogue: '您好！我是彰濱秀傳駐衛警，請共同維護醫療院所安寧，切勿在院內滋事！',
+          dialogue: '您好！我是駐衛警，請共同維護醫療院所安寧，切勿在院內滋事！',
           options: []
         }
       ];
@@ -4950,33 +4913,6 @@
       });
 
       document.getElementById('floor-modal-close').addEventListener('click', () => closeFloorSelectModal(true));
-      document.getElementById('btn-open-floor-menu').addEventListener('click', () => openFloorSelectModal('中央電梯 / 橫向手扶梯導覽'));
-      document.getElementById('transport-prompt').addEventListener('click', () => openFloorSelectModal(currentNearTransport ? currentNearTransport.label : '中央電梯 / 橫向手扶梯'));
-
-      document.getElementById('npc-talk-prompt').addEventListener('click', () => {
-        if (nearestNpc) openDialogueWithNpc(nearestNpc);
-      });
-      document.getElementById('dlg-close-btn').addEventListener('click', closeDialogue);
-
-      document.getElementById('btn-toggle-pov').addEventListener('click', toggleFirstPerson);
-      document.getElementById('btn-toggle-labels').addEventListener('click', () => {
-        showNpcLabels = !showNpcLabels;
-        document.getElementById('btn-toggle-labels').textContent = showNpcLabels ? '🏷️ NPC 標籤: 開' : '🏷️ NPC 標籤: 關';
-      });
-      document.getElementById('btn-mouse-mode').addEventListener('click', toggleMouseMode);
-      document.getElementById('btn-clear-wanted').addEventListener('click', clearWantedAndHeal);
-
-      document.getElementById('btn-toggle-help').addEventListener('click', (e) => {
-        const body = document.getElementById('help-body');
-        const hidden = body.classList.toggle('hidden');
-        e.target.textContent = hidden ? '展開' : '收合';
-      });
-
-      const sensSlider = document.getElementById('mouse-sens-slider');
-      sensSlider.addEventListener('input', (e) => {
-        camState.sensitivity = parseFloat(e.target.value);
-        document.getElementById('mouse-sens-val').textContent = `${camState.sensitivity.toFixed(1)}x`;
-      });
 
       document.getElementById('btn-action-attack').addEventListener('click', () => triggerPlayerAttack(false));
       document.getElementById('btn-action-heavy').addEventListener('click', () => triggerPlayerAttack(true));
