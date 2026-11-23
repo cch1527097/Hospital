@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>幸運草醫院-模擬人生</title>
+  <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js r128 -->
@@ -220,7 +220,7 @@
             <div class="flex items-center justify-between gap-1.5">
               <div class="flex items-center gap-1.5 min-w-0">
                 <span class="inline-block w-2.5 h-2.5 shrink-0 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
-                <span class="font-bold text-xs sm:text-sm tracking-wide text-amber-300 truncate">幸運草醫院健康園區</span>
+                <span class="font-bold text-xs sm:text-sm tracking-wide text-amber-300 truncate">向日葵醫院健康園區</span>
               </div>
               <button id="toggle-help-btn" class="shrink-0 px-2 py-0.5 text-[11px] rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition">
                 收合
@@ -339,7 +339,7 @@
 
         <!-- 中央下方：互動提示框 -->
         <div id="interaction-prompt" class="hidden absolute bottom-24 sm:bottom-8 left-1/2 -translate-x-1/2 z-20 px-4 py-2 rounded-xl hud-panel text-white font-bold text-xs sm:text-sm shadow-2xl prompt-pulse pointer-events-none whitespace-nowrap">
-          按 <span class="px-2 py-0.5 mx-1 rounded bg-amber-400 text-slate-950 font-black">F</span> 駕駛 幸運草醫療救護車
+          按 <span class="px-2 py-0.5 mx-1 rounded bg-amber-400 text-slate-950 font-black">F</span> 駕駛 向日葵醫療救護車
         </div>
 
         <!-- 右上方通知氣泡 -->
@@ -386,7 +386,7 @@
   <script>
     /**
      * ============================================================================
-     * 幸運草醫院健康園區 (Clover Hospital Health Park) - 3D 開放世界
+     * 向日葵醫院健康園區 (Clover Hospital Health Park) - 3D 開放世界
      * - 主角與所有 NPC 維持 1:1 原始相同身高（scale = 1, radius = 0.45, height = 1.82）
      * - 初始攝影機距離拉近至 4.8（越肩特寫 3.4），視覺放大且服飾細節清晰
      * - 完整人物與 NPC 實體防穿越系統（resolvePedestrianCharacterCollision）
@@ -986,12 +986,12 @@
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 20px "Noto Sans TC", sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('🍀 幸運草醫療體系', w / 2, 54);
+      ctx.fillText('🌻 向日葵醫療體系', w / 2, 54);
       ctx.font = 'bold 16px "Chakra Petch", sans-serif';
       ctx.fillStyle = '#fef08a';
       ctx.fillText('CLOVER HEALTH PARK', w / 2, 82);
 
-      const chars = ['幸', '運', '草', '健', '康', '園', '區'];
+      const chars = ['向', '日', '葵', '健', '康', '園', '區'];
       ctx.font = '900 54px "Noto Sans TC", sans-serif';
       chars.forEach((ch, idx) => {
         const cy = 185 + idx * 66;
@@ -1832,12 +1832,12 @@
       ctx.shadowColor = 'rgba(255, 210, 60, 0.85)';
       ctx.shadowBlur = 18;
       ctx.fillStyle = '#ffd63b';
-      ctx.fillText('幸運草醫院', textX, ly + 4);
+      ctx.fillText('向日葵醫院', textX, ly + 4);
 
       ctx.shadowBlur = 0;
       ctx.strokeStyle = '#b88614';
       ctx.lineWidth = 3;
-      ctx.strokeText('幸運草醫院', textX, ly + 4);
+      ctx.strokeText('向日葵醫院', textX, ly + 4);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.anisotropy = 4;
@@ -2429,7 +2429,7 @@
     }
 
     // --------------------------------------------------------------------------
-    // 4. 建構「幸運草醫院健康園區」全區建築群、緊貼主大樓急診雨庇大門、彰濱天后宮與道路網
+    // 4. 建構「向日葵醫院健康園區」全區建築群、緊貼主大樓急診雨庇大門、彰濱天后宮與道路網
     // --------------------------------------------------------------------------
     function createTemplePlaqueTexture() {
       const w = 512;
@@ -4112,7 +4112,7 @@
       monWall.castShadow = true;
       monWall.receiveShadow = true;
       forecourtGroup.add(monBase, monWall);
-      addCollider(0, monZ, monW + 0.3, monD + 0.3, monH + 0.3, '幸運草醫院健康園區入口矮牆');
+      addCollider(0, monZ, monW + 0.3, monD + 0.3, monH + 0.3, '向日葵醫院健康園區入口矮牆');
 
       const poleMat = new THREE.MeshStandardMaterial({ color: 0x4b5563, metalness: 0.6, roughness: 0.4 });
       const bulbMat = new THREE.MeshStandardMaterial({ color: 0xfff3c4, emissive: 0xffd166, emissiveIntensity: 0.0 });
@@ -4947,7 +4947,7 @@
 
       vehicles.push({
         id: 'ambulance',
-        name: '幸運草醫療救護車',
+        name: '向日葵醫療救護車',
         isBike: false,
         mesh: ambBuilt.group,
         wheels: ambBuilt.wheels,
@@ -5848,7 +5848,7 @@
 
       if (overlay) {
         titleEl.textContent = '🚨 生命徵象危急！急診室緊急後送中';
-        descEl.textContent = '幸運草醫療團隊已出動，正將您快速後送至【急診室門口】進行急救處置...';
+        descEl.textContent = '向日葵醫療團隊已出動，正將您快速後送至【急診室門口】進行急救處置...';
         overlay.classList.remove('hidden');
         overlay.classList.add('flex');
         requestAnimationFrame(() => overlay.classList.remove('opacity-0'));
@@ -7114,7 +7114,7 @@ if (linkEl) linkEl.href = targetUrl;
       setTimeout(() => {
         setBottomRightLoader({
           visible: true,
-          title: '✅ 幸運草醫院園區已就緒',
+          title: '✅ 向日葵醫院園區已就緒',
           subtitle: '1:1 等高寫實角色、近距特寫鏡頭與防穿越碰撞已啟動',
           percent: 100,
           spinning: false
