@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>幸運草醫院-模擬人生</title>
+  <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js r128 -->
@@ -82,8 +82,8 @@
   <!-- 載入遮罩 -->
   <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 text-white transition-opacity duration-500">
     <div class="w-16 h-16 border-4 border-teal-400 border-t-amber-400 rounded-full animate-spin mb-4"></div>
-    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">幸運草醫院-模擬人生</h1>
-    <p class="text-xs sm:text-sm text-slate-300">正在載入高級水磨石醫療磁磚地板...</p>
+    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">向日葵醫院-模擬人生</h1>
+    <p class="text-xs sm:text-sm text-slate-300">正在載入...</p>
   </div>
 
   <!-- 頂部橫向：全院各科區域與電梯快速傳送列 -->
@@ -157,8 +157,8 @@
             🛗
           </div>
           <div>
-            <h3 id="dlg-name" class="font-black text-base sm:text-lg text-teal-300">幸運草醫院-模擬人生・醫療電梯</h3>
-            <p id="dlg-role" class="text-xs text-slate-300">請選擇要前往的樓層（自動連結對應樓層 HTML）</p>
+            <h3 id="dlg-name" class="font-black text-base sm:text-lg text-teal-300">向日葵醫院-模擬人生</h3>
+            <p id="dlg-role" class="text-xs text-slate-300">請選擇要前往的樓層</p>
           </div>
         </div>
         <button id="dlg-close" class="px-3 py-1 rounded-lg bg-white/10 hover:bg-rose-500/80 text-xs font-bold transition">
@@ -211,7 +211,7 @@
   <script>
     /**
      * ============================================================================
-     * 幸運草醫院-模擬人生
+     * 向日葵醫院-模擬人生
      * ============================================================================
      * 1. 【變更全院地板材質】：
      *    - 全館預設地坪升級為「高級亮面微晶石／水磨石醫療防滑磁磚地板（Polished Terrazzo & Porcelain Tile）」，
@@ -1705,7 +1705,7 @@
 
       addWall(-5.2, 42.8, 3.2, 2.8, 4.2, null, '西側警衛室', 1, 0, 'clinical_blue');
       addWall(5.2, 42.8, 3.2, 2.8, 4.2, null, '東側警衛室', 1, 0, 'clinical_blue');
-      addHangingSign(0, 3.85, 42.2, 7.2, 0.9, '幸運草醫院 1F 入口門廳', 'MAIN ENTRANCE LOBBY・歡迎蒞臨本院', '#0f4c5c', '#2dd4bf');
+      addHangingSign(0, 3.85, 42.2, 7.2, 0.9, '向日葵醫院', 'MAIN ENTRANCE LOBBY', '#0f4c5c', '#2dd4bf');
 
       const kiosk1F = new THREE.Mesh(
         new THREE.BoxGeometry(1.35, 1.95, 0.18),
@@ -2635,7 +2635,7 @@
           appearance: { coatColor: 0xffffff, pantsColor: 0x1e293b, isDoctor: true },
           waypoints: [new THREE.Vector3(11.5, 0, -14.5), new THREE.Vector3(16.5, 0, -11.5)],
           speed: 1.35,
-          dialogue: '您好！這裡是幸運草醫院 1F 急診醫學部，我們提供 24 小時全年無休急重症救護服務。',
+          dialogue: '您好！這裡是向日葵醫院 1F 急診醫學部，我們提供 24 小時全年無休急重症救護服務。',
           options: []
         },
         {
@@ -2668,7 +2668,7 @@
         },
         // 2F NPC
         {
-          name: '李文清 腎臟科主治醫師',
+          name: '李汶情 主治醫師',
           role: '2F 腎臟科・血液透析 / CAPD 腹膜透析中心',
           avatar: '👨‍⚕️',
           type: 'staff',
@@ -2683,7 +2683,7 @@
             new THREE.Vector3(32.5, 4.6, -21.5)
           ],
           speed: 1.25,
-          dialogue: '您好！我是幸運草醫院腎臟科 李文清 主治醫師。這裡是 2F 洗腎室與 CAPD 腹膜透析中心，我們致力於慢性腎臟病整合照護、血液透析與居家腹膜透析治療！',
+          dialogue: '您好！我是向日葵醫院腎臟科主治醫師。這裡是洗腎室與CAPD腹膜透析中心，我們致力於慢性腎臟病整合照護、血液透析與居家腹膜透析治療！',
           options: [
             {
               label: '請問李醫師，日常該如何預防慢性腎臟病？',
@@ -2767,7 +2767,7 @@
           speed: 0,
           yaw: Math.PI / 2,
           isBedridden: true,
-          dialogue: '護理站的 E化行動護理車都會推到門口精準核對藥物，在幸運草住院非常安心！',
+          dialogue: '護理站的 E化行動護理車都會推到門口精準核對藥物，在向日葵住院非常安心！',
           options: []
         },
         {
@@ -2936,7 +2936,7 @@
             new THREE.Vector3(26.5, f5Y, -23.2)
           ],
           speed: 1.15,
-          dialogue: '您好！歡迎來到幸運草醫院 5F 住院病房樓層，全區已全面升級防滑水磨石醫療磁磚地板與開放式環形護理站，520、519、525、558 與 537 病房皆可直接走入探視！',
+          dialogue: '您好！歡迎來到向日葵醫院住院病房樓層，全區已全面升級防滑水磨石醫療磁磚地板與開放式環形護理站，520、519、525、558 與 537 病房皆可直接走入探視！',
           options: [
             {
               label: '立即開啟全院醫療電梯樓層選單 (B1 ~ 8F)',
@@ -3282,7 +3282,7 @@
       updateWantedAndHpHUD();
 
       if (player.hp <= 0) {
-        showToast('🚑 生命值歸零！已由幸運草急診室緊急救護並恢復滿血！');
+        showToast('🚑 生命值歸零！已由向日葵急診室緊急救護並恢復滿血！');
         clearWantedAndHeal();
         player.pos.set(11.5, 0, -14.5);
         player.yaw = Math.PI;
@@ -3371,7 +3371,7 @@
       const transportLabel = '醫療電梯';
 
       document.getElementById('dlg-avatar').textContent = '🛗';
-      document.getElementById('dlg-name').textContent = zoneTitle || `幸運草醫院・${transportLabel}樓層導覽`;
+      document.getElementById('dlg-name').textContent = zoneTitle || `向日葵醫院・${transportLabel}樓層導覽`;
       document.getElementById('dlg-role').textContent = `目前所在樓層：${getFloorNumber(player.pos.y)}F ・自動連結對應樓層 HTML`;
       document.getElementById('dlg-text').textContent = `您已進入${transportLabel}感應區！請問您要去 B1、1F、2F、3F、5F、6F、7F 還是 8F？（可直接點擊下方按鈕，或按鍵盤 0 / 1~8 鍵）`;
 
@@ -3426,7 +3426,7 @@
           btn.textContent = `💬 ${opt.label}`;
           btn.addEventListener('click', () => {
             if (opt.action === 'openFloors') {
-              openFloorTransportModal('elevator', '幸運草醫院・全院樓層直達選單');
+              openFloorTransportModal('elevator', '向日葵醫院・全院樓層直達選單');
             } else {
               document.getElementById('dlg-text').textContent = opt.reply;
             }
