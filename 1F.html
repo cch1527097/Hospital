@@ -62,7 +62,6 @@
       scrollbar-width: none;
     }
 
-    /* 可愛圓潤膠囊積木公仔專用：雙行圓角雙層微光邊框銘牌 */
     .npc-nameplate {
       position: fixed;
       top: 0;
@@ -963,13 +962,13 @@
     function selectFloorAndRedirect(floorKey) {
       const info = FLOOR_LINKS[floorKey];
       if (!info) return;
+      const role = getInheritedRole();
       navigateToHtml(
-        info.file,
+        `${info.file}?role=${encodeURIComponent(role.id)}`,
         `🛗 正在前往 ${info.label}`,
         `自動連結至 ${info.file} ...`
       );
     }
-
     // --------------------------------------------------------------------------
     // 3. 程序化高解析貼圖（含「幸運草醫院」品牌形象牆貼圖）
     // --------------------------------------------------------------------------
@@ -5234,20 +5233,56 @@
     // --------------------------------------------------------------------------
     // 11. 初始化玩家與全院 32 位 NPC（包含 6 位新增急診專屬 NPC）
     // --------------------------------------------------------------------------
+        
+// 1. 沿用 1index.html 的 8 種角色設定表
+    const CHARACTER_ROLES = [
+      { id: 'it_engineer', name: '橘黑拼色帽T青年', icon: '🧥', cash: 8800, health: 100, armor: 90, outfitStyle: 'colorblock_hoodie', jacketColor: 0xd9381e, teeColor: 0x111827, pantsColor: 0x162b3d, shoeColor: 0xf1f5f9, badgeColor: 0x10b981, hasHood: true, hasMask: false, hasGlasses: false, hasStethoscope: false, hasCap: false },
+      { id: 'doctor', name: '醫師 (白袍+口罩)', icon: '🩺', cash: 12000, health: 100, armor: 95, outfitStyle: 'lab_coat', jacketColor: 0xf8fafc, teeColor: 0xe0f2fe, pantsColor: 0x1e293b, shoeColor: 0x111827, badgeColor: 0x38bdf8, hasHood: false, hasMask: true, hasGlasses: true, hasStethoscope: true, hasCap: false },
+      { id: 'nurse', name: '護理師 (刷手服+口罩)', icon: '💉', cash: 7500, health: 100, armor: 90, outfitStyle: 'dress_shirt', jacketColor: 0x14b8a6, teeColor: 0xffffff, pantsColor: 0x1e3a5f, shoeColor: 0xf8fafc, badgeColor: 0xf472b6, hasHood: false, hasMask: true, hasGlasses: false, hasStethoscope: false, hasCap: false },
+      { id: 'patient', name: '門診訪客 (白襯衫+口罩)', icon: '🏥', cash: 3200, health: 85, armor: 65, outfitStyle: 'dress_shirt', jacketColor: 0xf1f5f9, teeColor: 0xffffff, pantsColor: 0x111827, shoeColor: 0x0f172a, badgeColor: 0xfacc15, hasHood: false, hasMask: true, hasGlasses: false, hasStethoscope: false, hasCap: false },
+      { id: 'pharmacist', name: '藥師 (藥師袍+口罩)', icon: '💊', cash: 8200, health: 100, armor: 88, outfitStyle: 'lab_coat', jacketColor: 0xf1f5f9, teeColor: 0xdcfce7, pantsColor: 0x1e293b, shoeColor: 0x111827, badgeColor: 0x22c55e, hasHood: false, hasMask: true, hasGlasses: true, hasStethoscope: false, hasCap: false },
+      { id: 'emt', name: '救護技術員 (紅黑執勤服)', icon: '🚑', cash: 6800, health: 100, armor: 100, outfitStyle: 'colorblock_hoodie', jacketColor: 0xb91c1c, teeColor: 0x0f172a, pantsColor: 0x0f172a, shoeColor: 0x111827, badgeColor: 0xfacc15, hasHood: false, hasMask: true, hasGlasses: false, hasStethoscope: true, hasCap: false },
+      { id: 'med_tech', name: '醫事檢驗師 (檢驗袍)', icon: '🩻', cash: 7400, health: 100, armor: 85, outfitStyle: 'lab_coat', jacketColor: 0xe2e8f0, teeColor: 0xede9fe, pantsColor: 0x1e293b, shoeColor: 0xf1f5f9, badgeColor: 0xa855f7, hasHood: false, hasMask: true, hasGlasses: true, hasStethoscope: false, hasCap: false },
+      { id: 'security', name: '園區警衛 (深藍制服)', icon: '🛡️', cash: 6000, health: 100, armor: 100, outfitStyle: 'security_uniform', jacketColor: 0x0f172a, teeColor: 0x38bdf8, pantsColor: 0x090d16, shoeColor: 0x090d16, badgeColor: 0xf59e0b, hasHood: false, hasMask: true, hasGlasses: false, hasStethoscope: false, hasCap: true }
+    ];
+
+    // 2. 自動取得從 1index.html 帶入的角色設定（同時存入 localStorage 供跨頁保留）
+    function getInheritedRole() {
+      const params = new URLSearchParams(window.location.search);
+      const roleId = params.get('role') || localStorage.getItem('clover_hospital_role') || 'it_engineer';
+      const found = CHARACTER_ROLES.find((r) => r.id === roleId) || CHARACTER_ROLES[0];
+      try {
+        localStorage.setItem('clover_hospital_role', found.id);
+      } catch (e) {}
+      return found;
+    }
+
+    // 3. 套用繼承的角色外觀與數值建立 3D 玩家公仔
     function createPlayer() {
+      const role = getInheritedRole();
+
+      // 對應 1F_2.html 膠囊公仔的制服樣式
+      let uniformStyle = 'casual';
+      if (role.outfitStyle === 'lab_coat') uniformStyle = 'doctor';
+      else if (role.id === 'nurse') uniformStyle = 'nurse';
+      else if (role.outfitStyle === 'security_uniform') uniformStyle = 'guard';
+
       const rig = buildHumanRig({
         skinColor: 0xffdbac,
         hairColor: 0x0f172a,
-        shirtColor: 0x0284c7,
-        shirtAccent: 0x0369a1,
-        shirtTrim: 0x38bdf8,
-        uniformStyle: 'casual',
-        pantsColor: 0x1e293b,
-        shoeColor: 0xffffff,
-        hasGlasses: true,
+        shirtColor: role.jacketColor,
+        shirtAccent: role.teeColor,
+        shirtTrim: role.badgeColor,
+        uniformStyle: uniformStyle,
+        pantsColor: role.pantsColor,
+        shoeColor: role.shoeColor,
+        hasDoctorCoat: role.outfitStyle === 'lab_coat' || role.hasStethoscope,
+        hasGuardCap: role.hasCap,
+        hasGlasses: role.hasGlasses,
         scale: 1.0,
         combatGlow: true
       });
+
       player.mesh = rig.root;
       player.bodyRoot = rig.bodyRoot;
       player.leftShoulder = rig.leftShoulder;
@@ -5262,11 +5297,23 @@
       player.leftFistAura = rig.leftFistAura;
       player.rightFootAura = rig.rightFootAura;
       player.mesh.position.copy(player.pos);
+
+      // 同步角色生命值與護甲至右上角 HUD 狀態條
+      player.hp = role.health;
+      player.maxHp = role.health;
+      player.armor = role.armor;
+      updateHealthArmorBarsUI();
+
+     // 在「健保卡已連線」徽章顯示目前帶入的角色名稱
+      const comboBadge = document.getElementById('hud-combo-badge');
+      if (comboBadge) {
+        comboBadge.textContent = `${role.icon} ${role.name}`;
+      }
     }
 
     function createHospitalStaffAndPatients() {
       const floatingLayer = document.getElementById('floating-fx-layer');
-
+     
       const npcConfigs = [
         // 1. 挑空鋼琴大廳 & 批價掛號處
         {
@@ -6647,30 +6694,23 @@
         }
       }
     }
-
-    function checkTransportAndExitTriggers() {
-      if (isRedirecting) return;
-
-      // 走出南側入口大門（z >= 43.95 且 x 位於大門通道 -3.6 ~ 3.6）自動連結至 1index.html
+function checkTransportAndExitTriggers() {
+      const currentRole = getInheritedRole();
       if (player.pos.z >= 43.95 && Math.abs(player.pos.x) <= 3.6) {
         navigateToHtml(
-          '1index.html',
+          `1index.html?role=${encodeURIComponent(currentRole.id)}`,
           '🚪 已走出醫院南側大門',
           '正在自動連結回戶外園區 1index.html ...'
         );
         return;
-      }
-
-      // 走出急診南側電動門出入口（z >= 2.0 且 x 位於 43.45 ~ 47.25）
-      if (player.pos.z >= 2.0 && player.pos.z <= 3.2 && player.pos.x >= 43.45 && player.pos.x <= 47.25) {
-        navigateToHtml(
-          '1index.html?from=er',
-          '🚑 已走出急診電動門出入口',
-          '正在自動連結至戶外急診車道 1index.html ...'
-        );
-        return;
-      }
-
+      }    if (player.pos.z >= 2.0 && player.pos.z <= 3.2 && player.pos.x >= 43.45 && player.pos.x <= 47.25) {
+      navigateToHtml(
+        `1index.html?from=er&role=${encodeURIComponent(currentRole.id)}`,
+        '🚑 已走出急診電動門出入口',
+        '正在自動連結至戶外急診車道 1index.html ...'
+      );
+      return;
+    }
       let foundZone = null;
       for (let i = 0; i < TRANSPORT_ZONES.length; i++) {
         const tz = TRANSPORT_ZONES[i];
