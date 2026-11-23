@@ -131,46 +131,14 @@
   <div class="fixed top-20 left-3 sm:left-4 z-20 flex flex-col gap-2 max-w-[310px]">
   </div>
 
-      <!-- 核心互動功能按鈕列 -->
-      <div class="mt-2.5 grid grid-cols-1 gap-1.5">
-      </div>
-
-        <!-- 自由滑鼠模式狀態標示 -->
-        <div class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-indigo-900/60 border border-indigo-400/40 text-indigo-100">
-          <span>🖱️ 自由滑鼠操控模式</span>
-          <span class="px-1.5 py-0.5 rounded bg-rose-400/20 border border-rose-300/40 text-[10px] text-rose-200">純戰鬥無對話</span>
-        </div>
-
-        <button id="btn-open-elevator" class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-teal-700/85 hover:bg-teal-600 border border-teal-300/40 text-white transition">
-          <span>🛗 搭乘電梯 (B1 ~ 7F)</span>
-          <span class="px-1.5 py-0.5 rounded bg-black/30 text-[10px]">接觸 / E 鍵</span>
-        </button>
-
-        <button id="btn-clear-wanted" class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-amber-600/85 hover:bg-amber-500 border border-amber-300/40 text-white transition">
-          <span>🕊️ 消除通緝 / 急救治療</span>
-          <span class="px-1.5 py-0.5 rounded bg-black/30 text-[10px]">C 鍵</span>
-        </button>
-
-        <!-- 滑鼠視角靈敏度與 Y軸反轉調節器 -->
-        <div class="mt-0.5 px-2.5 py-2 rounded-lg bg-slate-900/75 border border-white/10 space-y-1.5">
-          <div class="flex items-center justify-between text-[11px]">
-            <span class="text-teal-300 font-bold">🖱️ 滑鼠轉向靈敏度</span>
-            <span id="mouse-sens-value" class="font-black text-amber-300">1.2x</span>
-          </div>
-          <input id="mouse-sens-slider" type="range" min="0.5" max="2.5" step="0.1" value="1.2" class="w-full accent-teal-400 h-1.5 bg-slate-700 rounded-lg" />
-          <div class="flex items-center justify-between pt-1 border-t border-white/10 text-[11px]">
-            <span class="text-slate-300 font-bold">↕️ 滑鼠 Y 軸俯仰反轉</span>
-            <button id="btn-invert-y" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-[10px] font-black text-slate-200 border border-white/15 transition">
-              關閉
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 按鍵操作表 -->
-      <div id="help-body" class="mt-2 pt-2 border-t border-white/10 text-[11px] text-slate-200 space-y-1">
-      </div>
-    </div>
+  <!-- 核心互動功能按鈕列（保留原始 DOM 結構與 ID） -->
+  <div class="hidden">
+    <button id="btn-open-elevator"></button>
+    <button id="btn-clear-wanted"></button>
+    <span id="mouse-sens-value">1.2x</span>
+    <input id="mouse-sens-slider" type="range" min="0.5" max="2.5" step="0.1" value="1.2" />
+    <button id="btn-invert-y">關閉</button>
+    <div id="help-body"></div>
   </div>
 
   <!-- 右上角：GTA 風格狀態欄 -->
@@ -286,7 +254,7 @@
   <script>
     /**
      * ============================================================================
-     * 向日葵醫院-模擬人生 頂樓醫療與會議資訊空間 3D 實境（完整整合版）
+     * 向日葵醫院-模擬人生 頂樓醫療與會議資訊空間 3D 實境（獨立揮砍判定版）
      * ============================================================================
      */
 
@@ -321,7 +289,6 @@
     const npcs = [];
     const npcHitMeshes = [];
     let showNpcLabels = true;
-    let pendingAttackNpc = null;
 
     // 機房伺服器指示燈動畫陣列
     const serverBlinkLeds = [];
@@ -387,7 +354,8 @@
       attackType: 1,
       comboStep: 0,
       comboResetTimer: 0,
-      hitApplied: false,
+      hitNpcSet: new Set(),
+      attackSoundPlayed: false,
       wantedStars: 0,
       totalHitsLanded: 0
     };
@@ -420,10 +388,10 @@
     const mouseNDC = new THREE.Vector2();
     const floorHitPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -FLOOR_Y[8]);
 
-    // 快速傳送座標表（已將「開放式廁所及茶水間」更新為「美蒂琪吧檯」，並移除 8F 字樣）
+    // 快速傳送座標表
     const ZONES = {
       f8_here:       { label: '大圓桌會議室前走廊・高階主管會議入口', pos: new THREE.Vector3(-22.8, 27.6, -17.75), yaw: -Math.PI * 0.5 },
-      f8_round_conf: { label: '大圓桌會議室 (黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理)', pos: new THREE.Vector3(-28.6, 27.6, -17.75), yaw: -Math.PI * 0.5 },
+      f8_round_conf: { label: '大圓桌會議室 (黃茗賀總裁・黃嘉媛執行長・劉玲總經理・郭省銘協理)', pos: new THREE.Vector3(-28.6, 27.6, -17.75), yaw: -Math.PI * 0.5 },
       f8_medici_1:   { label: '美帝奇會議室一 (U型會議桌・投影大布幕・醫護會議)', pos: new THREE.Vector3(21.5, 27.6, -19.5), yaw: Math.PI * 0.5 },
       f8_medici_2:   { label: '美帝奇會議室二 (U型會議桌・投影大布幕・跨科討論)', pos: new THREE.Vector3(21.5, 27.6, -1.5), yaw: Math.PI * 0.5 },
       f8_large_conf: { label: '大型會議室 (大型U型會議桌・投影機大布幕・全院研討)', pos: new THREE.Vector3(-16.0, 27.6, -34.0), yaw: -Math.PI * 0.5 },
@@ -1516,7 +1484,7 @@
         g.add(sensorBox, ledDot);
       });
 
-      const signTex = createSignTexture('自動門 AUTOMATIC DOOR', '紅外線感應進出・請勿倚靠玻璃門扇', '#0f172a', '#38bdf8');
+      const signTex = createSignTexture('資訊處', 'Information Office', '#0f172a', '#38bdf8');
       const signBoard = new THREE.Mesh(
         new THREE.BoxGeometry(Math.min(2.6, openingWidth * 0.78), 0.34, 0.28),
         new THREE.MeshStandardMaterial({ map: signTex, emissive: 0xffffff, emissiveMap: signTex, emissiveIntensity: 0.42 })
@@ -1729,7 +1697,7 @@
       const exitPositions = [
         { x: -24.5, z: -28.2, rotY: 0 },
         { x: -7.5, z: -28.2, rotY: 0 },
-        { x: -25.2, z: -17.75, rotY: Math.PI / 2 },
+        { x: -25.6, z: -17.75, rotY: Math.PI / 2 },
         { x: 16.5, z: -19.5, rotY: -Math.PI / 2 },
         { x: 16.5, z: -1.5, rotY: -Math.PI / 2 },
         { x: -2.0, z: 14.5, rotY: 0 },
@@ -1771,7 +1739,6 @@
       (activeBuildGroup || scene).add(group);
     }
 
-    // 建構北排房間木門（已移除門牌）
     function addWardDoorFacade(x, z, baseY, isOffice = true) {
       const target = activeBuildGroup || scene;
       const g = new THREE.Group();
@@ -1796,7 +1763,6 @@
       target.add(g);
     }
 
-    // 美帝奇會議室一 & 美帝奇會議室二（已移除會議室招牌，投影布幕標題移除 8F 字樣）
     function buildMediciConferenceRooms(baseY, wallWoodIvoryMat) {
       const target = activeBuildGroup || scene;
 
@@ -1887,7 +1853,6 @@
       buildUShapedConferenceTableAndChairs(31.2, -1.5, 0, baseY, 7.8, 5.6, '美帝奇會議室二 U型會議桌');
     }
 
-    // 大型會議室（已移除會議室招牌，投影布幕標題移除 8F 字樣）
     function buildLargeConferenceRoom(baseY, wallCreamMat) {
       const target = activeBuildGroup || scene;
 
@@ -1961,7 +1926,6 @@
       buildLargeHallUShapedTableAndChairs(baseY);
     }
 
-    // 大圓桌會議室（投影布幕標題移除 8F 字樣）
     function buildRoundTableRoom(baseY, wallCreamMat) {
       const target = activeBuildGroup || scene;
       const centerX = -34.2;
@@ -1991,6 +1955,12 @@
 
       addWoodGlassViewingWall(-26.0, -22.775, 6.45, Math.PI / 2, baseY, wallCreamMat, '大圓桌會議室東側景觀窗(北)');
       addWoodGlassViewingWall(-26.0, -12.725, 6.45, Math.PI / 2, baseY, wallCreamMat, '大圓桌會議室東側景觀窗(南)');
+
+      const lintelHeader = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.85, 3.6), wallCreamMat);
+      lintelHeader.position.set(-26.0, baseY + 3.975, -17.75);
+      lintelHeader.castShadow = true;
+      lintelHeader.receiveShadow = true;
+      target.add(lintelHeader);
 
       addBacklitWoodSlatWall(-26.0, baseY + 2.2, -19.8, 0.65, 4.2, Math.PI / 2, 5);
       addBacklitWoodSlatWall(-26.0, baseY + 2.2, -15.7, 0.65, 4.2, Math.PI / 2, 5);
@@ -2086,7 +2056,6 @@
       });
     }
 
-    // 洗手間及美蒂琪吧檯（懸吊招牌已更新為「美蒂琪吧檯」與「洗手間」）
     function buildOpenRestroomsAndPantry(baseY, wallWoodMat) {
       const target = activeBuildGroup || scene;
 
@@ -2307,7 +2276,6 @@
       });
     }
 
-    // 資訊處與開放式機房（已移除上方三座懸吊燈箱招牌）
     function buildITDepartmentAndServerRoom(baseY) {
       const target = activeBuildGroup || scene;
 
@@ -2425,7 +2393,21 @@
         });
         g.add(top, frontModesty);
 
-        const screenTex = createSignTexture(labelText, 'SHOW CHWAN HIS / NOC', '#0f172a', '#38bdf8');
+        const chairLeatherMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.42 });
+        const chair = new THREE.Group();
+        const seat = new THREE.Mesh(createSmoothCapsuleGeometry(0.22, 0.11, 14, 6), chairLeatherMat);
+        seat.position.y = 0.47;
+        const back = new THREE.Mesh(createSmoothCapsuleGeometry(0.20, 0.44, 14, 6), chairLeatherMat);
+        back.position.set(0, 0.84, -0.19);
+        const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.45, 10), darkMetalMat);
+        stem.position.y = 0.23;
+        const baseStar = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.04, 16), darkMetalMat);
+        baseStar.position.y = 0.02;
+        chair.add(seat, back, stem, baseStar);
+        chair.position.set(0, 0, -0.68);
+        g.add(chair);
+
+        const screenTex = createSignTexture(labelText, 'SUNFLOWER HIS / NOC', '#0f172a', '#38bdf8');
         const screenMat = new THREE.MeshStandardMaterial({
           map: screenTex,
           emissive: 0x38bdf8,
@@ -2476,7 +2458,7 @@
       buildITWorkstation(23.2, 11.4, 0, '維護工程師・醫療端末維護', true);
       buildITWorkstation(23.2, 19.6, Math.PI, '維護工程師・硬體伺服器檢修', true);
 
-      const nocTex = createSignTexture('NOC網路監控看板', 'CORE SWITCH: 100Gbps OK ｜ HIS/PACS: ACTIVE ｜ FIREWALL: PROTECTED', '#090d16', '#22d3ee');
+      const nocTex = createSignTexture('NOC網路監控看板', 'CORE SWITCH: 100Gbps OK HIS/PACS: ACTIVE', '#090d16', '#22d3ee');
       const nocWallScreen = new THREE.Mesh(
         new THREE.BoxGeometry(0.12, 1.45, 2.85),
         new THREE.MeshStandardMaterial({
@@ -2574,7 +2556,6 @@
       colliders.push({ minX: 32.3, maxX: 36.7, minZ: 21.5, maxZ: 22.7, floor: 8, label: 'UPS不斷電系統櫃' });
     }
 
-    // 電梯感應區地墊（已移除所有 8F 字樣，顯示前往 B1 ~ 7F）
     function registerTransportZone({ x, z, y, radius, type, name }) {
       const zoneObj = { x, z, y, radius, type, name };
       transportTriggerZones.push(zoneObj);
@@ -2692,7 +2673,6 @@
 
       buildLargeConferenceRoom(f8Y, wallWoodIvoryMat);
 
-      // 北排房間（已移除招牌與門牌）
       const adminW = 18.0;
       const adminStep = adminW / 5;
       addWall(8.0, -34.0, adminW, 10.2, 4.4, wallWarmTeakMat, '北排辦公室與討論室', 8, f8Y);
@@ -2704,14 +2684,12 @@
 
       buildRoundTableRoom(f8Y, wallWoodIvoryMat);
 
-      // 西側房間（已移除值班室/清潔室/更衣室門牌）
       addWall(-34.55, -2.0, 17.1, 15.0, 4.4, wallWarmTeakMat, '西側房間區', 8, f8Y);
       addCorridorHandrail(-25.92, -9.2, -25.92, 5.2, f8Y);
 
       buildOpenRestroomsAndPantry(f8Y, wallWoodIvoryMat);
       buildCentralOpenAtrium(f8Y);
 
-      // 中央核心區（已移除含會議室/電腦室的懸吊燈箱招牌）
       addWall(-8.5, -12.5, 11.5, 14.5, 4.4, hallBlueWoodMat, '中央服務台與電梯核心區', 8, f8Y);
       addBacklitWoodSlatWall(-14.28, f8Y + 2.15, -12.5, 2.2, 4.1, -Math.PI / 2, 12);
       addCorridorHandrail(-14.1, -19.82, 9.1, -19.82, f8Y);
@@ -2738,17 +2716,15 @@
         name: '中央四座電梯廳'
       });
 
-      // 東北核心區（已移除書記室/討論室招牌）
       addWall(4.5, -12.5, 9.5, 14.5, 4.4, wallMintWoodMat, '東北房間區', 8, f8Y);
 
-      addWall(38.0, -34.0, 10.0, 10.2, 4.4, wallMintWoodMat, '東北安全梯與研討室', 8, f8Y);
-      addHangingSign(31.8, f8Y + 3.55, -34.0, 4.6, 0.78, '東北安全梯・研討室', 'NE STAIR & SEMINAR ROOM', '#065f46', '#6ee7b7', -Math.PI / 2);
+      addWall(38.0, -34.0, 10.0, 10.2, 4.4, wallMintWoodMat, '逃生安全梯', 8, f8Y);
+      addHangingSign(31.8, f8Y + 3.55, -34.0, 4.6, 0.78, '逃生安全梯', 'NE STAIR', '#065f46', '#6ee7b7', -Math.PI / 2);
 
       buildMediciConferenceRooms(f8Y, wallWoodIvoryMat);
 
-      // 南側電梯廳（已移除懸吊燈箱招牌）
-      addWall(-8.5, 22.0, 7.5, 9.5, 4.4, hallBlueWoodMat, '南側電梯廳與設備間', 8, f8Y);
-      addWall(4.5, 22.0, 7.5, 9.5, 4.4, wallMintWoodMat, '南側安全梯與休息室', 8, f8Y);
+      addWall(-8.5, 22.0, 7.5, 9.5, 4.4, hallBlueWoodMat, '電梯廳', 8, f8Y);
+      addWall(4.5, 22.0, 7.5, 9.5, 4.4, wallMintWoodMat, '逃生安全梯', 8, f8Y);
 
       const southElFrame = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.45, 2.2), darkFrameMat);
       southElFrame.position.set(-4.68, f8Y + 1.22, 21.5);
@@ -2765,16 +2741,16 @@
 
       buildITDepartmentAndServerRoom(f8Y);
 
-      addFireHydrantCabinet(-25.8, -22.5, Math.PI / 2, f8Y);
-      addFireHydrantCabinet(16.8, -10.5, -Math.PI / 2, f8Y);
-      addFireHydrantCabinet(-2.0, 15.0, Math.PI, f8Y);
-      addFireHydrantCabinet(10.8, 22.8, Math.PI, f8Y);
+      addFireHydrantCabinet(-25.55, -22.5, Math.PI / 2, f8Y);
+      addFireHydrantCabinet(18.8, -10.08, Math.PI, f8Y);
+      addFireHydrantCabinet(-8.5, 17.16, Math.PI, f8Y);
+      addFireHydrantCabinet(12.8, 23.01, Math.PI, f8Y);
 
       activeBuildGroup = null;
     }
 
     // --------------------------------------------------------------------------
-    // 3. 全圓弧立體角色與專屬 NPC（主管姓名更新、移除所有 8F 字樣、美蒂琪吧檯職稱更新）
+    // 3. 全圓弧立體角色與專屬 NPC
     // --------------------------------------------------------------------------
     function createHumanoidMesh(opts = {}) {
       const {
@@ -3231,10 +3207,11 @@
           floor: 8,
           baseY: FLOOR_Y[8],
           badgeColor: '#818cf8',
-          appearance: { coatColor: 0x1e3a8a, pantsColor: 0x0f172a },
-          waypoints: [new THREE.Vector3(17.5, FLOOR_Y[8], 12.6)],
+          appearance: { coatColor: 0x1e3a8a, pantsColor: 0x0f172a, isSeated: true },
+          waypoints: [new THREE.Vector3(17.5, FLOOR_Y[8], 10.72)], // 【修正】對齊椅子中心
           speed: 0,
-          yaw: Math.PI
+          yaw: 0,
+          isTyping: true
         },
         {
           name: '陳餘論 資深工程師',
@@ -3243,10 +3220,11 @@
           floor: 8,
           baseY: FLOOR_Y[8],
           badgeColor: '#818cf8',
-          appearance: { coatColor: 0x1e3a8a, pantsColor: 0x0f172a },
-          waypoints: [new THREE.Vector3(17.5, FLOOR_Y[8], 18.4)],
+          appearance: { coatColor: 0x1e3a8a, pantsColor: 0x0f172a, isSeated: true },
+          waypoints: [new THREE.Vector3(17.5, FLOOR_Y[8], 20.28)], // 【修正】對齊椅子中心
           speed: 0,
-          yaw: 0
+          yaw: Math.PI,
+          isTyping: true
         },
         {
           name: '李伽好 維護工程師',
@@ -3255,10 +3233,11 @@
           floor: 8,
           baseY: FLOOR_Y[8],
           badgeColor: '#2dd4bf',
-          appearance: { coatColor: 0x0d9488, pantsColor: 0x0f172a },
-          waypoints: [new THREE.Vector3(23.2, FLOOR_Y[8], 12.6)],
+          appearance: { coatColor: 0x0d9488, pantsColor: 0x0f172a, isSeated: true },
+          waypoints: [new THREE.Vector3(23.2, FLOOR_Y[8], 10.72)], // 【修正】對齊椅子中心
           speed: 0,
-          yaw: Math.PI
+          yaw: 0,
+          isTyping: true
         },
         {
           name: '陳擁寶 維護工程師',
@@ -3267,10 +3246,11 @@
           floor: 8,
           baseY: FLOOR_Y[8],
           badgeColor: '#2dd4bf',
-          appearance: { coatColor: 0x0d9488, pantsColor: 0x0f172a },
-          waypoints: [new THREE.Vector3(23.2, FLOOR_Y[8], 18.4)],
+          appearance: { coatColor: 0x0d9488, pantsColor: 0x0f172a, isSeated: true },
+          waypoints: [new THREE.Vector3(23.2, FLOOR_Y[8], 20.28)], // 【修正】對齊椅子中心
           speed: 0,
-          yaw: 0
+          yaw: Math.PI,
+          isTyping: true
         },
         {
           name: '李雨如 資訊助理員',
@@ -3279,10 +3259,40 @@
           floor: 8,
           baseY: FLOOR_Y[8],
           badgeColor: '#f472b6',
-          appearance: { coatColor: 0xf43f5e, pantsColor: 0x1e293b, isFemale: true },
-          waypoints: [new THREE.Vector3(12.4, FLOOR_Y[8], 15.8)],
+          appearance: { coatColor: 0xf43f5e, pantsColor: 0x1e293b, isFemale: true, isSeated: true },
+          waypoints: [new THREE.Vector3(14.28, FLOOR_Y[8], 15.8)], // 【修正】對齊椅子中心
           speed: 0,
-          yaw: -Math.PI * 0.5
+          yaw: -Math.PI * 0.5,
+          isTyping: true
+        },
+
+        // ================= 開放式機房檢修工程師 NPC =================
+        {
+          name: '黃桂林 機房系統工程師',
+          role: 'CORE SWITCH 與伺服器機櫃巡檢',
+          type: 'staff',
+          floor: 8,
+          baseY: FLOOR_Y[8],
+          badgeColor: '#38bdf8',
+          appearance: { coatColor: 0x0369a1, pantsColor: 0x0f172a },
+          waypoints: [
+            new THREE.Vector3(30.2, FLOOR_Y[8], 14.9),
+            new THREE.Vector3(38.8, FLOOR_Y[8], 14.9)
+          ],
+          speed: 1.05
+        },
+        {
+          name: '李丞華 硬體維運工程師',
+          role: 'HIS/PACS 伺服器機櫃檢測中',
+          type: 'staff',
+          floor: 8,
+          baseY: FLOOR_Y[8],
+          badgeColor: '#22d3ee',
+          appearance: { coatColor: 0x0f766e, pantsColor: 0x0f172a },
+          waypoints: [new THREE.Vector3(33.8, FLOOR_Y[8], 17.35)],
+          speed: 0,
+          yaw: 0,
+          isInspectingRack: true
         },
 
         // ================= 大型會議室、美蒂琪吧檯與駐衛警 =================
@@ -3407,6 +3417,8 @@
           isExecutive: !!def.appearance.isExecutive,
           isUsingRestroom: !!def.isUsingRestroom,
           isWashingHands: !!def.isWashingHands,
+          isTyping: !!def.isTyping,
+          isInspectingRack: !!def.isInspectingRack,
           hp: maxHp,
           maxHp,
           knockedTimer: 0,
@@ -3546,16 +3558,17 @@
     }
 
     // --------------------------------------------------------------------------
-    // 5. 雙向近戰格鬥與單擊地板波紋步行標記（純戰鬥互動模式）
+    // 5. 雙向近戰格鬥：先觸發動作與揮砍特效、再獨立進行範圍命中判定
     // --------------------------------------------------------------------------
     function performPlayerAttack(isHeavy = false) {
       if (player.isDead || isTransportModalOpen || player.isAttacking) return;
 
+      // 1. 無需預先鎖定目標，立即進入出招動作狀態並初始化單次揮砍命中紀錄集
       player.autoMoveTarget = null;
-      pendingAttackNpc = null;
       player.isAttacking = true;
       player.attackTimer = 0;
-      player.hitApplied = false;
+      player.hitNpcSet.clear();
+      player.attackSoundPlayed = false;
 
       if (isHeavy) {
         player.attackType = 4;
@@ -3568,7 +3581,8 @@
         player.comboResetTimer = 1.15;
       }
 
-      const lungeSpeed = isHeavy ? 4.0 : 2.6;
+      // 2. 出招前衝位移與碰撞修正
+      const lungeSpeed = isHeavy ? 4.2 : 2.8;
       player.pos.x += Math.sin(player.yaw) * lungeSpeed * 0.08;
       player.pos.z += Math.cos(player.yaw) * lungeSpeed * 0.08;
       for (let i = 0; i < npcs.length; i++) {
@@ -3576,34 +3590,45 @@
       }
       resolveCircleAllAABBs(player.pos, player.radius, 8);
 
+      // 3. 立即播放揮砍破風音效並生成綁定角色動作的 3D 揮砍光弧特效
       SoundFX.playWhoosh(isHeavy || player.attackType === 3);
-      spawnSlashArc(player.pos, player.yaw, isHeavy || player.attackType === 3 ? 0xf59e0b : 0xf43f5e);
+      const slashColor = isHeavy ? 0xf59e0b : (player.attackType === 3 ? 0x38bdf8 : 0xf43f5e);
+      spawnSlashArc(player.pos, player.yaw, slashColor, player.attackType, player.attackDuration);
     }
 
+    /**
+     * 獨立範圍命中判定（在揮砍有效幀區間內執行，支援橫掃多目標且同一招不重複扣血）
+     */
     function applyPlayerHitbox() {
       const isHeavy = player.attackType === 4;
       const isSpinKick = player.attackType === 3;
-      const reach = isHeavy ? 2.25 : isSpinKick ? 2.1 : 1.85;
+      const reach = isHeavy ? 2.35 : isSpinKick ? 2.2 : 1.95;
       const baseDmg = isHeavy ? 46 : isSpinKick ? 34 : 24;
 
       const fwdX = Math.sin(player.yaw);
       const fwdZ = Math.cos(player.yaw);
-      let hitCount = 0;
+      let newHitsThisFrame = 0;
 
       npcs.forEach((npc) => {
         if (npc.knockedTimer > 0) return;
+        // 同一記揮砍若已命中該目標，跳過重複判定
+        if (player.hitNpcSet.has(npc)) return;
 
         const dx = npc.pos.x - player.pos.x;
         const dz = npc.pos.z - player.pos.z;
         const dist = Math.hypot(dx, dz);
-        if (dist > reach) return;
+        // 納入目標碰撞半徑進行精準範圍判定
+        if (dist > reach + npc.radius * 0.65) return;
 
+        // 非 360° 迴旋踢時，檢查前方揮砍扇形角度（約 150 度扇形）
         if (!isSpinKick && dist > 0.05) {
           const dot = (dx / dist) * fwdX + (dz / dist) * fwdZ;
-          if (dot < 0.22) return;
+          if (dot < 0.20) return;
         }
 
-        hitCount++;
+        // 記錄已命中并獨立結算傷害、擊退與仇恨反擊
+        player.hitNpcSet.add(npc);
+        newHitsThisFrame++;
         player.totalHitsLanded++;
         npc.hp = Math.max(0, npc.hp - baseDmg);
         npc.isHostile = true;
@@ -3633,8 +3658,11 @@
         }
       });
 
-      if (hitCount > 0) {
-        SoundFX.playHit(isHeavy);
+      if (newHitsThisFrame > 0) {
+        if (!player.attackSoundPlayed) {
+          SoundFX.playHit(isHeavy);
+          player.attackSoundPlayed = true;
+        }
         camShake = isHeavy ? 0.34 : 0.18;
         player.wantedStars = Math.min(5, Math.max(1, Math.ceil(player.totalHitsLanded / 2)));
 
@@ -3677,7 +3705,7 @@
       SoundFX.playEnemyHit();
       camShake = 0.25;
       flashDamageVignette();
-      spawnSlashArc(npc.pos, npc.yaw, 0xef4444);
+      spawnSlashArc(npc.pos, npc.yaw, 0xef4444, 1, 0.26, false);
       spawnHitSpark(new THREE.Vector3(player.pos.x, player.pos.y + 1.3, player.pos.z), 0xef4444);
       spawnFloatingText(new THREE.Vector3(player.pos.x, player.pos.y + 2.1, player.pos.z), `-${dmg} HP`, '#ef4444');
       updateCombatHUD();
@@ -3693,16 +3721,51 @@
       document.getElementById('ko-overlay').classList.remove('hidden');
     }
 
-    function spawnSlashArc(originPos, yaw, colorHex) {
+    /**
+     * 生成動態跟隨角色動作與揮砍軌跡的 3D 光弧特效
+     */
+    function spawnSlashArc(originPos, yaw, colorHex, attackType = 1, duration = 0.28, followPlayer = true) {
+      const isHeavy = attackType === 4;
+      const isSpin = attackType === 3;
+      const innerR = isHeavy ? 0.85 : 0.72;
+      const outerR = isHeavy ? 1.65 : isSpin ? 1.55 : 1.38;
+      const thetaLen = isSpin ? Math.PI * 1.85 : isHeavy ? Math.PI * 1.15 : Math.PI * 0.92;
+
       const arc = new THREE.Mesh(
-        new THREE.RingGeometry(0.75, 1.35, 24, 1, -Math.PI * 0.45, Math.PI * 0.9),
-        new THREE.MeshBasicMaterial({ color: colorHex, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
+        new THREE.RingGeometry(innerR, outerR, 28, 1, -thetaLen * 0.5, thetaLen),
+        new THREE.MeshBasicMaterial({
+          color: colorHex,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.92,
+          depthWrite: false
+        })
       );
-      arc.rotation.x = -Math.PI / 2;
-      arc.rotation.z = -yaw + Math.PI * 0.5;
-      arc.position.set(originPos.x + Math.sin(yaw) * 0.65, originPos.y + 1.15, originPos.z + Math.cos(yaw) * 0.65);
+
+      // 依連段調整揮砍平面傾斜角，營造立體揮擊軌跡
+      const tiltX = -Math.PI / 2 + (attackType === 1 ? 0.22 : attackType === 2 ? -0.22 : 0.04);
+      const tiltY = attackType === 1 ? -0.25 : attackType === 2 ? 0.25 : 0;
+      arc.rotation.set(tiltX, tiltY, -yaw + Math.PI * 0.5);
+
+      const forwardOffset = isSpin ? 0.15 : 0.62;
+      const heightOffset = isSpin ? 0.85 : isHeavy ? 1.25 : 1.15;
+      arc.position.set(
+        originPos.x + Math.sin(yaw) * forwardOffset,
+        originPos.y + heightOffset,
+        originPos.z + Math.cos(yaw) * forwardOffset
+      );
+
       scene.add(arc);
-      slashEffects.push({ mesh: arc, life: 0.22, maxLife: 0.22 });
+      slashEffects.push({
+        mesh: arc,
+        life: duration,
+        maxLife: duration,
+        followPlayer,
+        attackType,
+        baseYaw: yaw,
+        forwardOffset,
+        heightOffset
+      });
     }
 
     function spawnHitSpark(pos, colorHex) {
@@ -3785,7 +3848,6 @@
       player.hp = player.maxHp;
       player.armor = 90;
       player.isDead = false;
-      pendingAttackNpc = null;
       document.getElementById('ko-overlay').classList.add('hidden');
       npcs.forEach((n) => {
         n.isHostile = false;
@@ -3949,7 +4011,6 @@
       player.vel.set(0, 0, 0);
       player.knockVel.set(0, 0, 0);
       player.autoMoveTarget = null;
-      pendingAttackNpc = null;
       camState.targetYaw = z.yaw + Math.PI;
       camState.yaw = z.yaw + Math.PI;
       document.getElementById('current-zone-label').textContent = z.label;
@@ -3976,7 +4037,6 @@
     function openElevatorModal(zoneName = '中央四座電梯廳') {
       isTransportModalOpen = true;
       player.autoMoveTarget = null;
-      pendingAttackNpc = null;
       document.getElementById('elv-name').textContent = `${zoneName}・全院樓層直達選單`;
 
       const optWrap = document.getElementById('elv-options');
@@ -4014,7 +4074,7 @@
       let zoneText = '中央環形走廊・會議中心與資訊空間';
 
       if (px >= -43.2 && px <= -25.8 && pz >= -26.0 && pz <= -9.5) {
-        zoneText = '大圓桌會議室 (黃合合總裁・黃媛媛執行長・劉玲總經理・郭盛名協理)';
+        zoneText = '大圓桌會議室 (黃茗賀總裁・黃嘉媛執行長・劉玲總經理・郭省銘協理)';
       } else if (px >= -31.0 && px <= -1.0 && pz >= -39.2 && pz <= -28.9) {
         zoneText = '大型會議室 (大型U型會議桌・投影大布幕)';
       } else if (px >= 17.3 && px <= 43.2 && pz >= -26.8 && pz <= -12.2) {
@@ -4053,29 +4113,6 @@
         if (player.comboResetTimer <= 0) player.comboStep = 0;
       }
 
-      if (pendingAttackNpc) {
-        if (pendingAttackNpc.knockedTimer > 0) {
-          pendingAttackNpc = null;
-          player.autoMoveTarget = null;
-        } else {
-          const distToTarget = Math.hypot(
-            pendingAttackNpc.pos.x - player.pos.x,
-            pendingAttackNpc.pos.z - player.pos.z
-          );
-          if (distToTarget <= 1.55) {
-            player.yaw = Math.atan2(
-              pendingAttackNpc.pos.x - player.pos.x,
-              pendingAttackNpc.pos.z - player.pos.z
-            );
-            pendingAttackNpc = null;
-            player.autoMoveTarget = null;
-            performPlayerAttack(false);
-          } else {
-            player.autoMoveTarget = pendingAttackNpc.pos.clone();
-          }
-        }
-      }
-
       let moveX = 0;
       let moveZ = 0;
       const forwardX = -Math.sin(camState.yaw);
@@ -4093,7 +4130,6 @@
       const hasManualInput = (moveX !== 0 || moveZ !== 0);
       if (hasManualInput) {
         player.autoMoveTarget = null;
-        pendingAttackNpc = null;
       } else if (player.autoMoveTarget && !isTransportModalOpen) {
         player.autoMoveTimer -= dt;
         const dx = player.autoMoveTarget.x - player.pos.x;
@@ -4158,27 +4194,28 @@
         const p = Math.min(1, player.attackTimer / player.attackDuration);
         const swing = Math.sin(p * Math.PI);
 
+        // 先播放完整出招肢體動作與發光軌跡
         if (player.attackType === 1) {
-          player.rightShoulder.rotation.x = -swing * 2.1;
+          player.rightShoulder.rotation.x = -swing * 2.15;
           player.rightElbow.rotation.x = -0.3 + swing * 0.25;
-          player.rightFistAura.material.opacity = swing * 0.65;
+          player.rightFistAura.material.opacity = swing * 0.72;
         } else if (player.attackType === 2) {
-          player.leftShoulder.rotation.x = -swing * 2.1;
+          player.leftShoulder.rotation.x = -swing * 2.15;
           player.leftElbow.rotation.x = -0.3 + swing * 0.25;
-          player.leftFistAura.material.opacity = swing * 0.65;
+          player.leftFistAura.material.opacity = swing * 0.72;
         } else if (player.attackType === 3) {
           player.bodyRoot.rotation.y = swing * Math.PI * 2;
-          player.rightHip.rotation.x = -swing * 1.45;
-          player.rightFootAura.material.opacity = swing * 0.75;
+          player.rightHip.rotation.x = -swing * 1.48;
+          player.rightFootAura.material.opacity = swing * 0.82;
         } else {
           player.rightShoulder.rotation.x = -swing * 2.4;
           player.leftShoulder.rotation.x = -swing * 2.2;
-          player.rightFistAura.material.opacity = swing * 0.85;
-          player.leftFistAura.material.opacity = swing * 0.85;
+          player.rightFistAura.material.opacity = swing * 0.88;
+          player.leftFistAura.material.opacity = swing * 0.88;
         }
 
-        if (p >= 0.42 && !player.hitApplied) {
-          player.hitApplied = true;
+        // 當揮砍動作推進至有效判定幀區間 (32% ~ 68%) 時，獨立進行範圍命中偵測
+        if (p >= 0.32 && p <= 0.68) {
           applyPlayerHitbox();
         }
 
@@ -4322,19 +4359,33 @@
               npc.rig.rightKnee.rotation.x = Math.PI * 0.45;
               if (npc.isExecutive) {
                 npc.rig.rightShoulder.rotation.x = -0.45 + Math.sin(elapsed * 2.6 + npc.walkCycle) * 0.14;
-                npc.rig.rightElbow.rotation.x = -0.65;
+                npc.rig.rightElbow.rotation.x = -0.75;
+              } else if (npc.isTyping) {
+                // 【新增】資訊處人員雙手在桌面敲打鍵盤與操作滑鼠的動態
+                npc.rig.leftShoulder.rotation.x = -0.62 + Math.sin(elapsed * 11.0 + npc.walkCycle) * 0.08;
+                npc.rig.leftElbow.rotation.x = -0.82 + Math.cos(elapsed * 13.0 + npc.walkCycle) * 0.12;
+                npc.rig.rightShoulder.rotation.x = -0.62 + Math.cos(elapsed * 10.5 + npc.walkCycle) * 0.08;
+                npc.rig.rightShoulder.rotation.z = -0.06 + Math.sin(elapsed * 3.5 + npc.walkCycle) * 0.07;
+                npc.rig.rightElbow.rotation.x = -0.82 + Math.sin(elapsed * 12.5 + npc.walkCycle) * 0.12;
+              } else {
+                npc.rig.rightShoulder.rotation.x = -0.35;
+                npc.rig.rightElbow.rotation.x = -0.55;
               }
             } else if (npc.isWashingHands) {
-              npc.rig.leftShoulder.rotation.x = -0.75 + Math.sin(elapsed * 8.0) * 0.14;
-              npc.rig.rightShoulder.rotation.x = -0.75 - Math.sin(elapsed * 8.0) * 0.14;
-              npc.rig.leftElbow.rotation.x = -0.85;
-              npc.rig.rightElbow.rotation.x = -0.85;
-            } else if (npc.isUsingRestroom) {
-              npc.rig.bodyRoot.position.y = Math.sin(elapsed * 2.0 + npc.walkCycle) * 0.015;
+              npc.rig.rightShoulder.rotation.x = -0.82 + Math.sin(elapsed * 8.5) * 0.14;
+              npc.rig.leftShoulder.rotation.x = -0.82 - Math.sin(elapsed * 8.5) * 0.14;
+              npc.rig.rightElbow.rotation.x = -0.78;
+              npc.rig.leftElbow.rotation.x = -0.78;
+              npc.rig.bodyRoot.position.y = Math.sin(elapsed * 4.2) * 0.015;
             } else if (!npc.isStationaryGuard && npc.waypoints.length > 1) {
-              const targetWp = npc.waypoints[npc.wpIndex];
-              const dx = targetWp.x - npc.pos.x;
-              const dz = targetWp.z - npc.pos.z;
+              npc.rig.rightShoulder.rotation.x = -1.25 + Math.sin(elapsed * 4.5) * 0.16;
+              npc.rig.rightElbow.rotation.x = -0.65 + Math.cos(elapsed * 5.2) * 0.15;
+              npc.rig.leftShoulder.rotation.x = -0.88;
+              npc.rig.leftElbow.rotation.x = -0.95;
+              npc.rig.bodyRoot.position.y = Math.sin(elapsed * 2.4) * 0.014;
+              const target = npc.waypoints[npc.wpIndex];
+              const dx = target.x - npc.pos.x;
+              const dz = target.z - npc.pos.z;
               const dist = Math.hypot(dx, dz);
               if (dist < 0.35) {
                 npc.wpIndex = (npc.wpIndex + 1) % npc.waypoints.length;
@@ -4342,22 +4393,24 @@
                 npc.pos.x += (dx / dist) * npc.speed * dt;
                 npc.pos.z += (dz / dist) * npc.speed * dt;
                 npc.yaw = Math.atan2(dx, dz);
-                npc.walkCycle += dt * 7.5;
+                npc.walkCycle += dt * 7;
                 resolveCircleAllAABBs(npc.pos, npc.radius, 8);
               }
+            } else {
+              npc.rig.bodyRoot.position.y = Math.sin(elapsed * 2 + npc.walkCycle) * 0.015;
             }
           }
 
           if (!npc.isSeated && !npc.isWashingHands) {
-            const swing = Math.sin(npc.walkCycle) * 0.55;
-            npc.rig.leftHip.rotation.x = swing;
-            npc.rig.rightHip.rotation.x = -swing;
             if (npc.swingAnimTimer > 0) {
               npc.swingAnimTimer -= dt;
-              npc.rig.rightShoulder.rotation.x = -1.9;
+              npc.rig.rightShoulder.rotation.x = -Math.sin((1 - npc.swingAnimTimer / 0.28) * Math.PI) * 2.1;
             } else {
-              npc.rig.leftShoulder.rotation.x = -swing * 0.45;
-              npc.rig.rightShoulder.rotation.x = swing * 0.45;
+              const swing = Math.sin(npc.walkCycle) * 0.55;
+              npc.rig.leftHip.rotation.x = swing;
+              npc.rig.rightHip.rotation.x = -swing;
+              npc.rig.leftShoulder.rotation.x = -swing * 0.5;
+              npc.rig.rightShoulder.rotation.x = swing * 0.5;
             }
           }
         }
@@ -4365,17 +4418,14 @@
         npc.rig.group.position.copy(npc.pos);
         npc.rig.group.rotation.y = npc.yaw;
 
-        const distToCam = camera.position.distanceTo(npc.pos);
-        if ((npc.isHostile || npc.hp < npc.maxHp) && distToCam < 24) {
-          const headPos = new THREE.Vector3(npc.pos.x, npc.pos.y + 2.55, npc.pos.z);
-          const proj = headPos.project(camera);
-          if (proj.z < 1) {
-            const sx = (proj.x * 0.5 + 0.5) * window.innerWidth;
-            const sy = (-proj.y * 0.5 + 0.5) * window.innerHeight;
-            npc.hpBarWrap.style.left = `${sx}px`;
-            npc.hpBarWrap.style.top = `${sy}px`;
-            npc.hpFillEl.style.width = `${Math.max(0, (npc.hp / npc.maxHp) * 100)}%`;
+        if (npc.isHostile || npc.hp < npc.maxHp) {
+          const headWorld = new THREE.Vector3(npc.pos.x, npc.pos.y + 2.45, npc.pos.z);
+          const proj = headWorld.project(camera);
+          if (proj.z < 1 && headWorld.distanceTo(camera.position) < 28) {
             npc.hpBarWrap.classList.remove('hidden');
+            npc.hpBarWrap.style.left = `${(proj.x * 0.5 + 0.5) * window.innerWidth}px`;
+            npc.hpBarWrap.style.top = `${(-proj.y * 0.5 + 0.5) * window.innerHeight}px`;
+            npc.hpFillEl.style.width = `${(npc.hp / npc.maxHp) * 100}%`;
           } else {
             npc.hpBarWrap.classList.add('hidden');
           }
@@ -4386,189 +4436,174 @@
     }
 
     function updateVisualEffects(dt, elapsed) {
-      transportPads.forEach((ring, idx) => {
-        const s = 1 + Math.sin(elapsed * 3.5 + idx) * 0.08;
+      transportPads.forEach((ring, i) => {
+        const s = 1 + Math.sin(elapsed * 3.5 + i) * 0.08;
         ring.scale.set(s, s, 1);
       });
 
-      serverBlinkLeds.forEach((led) => {
-        const blink = Math.sin(elapsed * 7.5 + led.phase) > 0;
-        led.mat.visible = blink;
+      serverBlinkLeds.forEach((led, idx) => {
+        const pulse = Math.sin(elapsed * 7.5 + led.phase + (idx % 3));
+        led.mat.color.setHex(pulse > 0.35 ? 0x38bdf8 : (pulse > -0.35 ? 0x22c55e : 0x0f172a));
       });
 
       for (let i = slashEffects.length - 1; i >= 0; i--) {
-        const ef = slashEffects[i];
-        ef.life -= dt;
-        ef.mesh.material.opacity = Math.max(0, (ef.life / ef.maxLife) * 0.85);
-        ef.mesh.scale.addScalar(dt * 2.5);
-        if (ef.life <= 0) {
-          scene.remove(ef.mesh);
+        const se = slashEffects[i];
+        se.life -= dt;
+        if (se.life <= 0) {
+          scene.remove(se.mesh);
           slashEffects.splice(i, 1);
+        } else {
+          const prog = 1 - se.life / se.maxLife;
+          se.mesh.material.opacity = (1 - prog) * 0.92;
+
+          // 若為玩家揮砍光弧，動態同步跟隨玩家座標、朝向與橫掃旋轉
+          if (se.followPlayer) {
+            const sweepAngle = se.attackType === 3
+              ? -player.yaw - prog * Math.PI * 2
+              : -player.yaw + Math.PI * 0.5 + (prog - 0.5) * (se.attackType === 2 ? -1.4 : 1.4);
+
+            se.mesh.position.set(
+              player.pos.x + Math.sin(player.yaw) * se.forwardOffset,
+              player.pos.y + se.heightOffset,
+              player.pos.z + Math.cos(player.yaw) * se.forwardOffset
+            );
+            se.mesh.rotation.z = sweepAngle;
+          }
+
+          const sc = 0.88 + prog * 0.42;
+          se.mesh.scale.set(sc, sc, 1);
         }
       }
 
       for (let i = impactParticles.length - 1; i >= 0; i--) {
-        const pt = impactParticles[i];
-        pt.life -= dt;
-        pt.vel.y -= 9.8 * dt;
-        pt.mesh.position.addScaledVector(pt.vel, dt);
-        if (pt.life <= 0) {
-          scene.remove(pt.mesh);
+        const ip = impactParticles[i];
+        ip.life -= dt;
+        if (ip.life <= 0) {
+          scene.remove(ip.mesh);
           impactParticles.splice(i, 1);
+        } else {
+          ip.vel.y -= 12 * dt;
+          ip.mesh.position.addScaledVector(ip.vel, dt);
+          ip.mesh.scale.setScalar(ip.life / 0.35);
         }
       }
 
       for (let i = floorClickRipples.length - 1; i >= 0; i--) {
         const rp = floorClickRipples[i];
         rp.life -= dt;
-        const prog = 1 - Math.max(0, rp.life / rp.maxLife);
-        const sc = 1 + prog * 2.2;
-        rp.outerRing.scale.set(sc, sc, 1);
-        rp.outerRing.material.opacity = (1 - prog) * 0.95;
-        rp.innerDot.material.opacity = (1 - prog) * 0.85;
         if (rp.life <= 0) {
-          scene.remove(rp.outerRing);
-          scene.remove(rp.innerDot);
+          scene.remove(rp.outerRing, rp.innerDot);
           floorClickRipples.splice(i, 1);
+        } else {
+          const prog = 1 - rp.life / rp.maxLife;
+          const sc = 1 + prog * 1.8;
+          rp.outerRing.scale.set(sc, sc, 1);
+          rp.outerRing.material.opacity = (1 - prog) * 0.9;
+          rp.innerDot.material.opacity = (1 - prog) * 0.85;
         }
       }
+
+      gameClockMinutes += dt * 0.6;
+      const hh = String(Math.floor(gameClockMinutes / 60) % 24).padStart(2, '0');
+      const mm = String(Math.floor(gameClockMinutes % 60)).padStart(2, '0');
+      document.getElementById('hud-clock').textContent = `${hh}:${mm}`;
     }
 
-    function init() {
-      const canvas = document.getElementById('game-canvas');
-
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xdbeafe);
-      scene.fog = new THREE.FogExp2(0xe0f2fe, 0.0045);
-
-      camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.15, 220);
-
-      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.12;
-
-      const hemiLight = new THREE.HemisphereLight(0xffffff, 0xd6c7b2, 1.05);
-      hemiLight.position.set(0, 50, 0);
-      scene.add(hemiLight);
-
-      const dirLight = new THREE.DirectionalLight(0xfffbeb, 0.85);
-      dirLight.position.set(28, 65, 22);
-      dirLight.castShadow = true;
-      dirLight.shadow.mapSize.width = 2048;
-      dirLight.shadow.mapSize.height = 2048;
-      dirLight.shadow.camera.near = 10;
-      dirLight.shadow.camera.far = 140;
-      const d = 55;
-      dirLight.shadow.camera.left = -d;
-      dirLight.shadow.camera.right = d;
-      dirLight.shadow.camera.top = d;
-      dirLight.shadow.camera.bottom = -d;
-      scene.add(dirLight);
-
-      buildFloor8();
-      spawnAllNpcs();
-      bindEvents();
-
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
-
-      setTimeout(() => {
-        const loader = document.getElementById('loading-overlay');
-        if (loader) {
-          loader.style.opacity = '0';
-          setTimeout(() => loader.remove(), 500);
-        }
-      }, 450);
-
-      animate();
-    }
-
+    // --------------------------------------------------------------------------
+    // 8. 鼠標點擊地面自由移動、NPC 鎖定攻擊、拖曳旋轉與所有 UI 綁定
+    // --------------------------------------------------------------------------
     function handleCanvasClickInteraction(clientX, clientY) {
-      if (isTransportModalOpen) return;
+      if (isTransportModalOpen || player.isDead) return;
 
-      mouseNDC.x = (clientX / window.innerWidth) * 2 - 1;
-      mouseNDC.y = -(clientY / window.innerHeight) * 2 + 1;
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouseNDC.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+      mouseNDC.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+
       raycaster.setFromCamera(mouseNDC, camera);
 
+      const elvHits = raycaster.intersectObjects(transportHitMeshes, false);
+      if (elvHits.length > 0 && elvHits[0].object.userData.elevatorZone) {
+        openElevatorModal(elvHits[0].object.userData.elevatorZone.name);
+        return;
+      }
+
+      // 1. 點擊任意 NPC 時：直接面向該方向出招（先觸發動作與揮砍特效，後續在判定幀獨立偵測範圍內是否命中）
       const npcHits = raycaster.intersectObjects(npcHitMeshes, false);
-      if (npcHits.length > 0) {
+      if (npcHits.length > 0 && npcHits[0].object.userData.npcRef) {
         const targetNpc = npcHits[0].object.userData.npcRef;
-        if (targetNpc && targetNpc.knockedTimer <= 0) {
-          const dist = Math.hypot(targetNpc.pos.x - player.pos.x, targetNpc.pos.z - player.pos.z);
-          if (dist <= 1.85) {
-            pendingAttackNpc = null;
-            player.autoMoveTarget = null;
-            player.yaw = Math.atan2(targetNpc.pos.x - player.pos.x, targetNpc.pos.z - player.pos.z);
-            performPlayerAttack(false);
+        if (targetNpc.knockedTimer <= 0) {
+          const dx = targetNpc.pos.x - player.pos.x;
+          const dz = targetNpc.pos.z - player.pos.z;
+          if (Math.hypot(dx, dz) > 0.01) {
+            player.yaw = Math.atan2(dx, dz);
           }
+          performPlayerAttack(false);
           return;
         }
       }
 
-      const padHits = raycaster.intersectObjects(transportHitMeshes, false);
-      if (padHits.length > 0) {
-        const elvZone = padHits[0].object.userData.elevatorZone;
-        if (elvZone) {
-          pendingAttackNpc = null;
-          openElevatorModal(elvZone.name);
-          return;
+      // 2. 點擊地面任意處時：面向點擊方向並立即觸發揮砍動作與特效
+      const hitPoint = new THREE.Vector3();
+      if (raycaster.ray.intersectPlane(floorHitPlane, hitPoint)) {
+        const dx = hitPoint.x - player.pos.x;
+        const dz = hitPoint.z - player.pos.z;
+        if (Math.hypot(dx, dz) > 0.01) {
+          player.yaw = Math.atan2(dx, dz);
         }
+        spawnFloorClickRipple(hitPoint.x, hitPoint.z, false);
+        performPlayerAttack(false);
       }
     }
 
-    function bindEvents() {
-      const canvas = document.getElementById('game-canvas');
+    function bindAllControls() {
+      const canvas = renderer.domElement;
 
       window.addEventListener('keydown', (e) => {
         keys[e.code] = true;
 
-        if (e.code === 'Escape') {
-          if (isTransportModalOpen) closeElevatorModal();
-          return;
-        }
-
         if (isTransportModalOpen) {
-          const matched = FLOOR_HTML_LINKS.find((f) => f.keyDigit === e.code);
-          if (matched) {
-            redirectToFloorHtml(matched.code);
+          const matchedFloor = FLOOR_HTML_LINKS.find((f) => f.keyDigit === e.code);
+          if (matchedFloor) {
+            e.preventDefault();
+            redirectToFloorHtml(matchedFloor.code);
+            return;
           }
-          return;
+          if (e.code === 'Escape' || e.code === 'KeyE') {
+            e.preventDefault();
+            closeElevatorModal();
+            return;
+          }
         }
 
-        if (e.code === 'Space') {
-          if (player.onGround && !player.isDead) {
-            player.vel.y = 7.4;
-            player.onGround = false;
-          }
-        } else if (e.code === 'KeyJ') {
+        if (e.code === 'KeyJ') {
           performPlayerAttack(false);
         } else if (e.code === 'KeyK') {
           performPlayerAttack(true);
+        } else if (e.code === 'Space' && player.onGround && !isTransportModalOpen) {
+          player.vel.y = 7.4;
+          player.onGround = false;
         } else if (e.code === 'KeyE') {
           if (nearTransportZone) {
             openElevatorModal(nearTransportZone.name);
           } else {
             openElevatorModal('中央四座電梯廳');
           }
-        } else if (e.code === 'KeyV') {
-  player.firstPerson = !player.firstPerson;
-  const povBtn = document.getElementById('btn-toggle-pov');
-  if (povBtn) povBtn.textContent = player.firstPerson ? '👁️ 第一人稱 (V)' : '👁️ 第三人稱 (V)';
-} else if (e.code === 'KeyC') {
+        } else if (e.code === 'KeyC') {
           clearWantedAndHeal();
+        } else if (e.code === 'KeyV') {
+          player.firstPerson = !player.firstPerson;
+          showToast(player.firstPerson ? '👁️ 已切換為第一人稱視角' : '🎥 已切換為第三人稱過肩視角');
+        } else if (e.code === 'KeyN') {
+          showNpcLabels = !showNpcLabels;
+          showToast(showNpcLabels ? '🏷️ 已顯示院內人員姓名牌' : '🏷️ 已隱藏院內人員姓名牌');
         }
       });
 
       window.addEventListener('keyup', (e) => {
         keys[e.code] = false;
       });
+
+      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
       canvas.addEventListener('mousedown', (e) => {
         if (e.button === 0) {
@@ -4587,16 +4622,19 @@
 
       window.addEventListener('mouseup', (e) => {
         if (e.button === 0) {
-          if (camState.isLeftMouseDown && !camState.hasDraggedSinceDown && e.target === canvas) {
+          if (camState.isLeftMouseDown && !camState.hasDraggedSinceDown) {
             handleCanvasClickInteraction(e.clientX, e.clientY);
           }
           camState.isLeftMouseDown = false;
+          camState.hasDraggedSinceDown = false;
+          camState.lastMouseX = null;
+          camState.lastMouseY = null;
         } else if (e.button === 2) {
           camState.isRightDragging = false;
+          camState.lastMouseX = null;
+          camState.lastMouseY = null;
         }
       });
-
-      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
       window.addEventListener('mousemove', (e) => {
         if (camState.lastMouseX === null || camState.lastMouseY === null) {
@@ -4610,33 +4648,103 @@
         camState.lastMouseX = e.clientX;
         camState.lastMouseY = e.clientY;
 
-        if (camState.isLeftMouseDown) {
-          const totalMoved = Math.hypot(e.clientX - camState.mouseDownX, e.clientY - camState.mouseDownY);
-          if (totalMoved > 6) {
+        if (camState.isLeftMouseDown && !camState.hasDraggedSinceDown) {
+          if (Math.hypot(e.clientX - camState.mouseDownX, e.clientY - camState.mouseDownY) > 6) {
             camState.hasDraggedSinceDown = true;
           }
         }
 
-        if ((camState.isLeftMouseDown || camState.isRightDragging) && !isTransportModalOpen) {
-          const rotFactor = 0.0046 * camState.sensitivity;
+        if (camState.isLeftMouseDown || camState.isRightDragging) {
+          const rotFactor = 0.0042 * camState.sensitivity;
           const ySign = camState.invertY ? -1 : 1;
           camState.targetYaw -= dx * rotFactor;
           camState.targetPitch = THREE.MathUtils.clamp(
-            camState.targetPitch + dy * rotFactor * 0.85 * ySign,
-            -0.38,
-            0.85
+            camState.targetPitch + dy * rotFactor * 0.78 * ySign,
+            0.05,
+            0.95
           );
         }
       });
 
       canvas.addEventListener('wheel', (e) => {
-        if (player.firstPerson || isTransportModalOpen) return;
-        camState.targetDistance = THREE.MathUtils.clamp(camState.targetDistance + e.deltaY * 0.0045, 2.4, 11.5);
-      }, { passive: true });
+        e.preventDefault();
+        camState.targetDistance = THREE.MathUtils.clamp(camState.targetDistance + e.deltaY * 0.005, 2.2, 11.5);
+      }, { passive: false });
+
+      const sensSlider = document.getElementById('mouse-sens-slider');
+      const sensValEl = document.getElementById('mouse-sens-value');
+      if (sensSlider && sensValEl) {
+        sensSlider.addEventListener('input', (e) => {
+          camState.sensitivity = parseFloat(e.target.value);
+          sensValEl.textContent = `${camState.sensitivity.toFixed(1)}x`;
+        });
+      }
+
+      const invertYBtn = document.getElementById('btn-invert-y');
+      if (invertYBtn) {
+        invertYBtn.addEventListener('click', (e) => {
+          camState.invertY = !camState.invertY;
+          e.target.textContent = camState.invertY ? '開啟' : '關閉';
+        });
+      }
+
+      document.querySelectorAll('.zone-jump-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          teleportToZone(btn.dataset.zone);
+        });
+      });
+
+      document.querySelectorAll('.floor-html-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          redirectToFloorHtml(btn.dataset.floor);
+        });
+      });
+
+      const elvOpenBtn = document.getElementById('btn-open-elevator');
+      if (elvOpenBtn) {
+        elvOpenBtn.addEventListener('click', () => {
+          openElevatorModal(nearTransportZone ? nearTransportZone.name : '中央四座電梯廳');
+        });
+      }
+      document.getElementById('elv-close-btn').addEventListener('click', closeElevatorModal);
+      document.getElementById('elevator-prompt').addEventListener('click', () => {
+        if (nearTransportZone) openElevatorModal(nearTransportZone.name);
+      });
+
+      const clearWantedBtn = document.getElementById('btn-clear-wanted');
+      if (clearWantedBtn) clearWantedBtn.addEventListener('click', clearWantedAndHeal);
+
+      document.getElementById('btn-action-attack').addEventListener('click', () => performPlayerAttack(false));
+      document.getElementById('btn-action-heavy').addEventListener('click', () => performPlayerAttack(true));
+
+      document.querySelectorAll('.touch-pad').forEach((btn) => {
+        const code = btn.dataset.key;
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[code] = true; }, { passive: false });
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[code] = false; }, { passive: false });
+      });
+
+      const touchJumpBtn = document.getElementById('btn-touch-jump');
+      if (touchJumpBtn) {
+        touchJumpBtn.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          if (player.onGround) { player.vel.y = 7.4; player.onGround = false; }
+        }, { passive: false });
+      }
+
+      const touchElvBtn = document.getElementById('btn-touch-elevator');
+      if (touchElvBtn) {
+        touchElvBtn.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          openElevatorModal(nearTransportZone ? nearTransportZone.name : '中央四座電梯廳');
+        }, { passive: false });
+      }
 
       canvas.addEventListener('touchstart', (e) => {
         if (e.touches.length === 1) {
           camState.touchDragging = true;
+          camState.hasDraggedSinceDown = false;
+          camState.mouseDownX = e.touches[0].clientX;
+          camState.mouseDownY = e.touches[0].clientY;
           camState.lastTouchX = e.touches[0].clientX;
           camState.lastTouchY = e.touches[0].clientY;
         }
@@ -4648,69 +4756,88 @@
           const dy = e.touches[0].clientY - camState.lastTouchY;
           camState.lastTouchX = e.touches[0].clientX;
           camState.lastTouchY = e.touches[0].clientY;
-          const rotFactor = 0.0055 * camState.sensitivity;
-          const ySign = camState.invertY ? -1 : 1;
-          camState.targetYaw -= dx * rotFactor;
-          camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * rotFactor * ySign, -0.35, 0.85);
+          if (Math.hypot(e.touches[0].clientX - camState.mouseDownX, e.touches[0].clientY - camState.mouseDownY) > 8) {
+            camState.hasDraggedSinceDown = true;
+          }
+          camState.targetYaw -= dx * 0.0055 * camState.sensitivity;
+          camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * 0.0045, 0.05, 0.95);
         }
       }, { passive: true });
 
-      canvas.addEventListener('touchend', () => {
-        camState.touchDragging = false;
-      });
-
-      document.querySelectorAll('.tp-btn').forEach((btn) => {
-        btn.addEventListener('click', () => teleportToZone(btn.dataset.zone));
-      });
-
-      document.querySelectorAll('.floor-link-btn').forEach((btn) => {
-        btn.addEventListener('click', () => redirectToFloorHtml(btn.dataset.linkFloor));
-      });
-
-      document.getElementById('btn-action-attack').addEventListener('click', () => performPlayerAttack(false));
-      document.getElementById('btn-action-heavy').addEventListener('click', () => performPlayerAttack(true));
-
-      document.getElementById('elevator-prompt').addEventListener('click', () => {
-        if (nearTransportZone) openElevatorModal(nearTransportZone.name);
-      });
-      document.getElementById('elv-close-btn').addEventListener('click', closeElevatorModal);
-
-      document.getElementById('btn-touch-elevator').addEventListener('click', () => {
-        openElevatorModal(nearTransportZone ? nearTransportZone.name : '中央四座電梯廳');
-      });
-      document.getElementById('btn-touch-jump').addEventListener('click', () => {
-        if (player.onGround && !player.isDead) {
-          player.vel.y = 7.4;
-          player.onGround = false;
+      canvas.addEventListener('touchend', (e) => {
+        if (camState.touchDragging && !camState.hasDraggedSinceDown && e.changedTouches.length > 0) {
+          handleCanvasClickInteraction(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
         }
-      });
-
-      document.querySelectorAll('.touch-pad').forEach((btn) => {
-        const k = btn.dataset.key;
-        btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[k] = true; }, { passive: false });
-        btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[k] = false; }, { passive: false });
+        camState.touchDragging = false;
       });
     }
 
-    let lastClockTick = 0;
+    // --------------------------------------------------------------------------
+    // 9. 初始化場景與主迴圈
+    // --------------------------------------------------------------------------
+    function init() {
+      const canvas = document.getElementById('game-canvas');
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x1e293b);
+      scene.fog = new THREE.FogExp2(0x1e293b, 0.0075);
+
+      camera = new THREE.PerspectiveCamera(56, window.innerWidth / window.innerHeight, 0.1, 140);
+
+      const hemiLight = new THREE.HemisphereLight(0xfffbeb, 0x92400e, 0.95);
+      hemiLight.position.set(0, 50, 0);
+      scene.add(hemiLight);
+
+      const dirLight = new THREE.DirectionalLight(0xfff7ed, 0.92);
+      dirLight.position.set(28, 62, 24);
+      dirLight.castShadow = true;
+      dirLight.shadow.mapSize.width = 2048;
+      dirLight.shadow.mapSize.height = 2048;
+      dirLight.shadow.camera.near = 5;
+      dirLight.shadow.camera.far = 120;
+      const d = 52;
+      dirLight.shadow.camera.left = -d;
+      dirLight.shadow.camera.right = d;
+      dirLight.shadow.camera.top = d;
+      dirLight.shadow.camera.bottom = -d;
+      scene.add(dirLight);
+
+      buildFloor8();
+      spawnAllNpcs();
+      bindAllControls();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      const loadOverlay = document.getElementById('loading-overlay');
+      setTimeout(() => {
+        loadOverlay.classList.add('opacity-0');
+        setTimeout(() => loadOverlay.remove(), 500);
+      }, 320);
+
+      animate();
+    }
+
     function animate() {
       requestAnimationFrame(animate);
       const dt = Math.min(0.05, clock.getDelta());
-      const elapsed = clock.elapsedTime;
+      const elapsed = clock.getElapsedTime();
 
-      updateAutomaticSlidingDoors(dt);
       updatePlayerAndCamera(dt);
+      updateAutomaticSlidingDoors(dt);
       updateNpcs(dt, elapsed);
       updateVisualEffects(dt, elapsed);
       renderMinimap();
-
-      if (elapsed - lastClockTick >= 1.0) {
-        lastClockTick = elapsed;
-        gameClockMinutes = (gameClockMinutes + 1) % (24 * 60);
-        const hh = String(Math.floor(gameClockMinutes / 60)).padStart(2, '0');
-        const mm = String(gameClockMinutes % 60).padStart(2, '0');
-        document.getElementById('hud-clock').textContent = `${hh}:${mm}`;
-      }
 
       renderer.render(scene, camera);
     }
