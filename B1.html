@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>幸運草醫院-模擬人生</title>
+  <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js r128 CDN -->
@@ -113,8 +113,8 @@
   <!-- 載入遮罩 -->
   <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 text-white transition-opacity duration-500">
     <div class="w-16 h-16 border-4 border-teal-400 border-t-amber-400 rounded-full animate-spin mb-4"></div>
-    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">幸運草醫院-模擬人生</h1>
-    <p class="text-xs sm:text-sm text-slate-300 text-center px-4">正在建構建築級分區護牆立面、實木不鏽鋼防撞扶手、洗牆燈槽與 ACES 電影級多色溫燈光系統...</p>
+    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">向日葵醫院-模擬人生</h1>
+    <p class="text-xs sm:text-sm text-slate-300 text-center px-4">正在載入...</p>
   </div>
 
   <!-- 頂部橫向：B1 各科區域快速傳送 + B1 ~ 8F 樓層 HTML 直連列 -->
@@ -248,7 +248,7 @@
             🛗
           </div>
           <div>
-            <h3 id="dlg-name" class="font-black text-base sm:text-lg text-amber-300">幸運草醫院手扶梯 / 電梯搭乘系統</h3>
+            <h3 id="dlg-name" class="font-black text-base sm:text-lg text-amber-300">向日葵醫院手扶梯 / 電梯搭乘系統</h3>
             <p id="dlg-role" class="text-xs text-teal-300 font-medium">目前所在樓層：B1 地下一樓</p>
           </div>
         </div>
@@ -449,7 +449,7 @@
       b1_neuro:     { label: 'B1 神內/神外/中醫門診大廳・腦波室 (201~204診・大爆滿)', pos: new THREE.Vector3(-22.5, -4.6, 21.8), yaw: 0 },
       b1_aesthetic: { label: 'B1 維納斯醫學美容中心・6+2人高壓氧艙', pos: new THREE.Vector3(-28.5, -4.6, 8.5), yaw: Math.PI },
       b1_gi:        { label: 'B1 消化器中心・耳鼻喉科門診候診區', pos: new THREE.Vector3(10.5, -4.6, 9.2), yaw: 0 },
-      b1_food:      { label: 'B1 實景美食街 (湯陽食堂・九龍廣東粥・龍山赤肉羹・弘爺漢堡)', pos: new THREE.Vector3(10.5, -4.6, -13.5), yaw: Math.PI }
+      b1_food:      { label: 'B1 實景美食街 (素食食堂・八九廣東粥・山上赤肉羹・爺爺漢堡)', pos: new THREE.Vector3(10.5, -4.6, -13.5), yaw: Math.PI }
     };
 
     const SoundFX = (() => {
@@ -2040,25 +2040,25 @@
 
       const realFoodStalls = [
         {
-          x: 2.2, w: 3.6, name: '湯陽食堂', sub: 'TANGYANG CANTEEN・現煮湯麵/蓋飯',
+          x: 2.2, w: 3.6, name: '素食食堂', sub: 'TANGYANG CANTEEN・現煮湯麵/蓋飯',
           signBg: '#451a03', signAccent: '#fde047', wallBg: '#fff7ed', accentHex: '#9a3412',
           mottos: ['好吃', '好好吃', '好好吃飯'],
           menus: ['招牌暖心湯麵 $85', '古早味排骨飯 $95', '養生藥膳雞湯 $90']
         },
         {
-          x: 6.0, w: 3.6, name: '九龍廣東粥', sub: 'KOWLOON CONGEE・現熬生滾粥/鍋燒',
+          x: 6.0, w: 3.6, name: '八九廣東粥', sub: 'KOWLOON CONGEE・現熬生滾粥/鍋燒',
           signBg: '#f8fafc', signAccent: '#dc2626', wallBg: '#f0f9ff', accentHex: '#0369a1',
           mottos: ['鮮熬', '生滾粥', '暖胃首選'],
           menus: ['皮蛋瘦肉粥 $75', '海鮮及第粥 $90', '沙茶鍋燒意麵 $85']
         },
         {
-          x: 9.8, w: 3.4, name: '祥順素食', sub: 'XIANGSHUN VEGETARIAN・健康蔬食',
+          x: 9.8, w: 3.4, name: '順利素食', sub: 'XIANGSHUN VEGETARIAN・健康蔬食',
           signBg: '#065f46', signAccent: '#6ee7b7', wallBg: '#ecfdf5', accentHex: '#047857',
           mottos: ['清淨', '養生蔬食', '每日現炒'],
           menus: ['五穀養生便當 $80', '紅燒猴頭菇麵 $90', '當歸藥膳湯 $60']
         },
         {
-          x: 13.4, w: 3.4, name: '龍山赤肉羹', sub: 'LONGSHAN PORK SOUP・鹿港傳統美食',
+          x: 13.4, w: 3.4, name: '山上赤肉羹', sub: 'LONGSHAN PORK SOUP・鹿港傳統美食',
           signBg: '#991b1b', signAccent: '#fde047', wallBg: '#fef2f2', accentHex: '#b91c1c',
           mottos: ['道地', '鹿港風味', '手作肉羹'],
           menus: ['招牌赤肉羹麵 $70', '香菇肉燥飯 $45', '綜合羹米粉 $75']
@@ -2070,7 +2070,7 @@
           menus: ['東坡控肉飯 $105', '蜜汁雞腿餐 $100', '冰糖銀耳露 $45']
         },
         {
-          x: 20.6, w: 3.4, name: '弘爺漢堡', sub: 'HONGYA BURGER・早午餐/現磨咖啡',
+          x: 20.6, w: 3.4, name: '爺爺漢堡', sub: 'HONGYA BURGER・早午餐/現磨咖啡',
           signBg: '#b45309', signAccent: '#fef08a', wallBg: '#fefce8', accentHex: '#d97706',
           mottos: ['活力', '現做漢堡', '香醇咖啡'],
           menus: ['卡啦雞腿堡餐 $85', '總匯三明治 $65', '美式研磨咖啡 $45']
@@ -2557,7 +2557,7 @@
         },
         {
           name: '蔡秀琴 美食街營運店長',
-          role: 'B1 湯陽食堂・九龍廣東粥・龍山赤肉羹・弘爺漢堡',
+          role: '素食食堂・八九廣東粥・山上赤肉羹・爺爺漢堡',
           avatar: '🍲',
           type: 'staff',
           floor: 'B1',
@@ -2565,7 +2565,7 @@
           appearance: { coatColor: 0xf59e0b, pantsColor: 0x1e293b, hasMask: true },
           waypoints: [new THREE.Vector3(4.5, b1Y, -17.2), new THREE.Vector3(18.5, b1Y, -17.2)],
           speed: 1.15,
-          dialogue: '歡迎來到全新改裝的大理石紋 B1 美食街！左邊第一間「湯陽食堂」現煮湯麵超受歡迎，隔壁「九龍廣東粥」跟「龍山赤肉羹」也很適合看完門診補充體力！',
+          dialogue: '歡迎來到全新改裝的大理石紋美食街！左邊第一間「湯陽食堂」現煮湯麵超受歡迎，隔壁「八九廣東粥」跟「山上赤肉羹」也很適合看完門診補充體力！',
           options: []
         },
         {
@@ -2613,13 +2613,13 @@
       const hairPalette = [0x1e1b18, 0x3f2e21, 0x9ca3af, 0xd1d5db, 0x090d16];
 
       const patientDialogues = [
-        '今天 B1 胸腔科跟中醫門診真的大爆滿！我早上 8 點半就來抽號碼牌，前面還有 20 幾個人呢！',
+        '今天胸腔科跟中醫門診真的大爆滿！我早上 8 點半就來抽號碼牌，前面還有 20 幾個人呢！',
         '這邊排椅幾乎全坐滿了，新改裝的護牆扶手跟柔和洗牆燈光讓人感覺很安心舒適。',
         '我陪爸爸來看胸腔科追蹤肺部 X 光，待會看完要去美食街的「九龍廣東粥」買熱粥吃！',
         '神內跟中醫門診今天人超多，連轉角候診椅都客滿了，醫師跟護理師真的很辛苦！',
         '剛剛去「湯陽食堂」點了一碗熱騰騰的湯麵，大理石櫃檯跟暖金吊燈裝潢得很氣派！',
         '我是來做腦波檢查跟神經傳導的，護理師說今天排檢人數大爆滿，要耐心等叫號。',
-        '幸運草 B1 的動線規劃得很好，地上有湖水藍跟米色引導線，牆壁還有實木防撞扶手。'
+        '向日葵醫院的動線規劃得很好，地上有湖水藍跟米色引導線，牆壁還有實木防撞扶手。'
       ];
 
       allWaitingSeats.forEach((seat, idx) => {
@@ -2662,11 +2662,11 @@
         { pos: [-18.2, 32.2], yaw: 0, wheelchair: true, text: '腦波室 204 室叫到我的號碼了，準備進去檢查！' },
         { pos: [-29.2, 22.8], yaw: Math.PI / 2, text: '神內候診大廳的排椅都坐滿了，我先站在柱子旁邊看叫號電視。' },
 
-        { pos: [2.2, -18.5], yaw: Math.PI, text: '「湯陽食堂」的招牌湯麵看起來好好吃，牆上寫著『好吃 好好吃 好好吃飯』真親切！' },
-        { pos: [5.8, -18.5], yaw: Math.PI, text: '我正在「九龍廣東粥」排隊點皮蛋瘦肉粥，大理石紋櫃檯與暖金踢腳燈好漂亮！' },
+        { pos: [2.2, -18.5], yaw: Math.PI, text: '「素食食堂」的招牌湯麵看起來好好吃，牆上寫著『好吃 好好吃 好好吃飯』真親切！' },
+        { pos: [5.8, -18.5], yaw: Math.PI, text: '我正在「八九廣東粥」排隊點皮蛋瘦肉粥，大理石紋櫃檯與暖金踢腳燈好漂亮！' },
         { pos: [6.4, -17.9], yaw: Math.PI, text: '我看完門診特地來九龍廣東粥買粥給家人吃，生意很好呢！' },
-        { pos: [13.4, -18.5], yaw: Math.PI, text: '來幸運草醫院一定要喝一碗「龍山赤肉羹」，道地鹿港好味道！' },
-        { pos: [20.6, -18.5], yaw: Math.PI, text: '抽完血空腹一整早，趕快來「弘爺漢堡」買份漢堡配熱咖啡！' }
+        { pos: [13.4, -18.5], yaw: Math.PI, text: '來向日葵醫院一定要喝一碗「山上赤肉羹」，道地鹿港好味道！' },
+        { pos: [20.6, -18.5], yaw: Math.PI, text: '抽完血空腹一整早，趕快來「爺爺漢堡」買份漢堡配熱咖啡！' }
       ];
 
       standingAndWalkingCrowd.forEach((item, idx) => {
@@ -3109,7 +3109,7 @@
       updateWantedAndHpHUD();
 
       if (player.hp <= 0) {
-        showToast('🚑 生命值歸零！已由秀傳急診團隊緊急救護並恢復滿血！');
+        showToast('🚑 生命值歸零！已由向日葵急診團隊緊急救護並恢復滿血！');
         clearWantedAndHeal();
         clearAutoMoveDestination();
         player.pos.set(-8.5, FLOOR_Y.B1, -2.5);
@@ -3229,7 +3229,7 @@
       clearAutoMoveDestination();
 
       document.getElementById('dlg-avatar').textContent = '🛗';
-      document.getElementById('dlg-name').textContent = `幸運草醫院 ${transportLabel}・樓層選擇`;
+      document.getElementById('dlg-name').textContent = `向日葵醫院 ${transportLabel}・樓層選擇`;
       document.getElementById('dlg-role').textContent = '目前所在樓層：B1 地下一樓醫療與美食街';
       document.getElementById('dlg-text').textContent = `您已接觸到${transportLabel}！請問要去哪一個樓層？（點擊按鈕或按對應數字鍵，將安全連結或顯示 B1 ~ 8F 樓層資訊）`;
 
@@ -3746,7 +3746,7 @@
       } else if (px >= -18 && px <= -8 && pz >= -11 && pz <= 2) {
         label = 'B1 免疫風濕科・中醫科門診候診區 (爆滿)';
       } else if (px >= 1 && px <= 24 && pz <= -13) {
-        label = 'B1 美食街 (湯陽食堂・九龍廣東粥・龍山赤肉羹・弘爺漢堡)';
+        label = 'B1 美食街 (素食食堂・九龍廣東粥・山上赤肉羹・爺爺漢堡)';
       } else if (px >= 4 && px <= 22 && pz > -13 && pz <= 2) {
         label = 'B1 中庭美食街共食區 (暖金飛碟吊燈區)';
       } else if (px < -34 && pz >= 4) {
