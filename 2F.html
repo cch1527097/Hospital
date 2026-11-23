@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>幸運草醫院-模擬人生</title>
+  <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js r128 穩定 CDN -->
@@ -125,8 +125,8 @@
   <!-- 載入遮罩 -->
   <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 text-white transition-opacity duration-500">
     <div class="w-16 h-16 border-4 border-teal-400 border-t-amber-400 rounded-full animate-spin mb-4"></div>
-    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">幸運草醫院-模擬人生 1F & 2F 室內實境</h1>
-    <p class="text-xs sm:text-sm text-slate-300">正在載入橫向手扶梯、電動門開刀房／ICU、透明櫥窗嬰兒室、產房與婦產科護理站...</p>
+    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">向日葵醫院-模擬人生</h1>
+    <p class="text-xs sm:text-sm text-slate-300">正在載入...</p>
   </div>
 
   <!-- 頂部橫向：1F / 2F 全院各科區域一鍵快速傳送列 -->
@@ -355,7 +355,7 @@
       </div>
 
       <p id="dlg-text" class="mt-4 text-sm sm:text-base leading-relaxed text-slate-100">
-        您好！歡迎來到幸運草醫院。
+        您好！歡迎來到向日葵醫院。
       </p>
 
       <div id="dlg-options" class="mt-4 flex flex-col gap-2"></div>
@@ -405,7 +405,7 @@
   <script>
     /**
      * ============================================================================
-     * 幸運草醫院-模擬人生 (2F 完整修復版)
+     * 向日葵醫院-模擬人生 (2F 完整修復版)
      * ============================================================================
      * 已修復之全部 7 項問題：
      * 1. 臥床病患模型位置修正 (isLyingBed: bodyRoot.position.z = 0.85)，頭部精準枕於枕頭上不穿床頭。
@@ -1335,7 +1335,7 @@
       // 左右警衛室
       addWall(-5.2, 42.2, 3.4, 3.8, 3.2, wallMintMat, '西側警衛室', 1, 0);
       addWall(5.2, 42.2, 3.4, 3.8, 3.2, wallMintMat, '東側警衛室', 1, 0);
-      addHangingSign(0, 3.75, 42.2, 7.6, 0.9, '幸運草醫院-模擬人生・入口門廳', 'CHANG BING SHOW CHWAN MEMORIAL HOSPITAL', '#0f4c5c', '#2dd4bf');
+      addHangingSign(0, 3.75, 42.2, 7.6, 0.9, '向日葵醫院-模擬人生', 'SUNFLOWER HOSPITAL', '#0f4c5c', '#2dd4bf');
 
       // B. 雙挑空採光中庭 (11.5m)、橫向手扶梯 (X: -4.8 ~ +4.8, Z: 12.6 ~ 18.2)、四座電梯、批價掛號
       buildTwinAtriums(glassMat, darkFrameMat, ArchMaterials.ceilingGypsum);
@@ -1705,7 +1705,7 @@
       ceil2FCenter.position.set(0, 9.0, 15.5);
       scene.add(ceil2FCenter);
 
-      addHangingSign(0, f2Y + 3.65, 7.6, 6.8, 0.88, '幸運草醫院二樓樓層', '產房・嬰兒室・婦產科病房・開刀房・ICU・牙科', '#0f4c5c', '#fbbf24');
+      addHangingSign(0, f2Y + 3.65, 7.6, 6.8, 0.88, '向日葵醫院電梯廳', '產房・嬰兒室・婦產科病房・開刀房・ICU・牙科', '#0f4c5c', '#fbbf24');
 
       // 1. 2F 東北側：2F 血液透析中心 & CAPD 腹膜透析中心（電動門設於正前方牆面中央 X = 39.5，兩側牆面完全密合）
       // 西牆延伸至北側外牆 (Z: -47.5 ~ -28.35)，消除北端縫隙
@@ -1869,8 +1869,8 @@
       [
         { x: -16, z: 43.9, rotY: Math.PI },
         { x: 16, z: 43.9, rotY: Math.PI },
-        { x: -34, z: 10.2, rotY: 0 },
-        { x: 34, z: 10.2, rotY: 0 }
+        { x: -14.8, z: 10.6, rotY: Math.PI / 2 },
+        { x: 14.8, z: 10.6, rotY: -Math.PI / 2 }
       ].forEach((hp) => addFireHydrantCabinet(hp.x, hp.z, hp.rotY, f2Y));
     }
 
@@ -4541,14 +4541,23 @@
         camState.yaw = 0;
         return;
       }
-      if (floorCode === '1F') {
-        closeFloorSelectModal();
-        player.pos.set(0, 0, 7.2);
-        player.yaw = Math.PI;
-        camState.targetYaw = 0;
-        camState.yaw = 0;
-        return;
-      }
+
+      // 儲存目前角色狀態，方便 1F.html 或其他樓層讀取接續遊玩
+      try {
+        localStorage.setItem('sunflower_hospital_state', JSON.stringify({
+          hp: player.hp,
+          maxHp: player.maxHp,
+          armor: player.armor,
+          wantedStars: player.wantedStars,
+          clockMinutes: gameClockMinutes,
+          fromFloor: '2F'
+        }));
+      } catch (e) {}
+
+      // 若前往 1F.html，可透過網址參數 ?from=2F&entry=elevator 讓 1F 知道玩家從二樓下來
+      const targetUrl = floorCode === '1F'
+        ? `${targetFile}?from=2F&entry=elevator`
+        : targetFile;
 
       const overlay = document.getElementById('floor-transition-overlay');
       document.getElementById('transition-target-title').textContent = `正在前往 ${floorCode} 樓層...`;
@@ -4556,7 +4565,7 @@
       overlay.classList.remove('hidden');
 
       setTimeout(() => {
-        window.location.href = targetFile;
+        window.location.href = targetUrl;
       }, 650);
     }
 
