@@ -1028,7 +1028,7 @@
       return tex;
     }
 
-    function createCoupletTexture(lines = ['幸', '運', '草', '園', '區', '護', '安', '康']) {
+    function createCoupletTexture(lines = ['向', '日', '葵', '園', '區', '護', '安', '康']) {
       const w = 128;
       const h = 768;
       const canvas = document.createElement('canvas');
@@ -2455,9 +2455,9 @@
       ctx.textBaseline = 'middle';
 
       ctx.fillStyle = '#111827';
-      ctx.fillText('彰 濱 天 后 宮', w / 2 + 4, h / 2 + 4);
+      ctx.fillText('天 后 宮', w / 2 + 4, h / 2 + 4);
       ctx.fillStyle = '#fbbf24';
-      ctx.fillText('彰 濱 天 后 宮', w / 2, h / 2);
+      ctx.fillText('天 后 宮', w / 2, h / 2);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.anisotropy = 4;
@@ -3182,7 +3182,7 @@
         entranceGroup.add(wallBase);
       });
 
-      const leftCoupletTex = createCoupletTexture(['幸', '運', '草', '園', '護', '百', '姓']);
+      const leftCoupletTex = createCoupletTexture(['向', '日', '葵', '園', '護', '百', '姓']);
       const rightCoupletTex = createCoupletTexture(['仁', '心', '醫', '術', '澤', '四', '方']);
 
       const leftCouplet = new THREE.Mesh(
