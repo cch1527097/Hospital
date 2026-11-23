@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>幸運草醫院-模擬人生</title>
+  <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js r128 CDN -->
@@ -115,8 +115,8 @@
   <!-- 載入遮罩 -->
   <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 text-white transition-opacity duration-500">
     <div class="w-16 h-16 border-4 border-teal-400 border-t-amber-400 rounded-full animate-spin mb-4"></div>
-    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">幸運草醫院-模擬人生</h1>
-    <p id="loading-status-text" class="text-xs sm:text-sm text-slate-300">正在載入 美帝奇會議室、資訊室...</p>
+    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">向日葵醫院-模擬人生</h1>
+    <p id="loading-status-text" class="text-xs sm:text-sm text-slate-300">正在載入...</p>
   </div>
 
   <!-- 頂部橫向：全院樓層與頂樓各區域快速導覽列 -->
@@ -286,7 +286,7 @@
   <script>
     /**
      * ============================================================================
-     * 幸運草醫院-模擬人生 頂樓醫療與會議資訊空間 3D 實境（完整整合版）
+     * 向日葵醫院-模擬人生 頂樓醫療與會議資訊空間 3D 實境（完整整合版）
      * ============================================================================
      */
 
@@ -982,7 +982,7 @@
 
       ctx.fillStyle = '#64748b';
       ctx.font = '700 20px "Noto Sans TC", sans-serif';
-      ctx.fillText('幸運草醫院・高階主管暨跨專業團隊會議簡報系統', 44, 534);
+      ctx.fillText('向日葵醫院・高階主管暨跨專業團隊會議簡報系統', 44, 534);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.anisotropy = 4;
@@ -1947,7 +1947,7 @@
         Math.PI / 2,
         baseY,
         6.8,
-        '幸運草醫院 大型會議室・全院醫療品質與臨床教學研討',
+        '向日葵醫院 大型會議室・全院醫療品質與臨床教學研討',
         'LARGE U-SHAPE CONFERENCE HALL',
         [
           '1. 全院跨科部急重症整合照護與臨床路徑成果',
@@ -2007,10 +2007,10 @@
         Math.PI / 2,
         baseY,
         5.2,
-        '大圓桌會議室・幸運草醫院高階決策會議',
+        '大圓桌會議室・向日葵醫院高階決策會議',
         'EXECUTIVE ROUND-TABLE BOARDROOM',
         [
-          '1. 幸運草醫院醫療品質提升與智慧醫院發展藍圖',
+          '1. 向日葵醫院醫療品質提升與智慧醫院發展藍圖',
           '2. 跨院區急重症整合醫療與微創中心擴建計畫',
           '3. 全院資訊系統雲端化與 AI 臨床輔助決策推展',
           '4. 秉持梅約精神・打造全人照護標竿醫療體系'
@@ -2136,7 +2136,7 @@
       addWall(-26.0, 6.85, 0.45, 2.7, 4.4, wallWoodMat, '洗手間北側木屏風', 8, baseY);
       addWall(-26.0, 13.75, 0.45, 2.7, 4.4, wallWoodMat, '洗手間南側木屏風', 8, baseY);
 
-      addHangingSign(-20.2, baseY + 3.65, 5.5, 6.4, 0.88, '美蒂琪吧檯', 'MEDICI CAFÉ BAR & LOUNGE', '#0f766e', '#fde047');
+      addHangingSign(-20.2, baseY + 3.65, 5.5, 6.4, 0.88, '俱樂部吧檯', 'MEDICI CAFÉ BAR & LOUNGE', '#0f766e', '#fde047');
       addHangingSign(-26.2, baseY + 3.45, 10.3, 3.6, 0.72, '洗手間', 'RESTROOMS', '#9d174d', '#f9a8d4', Math.PI / 2);
 
       const marbleMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.1 });
@@ -2237,7 +2237,7 @@
       const microwave = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.42, 0.48), applianceMat);
       microwave.position.set(-16.2, baseY + 1.16, 14.4);
       target.add(fridge, coffeeMachine, waterDispenser, microwave);
-      colliders.push({ minX: -25.3, maxX: -14.5, minZ: 13.85, maxZ: 15.05, floor: 8, label: '美蒂琪吧檯電器料理台' });
+      colliders.push({ minX: -25.3, maxX: -14.5, minZ: 13.85, maxZ: 15.05, floor: 8, label: '俱樂部吧檯電器料理台' });
 
       const islandBody = new THREE.Mesh(new THREE.BoxGeometry(6.8, 1.02, 0.95), woodCounterMat);
       islandBody.position.set(-20.0, baseY + 0.51, 10.8);
@@ -2252,7 +2252,7 @@
         stoolLeg.position.set(sx, baseY + 0.35, 9.95);
         target.add(stoolSeat, stoolLeg);
       });
-      colliders.push({ minX: -23.6, maxX: -16.4, minZ: 9.75, maxZ: 11.4, floor: 8, label: '美蒂琪吧檯中島吧台' });
+      colliders.push({ minX: -23.6, maxX: -16.4, minZ: 9.75, maxZ: 11.4, floor: 8, label: '俱樂部吧檯中島吧台' });
 
       [-22.0, -17.2].forEach((cx) => {
         const cafeTable = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.68, 0.06, 24), stoneTopMat);
@@ -2260,7 +2260,7 @@
         const cafeLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.28, 0.72, 16), chromeMat);
         cafeLeg.position.set(cx, baseY + 0.36, 7.1);
         target.add(cafeTable, cafeLeg);
-        colliders.push({ isCircle: true, cx, cz: 7.1, radius: 0.78, floor: 8, label: '美蒂琪吧檯交流圓桌' });
+        colliders.push({ isCircle: true, cx, cz: 7.1, radius: 0.78, floor: 8, label: '俱樂部吧檯交流圓桌' });
       });
     }
 
@@ -3041,10 +3041,10 @@
       const floatingLayer = document.getElementById('floating-fx-layer');
 
       const npcDefinitions = [
-        // ================= 大圓桌會議室四位高階長官 NPC（已替換為黃合合總裁、黃媛媛執行長、劉玲總經理、郭盛名協理） =================
+        // ================= 大圓桌會議室四位高階長官 NPC =================
         {
           name: '黃茗賀 總裁',
-          role: '幸運草醫療體系 總裁',
+          role: '向日葵醫療體系 總裁',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -3301,8 +3301,8 @@
           speed: 1.15
         },
         {
-          name: '許淑惠 美蒂琪吧檯服務員',
-          role: '美蒂琪吧檯・咖啡吧台與會議茶點服務',
+          name: '許淑惠 俱樂部吧檯服務員',
+          role: '俱樂部吧檯・咖啡吧台與會議茶點服務',
           type: 'staff',
           floor: 8,
           baseY: FLOOR_Y[8],
@@ -4507,12 +4507,6 @@
             player.autoMoveTarget = null;
             player.yaw = Math.atan2(targetNpc.pos.x - player.pos.x, targetNpc.pos.z - player.pos.z);
             performPlayerAttack(false);
-          } else {
-            pendingAttackNpc = targetNpc;
-            spawnFloorClickRipple(targetNpc.pos.x, targetNpc.pos.z, false);
-            player.autoMoveTarget = targetNpc.pos.clone();
-            player.autoMoveTimer = 6.0;
-            showToast(`👊 鎖定攻擊目標：${targetNpc.name}`);
           }
           return;
         }
@@ -4526,12 +4520,6 @@
           openElevatorModal(elvZone.name);
           return;
         }
-      }
-
-      const hitPt = new THREE.Vector3();
-      if (raycaster.ray.intersectPlane(floorHitPlane, hitPt)) {
-        pendingAttackNpc = null;
-        spawnFloorClickRipple(hitPt.x, hitPt.z, true);
       }
     }
 
