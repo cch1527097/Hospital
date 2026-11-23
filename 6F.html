@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>幸運草醫院-模擬人生</title>
+  <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js r128 CDN -->
@@ -98,8 +98,8 @@
   <!-- 載入遮罩 -->
   <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 text-white transition-opacity duration-500">
     <div class="w-16 h-16 border-4 border-teal-400 border-t-amber-400 rounded-full animate-spin mb-4"></div>
-    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">幸運草醫院-模擬人生</h1>
-    <p class="text-xs sm:text-sm text-slate-300">正在載入全區木質地板、可進入住院病房與按住左鍵拖曳轉向視角系統...</p>
+    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">向日葵醫院-模擬人生</h1>
+    <p class="text-xs sm:text-sm text-slate-300">正在載入...</p>
   </div>
 
   <!-- 頂部橫向：6F 區域快速傳送 & B1~8F 樓層直達列 -->
@@ -210,7 +210,7 @@
             🛗
           </div>
           <div>
-            <h3 id="dlg-name" class="font-black text-base sm:text-lg text-amber-300">幸運草醫院-模擬人生</h3>
+            <h3 id="dlg-name" class="font-black text-base sm:text-lg text-amber-300">向日葵醫院-模擬人生</h3>
             <p id="dlg-role" class="text-xs text-teal-300 font-medium">目前所在樓層：6F 住院病房</p>
           </div>
         </div>
@@ -265,7 +265,7 @@
   <script>
     /**
      * ============================================================================
-     * 幸運草醫院-模擬人生
+     * 向日葵醫院-模擬人生
      * ============================================================================
      * 核心操控與場景設計：
      * 1. 【按住滑鼠左鍵拖曳轉向】：僅當按住滑鼠左鍵移動時才旋轉視角（或使用 Q/E 鍵），
@@ -2329,7 +2329,7 @@
           waypoints: [new THREE.Vector3(23.5, FLOOR_Y[6], -15.6)],
           speed: 0,
           yaw: Math.PI,
-          dialogue: '歡迎來到幸運草醫院 6F 住院病房！全層已鋪設防滑減噪木質地板，所有病房門皆保持敞開歡迎您直接走入參觀病床、點滴架與床邊照護情形！',
+          dialogue: '歡迎來到向日葵醫院住院病房！全層已鋪設防滑減噪木質地板，所有病房門皆保持敞開歡迎您直接走入參觀病床、點滴架與床邊照護情形！',
           options: []
         },
         {
@@ -2874,7 +2874,7 @@
 
       SoundFX.playElevatorDing();
 
-      const facilityName = zoneInfo ? `${zoneInfo.titleText}（${zoneInfo.transportType}）` : '幸運草醫院電梯導引';
+      const facilityName = zoneInfo ? `${zoneInfo.titleText}（${zoneInfo.transportType}）` : '向日葵醫院電梯導引';
       document.getElementById('dlg-avatar').textContent = '🛗';
       document.getElementById('dlg-name').textContent = facilityName;
       document.getElementById('dlg-role').textContent = `目前所在樓層：${CURRENT_PAGE_FLOOR} 住院病房`;
