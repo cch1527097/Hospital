@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>幸運草醫院-模擬人生</title>
+  <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js r128 穩定 CDN -->
@@ -146,8 +146,8 @@
   <!-- 載入遮罩 -->
   <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 text-white transition-opacity duration-500">
     <div class="w-16 h-16 border-4 border-amber-400 border-t-teal-400 rounded-full animate-spin mb-4"></div>
-    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-amber-300 mb-1">幸運草醫院 1F 挑空鋼琴大廳</h1>
-    <p class="text-xs sm:text-sm text-slate-300">正在載入 60FPS 高流暢實境：大門/急診雙入口定位、批價掛號處、急診 CPR 與放射科...</p>
+    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-amber-300 mb-1">向日葵醫院-模擬人生</h1>
+    <p class="text-xs sm:text-sm text-slate-300">正在載入...</p>
   </div>
 
   <!-- 右上角：GTA 風格狀態欄 -->
@@ -279,7 +279,7 @@
       </div>
 
       <p id="dlg-text" class="mt-4 text-sm sm:text-base leading-relaxed text-slate-100">
-        您好！歡迎來到幸運草醫院。
+        您好！歡迎來到向日葵醫院。
       </p>
 
       <div id="dlg-options" class="mt-4 flex flex-col gap-2"></div>
@@ -329,7 +329,7 @@
   <script>
     /**
      * ============================================================================
-     * 幸運草醫院 1F 挑空鋼琴大廳與醫療空間 3D 實境（急診牆壁補齊 & 病床置中 & 急診 NPC 擴充版）
+     * 向日葵醫院 1F 挑空鋼琴大廳與醫療空間 3D 實境（急診牆壁補齊 & 病床置中 & 急診 NPC 擴充版）
      * 1. 急診牆壁無縫補齊：
      *    - x = 37.2 急診管制電動門（z = -8.2, 門洞 z = -9.9 ~ -6.5）兩側隔間牆完整延伸至北牆 z = -32.8 與南外牆 z = 2.2
      *    - z = -13.5 急診南牆東段與 z = 2.2 急診休息區南外牆完整閉合至東側外牆 x = 53.5
@@ -712,15 +712,15 @@
     // 全院快速傳送座標表
     const ZONES = {
       entrance:      { label: '南側大門入口 / 挑空鋼琴大廳', pos: new THREE.Vector3(0, 0, 41.2), yaw: Math.PI },
-      registration:  { label: '中央大廳・批價掛號處 / 幸運草醫院形象牆', pos: new THREE.Vector3(0, 0, 11.4), yaw: Math.PI },
+      registration:  { label: '中央大廳・批價掛號處 / 向日葵醫院形象牆', pos: new THREE.Vector3(0, 0, 11.4), yaw: Math.PI },
       elevatorNorth: { label: '北側電梯 (1~4號電梯)', pos: new THREE.Vector3(0, 0, -1.6), yaw: 0 },
       er:            { label: '急診室門口 / CPR 急救區', pos: new THREE.Vector3(24.5, 0, -15.2), yaw: Math.PI },
       erTriage:      { label: '急診管制電動門・急診批價掛號 / 檢傷休息區', pos: new THREE.Vector3(41.5, 0, -10.8), yaw: Math.PI },
       radiology:     { label: '放射科 (MRI/CT 檢查 / 感應電動門)', pos: new THREE.Vector3(-10.2, 0, -20.5), yaw: Math.PI / 2 },
-      imei:          { label: '大廳左側・義美食品 I-MEI 門市', pos: new THREE.Vector3(-12.6, 0, 30.5), yaw: -Math.PI / 2 },
-      starbucks:     { label: '大廳右側・STARBUCKS 星巴克門市', pos: new THREE.Vector3(12.2, 0, 30.5), yaw: Math.PI / 2 },
-      sevenEleven:   { label: '西南側・統一超商 7-ELEVEN 門市', pos: new THREE.Vector3(-37.8, 0, 39.2), yaw: -Math.PI / 2 },
-      artGallery:    { label: '西側・藝文廳 (幸運草醫院人文畫展)', pos: new THREE.Vector3(-37.8, 0, 27.4), yaw: -Math.PI / 2 },
+      imei:          { label: '大廳左側・美美食品 M-MEI 門市', pos: new THREE.Vector3(-12.6, 0, 30.5), yaw: -Math.PI / 2 },
+      starbucks:     { label: '大廳右側・STARFUCKS 星巴克門市', pos: new THREE.Vector3(12.2, 0, 30.5), yaw: Math.PI / 2 },
+      sevenEleven:   { label: '西南側・統購超商 8-ELEVEN 門市', pos: new THREE.Vector3(-37.8, 0, 39.2), yaw: -Math.PI / 2 },
+      artGallery:    { label: '西側・藝文廳 (向日葵醫院人文畫展)', pos: new THREE.Vector3(-37.8, 0, 27.4), yaw: -Math.PI / 2 },
       escalator:     { label: '中央橫向平行手扶梯大廳', pos: new THREE.Vector3(-5.8, 0, 15.0), yaw: Math.PI / 2 },
       atrium:        { label: '雙挑空採光中庭 (2F 挑空區)', pos: new THREE.Vector3(-22, 0, 15.5), yaw: Math.PI / 2 },
       westClinics:   { label: '西側門診區 (十五診～二十七診)', pos: new THREE.Vector3(-24.8, 0, 29.5), yaw: Math.PI },
@@ -970,7 +970,7 @@
       );
     }
     // --------------------------------------------------------------------------
-    // 3. 程序化高解析貼圖（含「幸運草醫院」品牌形象牆貼圖）
+    // 3. 程序化高解析貼圖（含「向日葵醫院」品牌形象牆貼圖）
     // --------------------------------------------------------------------------
     function createCloverHospitalBrandWallTexture() {
       const w = 2048;
@@ -1363,7 +1363,7 @@
       ctx.font = '900 44px "Noto Sans TC", sans-serif';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
-      ctx.fillText('幸運草醫療財團法人幸運草醫院', 182, 84);
+      ctx.fillText('向日葵醫療財團法人向日葵醫院', 182, 84);
 
       ctx.fillStyle = '#1e293b';
       ctx.font = '700 23px "Chakra Petch", sans-serif';
@@ -1435,7 +1435,7 @@
       ctx.font = '900 84px "Chakra Petch", "Noto Sans TC", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('I-MEI NEWS', w / 2, h / 2 + 4);
+      ctx.fillText('M-MEI NEWS', w / 2, h / 2 + 4);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.encoding = THREE.sRGBEncoding;
@@ -1458,7 +1458,7 @@
 
       const posters = [
         { x: 18, y: 18, pw: 140, ph: 118, top: '#dc2626', title: '早餐 1+1=88元', sub: '豆漿 + 鮮奶吐司' },
-        { x: 172, y: 18, pw: 140, ph: 118, top: '#ea580c', title: '義美小泡芙', sub: '牛奶/巧克力特惠' },
+        { x: 172, y: 18, pw: 140, ph: 118, top: '#ea580c', title: '美美小泡芙', sub: '牛奶/巧克力特惠' },
         { x: 326, y: 18, pw: 140, ph: 118, top: '#15803d', title: '台灣純濃豆漿', sub: '非基因改造黃豆' },
         { x: 480, y: 18, pw: 142, ph: 118, top: '#b91c1c', title: '手工蛋捲禮盒', sub: '伴手禮人氣推薦' }
       ];
@@ -1529,7 +1529,7 @@
       ctx.fillStyle = '#ffffff';
       ctx.font = '900 32px "Noto Sans TC", sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText('義美鮮乳霜淇淋・現煮飲品', 135, 68);
+      ctx.fillText('美美鮮乳霜淇淋・現煮飲品', 135, 68);
 
       ctx.fillStyle = '#0f172a';
       ctx.font = 'bold 20px "Noto Sans TC", sans-serif';
@@ -1562,7 +1562,7 @@
       ctx.fillStyle = '#fef08a';
       ctx.font = '900 34px "Noto Sans TC", sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('義美精選伴手禮', w / 2, 105);
+      ctx.fillText('美美精選伴手禮', w / 2, 105);
 
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 22px "Noto Sans TC", sans-serif';
@@ -1701,7 +1701,7 @@
       ctx.fillStyle = '#ffffff';
       ctx.font = '900 24px "Chakra Petch", sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('STARBUCKS', size / 2, size / 2 + 44);
+      ctx.fillText('STARFUCKS', size / 2, size / 2 + 44);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.encoding = THREE.sRGBEncoding;
@@ -1742,7 +1742,7 @@
       ctx.fillStyle = '#0f172a';
       ctx.font = '900 54px "Noto Sans TC", sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText('統一超商 7-ELEVEN', 162, 136);
+      ctx.fillText('統購超商 8-ELEVEN', 162, 136);
 
       ctx.fillStyle = '#00843d';
       ctx.font = 'bold 24px "Chakra Petch", sans-serif';
@@ -1991,7 +1991,7 @@
       const palettes = [
         { top: '#0d9488', title: '就醫安全須知', sub: '主動告知用藥史與過敏史' },
         { top: '#0284c7', title: '腸胃道健康篩檢', sub: '定期胃鏡與大腸鏡檢查' },
-        { top: '#6d28d9', title: '幸運草醫院藝文走廊特展', sub: '人文藝術療癒心靈空間' }
+        { top: '#6d28d9', title: '向日葵醫院藝文走廊特展', sub: '人文藝術療癒心靈空間' }
       ];
       const p = palettes[variant % palettes.length];
 
@@ -2189,7 +2189,7 @@
       ctx.fillStyle = '#ffffff';
       ctx.font = '900 30px "Noto Sans TC", sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('幸運草醫院 1F 平面導覽圖', w / 2, 46);
+      ctx.fillText('向日葵醫院 1F 平面導覽圖', w / 2, 46);
 
       const drawBlock = (x, y, bw, bh, col, label) => {
         ctx.fillStyle = col;
@@ -2215,10 +2215,10 @@
       drawBlock(110, 355, 100, 42, '#e2e8f0', '西側挑空');
       drawBlock(302, 355, 100, 42, '#e2e8f0', '東側挑空');
       drawBlock(32, 405, 72, 42, '#c7d2fe', '藝文畫展');
-      drawBlock(32, 450, 72, 30, '#fdba74', '7-ELEVEN');
+      drawBlock(32, 450, 72, 30, '#fdba74', '8-ELEVEN');
       drawBlock(108, 405, 58, 75, '#fbcfe8', '西門診');
-      drawBlock(170, 405, 56, 75, '#fed7aa', '義美食品');
-      drawBlock(286, 405, 58, 75, '#bbf7d0', 'STARBUCKS');
+      drawBlock(170, 405, 56, 75, '#fed7aa', '美美食品');
+      drawBlock(286, 405, 58, 75, '#bbf7d0', 'STARFUCKS');
       drawBlock(348, 405, 58, 75, '#fbcfe8', '東門診');
       drawBlock(410, 405, 70, 75, '#bae6fd', '會議廳');
 
@@ -2759,9 +2759,6 @@
       }
     }
 
-    // --------------------------------------------------------------------------
-    // 5. 義美食品 I-MEI、STARBUCKS、統一超商 7-ELEVEN 與藝文廳畫展
-    // --------------------------------------------------------------------------
     function buildImeiStorefront(glassMat) {
       const storeGroup = new THREE.Group();
       const charcoalMat = getCachedStandardMat(0x18181b, 0.38, 0.15);
@@ -2903,8 +2900,8 @@
       }
 
       scene.add(storeGroup);
-      colliders.push({ minX: -15.85, maxX: -14.88, minZ: 26.95, maxZ: 34.05, label: '義美食品櫃檯' });
-      colliders.push({ minX: -17.95, maxX: -17.15, minZ: 27.0, maxZ: 34.0, label: '義美後方工作檯' });
+      colliders.push({ minX: -15.85, maxX: -14.88, minZ: 26.95, maxZ: 34.05, label: '美美食品櫃檯' });
+      colliders.push({ minX: -17.95, maxX: -17.15, minZ: 27.0, maxZ: 34.0, label: '美美後方工作檯' });
     }
 
     function buildStarbucksStorefront(glassMat) {
@@ -3077,9 +3074,9 @@
       });
 
       scene.add(storeGroup);
-      colliders.push({ minX: 14.75, maxX: 15.78, minZ: 26.95, maxZ: 34.05, label: 'STARBUCKS 吧檯與展示架' });
-      colliders.push({ minX: 17.25, maxX: 18.0, minZ: 27.0, maxZ: 34.0, label: 'STARBUCKS 後方工作區' });
-      colliders.push({ minX: 13.42, maxX: 13.68, minZ: 27.15, maxZ: 30.15, label: 'STARBUCKS 排隊動線柱' });
+      colliders.push({ minX: 14.75, maxX: 15.78, minZ: 26.95, maxZ: 34.05, label: 'STARFUCKS 吧檯與展示架' });
+      colliders.push({ minX: 17.25, maxX: 18.0, minZ: 27.0, maxZ: 34.0, label: 'STARFUCKS 後方工作區' });
+      colliders.push({ minX: 13.42, maxX: 13.68, minZ: 27.15, maxZ: 30.15, label: 'STARFUCKS 排隊動線柱' });
     }
 
     function build7ElevenStore(glassMat, darkFrameMat) {
@@ -3208,7 +3205,7 @@
           maxX: gx + 0.52,
           minZ: 37.35,
           maxZ: 42.25,
-          label: '7-ELEVEN 商品貨架'
+          label: '8-ELEVEN 商品貨架'
         });
       });
 
@@ -3228,9 +3225,10 @@
 
       scene.add(storeGroup);
 
-      colliders.push({ minX: -43.0, maxX: -37.5, minZ: 41.65, maxZ: 44.1, label: '7-ELEVEN 收銀與咖啡吧檯' });
-      colliders.push({ minX: -53.1, maxX: -51.9, minZ: 35.5, maxZ: 43.3, label: '7-ELEVEN 飲料冷藏櫃' });
-      colliders.push({ minX: -47.4, maxX: -41.6, minZ: 35.0, maxZ: 36.25, label: '7-ELEVEN 休憩吧檯' });
+      colliders.push({ minX: -42.8, maxX: -37.6, minZ: 41.72, maxZ: 42.68, label: '8-ELEVEN 收銀櫃檯' });
+      colliders.push({ minX: -43.0, maxX: -37.4, minZ: 43.26, maxZ: 44.05, label: '8-ELEVEN 咖啡吧檯' });
+      colliders.push({ minX: -53.1, maxX: -51.9, minZ: 35.5, maxZ: 43.3, label: '8-ELEVEN 飲料冷藏櫃' });
+      colliders.push({ minX: -47.4, maxX: -41.6, minZ: 35.0, maxZ: 36.25, label: '8-ELEVEN 休憩吧檯' });
     }
 
     function buildArtExhibitionGallery() {
@@ -4012,11 +4010,11 @@
       // C. 西側翼樓
       addWall(-14.2, 25.025, 0.5, 3.55, 4.4, wallMarbleMainMat, '藝文走廊西牆北段');
       addWall(-14.2, 35.475, 0.5, 2.55, 4.4, wallMarbleMainMat, '藝文走廊西牆南段');
-      addWall(-16.2, 26.8, 4.0, 0.25, 4.4, wallMarbleMainMat, '義美門市北隔間牆');
-      addWall(-16.2, 34.2, 4.0, 0.25, 4.4, wallMarbleMainMat, '義美門市南隔間牆');
+      addWall(-16.2, 26.8, 4.0, 0.25, 4.4, wallMarbleMainMat, '美美門市北隔間牆');
+      addWall(-16.2, 34.2, 4.0, 0.25, 4.4, wallMarbleMainMat, '美美門市南隔間牆');
 
       buildImeiStorefront(glassMat);
-      addHangingSign(-13.8, 3.55, 30.5, 4.8, 0.82, '義美食品 I-MEI', '現烤麵包・豆漿・研磨咖啡', '#18181b', '#f97316', Math.PI / 2);
+      addHangingSign(-13.8, 3.55, 30.5, 4.8, 0.82, '美美食品 M-MEI', '現烤麵包・豆漿・研磨咖啡', '#18181b', '#f97316', Math.PI / 2);
 
       addWall(-33.5, 29.5, 0.6, 15.5, 4.4, wallMarblePinkMat, '西側門診西牆');
       addWall(-18.2, 29.5, 0.6, 15.5, 4.4, wallMarblePinkMat, '西側門診東牆');
@@ -4053,7 +4051,7 @@
       addWall(-36.2, 22.35, 0.5, 4.3, 4.4, wallMarbleBlueMat, '藝文廳東牆北段');
       addWall(-36.2, 32.55, 0.5, 4.5, 4.4, wallMarbleBlueMat, '藝文廳東牆南段');
       addWall(-44.65, 20.2, 17.4, 0.5, 4.4, wallMarbleBlueMat, '藝文廳北牆');
-      addWall(-44.65, 34.8, 17.4, 0.5, 4.4, wallMarbleMainMat, '藝文廳與 7-11 隔間牆');
+      addWall(-44.65, 34.8, 17.4, 0.5, 4.4, wallMarbleMainMat, '藝文廳與 8-11 隔間牆');
 
       buildArtExhibitionGallery();
       addHangingSign(-35.8, 3.55, 27.4, 5.2, 0.82, '人文藝術廳', 'ART GALLERY', '#312e81', '#a5b4fc', Math.PI / 2);
@@ -4065,11 +4063,11 @@
       // D. 東側翼樓
       addWall(14.2, 25.025, 0.5, 3.55, 4.4, wallMarbleMainMat, '藝文走廊東牆北段');
       addWall(14.2, 35.475, 0.5, 2.55, 4.4, wallMarbleMainMat, '藝文走廊東牆南段');
-      addWall(16.2, 26.8, 4.0, 0.25, 4.4, wallMarbleMainMat, 'STARBUCKS 北隔間牆');
-      addWall(16.2, 34.2, 4.0, 0.25, 4.4, wallMarbleMainMat, 'STARBUCKS 南隔間牆');
+      addWall(16.2, 26.8, 4.0, 0.25, 4.4, wallMarbleMainMat, 'STARFUCKS 北隔間牆');
+      addWall(16.2, 34.2, 4.0, 0.25, 4.4, wallMarbleMainMat, 'STARFUCKS 南隔間牆');
 
       buildStarbucksStorefront(glassMat);
-      addHangingSign(13.8, 3.55, 30.5, 4.8, 0.82, 'STARBUCKS 星巴克', '精品咖啡・星冰樂・現烤點心', '#00704A', '#ffffff', -Math.PI / 2);
+      addHangingSign(13.8, 3.55, 30.5, 4.8, 0.82, 'STARFUCKS', '精品咖啡・星冰樂・現烤點心', '#00704A', '#ffffff', -Math.PI / 2);
 
       addWall(18.2, 29.5, 0.6, 15.5, 4.4, wallMarblePinkMat, '東側門診西牆');
       addWall(33.5, 29.5, 0.6, 15.5, 4.4, wallMarblePinkMat, '東側門診東牆');
@@ -4139,6 +4137,159 @@
           scene.add(tbl);
           colliders.push({ minX: tx - 1.9, maxX: tx + 1.9, minZ: tz - 0.75, maxZ: tz + 0.75, label: '會議餐桌' });
         }
+        // ==========================================
+      // 國際會議廳：南牆電動大布幕與天花板投影機
+      // ==========================================
+      const screenGroup = new THREE.Group();
+      // 緊貼南側外牆內側 (z = 44.15)，中心對齊大門中軸線 (x = 44.35)，面向北方 (-Z)
+      screenGroup.position.set(44.35, 2.55, 44.15);
+      screenGroup.rotation.y = Math.PI;
+
+      // 1. 上方電動布幕收納外殼
+      const casing = new THREE.Mesh(
+        new THREE.BoxGeometry(7.2, 0.24, 0.26),
+        new THREE.MeshStandardMaterial({ color: 0x263238, roughness: 0.4, metalness: 0.5 })
+      );
+      casing.position.y = 1.65;
+      casing.castShadow = true;
+      screenGroup.add(casing);
+
+      // 2. 布幕黑色邊框
+      const screenFrame = new THREE.Mesh(
+        new THREE.BoxGeometry(6.8, 3.2, 0.04),
+        new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8 })
+      );
+      screenGroup.add(screenFrame);
+
+      // 3. 投影簡報畫面貼圖
+      const slideCanvas = document.createElement('canvas');
+      slideCanvas.width = 1024;
+      slideCanvas.height = 512;
+      const sCtx = slideCanvas.getContext('2d');
+
+      const bgGrad = sCtx.createLinearGradient(0, 0, 1024, 512);
+      bgGrad.addColorStop(0, '#f8fafc');
+      bgGrad.addColorStop(1, '#e0f2fe');
+      sCtx.fillStyle = bgGrad;
+      sCtx.fillRect(0, 0, 1024, 512);
+
+      sCtx.fillStyle = '#0284c7';
+      sCtx.fillRect(0, 0, 1024, 88);
+      sCtx.fillStyle = '#ffffff';
+      sCtx.font = 'bold 34px "Microsoft JhengHei", sans-serif';
+      sCtx.fillText('向日葵醫院 1F 國際醫學研討會', 42, 56);
+
+      sCtx.fillStyle = '#0f172a';
+      sCtx.font = 'bold 30px "Microsoft JhengHei", sans-serif';
+      sCtx.fillText('智慧醫療與臨床照護品質提升報告', 48, 155);
+
+      sCtx.fillStyle = '#334155';
+      sCtx.font = '24px "Microsoft JhengHei", sans-serif';
+      sCtx.fillText('• 急診與門診分流標準化作業流程', 56, 215);
+      sCtx.fillText('• 跨科別整合照護團隊協作模式', 56, 265);
+      sCtx.fillText('• AI 輔助影像判讀與臨床決策系統', 56, 315);
+
+      sCtx.fillStyle = '#ffffff';
+      sCtx.fillRect(610, 130, 360, 290);
+      sCtx.strokeStyle = '#bae6fd';
+      sCtx.lineWidth = 3;
+      sCtx.strokeRect(610, 130, 360, 290);
+
+      const barColors = ['#38bdf8', '#0284c7', '#0ea5e9', '#10b981'];
+      const barHeights = [110, 155, 190, 225];
+      barHeights.forEach((h, idx) => {
+        sCtx.fillStyle = barColors[idx];
+        sCtx.fillRect(650 + idx * 78, 390 - h, 46, h);
+      });
+
+      const slideTex = new THREE.CanvasTexture(slideCanvas);
+      const screenSurface = new THREE.Mesh(
+        new THREE.PlaneGeometry(6.5, 2.9),
+        new THREE.MeshStandardMaterial({
+          map: slideTex,
+          emissive: 0xffffff,
+          emissiveMap: slideTex,
+          emissiveIntensity: 0.35,
+          roughness: 0.35
+        })
+      );
+      screenSurface.position.z = 0.025;
+      screenGroup.add(screenSurface);
+
+      // 4. 下方配重軸桿
+      const bottomBar = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.035, 0.035, 6.9, 16),
+        new THREE.MeshStandardMaterial({ color: 0x37474f, metalness: 0.6, roughness: 0.3 })
+      );
+      bottomBar.rotation.z = Math.PI / 2;
+      bottomBar.position.y = -1.63;
+      screenGroup.add(bottomBar);
+
+      scene.add(screenGroup);
+
+      // 5. 天花板懸吊式投影機 (位於布幕正前方 x = 44.35, z = 38.5)
+      const projGroup = new THREE.Group();
+      projGroup.position.set(44.35, 4.15, 38.5);
+
+      // 吊桿與底座
+      const mountBase = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.18, 0.18, 0.06, 16),
+        new THREE.MeshStandardMaterial({ color: 0x455a64, metalness: 0.5 })
+      );
+      mountBase.position.y = 0.72;
+      projGroup.add(mountBase);
+
+      const pole = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.035, 0.035, 0.68, 12),
+        new THREE.MeshStandardMaterial({ color: 0xb0bec5, metalness: 0.7, roughness: 0.3 })
+      );
+      pole.position.y = 0.38;
+      projGroup.add(pole);
+
+      // 投影機機身 (鏡頭朝向 +Z 南側布幕)
+      const projBody = new THREE.Mesh(
+        new THREE.BoxGeometry(0.56, 0.22, 0.68),
+        new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35, metalness: 0.2 })
+      );
+      projBody.castShadow = true;
+      projGroup.add(projBody);
+
+      // 投影機鏡頭圈與發光鏡片
+      const lensRing = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.075, 0.085, 0.1, 20),
+        new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.6, roughness: 0.3 })
+      );
+      lensRing.rotation.x = Math.PI / 2;
+      lensRing.position.set(0.1, -0.02, 0.36);
+      projGroup.add(lensRing);
+
+      const lensGlass = new THREE.Mesh(
+        new THREE.CircleGeometry(0.065, 20),
+        new THREE.MeshStandardMaterial({
+          color: 0xe0f2fe,
+          emissive: 0x38bdf8,
+          emissiveIntensity: 1.6
+        })
+      );
+      lensGlass.position.set(0.1, -0.02, 0.412);
+      projGroup.add(lensGlass);
+
+      // 半透明投影光束錐 (從鏡頭射向南牆布幕)
+      const beamCone = new THREE.Mesh(
+        new THREE.ConeGeometry(1.8, 5.4, 24, 1, true),
+        new THREE.MeshBasicMaterial({
+          color: 0xe0f2fe,
+          transparent: true,
+          opacity: 0.07,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        })
+      );
+      beamCone.rotation.x = -Math.PI / 2;
+      beamCone.position.set(0.05, -0.75, 3.05);
+      projGroup.add(beamCone);
+
+      scene.add(projGroup);
       }
 
       // E. 北半部醫療區：檢驗科、藥劑科、放射科 (MRI/CT) 與急診室（含無縫補齊隔間牆）
@@ -4153,8 +4304,8 @@
       addWall(35.5, -36.5, 35.0, 0.7, 4.4, wallMarblePinkMat, '洗腎室南牆');
       addHangingSign(35.5, 3.55, -37.2, 4.6, 0.72, '血液透析中心 (洗腎室)', 'HEMODIALYSIS UNIT', '#9d174d', '#f9a8d4');
 
-      addFireHydrantCabinet(-14.3, 21.5, Math.PI / 2);
-      addFireHydrantCabinet(14.3, 21.5, -Math.PI / 2);
+      addFireHydrantCabinet(-17.80, 23.2, Math.PI / 2);
+      addFireHydrantCabinet(17.80, 23.2, -Math.PI / 2);
       addFireHydrantCabinet(-12.5, 10.8, 0);
       addFireHydrantCabinet(12.5, 10.8, 0);
     }
@@ -5319,7 +5470,7 @@
         {
           id: 'atrium_pianist',
           name: '沈若曦 音樂志工',
-          role: '挑空鋼琴大廳・鋼琴演奏',
+          role: '鋼琴大廳・鋼琴演奏',
           avatar: '🎹',
           plateClass: 'teal-plate',
           pos: new THREE.Vector3(0.72, 0, 32.97),
@@ -5336,16 +5487,16 @@
           pantsColor: 0x1e293b,
           shoeColor: 0x0f172a,
           isFemale: true,
-          greeting: '您好！歡迎來到幸運草醫院挑空大廳。音樂能舒緩看診與探病時的緊張情緒，您也可以靠近鋼琴按 E 鍵彈奏幾個和弦喔！',
+          greeting: '您好！歡迎來到向日葵醫院挑空大廳。音樂能舒緩看診與探病時的緊張情緒，您也可以靠近鋼琴按 E 鍵彈奏幾個和弦喔！',
           options: [
             { label: '聽一首療癒鋼琴曲', reply: '（琴聲悠揚迴盪在兩層樓高的蓮花燈中庭裡）祝您與家人今天都順心平安！' },
-            { label: '詢問批價掛號處方向', reply: '沿著中央大理石拼花走道直直往北走（穿過手扶梯旁），正前方就是批價掛號處與「幸運草醫院」形象牆。' }
+            { label: '詢問批價掛號處方向', reply: '沿著中央大理石拼花走道直直往北走（穿過手扶梯旁），正前方就是批價掛號處與「向日葵醫院」形象牆。' }
           ]
         },
         // [新增門診事件 NPC A] 門診候診區咆哮鬧事男子（持續指罵護理師「我還要等多久！」）
         {
           id: 'opd_yeller',
-          name: '劉姓家屬 (批價掛號鬧事者)',
+          name: '劉姓家屬',
           role: '批價掛號區・大聲咆哮辱罵中',
           avatar: '🤬',
           plateClass: 'amber-plate',
@@ -5397,7 +5548,7 @@
         {
           id: 'referral_nurse',
           name: '許雅雯 專員',
-          role: '服務台・轉診(檢)中心',
+          role: '服務台・轉診中心',
           avatar: '💚',
           plateClass: 'pink-plate',
           pos: new THREE.Vector3(-6.4, 0, 36.2),
@@ -5416,14 +5567,14 @@
           greeting: '您好！這裡是「服務 ♡ 台・轉診(檢)中心」。持基層診所轉診單就醫可享掛號優先服務喔！',
           options: [
             { label: '我要辦理轉診報到', reply: '沒問題！請出示您的轉診單與健保卡，我立即為您安排今日對應專科門診。' },
-            { label: '請問義美食品與星巴克在哪？', reply: '大廳左側玻璃門進去就是「義美食品 I-MEI」，大廳右側則是「STARBUCKS 星巴克」，西南側還有 7-ELEVEN 喔！' }
+            { label: '請問美美食品與STARFUCKS在哪？', reply: '大廳左側玻璃門進去就是「美美食品 M-MEI」，大廳右側則是「STARFUCKS」，西南側還有 8-ELEVEN 喔！' }
           ]
         },
         // [新增急診事件 NPC A] 急診暴力鬧事男子（持續揮拳攻擊護理師）
         {
           id: 'er_brawler',
-          name: '張姓醉漢 (急診鬧事者)',
-          role: '急診室・酒醉鬧事揮拳中',
+          name: '張姓醉漢',
+          role: '酒醉鬧事揮拳中',
           avatar: '💢',
           plateClass: 'amber-plate',
           pos: new THREE.Vector3(24.2, 0, -20.5),
@@ -5448,7 +5599,7 @@
         {
           id: 'er_victim_nurse',
           name: '蘇怡君 急診護理師',
-          role: '急診室・檢傷區遭受攻擊中',
+          role: '檢傷區遭受攻擊中',
           avatar: '🆘',
           plateClass: 'pink-plate',
           pos: new THREE.Vector3(25.3, 0, -20.5),
@@ -5473,7 +5624,7 @@
         {
           id: 'reg_clerk_1',
           name: '林佳穎 行政專員',
-          role: '批價掛號處・2號窗口',
+          role: '批價掛號處',
           avatar: '💳',
           plateClass: 'pink-plate',
           pos: new THREE.Vector3(-5.5, 0, 6.2),
@@ -5519,7 +5670,7 @@
         {
           id: 'guard_south',
           name: '陳志明 警衛隊長',
-          role: '南側大門警衛室',
+          role: '大門警衛室',
           avatar: '🛡️',
           plateClass: 'teal-plate',
           pos: new THREE.Vector3(-6.2, 0, 41.2),
@@ -5535,17 +5686,16 @@
           shoeColor: 0x090d16,
           hasGuardCap: true,
           isGuard: true,
-          greeting: '您好！歡迎蒞臨幸運草醫院。大門右側牆面設有「1F 平面導覽圖」，需要輪椅借用或方向指引請隨時告訴我！',
+          greeting: '您好！歡迎蒞臨向日葵醫院。大門右側牆面設有「1F 平面導覽圖」，需要輪椅借用或方向指引請隨時告訴我！',
           options: [
             { label: '如何前往其他樓層或戶外？', reply: '往前走到中央手扶梯或北側電梯（1~4號）即可選擇前往 B1～8F；若走出南側大門則會自動連結回戶外園區 1index.html！' }
           ]
         },
 
-        // 2. 義美食品 I-MEI、STARBUCKS、7-ELEVEN 與藝文廳畫展
         {
           id: 'imei_staff',
           name: '張雅婷 店長',
-          role: '義美食品 I-MEI 門市',
+          role: '美美食品 M-MEI 門市',
           avatar: '🥐',
           plateClass: 'amber-plate',
           pos: new THREE.Vector3(-16.4, 0, 30.2),
@@ -5560,7 +5710,7 @@
           pantsColor: 0x18181b,
           shoeColor: 0x0f172a,
           isFemale: true,
-          greeting: '歡迎光臨義美食品！剛出爐的鮮奶吐司、純濃豆漿與手工蛋捲禮盒都上架囉！',
+          greeting: '歡迎光臨美美食品！剛出爐的鮮奶吐司、純濃豆漿與手工蛋捲禮盒都上架囉！',
           options: [
             { label: '點一份豆漿與鮮奶吐司早餐', reply: '好的！早餐組合 1+1 優惠 88 元，祝您用餐愉快、健康活力滿分！' }
           ]
@@ -5568,7 +5718,7 @@
         {
           id: 'sb_barista',
           name: '吳宇軒 咖啡師',
-          role: 'STARBUCKS 幸運草門市',
+          role: 'STARFUCKS 向日葵門市',
           avatar: '☕',
           plateClass: 'teal-plate',
           pos: new THREE.Vector3(16.3, 0, 28.5),
@@ -5582,7 +5732,7 @@
           uniformStyle: 'casual',
           pantsColor: 0x14171a,
           shoeColor: 0x090d16,
-          greeting: '早安！歡迎來到星巴克幸運草醫院門市，今天想來杯經典那堤、冷萃咖啡，還是季節限定星冰樂呢？',
+          greeting: '早安！歡迎來到向日葵醫院門市，今天想來杯經典那堤、冷萃咖啡，還是季節限定星冰樂呢？',
           options: [
             { label: '來一杯大杯冰那堤', reply: '好的！大杯冰那堤馬上為您現萃濃縮咖啡製作，在旁稍候一下喔！' }
           ]
@@ -5590,8 +5740,8 @@
         // [新增東側門診暴力事件 NPC A] 精神科患者在診間走廊失控毆打護理師
         {
           id: 'east_psych_attacker',
-          name: '王姓男子 (失控就診患者)',
-          role: '東側門診走廊・情緒失控揮拳毆打中',
+          name: '王姓男子',
+          role: '情緒失控揮拳毆打中',
           avatar: '💢',
           plateClass: 'amber-plate',
           pos: new THREE.Vector3(20.2, 0, 27.6),
@@ -5617,8 +5767,8 @@
         // [新增東側門診暴力事件 NPC B] 遭受攻擊閃避防禦的門診護理師
         {
           id: 'east_attacked_nurse',
-          name: '張芸瑄 門診護理師',
-          role: '東側門診走廊・遭患者攻擊防禦中',
+          name: '張芸瑄 護理師',
+          role: '遭患者攻擊防禦中',
           avatar: '🆘',
           plateClass: 'pink-plate',
           pos: new THREE.Vector3(21.3, 0, 27.6),
@@ -5642,8 +5792,8 @@
         },
         {
           id: 'entrance_wheelchair_1',
-          name: '林阿嬤 (輪椅就診民眾)',
-          role: '南側大門入口・剛借用愛心輪椅',
+          name: '林阿嬤',
+          role: '愛心輪椅',
           avatar: '♿',
           plateClass: 'amber-plate',
           pos: new THREE.Vector3(4.2, 0, 41.5),
@@ -5668,8 +5818,8 @@
         // 西側門診候診區鬧事者與護理師（位於西側診間門前走道）
         {
           id: 'west_opd_yeller',
-          name: '劉姓家屬 (西側門診鬧事者)',
-          role: '西側門診候診區・大聲咆哮辱罵中',
+          name: '劉姓家屬',
+          role: '大聲咆哮辱罵中',
           avatar: '🤬',
           plateClass: 'amber-plate',
           pos: new THREE.Vector3(-19.6, 0, 30.8),
@@ -5693,8 +5843,8 @@
         },
         {
           id: 'west_opd_scolded_nurse',
-          name: '王惠美 門診護理師',
-          role: '西側門診・遭言語辱罵安撫中',
+          name: '王惠美 護理師',
+          role: '遭言語辱罵安撫中',
           avatar: '😥',
           plateClass: 'pink-plate',
           pos: new THREE.Vector3(-19.6, 0, 32.1),
@@ -5719,7 +5869,7 @@
         {
           id: 'sb_customer',
           name: '周曉涵 小姐',
-          role: '星巴克排隊顧客',
+          role: 'STARFUCKS 排隊顧客',
           avatar: '🧋',
           plateClass: 'amber-plate',
           pos: new THREE.Vector3(13.0, 0, 28.5),
@@ -5742,12 +5892,12 @@
         {
           id: 'seven_clerk',
           name: '劉冠宇 店員',
-          role: '統一超商 7-ELEVEN',
+          role: '統購超商 8-ELEVEN',
           avatar: '🏪',
           plateClass: 'amber-plate',
-          pos: new THREE.Vector3(-40.2, 0, 43.0),
+          pos: new THREE.Vector3(-40.2, 0, 42.95),
           yaw: Math.PI,
-          patrolRadius: 1.5,
+          patrolRadius: 0,
           skinColor: 0xffdbac,
           hairColor: 0x0f172a,
           shirtColor: 0x00843d,
@@ -5756,15 +5906,15 @@
           uniformStyle: 'casual',
           pantsColor: 0x1e293b,
           shoeColor: 0x0f172a,
-          greeting: '歡迎光臨 7-ELEVEN 幸運草醫院門市！CITY CAFE 咖啡、關東煮、茶葉蛋與醫療照護用品 24 小時供應！',
+          greeting: '歡迎光臨 8-ELEVEN 向日葵醫院門市！CITY CAFE 咖啡、關東煮、茶葉蛋與醫療照護用品 24 小時供應！',
           options: [
-            { label: '購買熱美式與茶葉蛋', reply: '謝謝惠顧！OPEN POINT 會員累點完成，祝您健康順心！' }
+            { label: '購買熱美式與茶葉蛋', reply: '謝謝惠顧！OPEN 會員累點完成，祝您健康順心！' }
           ]
         },
         {
           id: 'gallery_curator',
           name: '林文雄 藝術家',
-          role: '藝文廳・駐館畫展導覽',
+          role: '駐館畫展導覽',
           avatar: '🎨',
           plateClass: 'teal-plate',
           pos: new THREE.Vector3(-46.5, 0, 27.5),
@@ -5779,7 +5929,7 @@
           pantsColor: 0x1e293b,
           shoeColor: 0x3f2616,
           hasGlasses: true,
-          greeting: '歡迎來到幸運草醫院藝文廳！本期展出《鹿港古鎮晨曦》、《八卦山春櫻》與《王功漁火晚風》等彰化在地風景畫作。',
+          greeting: '歡迎來到向日葵醫院藝文廳！本期展出《鹿港古鎮晨曦》、《八卦山春櫻》與《王功漁火晚風》等彰化在地風景畫作。',
           options: [
             { label: '請介紹《鹿港古鎮晨曦》', reply: '這幅作品描繪清晨陽光灑落鹿港紅磚古巷與老街屋瓦的溫暖光影，希望能帶給病友平靜與力量。' }
           ]
@@ -5811,8 +5961,8 @@
         // 3. 急診室 (CPR 急救團隊 & 留觀病房 & 急診檢傷休息區 — 共 10 位急診人員與病患！)
         {
           id: 'er_cpr_lead',
-          name: '林冠廷 急診主治醫師',
-          role: '急診室・CPR 急救團隊指揮官',
+          name: '林冠廷 主治醫師',
+          role: 'CPR 急救團隊指揮官',
           avatar: '🚨',
           plateClass: 'teal-plate',
           pos: new THREE.Vector3(18.2, 0, -22.55),
@@ -5836,8 +5986,8 @@
         },
         {
           id: 'er_cpr_nurse',
-          name: '王詩涵 急診護理師',
-          role: '急診室・胸外按壓急救執行',
+          name: '王詩涵 護理師',
+          role: '胸外按壓急救執行',
           avatar: '💓',
           plateClass: 'pink-plate',
           pos: new THREE.Vector3(19.02, 0, -21.2),
@@ -5861,8 +6011,8 @@
         },
         {
           id: 'er_cpr_assistant',
-          name: '李承恩 專科護理師',
-          role: '急診室・靜脈輸液與急救給藥',
+          name: '李承恩 護理師',
+          role: '靜脈輸液與急救給藥',
           avatar: '💉',
           plateClass: 'pink-plate',
           pos: new THREE.Vector3(17.38, 0, -21.35),
@@ -6027,11 +6177,10 @@
             { label: '祝您先生檢查一切順利', reply: '謝謝你！剛剛急診醫師有出來跟我們說明檢查進度，讓人很安心。' }
           ]
         },
-        // [新增急診 NPC 6] 救護技術員 EMT
         {
           id: 'er_emt',
           name: '周子豪 救護技術員',
-          role: '急診大門・119 救護交接待命',
+          role: '消防局救護交接待命',
           avatar: '🚑',
           plateClass: 'teal-plate',
           pos: new THREE.Vector3(22.2, 0, -16.2),
@@ -6050,12 +6199,10 @@
             { label: '向救護人員致敬', reply: '守護鄉親黃金救援時間是我們的使命！隨時保持通道暢通！' }
           ]
         },
-
-        // 4. 放射科 (MRI / CT 檢查室)
         {
           id: 'rad_tech_console',
           name: '張哲瑋 放射師',
-          role: '放射科・3.0T MRI 操作台',
+          role: '3.0T MRI 操作台',
           avatar: '🩻',
           plateClass: 'teal-plate',
           pos: new THREE.Vector3(-26.5, 0, -17.0),
@@ -6078,7 +6225,7 @@
         {
           id: 'rad_tech_ct',
           name: '陳品妤 放射師',
-          role: '放射科・電腦斷層 CT 檢查室',
+          role: '電腦斷層 CT 檢查室',
           avatar: '☢️',
           plateClass: 'teal-plate',
           pos: new THREE.Vector3(-16.5, 0, -23.5),
@@ -6100,7 +6247,7 @@
         },
         {
           id: 'mri_patient',
-          name: '林先生 (MRI受檢者)',
+          name: '林先生',
           role: '3.0T MRI 檢查床・掃描中',
           avatar: '🧲',
           plateClass: 'amber-plate',
@@ -6126,7 +6273,7 @@
         {
           id: 'east_gi_doctor',
           name: '陳建宏 主治醫師',
-          role: '一診 腸胃內科・主治醫師',
+          role: '主治醫師',
           avatar: '🩺',
           plateClass: 'teal-plate',
           pos: new THREE.Vector3(20.6, 0, 24.5),
@@ -6149,8 +6296,8 @@
         },
         {
           id: 'east_clinic_nurse',
-          name: '林思妤 門診護理師',
-          role: '東側門診・跟診護理師',
+          name: '林思妤 護理師',
+          role: '護理師',
           avatar: '👩‍⚕️',
           plateClass: 'pink-plate',
           pos: new THREE.Vector3(24.8, 0, 29.0),
@@ -6174,7 +6321,7 @@
         {
           id: 'west_rehab_doctor',
           name: '周文傑 主治醫師',
-          role: '十八診 復健骨科・主治醫師',
+          role: '主治醫師',
           avatar: '🦴',
           plateClass: 'teal-plate',
           pos: new THREE.Vector3(-20.8, 0, 28.0),
@@ -6197,7 +6344,7 @@
         {
           id: 'west_clinic_nurse',
           name: '黃詩婷 護理師',
-          role: '西側門診・衛教護理師',
+          role: '衛教護理師',
           avatar: '📋',
           plateClass: 'pink-plate',
           pos: new THREE.Vector3(-24.8, 0, 32.5),
@@ -6223,7 +6370,7 @@
         {
           id: 'east_seated_1',
           name: '張阿嬤',
-          role: '東側門診候診區',
+          role: '門診候診',
           avatar: '👵',
           plateClass: 'amber-plate',
           pos: new THREE.Vector3(23.1, 0, 26.2),
@@ -6246,8 +6393,8 @@
         },
         {
           id: 'west_wheelchair_1',
-          name: '陳先生 (輪椅就醫)',
-          role: '西側門診無障礙走廊',
+          name: '陳先生',
+          role: '無障礙走廊',
           avatar: '♿',
           plateClass: 'amber-plate',
           pos: new THREE.Vector3(-24.8, 0, 25.0),
@@ -6262,7 +6409,7 @@
           uniformStyle: 'casual',
           pantsColor: 0x1e293b,
           shoeColor: 0x475569,
-          greeting: '幸運草醫院 1F 全區都是平坦無障礙大理石地面，推輪椅看診、去星巴克或搭電梯都非常順暢！',
+          greeting: '向日葵醫院 1F 全區都是平坦無障礙大理石地面，推輪椅看診、去星巴克或搭電梯都非常順暢！',
           options: [
             { label: '需要幫忙推輪椅嗎？', reply: '謝謝你的熱心！我自己操作很順手，祝你今天愉快！' }
           ]
@@ -6270,7 +6417,7 @@
         {
           id: 'lab_tech_1',
           name: '吳家豪 醫檢師',
-          role: '檢驗科・2號抽血台',
+          role: '實習中',
           avatar: '🩸',
           plateClass: 'teal-plate',
           pos: new THREE.Vector3(-25.9, 0, -7.8),
@@ -6288,13 +6435,13 @@
           hasDoctorCoat: true,
           greeting: '您好！這裡是檢驗科抽血服務櫃檯，抽血完成後請按壓止血棉球 5 至 10 分鐘，不要揉捏傷口喔！',
           options: [
-            { label: '詢問抽血報告查詢時間', reply: '一般生化與血液檢查約 1 小時後即可在診間或幸運草醫院 APP 查詢報告！' }
+            { label: '詢問抽血報告查詢時間', reply: '一般生化與血液檢查約 1 小時後即可在診間或向日葵醫院 APP 查詢報告！' }
           ]
         },
         {
           id: 'lab_patient_1',
-          name: '鄭小姐 (抽血受檢)',
-          role: '檢驗科・抽血中',
+          name: '鄭小姐',
+          role: '抽血中',
           avatar: '💪',
           plateClass: 'amber-plate',
           pos: new THREE.Vector3(-25.9, 0, -5.2),
@@ -6319,7 +6466,7 @@
         {
           id: 'pharm_1',
           name: '許瀞文 藥師',
-          role: '藥劑科・1號領藥窗口',
+          role: '1號領藥窗口',
           avatar: '💊',
           plateClass: 'teal-plate',
           pos: new THREE.Vector3(16.5, 0, -7.8),
@@ -7391,10 +7538,10 @@ function checkTransportAndExitTriggers() {
       else if (z >= -2.2 && z <= 1.2 && Math.abs(x) <= 11.5) label = '北側電梯大廳 (往 B1 / 2F~8F)';
       else if (z >= 4.2 && z <= 10.5 && Math.abs(x) <= 13.5) label = '中央大廳・批價掛號處 / 品牌形象牆';
       else if (x >= -5.5 && x <= 0.5 && z >= 12.2 && z <= 17.8) label = '中央橫向平行手扶梯大廳 (接觸可選樓層)';
-      else if (x < -14.2 && x > -18.2 && z >= 26.8 && z <= 34.2) label = '大廳左側・義美食品 I-MEI 門市';
-      else if (x > 14.2 && x < 18.2 && z >= 26.8 && z <= 34.2) label = '大廳右側・STARBUCKS 星巴克門市';
-      else if (x < -36.2 && z >= 34.8) label = '西南側・統一超商 7-ELEVEN 門市';
-      else if (x < -36.2 && z >= 20.2 && z < 34.8) label = '西側・藝文廳 (幸運草醫院人文畫展)';
+      else if (x < -14.2 && x > -18.2 && z >= 26.8 && z <= 34.2) label = '大廳左側・美美食品 M-MEI 門市';
+      else if (x > 14.2 && x < 18.2 && z >= 26.8 && z <= 34.2) label = '大廳右側・STARFUCKS 星巴克門市';
+      else if (x < -36.2 && z >= 34.8) label = '西南側・統購超商 8-ELEVEN 門市';
+      else if (x < -36.2 && z >= 20.2 && z < 34.8) label = '西側・藝文廳 (向日葵醫院人文畫展)';
       else if (Math.abs(x) <= 14.0 && z >= 20.5 && z <= 38.5) label = '挑空鋼琴大廳 (蓮花主燈 / 演奏鋼琴)';
       else if (x < -15.5 && z >= 11 && z <= 19) label = '西側雙挑空採光中庭';
       else if (x > 15.5 && z >= 11 && z <= 19) label = '東側雙挑空採光中庭';
