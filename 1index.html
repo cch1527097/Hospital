@@ -729,7 +729,7 @@
 
     const gameState = {
       started: true,
-      selectedRoleId: 'it_engineer',
+      selectedRoleId: urlParams.get('role') || localStorage.getItem('clover_hospital_role') || 'it_engineer',
       selectedSpawn: 'emergency',
       timeOfDay: 'day',
       clockMinutes: 17 * 60 + 30,
@@ -4897,6 +4897,11 @@
       const role = CHARACTER_ROLES.find((r) => r.id === roleId) || CHARACTER_ROLES[0];
       gameState.selectedRoleId = role.id;
 
+      try {
+    localStorage.setItem('clover_hospital_role', role.id);
+    localStorage.setItem('clover_hospital_cash', String(role.cash));
+  } catch (e) {}
+
       if (player.materials && player.materials.jacketMat) {
         player.materials.jacketMat.color.setHex(role.jacketColor);
         player.materials.teeMat.color.setHex(role.teeColor);
@@ -6286,8 +6291,10 @@
         descEl.innerHTML = `已感應【${sourceLabel}】，自動連接至 <span class="font-mono text-amber-300">1F.html</span> ...`;
       }
 
-      const targetUrl = sourceLabel.includes('急診') ? '1F.html?entry=er' : '1F.html?entry=main';
-      if (linkEl) linkEl.href = targetUrl;
+      const entryType = sourceLabel.includes('急診') ? 'er' : 'main';
+const currentRole = encodeURIComponent(gameState.selectedRoleId || 'it_engineer');
+const targetUrl = `1F.html?entry=${entryType}&role=${currentRole}`;
+if (linkEl) linkEl.href = targetUrl;
 
       overlay.classList.remove('hidden');
       overlay.classList.add('flex');
