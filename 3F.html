@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>幸運草醫院-模擬人生</title>
+  <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js r128 穩定 CDN -->
@@ -136,8 +136,8 @@
   <!-- 載入遮罩 -->
   <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 text-white transition-opacity duration-500">
     <div class="w-16 h-16 border-4 border-teal-400 border-t-amber-400 rounded-full animate-spin mb-4"></div>
-    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">幸運草醫院-模擬人生</h1>
-    <p class="text-xs sm:text-sm text-slate-300">正在最佳化靜態建築批次合併、烘焙陰影與 3F 實景病房...</p>
+    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">向日葵醫院-模擬人生</h1>
+    <p class="text-xs sm:text-sm text-slate-300">正在載入...</p>
   </div>
 
   <!-- 右上角：GTA 風格狀態欄 -->
@@ -196,7 +196,7 @@
             👩‍⚕️
           </div>
           <div>
-            <h3 id="dlg-name" class="font-black text-base sm:text-lg text-amber-300">幸運草醫院-模擬人生</h3>
+            <h3 id="dlg-name" class="font-black text-base sm:text-lg text-amber-300">向日葵醫院-模擬人生</h3>
             <p id="dlg-role" class="text-xs text-teal-300 font-medium">職位與照護資訊</p>
           </div>
         </div>
@@ -251,7 +251,7 @@
   <script>
     /**
      * ============================================================================
-     * 幸運草醫院-模擬人生 (高效能批次合併 + 樓層視錐剔除 + 靜態陰影烘焙優化版)
+     * 向日葵醫院-模擬人生 (高效能批次合併 + 樓層視錐剔除 + 靜態陰影烘焙優化版)
      * ============================================================================
      */
 
@@ -1428,8 +1428,8 @@
       const {
         rotY = 0,
         isExecutive = false,
-        screenTitle = '幸運草醫院-模擬人生資訊系統 (NIS)',
-        screenSub = '3F 護理排班・品管指標即時監控',
+        screenTitle = '向日葵醫院-模擬人生資訊系統',
+        screenSub = '護理排班・品管指標即時監控',
         nameplateText = '',
         addCollider = true
       } = opts;
@@ -1724,7 +1724,7 @@
         );
         monBody.position.set(-0.55, 1.04, -0.18);
         monBody.rotation.y = 0.32;
-        const scrTex = createSignTexture('HbA1c 控糖趨勢與飲食代換', '幸運草醫院糖尿病衛教系統', '#064e3b', '#6ee7b7');
+        const scrTex = createSignTexture('HbA1c 控糖趨勢與飲食代換', '向日葵醫院糖尿病衛教系統', '#064e3b', '#6ee7b7');
         const scrPlane = new THREE.Mesh(
           new THREE.PlaneGeometry(0.49, 0.29),
           new THREE.MeshBasicMaterial({ map: scrTex })
@@ -1939,7 +1939,7 @@
         ['#e0f2fe', '#38bdf8', '#15803d', '八卦山脈・晨曦綠意'],
         ['#fdf4ff', '#f472b6', '#0d9488', '班廷俱樂部・健康共好'],
         ['#ecfdf5', '#34d399', '#0369a1', '糖化血色素 HbA1c 控糖指標'],
-        ['#f3e8ff', '#a855f7', '#0f766e', '幸運草醫院護理部・全人照護品質']
+        ['#f3e8ff', '#a855f7', '#0f766e', '向日葵醫院護理部・全人照護品質']
       ];
       const t = themes[idx];
       const bg = ctx.createLinearGradient(0, 0, 384, 288);
@@ -2509,7 +2509,7 @@
 
       addWall(-5.2, 42.2, 3.4, 3.8, 3.2, wallMintMat, '西側警衛室', 1, 0);
       addWall(5.2, 42.2, 3.4, 3.8, 3.2, wallMintMat, '東側警衛室', 1, 0);
-      addHangingSign(0, 3.75, 42.2, 7.6, 0.9, '幸運草醫院・入口門廳', 'CHANG BING SHOW CHWAN MEMORIAL HOSPITAL', '#0f4c5c', '#2dd4bf');
+      addHangingSign(0, 3.75, 42.2, 7.6, 0.9, '向日葵醫院', 'SUNFLOWER HOSPITAL', '#0f4c5c', '#2dd4bf');
 
       buildTwinAtriums(glassMat, darkFrameMat, ArchMaterials.ceilingGypsum);
 
@@ -2814,7 +2814,7 @@
       ceil2FCenter.position.set(0, 9.0, 15.5);
       addToFloorGroup(ceil2FCenter, 2);
 
-      addHangingSign(0, f2Y + 3.65, 7.6, 6.4, 0.88, '幸運草醫院醫療樓層', '洗腎室・開刀房・ICU・婦產科・心血管中心・牙科', '#0f4c5c', '#fbbf24');
+      addHangingSign(0, f2Y + 3.65, 7.6, 6.4, 0.88, '向日葵醫院電梯廳', '洗腎室・開刀房・ICU・婦產科・心血管中心・牙科', '#0f4c5c', '#fbbf24');
 
       addWall(25.2, -37.5, 0.5, 18.0, 4.4, wallPinkMat, '2F 洗腎室西牆', 2, f2Y);
       addWall(38.0, -28.6, 26.0, 0.5, 4.4, wallPinkMat, '2F 洗腎室南牆', 2, f2Y);
@@ -3462,7 +3462,7 @@ thyroidBenches.forEach((b, bIdx) => {
       addComputerWorkstation(2.35, f3Y, 26.62, {
         rotY: 0,
         isExecutive: true,
-        screenTitle: '幸運草醫院護理部決策儀表板',
+        screenTitle: '向日葵醫院護理部決策儀表板',
         screenSub: '陳淑芬 主任・全院督導群與護病比總覽',
         nameplateText: '護理部主任 陳淑芬'
       });
@@ -4169,7 +4169,7 @@ thyroidBenches.forEach((b, bIdx) => {
           waypoints: [new THREE.Vector3(-27.22, 9.2, 25.15)],
           greeting: '（躺在 369 病房 2 號病床上，點滴架正穩定滴注營養液）謝謝你來探望，賴雅筑護理師剛剛才幫我調整好點滴流速。',
           options: [
-            { label: '祝福奶奶早日康復', reply: '黃奶奶：「謝謝你！幸運草醫院的護理師都像家人一樣親切。」' }
+            { label: '祝福奶奶早日康復', reply: '黃奶奶：「謝謝你！向日葵醫院的護理師都像家人一樣親切。」' }
           ]
         },
         {
