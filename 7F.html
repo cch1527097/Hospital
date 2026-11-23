@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>幸運草醫院-模擬人生</title>
+  <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js r128 CDN -->
@@ -111,8 +111,8 @@
   <!-- 載入遮罩 -->
   <div id="loading-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 text-white transition-opacity duration-500">
     <div class="w-16 h-16 border-4 border-amber-400 border-t-teal-400 rounded-full animate-spin mb-4"></div>
-    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-amber-300 mb-1">幸運草醫院-模擬人生</h1>
-    <p class="text-xs sm:text-sm text-slate-300">正在鋪設溫潤實木地板・建構電動病床病房・配置走道 E 化護理工作車...</p>
+    <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-amber-300 mb-1">向日葵醫院-模擬人生</h1>
+    <p class="text-xs sm:text-sm text-slate-300">正在載入...</p>
   </div>
 
   <!-- 頂部橫向：7F 區域傳送 + B1 ~ 8F 全院樓層 HTML 直達列 -->
@@ -225,7 +225,7 @@
             🛗
           </div>
           <div>
-            <h3 id="dlg-name" class="font-black text-base sm:text-lg text-amber-300">幸運草醫院-模擬人生</h3>
+            <h3 id="dlg-name" class="font-black text-base sm:text-lg text-amber-300">向日葵醫院-模擬人生</h3>
             <p id="dlg-role" class="text-xs text-teal-300 font-medium">目前所在樓層：7F VIP 與住院病房樓層</p>
           </div>
         </div>
@@ -282,7 +282,7 @@
   <script>
     /**
      * ============================================================================
-     * 幸運草醫院-模擬人生
+     * 向日葵醫院-模擬人生
      * ============================================================================
      */
 
@@ -297,7 +297,7 @@
     const FLOOR_LINKS = [
       { id: 'B1', file: 'B1.html', name: 'B1 地下一樓', desc: '美食街・停車場・放射腫瘤科・核子醫學科', keyCode: 'KeyB', keyLabel: 'B' },
       { id: '1F', file: '1F.html', name: '1F 一樓大廳', desc: '入口門廳・批價掛號・門診區・急診室・放射科', keyCode: 'Digit1', keyLabel: '1' },
-      { id: '2F', file: '2F.html', name: '2F 二樓醫療層', desc: '2F 洗腎室 (腎臟科 李文清醫師)・開刀房・ICU・牙科', keyCode: 'Digit2', keyLabel: '2' },
+      { id: '2F', file: '2F.html', name: '2F 二樓醫療層', desc: '2F 洗腎室・開刀房・ICU・牙科', keyCode: 'Digit2', keyLabel: '2' },
       { id: '3F', file: '3F.html', name: '3F 三樓醫療層', desc: '睡眠中心・婦產科 VIP 病房・班廷俱樂部・眼科', keyCode: 'Digit3', keyLabel: '3' },
       { id: '5F', file: '5F.html', name: '5F 五樓病房層', desc: '517~563 住院病房・537 正壓病房・祈禱室 / 神明廳', keyCode: 'Digit5', keyLabel: '5' },
       { id: '6F', file: '6F.html', name: '6F 六樓病房層', desc: '610~663 住院病房・雙圓弧護理站島・半圓弧展望廳', keyCode: 'Digit6', keyLabel: '6' },
@@ -3068,10 +3068,10 @@
       SoundFX.playAlert();
 
       document.getElementById('dlg-avatar').textContent = '💻';
-      document.getElementById('dlg-name').textContent = `幸運草醫院 E 化行動護理工作車 (Mobile E-Cart)`;
+      document.getElementById('dlg-name').textContent = `向日葵醫院 E 化行動護理工作車 (Mobile E-Cart)`;
       document.getElementById('dlg-role').textContent = `${cart.stationName}・NIS 護理資訊系統連線中`;
       document.getElementById('dlg-text').textContent =
-        '已登入幸運草智慧病房 NIS 護理資訊系統！請選擇您要執行的臨床護理作業：';
+        '已登入向日葵智慧病房 HIS 醫療資訊系統！請選擇您要執行的臨床護理作業：';
 
       const optContainer = document.getElementById('dlg-options');
       optContainer.innerHTML = '';
@@ -3121,7 +3121,7 @@
       activeTalkNpc = { isTransportModal: true };
 
       document.getElementById('dlg-avatar').textContent = '🛗';
-      document.getElementById('dlg-name').textContent = `幸運草醫院 ${transportLabel}・樓層選擇`;
+      document.getElementById('dlg-name').textContent = `向日葵醫院 ${transportLabel}・樓層選擇`;
       document.getElementById('dlg-role').textContent = '目前所在樓層：7F VIP 與住院病房樓層';
       document.getElementById('dlg-text').textContent = `您已抵達${transportLabel}廳！請問要去哪一個樓層？（點擊按鈕或按對應數字鍵，將自動連結 B1 ~ 8F 的 HTML 頁面）`;
 
@@ -3601,7 +3601,7 @@
     function updateCurrentZoneHUD() {
       const x = player.pos.x;
       const z = player.pos.z;
-      let label = '幸運草醫院 7F 實木地板病房走廊';
+      let label = '向日葵醫院 7F 實木地板病房走廊';
 
       if (currentTransportZone) {
         label = `7F ${currentTransportZone.transportType}感應區（可前往 B1 ~ 8F）`;
