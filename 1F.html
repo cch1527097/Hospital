@@ -718,8 +718,8 @@
       erTriage:      { label: '急診管制電動門・急診批價掛號 / 檢傷休息區', pos: new THREE.Vector3(41.5, 0, -10.8), yaw: Math.PI },
       radiology:     { label: '放射科 (MRI/CT 檢查 / 感應電動門)', pos: new THREE.Vector3(-10.2, 0, -20.5), yaw: Math.PI / 2 },
       imei:          { label: '大廳左側・美美食品 M-MEI 門市', pos: new THREE.Vector3(-12.6, 0, 30.5), yaw: -Math.PI / 2 },
-      starbucks:     { label: '大廳右側・STARFUCKS 星巴克門市', pos: new THREE.Vector3(12.2, 0, 30.5), yaw: Math.PI / 2 },
-      sevenEleven:   { label: '西南側・統購超商 8-ELEVEN 門市', pos: new THREE.Vector3(-37.8, 0, 39.2), yaw: -Math.PI / 2 },
+      starbucks:     { label: '大廳右側・STARFUCKS', pos: new THREE.Vector3(12.2, 0, 30.5), yaw: Math.PI / 2 },
+      sevenEleven:   { label: '西南側・向日葵超商', pos: new THREE.Vector3(-37.8, 0, 39.2), yaw: -Math.PI / 2 },
       artGallery:    { label: '西側・藝文廳 (向日葵醫院人文畫展)', pos: new THREE.Vector3(-37.8, 0, 27.4), yaw: -Math.PI / 2 },
       escalator:     { label: '中央橫向平行手扶梯大廳', pos: new THREE.Vector3(-5.8, 0, 15.0), yaw: Math.PI / 2 },
       atrium:        { label: '雙挑空採光中庭 (2F 挑空區)', pos: new THREE.Vector3(-22, 0, 15.5), yaw: Math.PI / 2 },
@@ -1012,60 +1012,79 @@
       const cx = 560;
       const cy = h * 0.47;
 
+      // 1. 暖金色光暈背景
       const haloGrad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 138);
-      haloGrad.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
-      haloGrad.addColorStop(1, 'rgba(16, 185, 129, 0)');
+      haloGrad.addColorStop(0, 'rgba(245, 158, 11, 0.28)');
+      haloGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
       ctx.fillStyle = haloGrad;
       ctx.beginPath();
       ctx.arc(cx, cy, 138, 0, Math.PI * 2);
       ctx.fill();
 
+      // 2. 外圈暖金細框
       ctx.strokeStyle = '#d97706';
       ctx.lineWidth = 5;
       ctx.beginPath();
       ctx.arc(cx, cy, 114, 0, Math.PI * 2);
       ctx.stroke();
 
-      const leafAngles = [-Math.PI / 4, Math.PI / 4, (3 * Math.PI) / 4, -(3 * Math.PI) / 4];
-      const leafColors = ['#10b981', '#059669', '#16a34a', '#0d9488'];
-
-      leafAngles.forEach((ang, idx) => {
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(ang);
-
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.bezierCurveTo(-44, -28, -56, -86, -18, -94);
-        ctx.bezierCurveTo(-4, -97, 0, -82, 0, -76);
-        ctx.bezierCurveTo(0, -82, 4, -97, 18, -94);
-        ctx.bezierCurveTo(56, -86, 44, -28, 0, 0);
-        ctx.closePath();
-
-        ctx.fillStyle = leafColors[idx];
-        ctx.fill();
-        ctx.strokeStyle = '#ecfdf5';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        ctx.restore();
-      });
-
+      // 3. 下方綠色花梗與葉片
       ctx.save();
       ctx.strokeStyle = '#15803d';
-      ctx.lineWidth = 8;
+      ctx.lineWidth = 9;
       ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.moveTo(cx, cy + 12);
-      ctx.quadraticCurveTo(cx + 12, cy + 78, cx + 38, cy + 112);
+      ctx.moveTo(cx, cy + 45);
+      ctx.quadraticCurveTo(cx + 12, cy + 84, cx + 36, cy + 112);
       ctx.stroke();
+
+      ctx.fillStyle = '#16a34a';
+      ctx.beginPath();
+      ctx.ellipse(cx + 28, cy + 88, 18, 9, -0.45, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
 
+      // 4. 外層向日葵花瓣（16 瓣）
+      const petalCount = 16;
+      for (let i = 0; i < petalCount; i++) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate((i * Math.PI * 2) / petalCount);
+        ctx.fillStyle = i % 2 === 0 ? '#fbbf24' : '#f59e0b';
+        ctx.beginPath();
+        ctx.ellipse(0, -68, 13, 32, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 5. 內層亮黃向日葵花瓣（交錯 16 瓣）
+      for (let i = 0; i < petalCount; i++) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(((i + 0.5) * Math.PI * 2) / petalCount);
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath();
+        ctx.ellipse(0, -56, 10, 24, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 6. 深琥珀色向日葵花蕊
+      ctx.fillStyle = '#78350f';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 44, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#b45309';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // 7. 中央白色醫療十字標誌
       ctx.save();
       ctx.shadowColor = 'rgba(6, 78, 59, 0.45)';
       ctx.shadowBlur = 10;
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(cx - 12, cy - 34, 24, 68);
-      ctx.fillRect(cx - 34, cy - 12, 68, 24);
+      ctx.fillRect(cx - 11, cy - 28, 22, 56);
+      ctx.fillRect(cx - 28, cy - 11, 56, 22);
       ctx.restore();
 
       const textX = 720;
@@ -1075,14 +1094,14 @@
       ctx.font = '900 128px "Noto Sans TC", sans-serif';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
-      ctx.fillText('幸 運 草 醫 院', textX + 5, cy - 22 + 5);
+      ctx.fillText('向 日 葵 醫 院', textX + 5, cy - 22 + 5);
 
       const titleGrad = ctx.createLinearGradient(textX, cy - 85, textX + 820, cy + 35);
       titleGrad.addColorStop(0, '#065f46');
       titleGrad.addColorStop(0.5, '#0f766e');
       titleGrad.addColorStop(1, '#14532d');
       ctx.fillStyle = titleGrad;
-      ctx.fillText('幸 運 草 醫 院', textX, cy - 22);
+      ctx.fillText('向 日 葵 醫 院', textX, cy - 22);
       ctx.restore();
 
       const lineGrad = ctx.createLinearGradient(textX, 0, textX + 860, 0);
@@ -1095,11 +1114,11 @@
       ctx.fillStyle = '#1e293b';
       ctx.font = '700 32px "Chakra Petch", sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText('CLOVER MEMORIAL HOSPITAL', textX + 2, cy + 92);
+      ctx.fillText('SUNFLOWER HOSPITAL', textX + 2, cy + 92);
 
       ctx.fillStyle = '#92400e';
       ctx.font = 'bold 26px "Noto Sans TC", sans-serif';
-      ctx.fillText('用心・創新・視病猶親  |  全人智慧醫療照護中心', textX + 490, cy + 92);
+      ctx.fillText('全人智慧醫療照護中心', textX + 490, cy + 92);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.encoding = THREE.sRGBEncoding;
@@ -1367,12 +1386,12 @@
 
       ctx.fillStyle = '#1e293b';
       ctx.font = '700 23px "Chakra Petch", sans-serif';
-      ctx.fillText('Clover Memorial Hospital', 184, 128);
+      ctx.fillText('Sunflower Hospital', 184, 128);
 
       ctx.fillStyle = '#7f1d1d';
       ctx.font = 'bold 20px "Noto Sans TC", sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('用心・創新・視病猶親  |  結合醫療、預防醫學與人文藝術的健康園區', w / 2, 266);
+      ctx.fillText('綜合醫療、預防醫學與人文藝術的健康園區', w / 2, 266);
 
       ctx.strokeStyle = '#78716c';
       ctx.lineWidth = 6;
@@ -1391,29 +1410,26 @@
       canvas.height = h;
       const ctx = canvas.getContext('2d');
 
-      const grad = ctx.createLinearGradient(0, 0, w, h);
-      grad.addColorStop(0, '#6ee7b7');
-      grad.addColorStop(0.5, '#a7f3d0');
-      grad.addColorStop(1, '#34d399');
+      const grad = ctx.createLinearGradient(0, 0, 512, 256);
+      grad.addColorStop(0, '#065f46');
+      grad.addColorStop(0.5, '#047857');
+      grad.addColorStop(1, '#064e3b');
       ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
+      ctx.fillRect(0, 0, 512, 256);
 
-      ctx.strokeStyle = '#ffffff';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.92)';
       ctx.lineWidth = 8;
-      ctx.strokeRect(6, 6, w - 12, h - 12);
+      ctx.strokeRect(20, 20, w - 40, h - 40);
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '900 54px "Noto Sans TC", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('服務 ♡ 台', w / 2, 58);
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+      ctx.shadowBlur = 6;
+      ctx.shadowOffsetY = 2;
 
-      ctx.font = '900 44px "Noto Sans TC", sans-serif';
-      ctx.fillText('轉診(檢)中心', w / 2, 124);
-
-      ctx.fillStyle = '#064e3b';
-      ctx.font = '700 22px "Chakra Petch", sans-serif';
-      ctx.fillText('Information & Referral Center', w / 2, 174);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 76px "Noto Sans TC", sans-serif';
+      ctx.fillText('服務台', w / 2, h / 2);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.encoding = THREE.sRGBEncoding;
@@ -1729,25 +1745,62 @@
       ctx.fillStyle = '#00843d';
       ctx.fillRect(0, h - 22, w, 22);
 
+      // --- 以下為替換後的向日葵圖示 ---
       ctx.fillStyle = '#00843d';
       ctx.fillRect(42, 82, 92, 82);
-      ctx.fillStyle = '#f97316';
-      ctx.font = '900 66px "Chakra Petch", sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('7', 88, 144);
-      ctx.fillStyle = '#ee2737';
-      ctx.font = '900 18px "Chakra Petch", sans-serif';
-      ctx.fillText('ELEVEN', 88, 158);
+
+      const cx = 88;
+      const cy = 123;
+
+      // 外圈橘黃色花瓣 (12片)
+      ctx.save();
+      ctx.translate(cx, cy);
+      for (let i = 0; i < 12; i++) {
+        ctx.rotate((Math.PI * 2) / 12);
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.ellipse(0, -21, 6, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // 內層亮黃色花瓣
+      for (let i = 0; i < 12; i++) {
+        ctx.rotate((Math.PI * 2) / 12);
+        ctx.fillStyle = '#fcd34d';
+        ctx.beginPath();
+        ctx.ellipse(0, -17, 3.8, 8.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // 深棕色花蕊與種子點
+      ctx.fillStyle = '#78350f';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 13, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#451a03';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 9, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#fbbf24';
+      for (let a = 0; a < 8; a++) {
+        const rad = (a * Math.PI) / 4;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(rad) * 5, cy + Math.sin(rad) * 5, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // --- 向日葵圖示結束 ---
 
       ctx.fillStyle = '#0f172a';
       ctx.font = '900 54px "Noto Sans TC", sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText('統購超商 8-ELEVEN', 162, 136);
+      ctx.fillText('向日葵超商', 162, 136);
 
       ctx.fillStyle = '#00843d';
       ctx.font = 'bold 24px "Chakra Petch", sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText('CITY CAFE・OPEN!・24HR', w - 36, 134);
+      ctx.fillText('CITY CAFE・24HR', w - 36, 134);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.encoding = THREE.sRGBEncoding;
@@ -2215,7 +2268,7 @@
       drawBlock(110, 355, 100, 42, '#e2e8f0', '西側挑空');
       drawBlock(302, 355, 100, 42, '#e2e8f0', '東側挑空');
       drawBlock(32, 405, 72, 42, '#c7d2fe', '藝文畫展');
-      drawBlock(32, 450, 72, 30, '#fdba74', '8-ELEVEN');
+      drawBlock(32, 450, 72, 30, '#fdba74', 'SUNFLOWER');
       drawBlock(108, 405, 58, 75, '#fbcfe8', '西門診');
       drawBlock(170, 405, 56, 75, '#fed7aa', '美美食品');
       drawBlock(286, 405, 58, 75, '#bbf7d0', 'STARFUCKS');
@@ -3205,7 +3258,7 @@
           maxX: gx + 0.52,
           minZ: 37.35,
           maxZ: 42.25,
-          label: '8-ELEVEN 商品貨架'
+          label: '向日葵超商 商品貨架'
         });
       });
 
@@ -3705,20 +3758,21 @@
         emissiveIntensity: 0.78,
         roughness: 0.25
       });
-      const referralSign = new THREE.Mesh(getCachedBoxGeom(1.75, 0.78, 0.14), mintSignMat);
-      referralSign.position.set(-6.95, 2.65, 35.5);
+      const referralSign = new THREE.Mesh(getCachedBoxGeom(0.68, 0.34, 0.03), mintSignMat);
+      referralSign.rotation.y = Math.PI / 2;
+      referralSign.position.set(-5.46, 0.62, 36.75);
       scene.add(referralSign);
 
-      addWall(-7.35, 36.35, 1.45, 0.85, 0.96, walnutWoodMat, '轉診中心服務台');
+      addWall(-5.90, 36.75, 0.85, 1.45, 0.96, walnutWoodMat, '轉診中心服務台');
 
-      const vitrineBase = new THREE.Mesh(getCachedBoxGeom(0.65, 0.65, 2.3), walnutWoodMat);
-      vitrineBase.position.set(-6.75, 0.325, 32.8);
-      const vitrineGlass = new THREE.Mesh(getCachedBoxGeom(0.62, 1.95, 2.26), glassMat);
-      vitrineGlass.position.set(-6.75, 1.62, 32.8);
-      const vitrineTop = new THREE.Mesh(getCachedBoxGeom(0.68, 0.12, 2.34), walnutWoodMat);
-      vitrineTop.position.set(-6.75, 2.65, 32.8);
-      scene.add(vitrineBase, vitrineGlass, vitrineTop);
-      colliders.push({ minX: -7.1, maxX: -6.4, minZ: 31.6, maxZ: 34.0, label: '藝文玻璃展示櫃' });
+     const vitrineBase = new THREE.Mesh(getCachedBoxGeom(0.65, 0.65, 2.3), walnutWoodMat);
+vitrineBase.position.set(-6.00, 0.325, 33.83);
+const vitrineGlass = new THREE.Mesh(getCachedBoxGeom(0.62, 1.95, 2.26), glassMat);
+vitrineGlass.position.set(-6.00, 1.62, 33.83);
+const vitrineTop = new THREE.Mesh(getCachedBoxGeom(0.68, 0.12, 2.34), walnutWoodMat);
+vitrineTop.position.set(-6.00, 2.65, 33.83);
+scene.add(vitrineBase, vitrineGlass, vitrineTop);
+colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝文玻璃展示櫃' });
 
       const spotGlowMat = new THREE.MeshStandardMaterial({
         color: 0xfffbeb,
@@ -3958,7 +4012,7 @@
         scene.add(monitor);
       }
 
-      addHangingSign(-0.5, 3.68, 7.5, 7.8, 0.96, '批價掛號處', '1~6號服務窗口  |  目前叫號：A0128', '#be185d', '#fbcfe8');
+      addHangingSign(-0.5, 3.68, 7.5, 7.8, 0.96, '批價掛號處', 'Registration and Cashier', '#be185d', '#fbcfe8');
       addHangingSign(-10.8, 3.45, 7.5, 2.6, 0.72, 'VIP 服務台', 'VIP SERVICE', '#1e3a8a', '#93c5fd');
 
       addWall(0, 2.4, 22.5, 3.2, 4.4, wallMarbleMintMat, '中庭核心形象牆與電梯區');
@@ -5551,9 +5605,9 @@
           role: '服務台・轉診中心',
           avatar: '💚',
           plateClass: 'pink-plate',
-          pos: new THREE.Vector3(-6.4, 0, 36.2),
+          pos: new THREE.Vector3(-6.85, 0, 36.75),
           yaw: Math.PI / 2,
-          patrolRadius: 0.8,
+          patrolRadius: 0.35,
           skinColor: 0xffdbac,
           hairColor: 0x1e293b,
           shirtColor: 0xfce7f3,
@@ -5564,10 +5618,10 @@
           shoeColor: 0xffffff,
           isFemale: true,
           hasNurseCap: true,
-          greeting: '您好！這裡是「服務 ♡ 台・轉診(檢)中心」。持基層診所轉診單就醫可享掛號優先服務喔！',
+          greeting: '您好！這裡是「服務台・轉診(檢)中心」。持基層診所轉診單就醫可享掛號優先服務喔！',
           options: [
             { label: '我要辦理轉診報到', reply: '沒問題！請出示您的轉診單與健保卡，我立即為您安排今日對應專科門診。' },
-            { label: '請問美美食品與STARFUCKS在哪？', reply: '大廳左側玻璃門進去就是「美美食品 M-MEI」，大廳右側則是「STARFUCKS」，西南側還有 8-ELEVEN 喔！' }
+            { label: '請問美美食品與STARFUCKS在哪？', reply: '大廳左側玻璃門進去就是「美美食品 M-MEI」，大廳右側則是「STARFUCKS」，西南側還有 向日葵超商 喔！' }
           ]
         },
         // [新增急診事件 NPC A] 急診暴力鬧事男子（持續揮拳攻擊護理師）
@@ -5884,7 +5938,7 @@
           pantsColor: 0x334155,
           shoeColor: 0xffffff,
           isFemale: true,
-          greeting: '每次陪家人來複診都會來大廳的星巴克買杯咖啡，邊聽鋼琴聲邊休息真的很放鬆。',
+          greeting: '每次陪家人來複診都會來大廳買杯咖啡，邊聽鋼琴聲邊休息真的很放鬆。',
           options: [
             { label: '推薦店內伴手禮馬克杯', reply: '旁邊胡桃木展示櫃有城市限定隨行杯與禮盒，質感很棒！' }
           ]
@@ -5892,7 +5946,7 @@
         {
           id: 'seven_clerk',
           name: '劉冠宇 店員',
-          role: '統購超商 8-ELEVEN',
+          role: '向日葵超商',
           avatar: '🏪',
           plateClass: 'amber-plate',
           pos: new THREE.Vector3(-40.2, 0, 42.95),
@@ -5906,7 +5960,7 @@
           uniformStyle: 'casual',
           pantsColor: 0x1e293b,
           shoeColor: 0x0f172a,
-          greeting: '歡迎光臨 8-ELEVEN 向日葵醫院門市！CITY CAFE 咖啡、關東煮、茶葉蛋與醫療照護用品 24 小時供應！',
+          greeting: '歡迎光臨 向日葵超商 向日葵醫院門市！CITY CAFE 咖啡、關東煮、茶葉蛋與醫療照護用品 24 小時供應！',
           options: [
             { label: '購買熱美式與茶葉蛋', reply: '謝謝惠顧！OPEN 會員累點完成，祝您健康順心！' }
           ]
@@ -6409,7 +6463,7 @@
           uniformStyle: 'casual',
           pantsColor: 0x1e293b,
           shoeColor: 0x475569,
-          greeting: '向日葵醫院 1F 全區都是平坦無障礙大理石地面，推輪椅看診、去星巴克或搭電梯都非常順暢！',
+          greeting: '向日葵醫院全區都是平坦無障礙大理石地面，推輪椅看診或搭電梯都非常順暢！',
           options: [
             { label: '需要幫忙推輪椅嗎？', reply: '謝謝你的熱心！我自己操作很順手，祝你今天愉快！' }
           ]
@@ -7539,8 +7593,8 @@ function checkTransportAndExitTriggers() {
       else if (z >= 4.2 && z <= 10.5 && Math.abs(x) <= 13.5) label = '中央大廳・批價掛號處 / 品牌形象牆';
       else if (x >= -5.5 && x <= 0.5 && z >= 12.2 && z <= 17.8) label = '中央橫向平行手扶梯大廳 (接觸可選樓層)';
       else if (x < -14.2 && x > -18.2 && z >= 26.8 && z <= 34.2) label = '大廳左側・美美食品 M-MEI 門市';
-      else if (x > 14.2 && x < 18.2 && z >= 26.8 && z <= 34.2) label = '大廳右側・STARFUCKS 星巴克門市';
-      else if (x < -36.2 && z >= 34.8) label = '西南側・統購超商 8-ELEVEN 門市';
+      else if (x > 14.2 && x < 18.2 && z >= 26.8 && z <= 34.2) label = '大廳右側・STARFUCKS';
+      else if (x < -36.2 && z >= 34.8) label = '西南側・向日葵超商';
       else if (x < -36.2 && z >= 20.2 && z < 34.8) label = '西側・藝文廳 (向日葵醫院人文畫展)';
       else if (Math.abs(x) <= 14.0 && z >= 20.5 && z <= 38.5) label = '挑空鋼琴大廳 (蓮花主燈 / 演奏鋼琴)';
       else if (x < -15.5 && z >= 11 && z <= 19) label = '西側雙挑空採光中庭';
