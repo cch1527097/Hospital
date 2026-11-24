@@ -6,6 +6,7 @@
   <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <!-- Three.js r128 CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Google Fonts: 繁體中文思源黑體 & GTA 風格數字字體 -->
@@ -75,6 +76,36 @@
   </style>
 </head>
 <body>
+
+<!-- 1. 未授權登入強制跳轉遮罩 -->
+<div id="auth-overlay" class="fixed inset-0 z-50 hidden flex-col items-center justify-center bg-slate-950/95 text-white p-6 text-center">
+  <div class="text-red-500 text-5xl mb-4">⚠️</div>
+  <h2 class="text-2xl font-bold mb-2">門禁驗證失敗：未刷卡登入</h2>
+  <p class="text-slate-300 mb-6">系統偵測到您尚未透過大廳門禁系統刷卡驗證，將於 2 秒後自動返回大廳...</p>
+</div>
+
+<!-- 左下角上方：員工識別證與 8F 多人即時聊天室面板 -->
+<div id="mp-panel-8f" class="fixed bottom-44 sm:bottom-52 left-3 sm:left-4 z-30 w-72 sm:w-80 rounded-2xl hud-glass border border-teal-400/40 shadow-2xl overflow-hidden flex flex-col">
+  <div class="px-3 py-2 bg-slate-900/90 border-b border-white/10 flex items-center justify-between">
+    <div class="flex items-center gap-2 min-w-0">
+      <span id="online-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
+      <div class="truncate">
+        <div class="text-[11px] font-black text-white truncate" id="staff-display">驗證中...</div>
+        <div class="text-[10px] text-teal-300 font-mono truncate" id="peer-status">連線至 8F 頻道中...</div>
+      </div>
+    </div>
+    <button onclick="window.location.href='index.html'" class="px-2 py-0.5 rounded bg-rose-600/80 hover:bg-rose-500 text-[10px] font-bold text-white transition shrink-0">登出</button>
+  </div>
+
+  <div id="mp-chat-log" class="h-28 overflow-y-auto p-2.5 space-y-1.5 text-[11px] text-slate-100 select-text">
+    <div class="text-slate-400 text-[10px]">系統：歡迎進入 8F 會議中心與資訊處，所有在線人員將即時同步位置與對話。</div>
+  </div>
+
+  <form id="mp-chat-form" class="p-1.5 bg-slate-900/80 border-t border-white/10 flex gap-1.5">
+    <input id="mp-chat-input" type="text" maxlength="80" placeholder="輸入 8F 頻道訊息 (Enter發送)..." class="flex-1 bg-slate-950/90 border border-white/15 rounded-lg px-2.5 py-1 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-teal-400" />
+    <button type="submit" class="px-2.5 py-1 rounded-lg bg-teal-600 hover:bg-teal-500 text-xs font-bold text-white transition">發送</button>
+  </form>
+</div>
   <!-- 主 3D 渲染畫布 -->
   <canvas id="game-canvas"></canvas>
 
@@ -252,6 +283,448 @@
   </div>
 
   <script>
+
+/// 職業對應代表色（用於多人連線 3D 替身外觀）
+const ROLE_COLOR_MAP = {
+  nurse: 0xf472b6,       // 護理師：粉紅
+  doctor: 0x38bdf8,      // 醫師：天藍
+  it_engineer: 0x34d399, // 資訊工程師：翠綠
+  it: 0x34d399,
+  educator: 0xfbbf24     // 衛教師：琥珀黃
+};
+
+let currentUser = null;
+
+function verifyAuthSession() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const sessionRaw = sessionStorage.getItem('vh_user_session') || localStorage.getItem('vh_user_session');
+  let userData = null;
+
+  // 1. 優先讀取從 index.html 刷卡存入的 session 資料
+  if (sessionRaw) {
+    try {
+      const parsed = JSON.parse(sessionRaw);
+      const cardKey = parsed.cardNumber || parsed.card || parsed.cardId || parsed.id;
+      if (cardKey) {
+        const rId = parsed.roleId || 'nurse';
+        userData = {
+          card: cardKey,
+          name: parsed.staffName || parsed.name || '授權人員',
+          roleId: rId,
+          roleName: parsed.roleName || '執勤人員',
+          color: parsed.color || ROLE_COLOR_MAP[rId] || 0x38bdf8
+        };
+      }
+    } catch (e) {}
+  }
+
+  // 2. 若無 sessionStorage，則檢查網址參數 (?card=xxx&role=xxx&name=xxx)
+  if (!userData && urlParams.get('card')) {
+    const cardKey = urlParams.get('card');
+    const rId = urlParams.get('role') || 'nurse';
+    const roleNameMap = {
+      nurse: '護理師',
+      doctor: '醫師',
+      it_engineer: '資訊工程師',
+      educator: '衛教師'
+    };
+    userData = {
+      card: cardKey,
+      name: urlParams.get('name') || '授權人員',
+      roleId: rId,
+      roleName: roleNameMap[rId] || '執勤人員',
+      color: ROLE_COLOR_MAP[rId] || 0x38bdf8
+    };
+  }
+
+  // 3. 若完全沒有任何登入紀錄，才顯示警告並返回 index.html
+  if (!userData || !userData.card) {
+    const overlay = document.getElementById('auth-overlay');
+    if (overlay) {
+      overlay.classList.remove('hidden');
+      overlay.classList.add('flex');
+    }
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 2000);
+    return false;
+  }
+
+  // 確保跨樓層切換時資料持續保存
+  currentUser = userData;
+  try {
+    sessionStorage.setItem('vh_user_session', JSON.stringify({
+      cardNumber: currentUser.card,
+      staffName: currentUser.name,
+      roleId: currentUser.roleId,
+      roleName: currentUser.roleName,
+      color: currentUser.color
+    }));
+  } catch (e) {}
+
+  const staffDisplayEl = document.getElementById('staff-display');
+  if (staffDisplayEl) {
+    staffDisplayEl.textContent = `${currentUser.roleName}｜${currentUser.name} (${currentUser.card})`;
+  }
+  return true;
+}
+
+// 頁面載入時立即驗證，失敗則中斷後續執行
+if (!verifyAuthSession()) {
+  throw new Error('Unauthorized access - redirecting to index.html');
+}
+
+const ROOM_HOST_ID = 'sunflower-hospital-8f-main-lobby';
+let peer = null;
+let isHost = false;
+let hostConn = null;
+const clientConns = {};      
+const remotePlayers = {};    
+  const PEER_CONFIG = {
+  config: {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' }
+    ]
+  }
+};
+
+const ROLE_PROFILES = {
+  nurse: {
+    title: '護理師',
+    shirtColor: 0x34d399,   // 薄荷綠護理服
+    pantsColor: 0xf8fafc,   // 白色長褲
+    coatColor: null
+  },
+  doctor: {
+    title: '醫師',
+    shirtColor: 0x38bdf8,   // 天藍刷手服內搭
+    pantsColor: 0x1e293b,   // 深色長褲
+    coatColor: 0xf8fafc     // 醫師白袍
+  },
+  it_engineer: {
+    title: '資訊工程師',
+    shirtColor: 0xf97316,   // 橘黑拼色外套
+    pantsColor: 0x1e293b,
+    coatColor: null
+  },
+  educator: {
+    title: '衛教師',
+    shirtColor: 0xfbbf24,   // 暖黃色系服裝
+    pantsColor: 0x334155,
+    coatColor: null
+  }
+};
+
+// 讀取登入資訊（優先讀 URL 參數，其次讀 sessionStorage / localStorage）
+function getCurrentPlayerIdentity() {
+  const params = new URLSearchParams(window.location.search);
+  let session = {};
+  try {
+    session = JSON.parse(sessionStorage.getItem('vh_user_session') || '{}');
+  } catch (e) {}
+
+  const roleId = params.get('role') || session.roleId || localStorage.getItem('vh_last_role') || 'nurse';
+  const staffName = params.get('name') || session.staffName || localStorage.getItem('vh_last_name') || '員工';
+  const cardNumber = params.get('card') || session.cardNumber || localStorage.getItem('vh_last_card') || '';
+  const profile = ROLE_PROFILES[roleId] || ROLE_PROFILES.nurse;
+
+  return {
+    roleId,
+    roleName: profile.title,
+    staffName,
+    cardNumber,
+    profile
+  };
+}
+
+const currentPlayer = getCurrentPlayerIdentity();
+
+function initMultiplayerPeerJS() {
+  peer = new Peer(ROOM_HOST_ID, PEER_CONFIG);
+
+  peer.on('open', (id) => {
+    isHost = true;
+    updateConnectionUI('已建立 8F 伺服器 (主機)', true);
+  });
+
+  peer.on('error', (err) => {
+    if (err.type === 'unavailable-id') {
+      isHost = false;
+      peer = new Peer(PEER_CONFIG);
+      peer.on('open', () => {
+        hostConn = peer.connect(ROOM_HOST_ID);
+        setupClientConnection(hostConn);
+      });
+    } else {
+      updateConnectionUI(`連線異常 (${err.type})`, false);
+    }
+  });
+
+  // Host 接收其他玩家的連線
+  peer.on('connection', (conn) => {
+    if (!isHost) return;
+    clientConns[conn.peer] = conn;
+
+    conn.on('open', () => {
+      if (player && player.mesh && currentUser) {
+        conn.send({
+          type: 'sync',
+          id: ROOM_HOST_ID,
+          name: currentUser.name,
+          roleName: currentUser.roleName,
+          color: currentUser.color,
+          x: player.mesh.position.x,
+          y: player.mesh.position.y,
+          z: player.mesh.position.z,
+          rotY: player.mesh.rotation.y
+        });
+      }
+      Object.entries(remotePlayers).forEach(([rid, rp]) => {
+        conn.send({
+          type: 'sync',
+          id: rid,
+          name: rp.name,
+          roleName: rp.roleName || '執勤人員',
+          color: rp.color || 0x38bdf8,
+          x: rp.targetPos.x,
+          y: rp.targetPos.y,
+          z: rp.targetPos.z,
+          rotY: rp.targetRotY
+        });
+      });
+    });
+
+    conn.on('data', (data) => {
+      if (data.type === 'sync') {
+        handleRemotePlayerData(conn.peer, data);
+        broadcastToClients({ ...data, id: conn.peer }, conn.peer);
+      } else if (data.type === 'chat') {
+        appendChatMessage(data.name, data.roleName, data.text);
+        broadcastToClients({ ...data, id: conn.peer }, conn.peer);
+      }
+    });
+
+    conn.on('close', () => {
+      delete clientConns[conn.peer];
+      removeRemotePlayer(conn.peer);
+      broadcastToClients({ type: 'leave', id: conn.peer });
+    });
+  });
+}
+
+function setupClientConnection(conn) {
+  conn.on('open', () => {
+    updateConnectionUI('已連線至 8F 多人頻道', true);
+  });
+  conn.on('data', (data) => {
+    if (data.type === 'sync' && data.id !== peer.id) {
+      handleRemotePlayerData(data.id, data);
+    } else if (data.type === 'chat' && data.id !== peer.id) {
+      appendChatMessage(data.name, data.roleName, data.text);
+    } else if (data.type === 'leave') {
+      removeRemotePlayer(data.id);
+    }
+  });
+  conn.on('close', () => {
+    updateConnectionUI('與主機斷線，嘗試重連...', false);
+  });
+}
+
+function broadcastToClients(payload, excludePeerId = null) {
+  Object.keys(clientConns).forEach((pid) => {
+    if (pid !== excludePeerId && clientConns[pid].open) {
+      clientConns[pid].send(payload);
+    }
+  });
+}
+
+function handleRemotePlayerData(id, data) {
+  if (!scene || !id) return;
+  const safeY = (typeof data.y === 'number' && data.y >= FLOOR_Y[8] - 0.5) ? data.y : FLOOR_Y[8];
+
+  if (!remotePlayers[id]) {
+    const rig = createHumanoidMesh({
+      coatColor: data.color || 0x38bdf8,
+      pantsColor: 0x0f172a,
+      isPlayer: true
+    });
+
+    const displayName = data.name || '連線人員';
+    const displayRole = data.roleName || '執勤人員';
+    const badgeColorHex = '#' + new THREE.Color(data.color || 0x38bdf8).getHexString();
+    const badge = createNameBadgeSprite(displayName, displayRole, badgeColorHex);
+    badge.position.set(0, 2.28, 0);
+    rig.group.add(badge);
+
+    rig.group.position.set(data.x || 0, safeY, data.z || 0);
+    scene.add(rig.group);
+
+    remotePlayers[id] = {
+      mesh: rig.group,
+      rig: rig,
+      badge: badge,
+      targetPos: new THREE.Vector3(data.x || 0, safeY, data.z || 0),
+      targetRotY: data.rotY || 0,
+      walkCycle: 0,
+      name: displayName,
+      roleName: displayRole,
+      color: data.color || 0x38bdf8
+    };
+    updateOnlineCount();
+  }
+
+  remotePlayers[id].targetPos.set(data.x || 0, safeY, data.z || 0);
+  remotePlayers[id].targetRotY = data.rotY || 0;
+}
+
+function updateRemotePlayers() {
+  Object.values(remotePlayers).forEach((rp) => {
+    const moveDist = rp.mesh.position.distanceTo(rp.targetPos);
+    rp.mesh.position.lerp(rp.targetPos, 0.2);
+
+    let diff = rp.targetRotY - rp.mesh.rotation.y;
+    while (diff > Math.PI) diff -= Math.PI * 2;
+    while (diff < -Math.PI) diff += Math.PI * 2;
+    rp.mesh.rotation.y += diff * 0.25;
+
+    if (rp.badge) rp.badge.visible = showNpcLabels;
+
+    if (rp.rig) {
+      if (moveDist > 0.015) {
+        rp.walkCycle += 0.22;
+        const swing = Math.sin(rp.walkCycle) * 0.65;
+        rp.rig.leftHip.rotation.x = swing;
+        rp.rig.rightHip.rotation.x = -swing;
+        rp.rig.leftKnee.rotation.x = Math.max(0, -swing) * 0.7;
+        rp.rig.rightKnee.rotation.x = Math.max(0, swing) * 0.7;
+        rp.rig.leftShoulder.rotation.x = -swing * 0.5;
+        rp.rig.rightShoulder.rotation.x = swing * 0.5;
+      } else {
+        rp.rig.leftHip.rotation.x *= 0.8;
+        rp.rig.rightHip.rotation.x *= 0.8;
+        rp.rig.leftShoulder.rotation.x *= 0.8;
+        rp.rig.rightShoulder.rotation.x *= 0.8;
+      }
+    }
+  });
+}
+
+let lastSyncTime = 0;
+
+function syncMyPosition(mesh) {
+  if (!mesh || !peer || !currentUser) return;
+  const now = performance.now();
+  if (now - lastSyncTime < 65) return;
+  lastSyncTime = now;
+
+  const myId = isHost ? ROOM_HOST_ID : (peer ? peer.id : null);
+  if (!myId) return;
+
+  const payload = {
+    type: 'sync',
+    id: myId,
+    name: currentUser.name,
+    roleName: currentUser.roleName,
+    color: currentUser.color,
+    x: Number(mesh.position.x.toFixed(3)),
+    y: Number(mesh.position.y.toFixed(3)),
+    z: Number(mesh.position.z.toFixed(3)),
+    rotY: Number(mesh.rotation.y.toFixed(3))
+  };
+
+  if (isHost) {
+    broadcastToClients(payload);
+  } else if (hostConn && hostConn.open) {
+    hostConn.send(payload);
+  }
+}
+
+function removeRemotePlayer(id) {
+  const rp = remotePlayers[id];
+  if (!rp) return;
+  scene.remove(rp.mesh);
+  delete remotePlayers[id];
+  updateOnlineCount();
+}
+
+function updateConnectionUI(statusText, isConnected) {
+  const statusEl = document.getElementById('peer-status');
+  const dotEl = document.getElementById('online-dot');
+  if (statusEl) statusEl.textContent = statusText;
+  if (dotEl) {
+    dotEl.className = isConnected
+      ? 'w-2.5 h-2.5 rounded-full bg-emerald-400'
+      : 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse';
+  }
+  updateOnlineCount();
+}
+
+function updateOnlineCount() {
+  const statusEl = document.getElementById('peer-status');
+  if (!statusEl) return;
+  const totalOnline = Object.keys(remotePlayers).length + 1;
+  const roleLabel = isHost ? '8F 主機' : '8F 頻道';
+  statusEl.textContent = `${roleLabel}・目前線上 ${totalOnline} 人`;
+}
+
+function appendChatMessage(senderName, senderRole, text, isSystem = false) {
+  const logEl = document.getElementById('mp-chat-log');
+  if (!logEl) return;
+  const row = document.createElement('div');
+  if (isSystem) {
+    row.className = 'text-amber-300/90 text-[10px]';
+    row.textContent = `系統：${text}`;
+  } else {
+    row.className = 'leading-snug break-words';
+    row.innerHTML = `<span class="font-bold text-teal-300">[${senderRole}] ${senderName}：</span><span></span>`;
+    row.querySelector('span:last-child').textContent = text;
+  }
+  logEl.appendChild(row);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+// 綁定聊天室發送事件
+window.addEventListener('DOMContentLoaded', () => {
+  const chatForm = document.getElementById('mp-chat-form');
+  const chatInput = document.getElementById('mp-chat-input');
+  if (chatForm && chatInput) {
+    // 避免打字時觸發 WASD 移動或 J/K 攻擊
+    chatInput.addEventListener('keydown', (e) => e.stopPropagation());
+    chatInput.addEventListener('keyup', (e) => e.stopPropagation());
+
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const msg = chatInput.value.trim();
+      if (!msg || !currentUser) return;
+      chatInput.value = '';
+
+      appendChatMessage(currentUser.name, currentUser.roleName, msg);
+      const chatPayload = {
+        type: 'chat',
+        id: peer ? peer.id : 'local',
+        name: currentUser.name,
+        roleName: currentUser.roleName,
+        text: msg
+      };
+      if (isHost) {
+        broadcastToClients(chatPayload);
+      } else if (hostConn && hostConn.open) {
+        hostConn.send(chatPayload);
+      }
+    });
+  }
+});
+
+window.addEventListener('beforeunload', () => {
+  if (!peer) return;
+  if (isHost) {
+    broadcastToClients({ type: 'leave', id: peer.id });
+  } else if (hostConn && hostConn.open) {
+    hostConn.send({ type: 'leave', id: peer.id });
+  }
+  peer.destroy();
+});
     /**
      * ============================================================================
      * 向日葵醫院-模擬人生 頂樓醫療與會議資訊空間 3D 實境（獨立揮砍判定版）
@@ -2992,10 +3465,10 @@
 
     function spawnAllNpcs() {
       const pRig = createHumanoidMesh({
-        coatColor: 0x0284c7,
-        pantsColor: 0x0f172a,
-        isPlayer: true
-      });
+  coatColor: (currentUser && currentUser.color) ? currentUser.color : 0x0284c7,
+  pantsColor: 0x0f172a,
+  isPlayer: true
+});
       pRig.group.position.copy(player.pos);
       pRig.group.rotation.y = player.yaw;
       scene.add(pRig.group);
@@ -4812,6 +5285,7 @@
       buildFloor8();
       spawnAllNpcs();
       bindAllControls();
+      initMultiplayerPeerJS();
 
       window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -4838,6 +5312,8 @@
       updateNpcs(dt, elapsed);
       updateVisualEffects(dt, elapsed);
       renderMinimap();
+      syncMyPosition(player.mesh);
+      updateRemotePlayers();
 
       renderer.render(scene, camera);
     }
