@@ -6,6 +6,7 @@
   <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <!-- Three.js r128 穩定 CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Google Fonts: 繁體中文思源黑體 & GTA 風格數字字體 -->
@@ -103,6 +104,27 @@
       <span class="absolute right-0 h-0.5 w-1.5 bg-white/80"></span>
     </div>
   </div>
+
+   <!-- 3F 多人連線狀態與聊天室面板 -->
+<div id="multiplayer-panel" class="fixed bottom-44 sm:bottom-52 left-4 z-20 w-64 sm:w-72 hud-glass rounded-xl p-2.5 text-white shadow-xl pointer-events-auto border border-teal-400/35">
+  <div class="flex items-center justify-between border-b border-white/10 pb-1.5 mb-1.5">
+    <div class="flex items-center gap-1.5">
+      <span id="mp-status-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+      <span id="mp-status-text" class="text-[11px] font-bold text-teal-300">正在連線至 3F 病房區...</span>
+    </div>
+    <span id="mp-online-count" class="px-1.5 py-0.5 rounded bg-teal-500/20 text-[10px] font-bold text-teal-300">1 人在線</span>
+  </div>
+  <!-- 3F 線上玩家名單 -->
+  <div id="mp-player-list" class="text-[10px] text-slate-300 max-h-14 overflow-y-auto space-y-0.5 mb-1.5"></div>
+  <!-- 3F 簡易即時頻道 -->
+  <div id="mp-chat-box" class="h-16 overflow-y-auto bg-black/40 rounded p-1.5 text-[11px] space-y-1 mb-1.5 select-text">
+    <div class="text-slate-400">系統：歡迎進入 3F 病房樓層！</div>
+  </div>
+  <form id="mp-chat-form" class="flex gap-1">
+    <input id="mp-chat-input" type="text" maxlength="50" placeholder="按 Enter 發送訊息..." class="flex-1 bg-slate-900/90 border border-white/15 rounded px-2 py-1 text-[11px] text-white focus:border-teal-400 focus:outline-none" />
+    <button type="submit" class="px-2 py-1 rounded bg-teal-600 hover:bg-teal-500 text-[11px] font-bold cursor-pointer">送出</button>
+  </form>
+</div>
 
   <!-- 樓層 HTML 自動連結跳轉過場動畫遮罩 -->
   <div id="floor-redirect-overlay" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-md text-center px-6">
@@ -249,6 +271,317 @@
   </div>
 
   <script>
+
+    // ==========================================================================
+// 0. 嚴格門禁驗證：必須從 index.html 刷卡登入且核對授權員工名單，否則退回登入頁
+// ==========================================================================
+const AUTHORIZED_STAFF_3F = {
+  '18445': { name: '李珈豪' },
+  '16661': { name: '陳育倫' },
+  '10047': { name: '許博捷' },
+  '601471': { name: '陳永育' },
+  '6513': { name: '李承州' },
+  '11110': { name: '林佳蘭' },
+  'TEST': { name: '實習生' }
+};
+
+const loginParams3F = new URLSearchParams(window.location.search);
+let currentUserSession3F = null;
+try {
+  currentUserSession3F = JSON.parse(sessionStorage.getItem('vh_user_session'));
+} catch (e) {}
+
+const authCard = (loginParams3F.get('card') || (currentUserSession3F && currentUserSession3F.cardNumber) || '').trim().toUpperCase();
+const authRole = (loginParams3F.get('role') || (currentUserSession3F && currentUserSession3F.roleId) || '').trim();
+const staffRecord3F = AUTHORIZED_STAFF_3F[authCard];
+
+// 檢查：1.是否有卡號 2.是否在授權名單內 3.是否有選擇職業身分
+if (!authCard || !staffRecord3F || !authRole) {
+  alert('⛔ 門禁驗證失敗：請先至首頁刷卡登入授權員工卡號，方可進入 3F 並啟動多人連線！');
+  window.location.replace('index.html');
+  throw new Error('Unauthorized access: redirected to index.html');
+}
+
+// 通過驗證：以授權名單中的真實姓名為準，並同步更新 sessionStorage 供樓層切換延續
+const authName = staffRecord3F.name;
+try {
+  sessionStorage.setItem('vh_user_session', JSON.stringify({
+    roleId: authRole,
+    staffName: authName,
+    cardNumber: authCard,
+    loginTime: (currentUserSession3F && currentUserSession3F.loginTime) || new Date().toISOString()
+  }));
+} catch (e) {}
+
+// ==========================================================================
+// 3F 室內 PeerJS 免伺服器多人連線同步系統 (獨立 3F 頻道)
+// ==========================================================================
+const ROOM_HOST_ID_3F = 'sunflower-hospital-3f-indoor-v1';
+const remotePlayers3F = new Map();
+let peer3F = null;
+let isHost3F = false;
+let hostConn3F = null;
+const clientConns3F = new Map();
+
+const ROLE_STYLES_3F = {
+  educator:    { label: '衛教師', coat: 0xf59e0b, pants: 0x1e293b },
+  it_engineer: { label: '資訊工程師', coat: 0xd9381e, pants: 0x162b3d },
+  doctor:      { label: '主治醫師', coat: 0xf8fafc, pants: 0x1e293b },
+  nurse:       { label: '護理師', coat: 0x14b8a6, pants: 0x1e3a5f },
+  patient:     { label: '門診訪客', coat: 0xf1f5f9, pants: 0x111827 },
+  pharmacist:  { label: '藥師', coat: 0xf1f5f9, pants: 0x1e293b },
+  emt:         { label: '救護技術員', coat: 0xb91c1c, pants: 0x0f172a },
+  med_tech:    { label: '醫事檢驗師', coat: 0xe2e8f0, pants: 0x1e293b },
+  security:    { label: '園區警衛', coat: 0x0f172a, pants: 0x090d16 }
+};
+
+function createNameTag3F(staffName, roleLabel) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = 'rgba(10, 17, 26, 0.82)';
+  ctx.beginPath();
+  ctx.roundRect(46, 18, 420, 92, 24);
+  ctx.fill();
+  ctx.strokeStyle = '#2dd4bf';
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
+  ctx.font = '900 34px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#fbbf24';
+  ctx.textAlign = 'center';
+  ctx.fillText(staffName, 256, 58);
+
+  ctx.font = 'bold 22px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#5eead4';
+  ctx.fillText(roleLabel, 256, 94);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(2.1, 0.52, 1);
+  sprite.position.set(0, 2.15, 0);
+  return sprite;
+}
+
+function buildRemoteCharacter3F(roleId) {
+  const style = ROLE_STYLES_3F[roleId] || ROLE_STYLES_3F.nurse;
+  // 直接複用 3F_2.html 內建的精緻關節角色建構器
+  const rig = createArticulatedCharacterMesh({
+    skinColor: 0xf1c29b,
+    shirtColor: style.coat,
+    pantsColor: style.pants,
+    shoeColor: 0xf8fafc,
+    hairColor: 0x1e293b,
+    roleType: roleId === 'doctor' ? 'doctor' : (roleId === 'nurse' ? 'nurse' : 'civilian')
+  });
+  return { group: rig.root, parts: rig, roleLabel: style.label };
+}
+
+function upsertRemotePlayer3F(peerId, state) {
+  if (!peerId || peerId === (peer3F && peer3F.id) || !scene) return;
+
+  let rp = remotePlayers3F.get(peerId);
+  if (!rp) {
+    const built = buildRemoteCharacter3F(state.roleId);
+    const tag = createNameTag3F(state.name || '院內同仁', built.roleLabel);
+    built.group.add(tag);
+    built.group.position.set(state.x || -28.2, state.y || 9.2, state.z || 32.2);
+    scene.add(built.group);
+
+    rp = {
+      id: peerId,
+      group: built.group,
+      parts: built.parts,
+      name: state.name,
+      card: state.card,
+      targetPos: new THREE.Vector3(state.x, state.y, state.z),
+      targetYaw: state.yaw || 0,
+      isMoving: false,
+      walkCycle: 0
+    };
+    remotePlayers3F.set(peerId, rp);
+    appendChat3F('系統', `${state.name} (${built.roleLabel}) 進入了 3F 病房區！`, 'text-teal-300');
+    updateOnlineList3F();
+  }
+
+  rp.targetPos.set(state.x, state.y, state.z);
+  rp.targetYaw = state.yaw;
+  rp.isMoving = state.isMoving;
+}
+
+function removeRemotePlayer3F(peerId) {
+  const rp = remotePlayers3F.get(peerId);
+  if (rp) {
+    scene.remove(rp.group);
+    appendChat3F('系統', `${rp.name} 已離開 3F 病房區。`, 'text-slate-400');
+    remotePlayers3F.delete(peerId);
+    updateOnlineList3F();
+  }
+}
+
+function appendChat3F(sender, text, colorClass = 'text-white') {
+  const box = document.getElementById('mp-chat-box');
+  if (!box) return;
+  const div = document.createElement('div');
+  div.className = colorClass;
+  div.innerHTML = `<span class="font-bold text-amber-300">[${sender}]</span> ${text}`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function updateOnlineList3F() {
+  const countEl = document.getElementById('mp-online-count');
+  const listEl = document.getElementById('mp-player-list');
+  const total = remotePlayers3F.size + 1;
+  if (countEl) countEl.textContent = `${total} 人在線`;
+  if (listEl) {
+    let html = `<div class="text-teal-300 font-bold">● ${authName} (我 • ${authCard})</div>`;
+    remotePlayers3F.forEach((rp) => {
+      html += `<div>● ${rp.name} (${rp.card || '同仁'})</div>`;
+    });
+    listEl.innerHTML = html;
+  }
+}
+
+function broadcastFromHost3F(packet, excludePeerId = null) {
+  clientConns3F.forEach((conn, id) => {
+    if (id !== excludePeerId && conn.open) {
+      conn.send(packet);
+    }
+  });
+}
+
+function initMultiplayer3F() {
+  const statusDot = document.getElementById('mp-status-dot');
+  const statusText = document.getElementById('mp-status-text');
+  updateOnlineList3F();
+
+  peer3F = new Peer(ROOM_HOST_ID_3F, { debug: 0 });
+
+  peer3F.on('open', () => {
+    isHost3F = true;
+    if (statusDot) statusDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+    if (statusText) statusText.textContent = '3F 病房連線正常 (主節點)';
+    appendChat3F('系統', `已開啟 3F 病房連線頻道，歡迎 ${authName}！`, 'text-teal-300');
+  });
+
+  peer3F.on('connection', (conn) => {
+    clientConns3F.set(conn.peer, conn);
+    conn.on('data', (data) => {
+      if (data.type === 'state') {
+        upsertRemotePlayer3F(conn.peer, data.payload);
+        broadcastFromHost3F(data, conn.peer);
+      } else if (data.type === 'chat') {
+        appendChat3F(data.sender, data.text);
+        broadcastFromHost3F(data, conn.peer);
+      }
+    });
+    conn.on('close', () => {
+      clientConns3F.delete(conn.peer);
+      removeRemotePlayer3F(conn.peer);
+      broadcastFromHost3F({ type: 'leave', peerId: conn.peer });
+    });
+  });
+
+  peer3F.on('error', (err) => {
+    if (err.type === 'unavailable-id') {
+      peer3F.destroy();
+      peer3F = new Peer(undefined, { debug: 0 });
+      peer3F.on('open', () => {
+        hostConn3F = peer3F.connect(ROOM_HOST_ID_3F, { reliable: false });
+        hostConn3F.on('open', () => {
+          if (statusDot) statusDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+          if (statusText) statusText.textContent = '3F 病房連線正常 (已加入)';
+          appendChat3F('系統', '已成功連線至 3F 病房樓層！', 'text-teal-300');
+        });
+        hostConn3F.on('data', (data) => {
+          if (data.type === 'state') {
+            upsertRemotePlayer3F(data.peerId, data.payload);
+          } else if (data.type === 'chat') {
+            appendChat3F(data.sender, data.text);
+          } else if (data.type === 'leave') {
+            removeRemotePlayer3F(data.peerId);
+          }
+        });
+        hostConn3F.on('close', () => {
+          if (statusDot) statusDot.className = 'w-2 h-2 rounded-full bg-rose-500';
+          if (statusText) statusText.textContent = '與 3F 主機斷線';
+        });
+      });
+    }
+  });
+
+  const chatForm = document.getElementById('mp-chat-form');
+  const chatInput = document.getElementById('mp-chat-input');
+  if (chatForm && chatInput) {
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const msg = chatInput.value.trim();
+      if (!msg) return;
+      chatInput.value = '';
+      appendChat3F(authName, msg, 'text-sky-200');
+      const packet = { type: 'chat', sender: authName, text: msg, peerId: peer3F.id };
+      if (isHost3F) {
+        broadcastFromHost3F(packet);
+      } else if (hostConn3F && hostConn3F.open) {
+        hostConn3F.send(packet);
+      }
+    });
+  }
+
+  // 每 60ms 同步一次自身在 3F 的座標與朝向
+  setInterval(() => {
+    if (!peer3F || !peer3F.id || !player.mesh) return;
+    const isMoving = Math.hypot(player.vel.x, player.vel.z) > 0.25;
+    const packet = {
+      type: 'state',
+      peerId: peer3F.id,
+      payload: {
+        x: Number(player.pos.x.toFixed(2)),
+        y: Number(player.pos.y.toFixed(2)),
+        z: Number(player.pos.z.toFixed(2)),
+        yaw: Number(player.yaw.toFixed(2)),
+        roleId: authRole,
+        name: authName,
+        card: authCard,
+        isMoving
+      }
+    };
+    if (isHost3F) {
+      broadcastFromHost3F(packet);
+    } else if (hostConn3F && hostConn3F.open) {
+      hostConn3F.send(packet);
+    }
+  }, 60);
+}
+
+function updateRemotePlayers3F(dt) {
+  remotePlayers3F.forEach((rp) => {
+    rp.group.position.lerp(rp.targetPos, Math.min(1, dt * 12));
+    let diff = rp.targetYaw - rp.group.rotation.y;
+    while (diff < -Math.PI) diff += Math.PI * 2;
+    while (diff > Math.PI) diff -= Math.PI * 2;
+    rp.group.rotation.y += diff * Math.min(1, dt * 12);
+
+    if (rp.isMoving) {
+      rp.walkCycle += dt * 10;
+      const swing = Math.sin(rp.walkCycle) * 0.55;
+      rp.parts.leftHip.rotation.x = swing;
+      rp.parts.rightHip.rotation.x = -swing;
+      rp.parts.leftShoulder.rotation.x = -swing * 0.75;
+      rp.parts.rightShoulder.rotation.x = swing * 0.75;
+    } else {
+      rp.parts.leftHip.rotation.x *= 0.85;
+      rp.parts.rightHip.rotation.x *= 0.85;
+      rp.parts.leftShoulder.rotation.x *= 0.85;
+      rp.parts.rightShoulder.rotation.x *= 0.85;
+    }
+  });
+}
+
     /**
      * ============================================================================
      * 向日葵醫院-模擬人生 (高效能批次合併 + 樓層視錐剔除 + 靜態陰影烘焙優化版)
@@ -6097,6 +6430,7 @@ thyroidBenches.forEach((b, bIdx) => {
       }
 
       updatePlayerAndCamera(dt);
+      updateRemotePlayers3F(dt);
       updateNPCs(dt);
 
       // 小地圖每 3 幀更新一次 (~20fps)，搭配離屏底圖快取極致絲滑
@@ -6136,6 +6470,12 @@ thyroidBenches.forEach((b, bIdx) => {
       createHospitalCharacters();
       bindControls();
       updateCombatHud();
+
+      if (player.mesh) {
+  const roleInfo = ROLE_STYLES_3F[authRole] || ROLE_STYLES_3F.nurse;
+  player.mesh.add(createNameTag3F(`${authName} (${authCard})`, roleInfo.label));
+}
+initMultiplayer3F();
 
       // 初始化樓層剔除狀態並烘焙一次靜態建築陰影
       updateFloorVisibilityCulling(true);
