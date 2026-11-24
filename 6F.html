@@ -6,6 +6,7 @@
   <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <!-- Three.js r128 CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Google Fonts: 繁體中文思源黑體 & GTA 風格數字字體 -->
@@ -76,6 +77,37 @@
   </style>
 </head>
 <body>
+
+<!-- 左下角上方：員工識別證與 6F 多人即時聊天室面板 -->
+  <div id="mp-panel-6f" class="fixed bottom-44 sm:bottom-52 left-3 sm:left-4 z-30 w-72 sm:w-80 rounded-2xl hud-glass border border-teal-400/40 shadow-2xl overflow-hidden flex flex-col">
+    <div class="px-3 py-2 bg-slate-900/90 border-b border-white/10 flex items-center justify-between">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+        <div class="truncate">
+          <div class="text-[11px] font-black text-white truncate" id="mp-badge-name">載入員工資料中...</div>
+          <div class="text-[10px] text-teal-300 font-mono truncate" id="mp-badge-card">ID: --</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <span id="mp-online-count" class="px-2 py-0.5 rounded-full bg-teal-500/25 border border-teal-400/40 text-[10px] font-bold text-teal-200">1 人在線</span>
+        <button id="mp-logout-btn" title="登出並切換員工帳號" class="px-2 py-0.5 rounded bg-rose-600/80 hover:bg-rose-500 text-[10px] font-bold text-white transition">登出</button>
+      </div>
+    </div>
+
+    <div id="mp-status-dot" class="px-3 py-1 bg-black/40 text-[10px] text-amber-300 font-medium border-b border-white/5">
+      正在連線至 6F 多人伺服器...
+    </div>
+
+    <div id="mp-chat-log" class="h-28 overflow-y-auto p-2.5 space-y-1.5 text-[11px] text-slate-100 select-text">
+      <div class="text-slate-400 text-[10px]">系統：歡迎進入 6F 住院病房，所有在線員工將即時同步位置。</div>
+    </div>
+
+    <form id="mp-chat-form" class="p-1.5 bg-slate-900/80 border-t border-white/10 flex gap-1.5">
+      <input id="mp-chat-input" type="text" maxlength="80" placeholder="輸入 6F 頻道訊息 (Enter發送)..." class="flex-1 bg-slate-950/90 border border-white/15 rounded-lg px-2.5 py-1 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-teal-400" />
+      <button type="submit" class="px-2.5 py-1 rounded-lg bg-teal-600 hover:bg-teal-500 text-xs font-bold text-white transition">發送</button>
+    </form>
+  </div>
+
   <!-- 主 3D 渲染畫布 -->
   <canvas id="game-canvas" tabindex="0"></canvas>
 
@@ -263,6 +295,64 @@
   </div>
 
   <script>
+
+// --------------------------------------------------------------------------
+    // 0. 員工身分驗證 & 6F 獨立多人連線房間設定（完全對齊 index.html 登入資料）
+    // --------------------------------------------------------------------------
+    const ROLE_LABEL_MAP_6F = {
+      nurse: '護理師',
+      doctor: '醫師',
+      it_engineer: '資訊工程師',
+      educator: '衛教師'
+    };
+
+    const urlParams6F = new URLSearchParams(window.location.search);
+    const paramCard6F = urlParams6F.get('card');
+    const paramName6F = urlParams6F.get('name');
+    const paramRole6F = urlParams6F.get('role');
+
+    let vhSession6F = null;
+    try {
+      const rawSession = sessionStorage.getItem('vh_user_session');
+      if (rawSession) vhSession6F = JSON.parse(rawSession);
+    } catch (e) {}
+
+    const resolvedCard6F = paramCard6F || (vhSession6F && vhSession6F.cardNumber) || localStorage.getItem('vh_last_card');
+    const resolvedName6F = paramName6F || (vhSession6F && vhSession6F.staffName) || localStorage.getItem('vh_last_name');
+    const rawRole6F = paramRole6F || (vhSession6F && vhSession6F.roleId) || localStorage.getItem('vh_last_role') || 'nurse';
+    const resolvedRole6F = ROLE_LABEL_MAP_6F[rawRole6F] || (vhSession6F && vhSession6F.roleName) || rawRole6F;
+
+    // 寫回 storage 確保跨樓層切換時資料不遺失
+    if (resolvedCard6F && resolvedName6F) {
+      try {
+        sessionStorage.setItem('vh_user_session', JSON.stringify({
+          roleId: rawRole6F,
+          roleName: resolvedRole6F,
+          staffName: resolvedName6F,
+          cardNumber: resolvedCard6F
+        }));
+        localStorage.setItem('vh_last_card', resolvedCard6F);
+        localStorage.setItem('vh_last_name', resolvedName6F);
+        localStorage.setItem('vh_last_role', rawRole6F);
+      } catch (e) {}
+    } else {
+      // 未登入則導回 index.html
+      window.location.replace('index.html');
+    }
+
+    const staffAuth6F = {
+      card: resolvedCard6F || 'TEST',
+      name: resolvedName6F || '實習生',
+      roleId: rawRole6F,
+      role: resolvedRole6F || '護理師'
+    };
+
+    const ROOM_HOST_ID_6F = 'sunflower-hospital-6f-indoor-v1';
+    let peer6F = null;
+    let isRoomHost6F = false;
+    let hostConn6F = null;
+    const clientConns6F = new Map();
+    const remotePlayers6F = new Map();
     /**
      * ============================================================================
      * 向日葵醫院-模擬人生
@@ -2102,9 +2192,12 @@
     }
 
     function spawnAllNpcs() {
+      const myRole = staffAuth6F.role;
       const pRig = createHumanoidMesh({
-        coatColor: 0x0284c7,
-        pantsColor: 0x0f172a,
+        coatColor: myRole === '醫師' ? 0xffffff : myRole === '護理師' ? 0x34d399 : myRole === '資訊工程師' ? 0xea580c : 0x0284c7,
+        pantsColor: myRole === '護理師' ? 0xf8fafc : 0x0f172a,
+        isDoctor: myRole === '醫師',
+        isNurse: myRole === '護理師',
         isPlayer: true
       });
       pRig.group.position.copy(player.pos);
@@ -3354,6 +3447,7 @@
         );
         camera.lookAt(camState.targetPos);
       }
+        updateRemotePlayers6F(dt);
     }
 
     function updateNpcFloatingUI(npc) {
@@ -3468,6 +3562,15 @@
         }
         mctx.beginPath();
         mctx.arc(nx, nz, 3.5, 0, Math.PI * 2);
+        mctx.fill();
+      });
+
+      remotePlayers6F.forEach((rp) => {
+        const rpx = (rp.targetPos.x - px) * scale;
+        const rpz = (rp.targetPos.z - pz) * scale;
+        mctx.fillStyle = '#14b8a6';
+        mctx.beginPath();
+        mctx.arc(rpx, rpz, 4.2, 0, Math.PI * 2);
         mctx.fill();
       });
 
@@ -3675,6 +3778,10 @@
           e.preventDefault();
         }
 
+        if (document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+          return;
+        }
+
         const code = e.code;
         const key = (e.key || '').toLowerCase();
 
@@ -3862,8 +3969,257 @@
       renderer.render(scene, camera);
     }
 
+     // --------------------------------------------------------------------------
+    // 12. 6F 專屬 PeerJS 多人即時連線與聊天室系統（含斷線殘影清理修復）
+    // --------------------------------------------------------------------------
+    function appendChat6F(sender, text, isSystem = false) {
+      const log = document.getElementById('mp-chat-log');
+      if (!log) return;
+      const row = document.createElement('div');
+      if (isSystem) {
+        row.className = 'text-amber-300/90 text-[10px] font-medium';
+        row.textContent = `• ${text}`;
+      } else {
+        row.innerHTML = `<span class="font-bold text-teal-300">${sender}：</span><span class="text-white break-all">${text}</span>`;
+      }
+      log.appendChild(row);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function updateOnlineCount6F() {
+      const el = document.getElementById('mp-online-count');
+      if (el) el.textContent = `${remotePlayers6F.size + 1} 人在線`;
+    }
+
+    function clearAllRemotePlayers6F() {
+      remotePlayers6F.forEach((rp) => {
+        if (scene && rp.rig && rp.rig.group) scene.remove(rp.rig.group);
+      });
+      remotePlayers6F.clear();
+      updateOnlineCount6F();
+    }
+
+    function getOrCreateRemotePlayer6F(peerId, info) {
+      if (remotePlayers6F.has(peerId)) {
+        const existing = remotePlayers6F.get(peerId);
+        if (info.name && existing.name !== info.name) {
+          existing.name = info.name;
+          existing.role = info.role || existing.role;
+          existing.rig.group.remove(existing.badge);
+          existing.badge = createNameBadgeSprite(`${existing.name}`, existing.role, '#38bdf8');
+          existing.badge.position.set(0, 2.28, 0);
+          existing.rig.group.add(existing.badge);
+        }
+        return existing;
+      }
+
+      const roleStr = info.role || '護理師';
+      const isDoc = roleStr.includes('醫師');
+      const isNur = roleStr.includes('護理');
+      const isEng = roleStr.includes('工程師');
+      const rig = createHumanoidMesh({
+        coatColor: isDoc ? 0xffffff : isNur ? 0x34d399 : isEng ? 0xea580c : 0x0284c7,
+        pantsColor: isNur ? 0xf8fafc : 0x0f172a,
+        isDoctor: isDoc,
+        isNurse: isNur
+      });
+
+      const startX = typeof info.x === 'number' ? info.x : 24.5;
+      const startY = typeof info.y === 'number' ? info.y : FLOOR_Y[6];
+      const startZ = typeof info.z === 'number' ? info.z : -18.2;
+      rig.group.position.set(startX, startY, startZ);
+      scene.add(rig.group);
+
+      const badge = createNameBadgeSprite(
+        `${info.name || '院內同仁'}`,
+        roleStr || '向日葵醫院員工',
+        '#38bdf8'
+      );
+      badge.position.set(0, 2.28, 0);
+      rig.group.add(badge);
+
+      const rp = {
+        peerId,
+        card: info.card || '',
+        name: info.name || '院內同仁',
+        role: roleStr || '向日葵醫院員工',
+        rig,
+        badge,
+        targetPos: new THREE.Vector3(startX, startY, startZ),
+        targetYaw: info.yaw || 0,
+        isMoving: false,
+        walkCycle: 0
+      };
+      remotePlayers6F.set(peerId, rp);
+      updateOnlineCount6F();
+      return rp;
+    }
+
+    function removeRemotePlayer6F(peerId) {
+      const rp = remotePlayers6F.get(peerId);
+      if (!rp) return;
+      scene.remove(rp.rig.group);
+      remotePlayers6F.delete(peerId);
+      updateOnlineCount6F();
+      appendChat6F('', `${rp.name} 已離開 6F`, true);
+    }
+
+    function updateRemotePlayers6F(dt) {
+      remotePlayers6F.forEach((rp) => {
+        rp.rig.group.position.lerp(rp.targetPos, Math.min(1, dt * 12));
+        let diff = rp.targetYaw - rp.rig.group.rotation.y;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        rp.rig.group.rotation.y += diff * Math.min(1, dt * 12);
+
+        if (rp.isMoving) {
+          rp.walkCycle += dt * 10;
+          const swing = Math.sin(rp.walkCycle) * 0.55;
+          rp.rig.leftHip.rotation.x = swing;
+          rp.rig.rightHip.rotation.x = -swing;
+          rp.rig.leftShoulder.rotation.x = -swing * 0.65;
+          rp.rig.rightShoulder.rotation.x = swing * 0.65;
+        } else {
+          rp.rig.leftHip.rotation.x *= 0.85;
+          rp.rig.rightHip.rotation.x *= 0.85;
+          rp.rig.leftShoulder.rotation.x *= 0.85;
+          rp.rig.rightShoulder.rotation.x *= 0.85;
+        }
+      });
+    }
+
+    function handleNetPacket6F(fromPeerId, data) {
+      if (!data || typeof data !== 'object') return;
+      if (data.type === 'state') {
+        const senderId = data.peerId || fromPeerId;
+        if (peer6F && senderId === peer6F.id) return;
+        const rp = getOrCreateRemotePlayer6F(senderId, data);
+        rp.targetPos.set(data.x, data.y, data.z);
+        rp.targetYaw = data.yaw;
+        rp.isMoving = !!data.moving;
+        if (isRoomHost6F) {
+          clientConns6F.forEach((conn, cid) => {
+            if (cid !== fromPeerId && conn.open) conn.send({ ...data, peerId: senderId });
+          });
+        }
+      } else if (data.type === 'chat') {
+        appendChat6F(data.name, data.text, false);
+        if (isRoomHost6F) {
+          clientConns6F.forEach((conn, cid) => {
+            if (cid !== fromPeerId && conn.open) conn.send(data);
+          });
+        }
+      } else if (data.type === 'leave' && data.peerId) {
+        removeRemotePlayer6F(data.peerId);
+      }
+    }
+
+    function sendNetPacket6F(payload) {
+      if (isRoomHost6F) {
+        clientConns6F.forEach((conn) => {
+          if (conn.open) conn.send({ ...payload, peerId: peer6F.id });
+        });
+      } else if (hostConn6F && hostConn6F.open) {
+        hostConn6F.send(payload);
+      }
+    }
+
+    function initMultiplayer6F() {
+      document.getElementById('mp-badge-name').textContent = `${staffAuth6F.name}（${staffAuth6F.role}）`;
+      document.getElementById('mp-badge-card').textContent = `員工卡號：${staffAuth6F.card}`;
+
+      document.getElementById('mp-logout-btn').addEventListener('click', () => {
+        sessionStorage.removeItem('vh_user_session');
+        localStorage.removeItem('vh_last_card');
+        localStorage.removeItem('vh_last_name');
+        localStorage.removeItem('vh_last_role');
+        window.location.href = 'index.html';
+      });
+
+      document.getElementById('mp-chat-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('mp-chat-input');
+        const msg = input.value.trim();
+        if (!msg) return;
+        input.value = '';
+        appendChat6F(`${staffAuth6F.name}`, msg, false);
+        sendNetPacket6F({ type: 'chat', name: staffAuth6F.name, text: msg });
+        document.getElementById('game-canvas').focus();
+      });
+
+      if (typeof Peer === 'undefined') {
+        document.getElementById('mp-status-dot').textContent = '⚠️ 離線單機模式 (PeerJS 未載入)';
+        return;
+      }
+
+      const startAsHost = () => {
+        peer6F = new Peer(ROOM_HOST_ID_6F);
+        peer6F.on('open', () => {
+          isRoomHost6F = true;
+          document.getElementById('mp-status-dot').textContent = '🟢 6F 房主伺服器已連線';
+          appendChat6F('', '您已建立 6F 多人連線頻道', true);
+        });
+        peer6F.on('connection', (conn) => {
+          clientConns6F.set(conn.peer, conn);
+          conn.on('data', (d) => handleNetPacket6F(conn.peer, d));
+          conn.on('close', () => {
+            clientConns6F.delete(conn.peer);
+            removeRemotePlayer6F(conn.peer);
+            clientConns6F.forEach((c) => {
+              if (c.open) c.send({ type: 'leave', peerId: conn.peer });
+            });
+          });
+        });
+        peer6F.on('error', (err) => {
+          if (err.type === 'unavailable-id') {
+            peer6F.destroy();
+            startAsClient();
+          }
+        });
+      };
+
+      const startAsClient = () => {
+        peer6F = new Peer();
+        peer6F.on('open', () => {
+          isRoomHost6F = false;
+          hostConn6F = peer6F.connect(ROOM_HOST_ID_6F, { reliable: true });
+          hostConn6F.on('open', () => {
+            document.getElementById('mp-status-dot').textContent = '🟢 已連線至 6F 多人頻道';
+            appendChat6F('', '已成功加入 6F 住院病房多人連線', true);
+          });
+          hostConn6F.on('data', (d) => handleNetPacket6F(ROOM_HOST_ID_6F, d));
+          hostConn6F.on('close', () => {
+            document.getElementById('mp-status-dot').textContent = '🟡 房主已離開，重新連線中...';
+            clearAllRemotePlayers6F();
+            setTimeout(startAsHost, 1500);
+          });
+        });
+      };
+
+      startAsHost();
+
+      setInterval(() => {
+        if (!player || !player.pos) return;
+        const moving = Boolean(
+          keys['KeyW'] || keys['KeyS'] || keys['KeyA'] || keys['KeyD'] ||
+          keys['ArrowUp'] || keys['ArrowDown'] || keys['ArrowLeft'] || keys['ArrowRight']
+        );
+        sendNetPacket6F({
+          type: 'state',
+          name: staffAuth6F.name,
+          role: staffAuth6F.role,
+          x: Number(player.pos.x.toFixed(3)),
+          y: Number(player.pos.y.toFixed(3)),
+          z: Number(player.pos.z.toFixed(3)),
+          yaw: Number(player.yaw.toFixed(3)),
+          moving
+        });
+      }, 60);
+    }
+
     window.onload = function () {
       initScene();
+      initMultiplayer6F();
       animateLoop();
     };
   </script>
