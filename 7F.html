@@ -6,6 +6,7 @@
   <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <!-- Three.js r128 CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Google Fonts: 繁體中文思源黑體 & GTA 風格數字字體 -->
@@ -75,6 +76,36 @@
   </style>
 </head>
 <body>
+<!-- 左下角上方：員工識別證與 7F 多人即時聊天室面板 -->
+  <div id="mp-panel-7f" class="fixed bottom-44 sm:bottom-52 left-3 sm:left-4 z-30 w-72 sm:w-80 rounded-2xl hud-glass border border-teal-400/40 shadow-2xl overflow-hidden flex flex-col">
+    <div class="px-3 py-2 bg-slate-900/90 border-b border-white/10 flex items-center justify-between">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+        <div class="truncate">
+          <div class="text-[11px] font-black text-white truncate" id="mp-badge-name">載入員工資料中...</div>
+          <div class="text-[10px] text-teal-300 font-mono truncate" id="mp-badge-card">ID: --</div>
+        </div>
+      </div>
+<div class="flex items-center gap-1.5 shrink-0">
+        <span id="mp-online-count" class="px-2 py-0.5 rounded-full bg-teal-500/25 border border-teal-400/40 text-[10px] font-bold text-teal-200">1 人在線</span>
+        <button id="mp-logout-btn" title="登出並切換員工帳號" class="px-2 py-0.5 rounded bg-rose-600/80 hover:bg-rose-500 text-[10px] font-bold text-white transition">登出</button>
+      </div>
+    </div>
+
+    <div id="mp-status-dot" class="px-3 py-1 bg-black/40 text-[10px] text-amber-300 font-medium border-b border-white/5">
+      正在連線至 7F 多人伺服器...
+    </div>
+
+    <div id="mp-chat-log" class="h-28 overflow-y-auto p-2.5 space-y-1.5 text-[11px] text-slate-100 select-text">
+      <div class="text-slate-400 text-[10px]">系統：歡迎進入 7F 綜合住院病房，所有在線員工將即時同步位置。</div>
+    </div>
+
+    <form id="mp-chat-form" class="p-1.5 bg-slate-900/80 border-t border-white/10 flex gap-1.5">
+      <input id="mp-chat-input" type="text" maxlength="80" placeholder="輸入 7F 頻道訊息 (Enter發送)..." class="flex-1 bg-slate-950/90 border border-white/15 rounded-lg px-2.5 py-1 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-teal-400" />
+      <button type="submit" class="px-2.5 py-1 rounded-lg bg-teal-600 hover:bg-teal-500 text-xs font-bold text-white transition">發送</button>
+    </form>
+  </div>
+
   <!-- 主 3D 渲染畫布 -->
   <canvas id="game-canvas"></canvas>
 
@@ -113,60 +144,6 @@
     <div class="w-16 h-16 border-4 border-amber-400 border-t-teal-400 rounded-full animate-spin mb-4"></div>
     <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-amber-300 mb-1">向日葵醫院-模擬人生</h1>
     <p class="text-xs sm:text-sm text-slate-300">正在載入...</p>
-  </div>
-
-  <!-- 頂部橫向：7F 區域傳送 + B1 ~ 8F 全院樓層 HTML 直達列 -->
-  <div class="fixed top-2.5 left-1/2 -translate-x-1/2 z-20 w-[97vw] max-w-6xl">
-  </div>
-
-  <!-- 操作提示膠囊 -->
-  <div class="fixed top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-max max-w-[95vw]">
-  </div>
-
-  <!-- 左上角：功能開關、滑鼠靈敏度與操作說明面板 -->
-  <div class="fixed top-20 left-3 sm:left-4 z-20 flex flex-col gap-2 max-w-[308px]">
-  </div>
-
-      <!-- 核心互動功能按鈕列 -->
-      <div class="mt-2.5 grid grid-cols-1 gap-1.5">
-        <div class="grid grid-cols-2 gap-1.5">
-          <button id="btn-toggle-pov" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-sky-700/80 hover:bg-sky-600 border border-sky-400/30 text-white transition">
-            👁️ 第三人稱 (V)
-          </button>
-          <button id="btn-toggle-labels" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-emerald-700/80 hover:bg-emerald-600 border border-emerald-400/30 text-white transition">
-            🏷️ NPC 標籤: 開
-          </button>
-        </div>
-
-        <button id="btn-open-elevator" class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-teal-700/85 hover:bg-teal-600 border border-teal-300/40 text-white transition">
-          <span>🛗 中央電梯廳 (B1 ~ 8F)</span>
-          <span class="px-1.5 py-0.5 rounded bg-black/30 text-[10px]">E 鍵</span>
-        </button>
-
-        <button id="btn-clear-wanted" class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-amber-600/85 hover:bg-amber-500 border border-amber-300/40 text-white transition">
-          <span>🕊️ 消除通緝 / 急救治療</span>
-          <span class="px-1.5 py-0.5 rounded bg-black/30 text-[10px]">C 鍵</span>
-        </button>
-
-        <!-- 滑鼠靈敏度即時調節 -->
-        <div class="px-2.5 py-1.5 rounded-lg bg-slate-900/70 border border-white/10">
-          <div class="flex items-center justify-between text-[11px] mb-1">
-            <span class="text-teal-200 font-bold">🖱️ 左鍵拖曳視角靈敏度</span>
-            <span id="mouse-sens-val" class="font-black text-amber-300 gta-font">1.0x</span>
-          </div>
-          <input id="mouse-sens-slider" type="range" min="0.4" max="2.2" step="0.1" value="1.0" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-400" />
-        </div>
-      </div>
-
-      <!-- 按鍵操作表 -->
-      <div id="help-body" class="mt-2.5 pt-2 border-t border-white/10 text-[11px] text-slate-200 space-y-1">
-        <div class="flex justify-between"><span class="text-slate-400">移動視角 (無須鎖定)</span><span class="font-bold text-amber-300">按住滑鼠左鍵拖曳</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">行走 / 衝刺 / 跳躍</span><span class="font-bold text-amber-300">WASD / Shift / Space</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">E 化護理車 / 交談 / 電梯</span><span class="font-bold text-emerald-300">走近按 E 鍵互動</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">鏡頭回正角色背後</span><span class="font-bold text-sky-300">滑鼠中鍵 / R 鍵</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">近戰輕擊 / 重擊</span><span class="font-bold text-rose-300">左鍵短按(J) / 右鍵(K)</span></div>
-      </div>
-    </div>
   </div>
 
   <!-- 右上角：GTA 風格狀態欄 -->
@@ -280,6 +257,61 @@
   </div>
 
   <script>
+// --------------------------------------------------------------------------
+    // 0. 員工身分驗證 & 7F 獨立多人連線房間設定（完全對齊 index.html 登入資料）
+    // --------------------------------------------------------------------------
+    const ROLE_LABEL_MAP_7F = {
+      nurse: '護理師',
+      doctor: '醫師',
+      it_engineer: '資訊工程師',
+      educator: '衛教師'
+    };
+
+    const urlParams7F = new URLSearchParams(window.location.search);
+    const paramCard7F = urlParams7F.get('card');
+    const paramName7F = urlParams7F.get('name');
+    const paramRole7F = urlParams7F.get('role');
+
+    let vhSession7F = null;
+    try {
+      const rawSession = sessionStorage.getItem('vh_user_session');
+      if (rawSession) vhSession7F = JSON.parse(rawSession);
+    } catch (e) {}
+
+    const resolvedCard7F = paramCard7F || (vhSession7F && vhSession7F.cardNumber) || localStorage.getItem('vh_last_card');
+    const resolvedName7F = paramName7F || (vhSession7F && vhSession7F.staffName) || localStorage.getItem('vh_last_name');
+    const rawRole7F = paramRole7F || (vhSession7F && vhSession7F.roleId) || localStorage.getItem('vh_last_role') || 'nurse';
+    const resolvedRole7F = ROLE_LABEL_MAP_7F[rawRole7F] || (vhSession7F && vhSession7F.roleName) || rawRole7F;
+
+    if (resolvedCard7F && resolvedName7F) {
+      try {
+        sessionStorage.setItem('vh_user_session', JSON.stringify({
+          roleId: rawRole7F,
+          roleName: resolvedRole7F,
+          staffName: resolvedName7F,
+          cardNumber: resolvedCard7F
+        }));
+        localStorage.setItem('vh_last_card', resolvedCard7F);
+        localStorage.setItem('vh_last_name', resolvedName7F);
+        localStorage.setItem('vh_last_role', rawRole7F);
+      } catch (e) {}
+    } else {
+      window.location.replace('index.html');
+    }
+
+    const staffAuth7F = {
+      card: resolvedCard7F || 'TEST',
+      name: resolvedName7F || '實習生',
+      roleId: rawRole7F,
+      role: resolvedRole7F || '護理師'
+    };
+
+    const ROOM_HOST_ID_7F = 'sunflower-hospital-7f-indoor-v1';
+    let peer7F = null;
+    let isRoomHost7F = false;
+    let hostConn7F = null;
+    const clientConns7F = new Map();
+    const remotePlayers7F = new Map();
     /**
      * ============================================================================
      * 向日葵醫院-模擬人生
@@ -2267,9 +2299,12 @@
     }
 
     function spawnAllNpcs() {
+      const myRole = staffAuth7F.role;
       const pRig = createHumanoidMesh({
-        coatColor: 0x0284c7,
-        pantsColor: 0x0f172a,
+        coatColor: myRole === '醫師' ? 0xffffff : myRole === '護理師' ? 0x34d399 : myRole === '資訊工程師' ? 0xea580c : 0x0284c7,
+        pantsColor: myRole === '護理師' ? 0xf8fafc : 0x0f172a,
+        isDoctor: myRole === '醫師',
+        isNurse: myRole === '護理師',
         isPlayer: true
       });
       pRig.group.position.copy(player.pos);
@@ -3112,8 +3147,12 @@
       document.getElementById('transfer-sub').textContent = `自動連結至 ${floorItem.file}（${floorItem.desc}）`;
       overlay.classList.remove('hidden');
 
+      const card = encodeURIComponent(staffAuth7F.card || '');
+      const name = encodeURIComponent(staffAuth7F.name || '7F訪客');
+      const role = encodeURIComponent(staffAuth7F.roleId || 'nurse');
+
       setTimeout(() => {
-        window.location.href = floorItem.file;
+        window.location.href = `${floorItem.file}?card=${card}&name=${name}&role=${role}`;
       }, 280);
     }
 
@@ -3574,6 +3613,7 @@
         );
         camera.lookAt(camState.targetPos);
       }
+       updateRemotePlayers7F(dt);
     }
 
     function updateNpcFloatingUI(npc) {
@@ -3650,7 +3690,6 @@
       const scale = 2.05;
 
       mctx.clearRect(0, 0, size, size);
-      // 溫潤實木暖色調底色
       mctx.fillStyle = '#c5925e';
       mctx.fillRect(0, 0, size, size);
 
@@ -3660,65 +3699,19 @@
       const px = player.pos.x;
       const pz = player.pos.z;
 
-      function drawZoneBlock(wx, wz, ww, wd, fill, stroke = '#5c3818') {
-        const rx = (wx - ww / 2 - px) * scale;
-        const rz = (wz - wd / 2 - pz) * scale;
-        mctx.fillStyle = fill;
-        mctx.fillRect(rx, rz, ww * scale, wd * scale);
-        if (stroke) {
-          mctx.strokeStyle = stroke;
-          mctx.lineWidth = 1.2;
-          mctx.strokeRect(rx, rz, ww * scale, wd * scale);
-        }
-      }
-
-      drawZoneBlock(0, -12.5, 107, 70, '#d8aa78', '#5c3818');
-      drawZoneBlock(-47.5, -39.5, 11.5, 14.5, '#a7f3d0');
-      drawZoneBlock(47.5, -39.5, 11.0, 14.5, '#a7f3d0');
-      drawZoneBlock(-46.5, -10.5, 13.0, 13.5, '#8b5a34');
-      drawZoneBlock(-46.5, 6.5, 13.0, 18.5, '#8b5a34');
-      drawZoneBlock(-11.5, -29.0, 35.0, 8.5, '#9a663d');
-      drawZoneBlock(9.4, -29.0, 6.8, 8.4, '#9cd6bd');
-      drawZoneBlock(27.0, -29.0, 28.0, 8.5, '#e3aea3');
-      drawZoneBlock(47.5, -16.5, 11.0, 22.0, '#e3aea3');
-      drawZoneBlock(-19.5, -12.5, 18.0, 5.2, '#bae6fd');
-      drawZoneBlock(0.5, -12.5, 13.5, 4.8, '#2dd4bf');
-      drawZoneBlock(25.0, -12.5, 14.5, 4.8, '#bae6fd');
-      drawZoneBlock(-22.0, 6.8, 14.0, 6.2, '#9a663d');
-      drawZoneBlock(-11.0, 6.8, 7.6, 6.2, '#bae6fd');
-      drawZoneBlock(2.5, 15.2, 18.0, 13.0, '#8b5a34');
-      drawZoneBlock(17.15, 7.9, 6.8, 8.4, '#9cd6bd');
-      drawZoneBlock(33.0, 6.8, 24.5, 6.2, '#e3aea3');
-
-      // 標示 E 化護理工作車位置（亮青藍方塊）
-      eCarts.forEach((cart) => {
-        const cx = (cart.x - px) * scale;
-        const cz = (cart.z - pz) * scale;
-        mctx.fillStyle = '#38bdf8';
-        mctx.fillRect(cx - 3, cz - 3, 6, 6);
-      });
-
-      // 標示 VIP 感應電動門位置
-      automaticDoors.forEach((door) => {
-        const dx = (door.x - px) * scale;
-        const dz = (door.z - pz) * scale;
-        mctx.fillStyle = door.openProgress > 0.2 ? '#38bdf8' : '#facc15';
-        mctx.fillRect(dx - 2.5, dz - 2.5, 5, 5);
-      });
-
-      npcs.forEach((npc) => {
-        if (npc.knockedTimer > 0) return;
-        const nx = (npc.pos.x - px) * scale;
-        const nz = (npc.pos.z - pz) * scale;
-        if (npc.isHostile || (npc.type === 'security' && player.wantedStars > 0)) {
-          mctx.fillStyle = Math.sin(Date.now() * 0.015) > 0 ? '#ef4444' : '#fca5a5';
-        } else {
-          mctx.fillStyle = npc.type === 'staff' ? '#0284c7' : npc.type === 'security' ? '#1d4ed8' : '#f59e0b';
-        }
+      remotePlayers7F.forEach((rp) => {
+        const rpx = (rp.targetPos.x - px) * scale;
+        const rpz = (rp.targetPos.z - pz) * scale;
+        mctx.fillStyle = '#14b8a6';
         mctx.beginPath();
-        mctx.arc(nx, nz, 3.5, 0, Math.PI * 2);
+        mctx.arc(rpx, rpz, 4.2, 0, Math.PI * 2);
         mctx.fill();
       });
+
+      mctx.fillStyle = '#ec4899';
+      mctx.beginPath();
+      mctx.arc(0, 0, 5.5, 0, Math.PI * 2);
+      mctx.fill();
 
       mctx.fillStyle = '#ec4899';
       mctx.beginPath();
@@ -3739,6 +3732,310 @@
       mctx.restore();
     }
 
+// --------------------------------------------------------------------------
+    // PeerJS 多人 P2P 即時同步系統 (支援 7F 同層 3D 同步 + B1~8F 跨樓層動態)
+    // --------------------------------------------------------------------------
+    const MP = {
+      CURRENT_FLOOR: '7F',
+      peer: null,
+      isHost: false,
+      room: 'sunflower-hospital',
+      myId: '',
+      myName: '',
+      connections: new Map(), // peerId -> DataConnection
+      remotePlayers: new Map(), // peerId -> { name, floor, x, y, z, yaw, isAttacking, mesh, badge, lastSeen }
+      syncTimer: 0
+    };
+
+    function initMultiplayer() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const savedRoom = urlParams.get('room') || localStorage.getItem('sunflower_mp_room') || 'sunflower-hospital';
+      const savedName = urlParams.get('name') || localStorage.getItem('sunflower_mp_name') || `護理師_${Math.floor(100 + Math.random() * 899)}`;
+
+      MP.room = savedRoom.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'sunflower-hospital';
+      MP.myName = savedName.trim().slice(0, 14);
+
+      const roomInput = document.getElementById('mp-room-input');
+      const nameInput = document.getElementById('mp-name-input');
+      if (roomInput) roomInput.value = MP.room;
+      if (nameInput) nameInput.value = MP.myName;
+
+      document.getElementById('mp-join-btn')?.addEventListener('click', () => {
+        const nextRoom = (roomInput?.value || 'sunflower-hospital').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+        const nextName = (nameInput?.value || MP.myName).trim().slice(0, 14);
+        if (nextName) {
+          MP.myName = nextName;
+          localStorage.setItem('sunflower_mp_name', MP.myName);
+        }
+        if (nextRoom && nextRoom !== MP.room) {
+          MP.room = nextRoom;
+          localStorage.setItem('sunflower_mp_room', MP.room);
+          connectToPeerRoom(MP.room);
+        } else {
+          broadcastState(true);
+          renderMultiplayerRoster();
+        }
+      });
+
+      nameInput?.addEventListener('change', () => {
+        MP.myName = nameInput.value.trim().slice(0, 14) || MP.myName;
+        localStorage.setItem('sunflower_mp_name', MP.myName);
+        broadcastState(true);
+        renderMultiplayerRoster();
+      });
+
+      document.getElementById('mp-copy-link-btn')?.addEventListener('click', () => {
+        const shareUrl = `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(MP.room)}`;
+        navigator.clipboard?.writeText(shareUrl);
+        appendChatLog('系統', `已複製邀請連結（房間：${MP.room}）`, '#38bdf8');
+      });
+
+      const chatInput = document.getElementById('mp-chat-input');
+      chatInput?.addEventListener('keydown', (e) => {
+        e.stopPropagation(); // 避免打字時觸發 WASD 移動
+        if (e.key === 'Enter' && chatInput.value.trim()) {
+          const text = chatInput.value.trim();
+          chatInput.value = '';
+          appendChatLog(`${MP.myName} (${MP.CURRENT_FLOOR})`, text, '#fde047');
+          sendPacketToAll({
+            type: 'chat',
+            id: MP.myId,
+            name: MP.myName,
+            floor: MP.CURRENT_FLOOR,
+            text
+          });
+        }
+      });
+
+      connectToPeerRoom(MP.room);
+    }
+
+    function connectToPeerRoom(roomName) {
+      if (MP.peer) {
+        try { MP.peer.destroy(); } catch (e) {}
+      }
+      MP.connections.clear();
+      MP.remotePlayers.forEach((rp) => { if (rp.mesh) scene.remove(rp.mesh); });
+      MP.remotePlayers.clear();
+
+      const hostId = `sunflower-hosp-host-${roomName}`;
+      setMpStatus('連線中...', 'bg-amber-400');
+
+      // 嘗試搶佔成為該房間的 Host；若已被佔用則自動切換為 Client 連向 Host
+      const peer = new Peer(hostId);
+      MP.peer = peer;
+
+      peer.on('open', (id) => {
+        MP.isHost = true;
+        MP.myId = id;
+        setMpStatus('房主在線', 'bg-emerald-400');
+        appendChatLog('系統', `已建立院區房間「${roomName}」(7F)`, '#34d399');
+        renderMultiplayerRoster();
+      });
+
+      peer.on('connection', (conn) => {
+        setupPeerConnection(conn);
+      });
+
+      peer.on('error', (err) => {
+        if (err.type === 'unavailable-id') {
+          // 房間已有房主 -> 改用隨機 ID 以訪客身分連入 Host
+          peer.destroy();
+          const clientPeer = new Peer();
+          MP.peer = clientPeer;
+          MP.isHost = false;
+
+          clientPeer.on('open', (cid) => {
+            MP.myId = cid;
+            const conn = clientPeer.connect(hostId, { reliable: true });
+            setupPeerConnection(conn);
+          });
+
+          clientPeer.on('error', () => {
+            setMpStatus('離線模式', 'bg-rose-500');
+          });
+        } else {
+          setMpStatus('連線異常', 'bg-rose-500');
+        }
+      });
+    }
+
+    function setupPeerConnection(conn) {
+      conn.on('open', () => {
+        MP.connections.set(conn.peer, conn);
+        setMpStatus(MP.isHost ? '房主在線' : '已連線', 'bg-emerald-400');
+        // 立刻傳送自己的初始座標
+        conn.send(buildMyStatePacket());
+        renderMultiplayerRoster();
+      });
+
+      conn.on('data', (data) => {
+        if (!data || typeof data !== 'object') return;
+
+        // 若我是 Host，將收到的封包轉發給其他所有連線成員（星狀拓撲全院廣播）
+        if (MP.isHost) {
+          MP.connections.forEach((otherConn, pid) => {
+            if (pid !== conn.peer && otherConn.open) {
+              otherConn.send(data);
+            }
+          });
+        }
+
+        if (data.type === 'state' && data.id !== MP.myId) {
+          upsertRemotePlayer(data);
+        } else if (data.type === 'chat' && data.id !== MP.myId) {
+          appendChatLog(`${data.name} (${data.floor})`, data.text, '#67e8f9');
+        }
+      });
+
+      conn.on('close', () => {
+        MP.connections.delete(conn.peer);
+        removeRemotePlayer(conn.peer);
+        renderMultiplayerRoster();
+      });
+    }
+
+    function buildMyStatePacket() {
+      return {
+        type: 'state',
+        id: MP.myId,
+        name: MP.myName,
+        floor: MP.CURRENT_FLOOR,
+        x: Number(player.pos.x.toFixed(2)),
+        y: Number(player.pos.y.toFixed(2)),
+        z: Number(player.pos.z.toFixed(2)),
+        yaw: Number(player.yaw.toFixed(2)),
+        isAttacking: player.isAttacking
+      };
+    }
+
+    function sendPacketToAll(pkt) {
+      MP.connections.forEach((conn) => {
+        if (conn.open) conn.send(pkt);
+      });
+    }
+
+    function broadcastState(force = false) {
+      if (!MP.myId || MP.connections.size === 0) return;
+      sendPacketToAll(buildMyStatePacket());
+    }
+
+    function upsertRemotePlayer(data) {
+      let rp = MP.remotePlayers.get(data.id);
+      const isSameFloor = data.floor === MP.CURRENT_FLOOR;
+
+      if (!rp) {
+        const rig = createHumanoidMesh({
+          coatColor: 0x06b6d4,
+          pantsColor: 0x0f172a,
+          isDoctor: true
+        });
+        const badge = createNameBadgeSprite(data.name || '連線玩家', `${data.floor} 連線隊友`, '#38bdf8');
+        badge.position.set(0, 2.28, 0);
+        rig.group.add(badge);
+        scene.add(rig.group);
+
+        rp = {
+          id: data.id,
+          name: data.name,
+          floor: data.floor,
+          targetPos: new THREE.Vector3(data.x, data.y, data.z),
+          targetYaw: data.yaw,
+          rig,
+          mesh: rig.group,
+          badge,
+          walkCycle: 0,
+          lastSeen: Date.now()
+        };
+        MP.remotePlayers.set(data.id, rp);
+        renderMultiplayerRoster();
+      }
+
+      if (rp.name !== data.name || rp.floor !== data.floor) {
+        rp.name = data.name;
+        rp.floor = data.floor;
+        rp.mesh.remove(rp.badge);
+        rp.badge = createNameBadgeSprite(data.name, isSameFloor ? '7F 同層隊友' : `目前在 ${data.floor}`, isSameFloor ? '#34d399' : '#fbbf24');
+        rp.badge.position.set(0, 2.28, 0);
+        rp.mesh.add(rp.badge);
+        renderMultiplayerRoster();
+      }
+
+      rp.mesh.visible = isSameFloor;
+      rp.targetPos.set(data.x, data.y, data.z);
+      rp.targetYaw = data.yaw;
+      rp.isAttacking = data.isAttacking;
+      rp.lastSeen = Date.now();
+    }
+
+    function removeRemotePlayer(id) {
+      const rp = MP.remotePlayers.get(id);
+      if (rp) {
+        if (rp.mesh) scene.remove(rp.mesh);
+        MP.remotePlayers.delete(id);
+      }
+    }
+
+    function updateRemotePlayers(dt) {
+      const now = Date.now();
+      MP.remotePlayers.forEach((rp, id) => {
+        if (now - rp.lastSeen > 12000) {
+          removeRemotePlayer(id);
+          renderMultiplayerRoster();
+          return;
+        }
+        if (!rp.mesh.visible) return;
+
+        const dist = rp.mesh.position.distanceTo(rp.targetPos);
+        rp.mesh.position.lerp(rp.targetPos, Math.min(1, dt * 14));
+        rp.mesh.rotation.y = rp.targetYaw;
+
+        if (dist > 0.04) {
+          rp.walkCycle += dt * 11;
+          const swing = Math.sin(rp.walkCycle) * 0.55;
+          rp.rig.leftHip.rotation.x = swing;
+          rp.rig.rightHip.rotation.x = -swing;
+          rp.rig.leftShoulder.rotation.x = -swing * 0.7;
+          rp.rig.rightShoulder.rotation.x = swing * 0.7;
+        } else {
+          rp.rig.leftHip.rotation.x *= 0.85;
+          rp.rig.rightHip.rotation.x *= 0.85;
+        }
+        rp.rig.rightShoulder.rotation.x = rp.isAttacking ? -1.6 : rp.rig.rightShoulder.rotation.x;
+      });
+
+      MP.syncTimer += dt;
+      if (MP.syncTimer >= 0.06) { // 約 16 FPS 同步座標
+        MP.syncTimer = 0;
+        broadcastState();
+      }
+    }
+
+    function renderMultiplayerRoster() {
+      const rosterEl = document.getElementById('mp-roster');
+      const countEl = document.getElementById('mp-peer-count');
+      if (!rosterEl || !countEl) return;
+
+      const total = 1 + MP.remotePlayers.size;
+      countEl.textContent = `${total} 人在線`;
+
+      let html = `<div class="flex justify-between text-amber-300 font-bold"><span>⭐ ${MP.myName} (你)</span><span>7F</span></div>`;
+      MP.remotePlayers.forEach((rp) => {
+        const badgeColor = rp.floor === '7F' ? 'text-emerald-300' : 'text-slate-400';
+        html += `<div class="flex justify-between"><span>👤 ${rp.name}</span><span class="${badgeColor} font-bold">${rp.floor}</span></div>`;
+      });
+      rosterEl.innerHTML = html;
+    }
+
+    function appendChatLog(sender, msg, colorHex = '#e2e8f0') {
+      const log = document.getElementById('mp-chat-log');
+      if (!log) return;
+      const line = document.createElement('div');
+      line.innerHTML = `<span style="color:${colorHex}" class="font-bold">[${sender}]</span> <span></span>`;
+      line.querySelector('span:last-child').textContent = msg;
+      log.appendChild(line);
+      log.scrollTop = log.scrollHeight;
+    }
     // --------------------------------------------------------------------------
     // 13. 場景初始化、無須鎖定滑鼠・左鍵拖曳視角監聽與主渲染迴圈
     // --------------------------------------------------------------------------
@@ -4054,8 +4351,351 @@
       renderer.render(scene, camera);
     }
 
+    // --------------------------------------------------------------------------
+    // 12. 7F 專屬 PeerJS 多人即時連線與聊天室系統（完整修復版）
+    // --------------------------------------------------------------------------
+    function appendChat7F(sender, text, isSystem = false) {
+      const log = document.getElementById('mp-chat-log');
+      if (!log) return;
+      const row = document.createElement('div');
+      if (isSystem) {
+        row.className = 'text-amber-300/90 text-[10px] font-medium';
+        row.textContent = `• ${text}`;
+      } else {
+        row.innerHTML = `<span class="font-bold text-teal-300"></span><span class="text-white break-all"></span>`;
+        row.children[0].textContent = `${sender}：`;
+        row.children[1].textContent = text;
+      }
+      log.appendChild(row);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function updateOnlineCount7F() {
+      const el = document.getElementById('mp-online-count');
+      if (el) el.textContent = `${remotePlayers7F.size + 1} 人在線`;
+    }
+
+    function clearAllRemotePlayers7F() {
+      remotePlayers7F.forEach((rp) => {
+        if (scene && rp.rig && rp.rig.group) scene.remove(rp.rig.group);
+      });
+      remotePlayers7F.clear();
+      updateOnlineCount7F();
+    }
+
+    function buildMyStatePacket7F(moving = false) {
+      return {
+        type: 'state',
+        peerId: peer7F ? peer7F.id : '',
+        card: staffAuth7F.card,
+        name: staffAuth7F.name,
+        role: staffAuth7F.role,
+        x: Number(player.pos.x.toFixed(3)),
+        y: Number(player.pos.y.toFixed(3)),
+        z: Number(player.pos.z.toFixed(3)),
+        yaw: Number(player.yaw.toFixed(3)),
+        moving
+      };
+    }
+
+    function getOrCreateRemotePlayer7F(peerId, info) {
+      if (remotePlayers7F.has(peerId)) {
+        const existing = remotePlayers7F.get(peerId);
+        existing.lastSeen = Date.now();
+        if (info.name && existing.name !== info.name) {
+          existing.name = info.name;
+          existing.role = info.role || existing.role;
+          existing.rig.group.remove(existing.badge);
+          existing.badge = createNameBadgeSprite(`${existing.name}`, existing.role, '#38bdf8');
+          existing.badge.position.set(0, 2.28, 0);
+          existing.rig.group.add(existing.badge);
+        }
+        return existing;
+      }
+
+      const roleStr = info.role || '護理師';
+      const isDoc = roleStr.includes('醫師');
+      const isNur = roleStr.includes('護理');
+      const isEng = roleStr.includes('工程師');
+      const rig = createHumanoidMesh({
+        coatColor: isDoc ? 0xffffff : isNur ? 0x34d399 : isEng ? 0xea580c : 0x0284c7,
+        pantsColor: isNur ? 0xf8fafc : 0x0f172a,
+        isDoctor: isDoc,
+        isNurse: isNur
+      });
+
+      const startX = typeof info.x === 'number' ? info.x : -33.5;
+      const startY = typeof info.y === 'number' ? info.y : FLOOR_Y[7];
+      const startZ = typeof info.z === 'number' ? info.z : 1.5;
+      rig.group.position.set(startX, startY, startZ);
+      scene.add(rig.group);
+
+      const badge = createNameBadgeSprite(
+        `${info.name || '院內同仁'}`,
+        roleStr || '向日葵醫院員工',
+        '#38bdf8'
+      );
+      badge.position.set(0, 2.28, 0);
+      rig.group.add(badge);
+
+      const rp = {
+        peerId,
+        card: info.card || '',
+        name: info.name || '院內同仁',
+        role: roleStr || '向日葵醫院員工',
+        rig,
+        badge,
+        targetPos: new THREE.Vector3(startX, startY, startZ),
+        targetYaw: info.yaw || 0,
+        isMoving: false,
+        walkCycle: 0,
+        lastSeen: Date.now()
+      };
+      remotePlayers7F.set(peerId, rp);
+      updateOnlineCount7F();
+      appendChat7F('', `${rp.name} 進入了 7F`, true);
+      return rp;
+    }
+
+    function removeRemotePlayer7F(peerId) {
+      const rp = remotePlayers7F.get(peerId);
+      if (!rp) return;
+      scene.remove(rp.rig.group);
+      remotePlayers7F.delete(peerId);
+      updateOnlineCount7F();
+      appendChat7F('', `${rp.name} 已離開 7F`, true);
+    }
+
+    function updateRemotePlayers7F(dt) {
+      const now = Date.now();
+      remotePlayers7F.forEach((rp, id) => {
+        // 超過 10 秒未收到心跳自動清除斷線殘影
+        if (now - rp.lastSeen > 10000) {
+          removeRemotePlayer7F(id);
+          return;
+        }
+
+        rp.rig.group.position.lerp(rp.targetPos, Math.min(1, dt * 12));
+        let diff = rp.targetYaw - rp.rig.group.rotation.y;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        rp.rig.group.rotation.y += diff * Math.min(1, dt * 12);
+
+        if (rp.isMoving) {
+          rp.walkCycle += dt * 10;
+          const swing = Math.sin(rp.walkCycle) * 0.55;
+          rp.rig.leftHip.rotation.x = swing;
+          rp.rig.rightHip.rotation.x = -swing;
+          rp.rig.leftShoulder.rotation.x = -swing * 0.65;
+          rp.rig.rightShoulder.rotation.x = swing * 0.65;
+        } else {
+          rp.rig.leftHip.rotation.x *= 0.85;
+          rp.rig.rightHip.rotation.x *= 0.85;
+          rp.rig.leftShoulder.rotation.x *= 0.85;
+          rp.rig.rightShoulder.rotation.x *= 0.85;
+        }
+      });
+    }
+
+    function handleNetPacket7F(fromPeerId, data) {
+      if (!data || typeof data !== 'object') return;
+      if (data.type === 'state') {
+        const senderId = data.peerId || fromPeerId;
+        if (!senderId || (peer7F && senderId === peer7F.id)) return;
+        const rp = getOrCreateRemotePlayer7F(senderId, data);
+        rp.targetPos.set(data.x, data.y, data.z);
+        rp.targetYaw = data.yaw;
+        rp.isMoving = !!data.moving;
+        rp.lastSeen = Date.now();
+
+        if (isRoomHost7F) {
+          const relayPacket = { ...data, peerId: senderId };
+          clientConns7F.forEach((conn, cid) => {
+            if (cid !== fromPeerId && conn.open) conn.send(relayPacket);
+          });
+        }
+      } else if (data.type === 'chat') {
+        appendChat7F(data.name, data.text, false);
+        if (isRoomHost7F) {
+          clientConns7F.forEach((conn, cid) => {
+            if (cid !== fromPeerId && conn.open) conn.send(data);
+          });
+        }
+      } else if (data.type === 'leave' && data.peerId) {
+        removeRemotePlayer7F(data.peerId);
+        if (isRoomHost7F) {
+          clientConns7F.forEach((conn, cid) => {
+            if (cid !== fromPeerId && conn.open) conn.send(data);
+          });
+        }
+      }
+    }
+
+    function sendNetPacket7F(payload) {
+      if (!peer7F || !peer7F.id) return;
+      const packet = { ...payload, peerId: peer7F.id };
+      if (isRoomHost7F) {
+        clientConns7F.forEach((conn) => {
+          if (conn.open) conn.send(packet);
+        });
+      } else if (hostConn7F && hostConn7F.open) {
+        hostConn7F.send(packet);
+      }
+    }
+
+    function initMultiplayer7F() {
+      const VALID_CARDS = ['18445', '16661', '10047', '601471', '6513', '11110', 'TEST'];
+      let hasSession = false;
+      try {
+        const raw = sessionStorage.getItem('vh_user_session');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && VALID_CARDS.includes(String(parsed.cardNumber || '').toUpperCase())) {
+            hasSession = true;
+          }
+        }
+      } catch (e) {}
+
+      const currentCard = String(staffAuth7F?.card || '').trim().toUpperCase();
+      const currentName = String(staffAuth7F?.name || '').trim();
+      const isValidCard = VALID_CARDS.includes(currentCard) && currentName.length > 0;
+
+      if (!isValidCard || (!hasSession && !new URLSearchParams(window.location.search).get('card'))) {
+        alert('請先於「向日葵醫院-模擬人生」首頁 (index.html) 刷卡登入，方可開啟多人連線！');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      document.getElementById('mp-badge-name').textContent = `${staffAuth7F.name}（${staffAuth7F.role}）`;
+      document.getElementById('mp-badge-card').textContent = `員工卡號：${staffAuth7F.card}`;
+
+      document.getElementById('mp-logout-btn').addEventListener('click', () => {
+        sendNetPacket7F({ type: 'leave' });
+        sessionStorage.removeItem('vh_user_session');
+        localStorage.removeItem('vh_last_card');
+        localStorage.removeItem('vh_last_name');
+        localStorage.removeItem('vh_last_role');
+        window.location.href = 'index.html';
+      });
+
+      document.getElementById('mp-chat-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('mp-chat-input');
+        const msg = input.value.trim();
+        if (!msg) return;
+        input.value = '';
+        appendChat7F(`${staffAuth7F.name}`, msg, false);
+        sendNetPacket7F({ type: 'chat', name: staffAuth7F.name, text: msg });
+        document.getElementById('game-canvas').focus();
+      });
+
+      if (typeof Peer === 'undefined') {
+        document.getElementById('mp-status-dot').textContent = '⚠️ 離線單機模式 (PeerJS 未載入)';
+        return;
+      }
+
+      const startAsHost = () => {
+        if (peer7F && !peer7F.destroyed) {
+          try { peer7F.destroy(); } catch (e) {}
+        }
+        peer7F = new Peer(ROOM_HOST_ID_7F);
+
+        peer7F.on('open', () => {
+          isRoomHost7F = true;
+          document.getElementById('mp-status-dot').textContent = '🟢 7F 房主伺服器已連線';
+          appendChat7F('', '您已建立 7F 多人連線頻道', true);
+        });
+
+        peer7F.on('connection', (conn) => {
+          clientConns7F.set(conn.peer, conn);
+          conn.on('open', () => {
+            // 新成員連入時，房主立刻把自己的位置傳給他
+            conn.send(buildMyStatePacket7F(false));
+          });
+          conn.on('data', (d) => handleNetPacket7F(conn.peer, d));
+          conn.on('close', () => {
+            clientConns7F.delete(conn.peer);
+            removeRemotePlayer7F(conn.peer);
+            clientConns7F.forEach((c) => {
+              if (c.open) c.send({ type: 'leave', peerId: conn.peer });
+            });
+          });
+        });
+
+        peer7F.on('error', (err) => {
+          if (err.type === 'unavailable-id') {
+            // 已有房主在線：銷毀舊實例並延遲 200ms 再轉為 Client，避免底層連線衝突
+            try { peer7F.destroy(); } catch (e) {}
+            setTimeout(startAsClient, 200);
+          } else {
+            // 其他網路或伺服器超時錯誤：顯示提示並於 2 秒後自動重試
+            const dot = document.getElementById('mp-status-dot');
+            if (dot) dot.textContent = '🟡 伺服器重連中...';
+            setTimeout(startAsHost, 2000);
+          }
+        });
+      };
+
+      const startAsClient = () => {
+        if (peer7F && !peer7F.destroyed) {
+          try { peer7F.destroy(); } catch (e) {}
+        }
+        peer7F = new Peer();
+
+        peer7F.on('open', () => {
+          isRoomHost7F = false;
+          hostConn7F = peer7F.connect(ROOM_HOST_ID_7F, { reliable: true });
+
+          hostConn7F.on('open', () => {
+            document.getElementById('mp-status-dot').textContent = '🟢 已連線至 7F 多人頻道';
+            appendChat7F('', '已成功加入 7F 綜合住院病房多人連線', true);
+            // 【關鍵修復】Client 連上線後立刻傳送自己的初始位置給房主與全員
+            sendNetPacket7F(buildMyStatePacket7F(false));
+          });
+
+          hostConn7F.on('data', (d) => handleNetPacket7F(ROOM_HOST_ID_7F, d));
+
+          hostConn7F.on('close', () => {
+            document.getElementById('mp-status-dot').textContent = '🟡 房主已離開，重新連線中...';
+            clearAllRemotePlayers7F();
+            setTimeout(startAsHost, 1200);
+          });
+
+          hostConn7F.on('error', () => {
+            document.getElementById('mp-status-dot').textContent = '🟡 連線中斷，嘗試重新建立連線...';
+            setTimeout(startAsHost, 1500);
+          });
+        });
+
+        peer7F.on('error', () => {
+          document.getElementById('mp-status-dot').textContent = '🟡 連線異常，重新嘗試中...';
+          setTimeout(startAsHost, 2000);
+        });
+      };
+
+      // 離開或切換樓層時主動通知其他玩家移除模型
+      window.addEventListener('beforeunload', () => {
+        sendNetPacket7F({ type: 'leave' });
+        if (peer7F && !peer7F.destroyed) {
+          try { peer7F.destroy(); } catch (e) {}
+        }
+      });
+
+      startAsHost();
+
+      setInterval(() => {
+        if (!player || !player.pos || !peer7F || !peer7F.id) return;
+        const moving = Boolean(
+          keys['KeyW'] || keys['KeyS'] || keys['KeyA'] || keys['KeyD'] ||
+          keys['ArrowUp'] || keys['ArrowDown'] || keys['ArrowLeft'] || keys['ArrowRight']
+        );
+        sendNetPacket7F(buildMyStatePacket7F(moving));
+      }, 60);
+    }
+
     window.onload = function () {
       initScene();
+      initMultiplayer7F();
       animateLoop();
     };
   </script>
