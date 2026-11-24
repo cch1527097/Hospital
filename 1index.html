@@ -616,36 +616,6 @@
       isTransitioning: false
     };
 
-    // ✅ 更新心理健康研究中心感應電動門（自動抓取真實世界座標）
-      if (window.mhAutoDoor) {
-        const door = window.mhAutoDoor;
-        door.doorGroup.getWorldPosition(door._worldPos);
-
-        const distToPlayer = Math.hypot(
-          player.pos.x - door._worldPos.x,
-          player.pos.z - door._worldPos.z
-        );
-
-        let npcNear = false;
-        if (typeof npcs !== 'undefined') {
-          for (let i = 0; i < npcs.length; i++) {
-            const p = npcs[i].pos || (npcs[i].mesh && npcs[i].mesh.position);
-            if (p && Math.hypot(p.x - door._worldPos.x, p.z - door._worldPos.z) < 6.5) {
-              npcNear = true;
-              break;
-            }
-          }
-        }
-
-        const targetOpen = (distToPlayer < 7.0 || npcNear) ? 1 : 0;
-        const step = (typeof dt === 'number' && dt > 0) ? Math.min(1, dt * 6.5) : 0.12;
-        door.openRatio += (targetOpen - door.openRatio) * step;
-
-        const offset = 1.1 + door.openRatio * 1.05;
-        door.leftLeaf.position.x = -offset;
-        door.rightLeaf.position.x = offset;
-      }
-
     // NPC 與動態汽機車陣列
     const securityGuards = [];
     const patientNPCs = [];
@@ -3183,6 +3153,81 @@
         entranceGroup.add(wallBase);
       });
 
+      // ✅ 左右兩邊牆壁改為與大門一致的深綠框架落地玻璃帷幕（連接門柱 ±4.95 至左右兩翼 ±11.25）
+      const sideGlassBackdropMat = new THREE.MeshBasicMaterial({ color: 0xfef3c7 });
+      const sideTransomMat = new THREE.MeshStandardMaterial({
+        color: 0x264653,
+        roughness: 0.12,
+        metalness: 0.85
+      });
+      const sideLowerGlassMat = new THREE.MeshStandardMaterial({
+        color: 0x1e3a4c,
+        transparent: true,
+        opacity: 0.72,
+        roughness: 0.08,
+        metalness: 0.82
+      });
+
+      [-1, 1].forEach((sideSign) => {
+        const extWallW = 6.3;
+        const extWallX = sideSign * (4.95 + extWallW / 2); // ±8.1
+        const extWallD = 0.5;
+        const lowerGlassH = 2.75; // 與大門門框高度對齊
+        const upperGlassH = facadeH - lowerGlassH; // 與大門上方氣窗高度對齊
+
+        // 1. 內部大廳暖光背板（與大門透出的室內微光一致）
+        const innerGlow = new THREE.Mesh(
+          new THREE.PlaneGeometry(extWallW - 0.16, facadeH - 0.1),
+          sideGlassBackdropMat
+        );
+        innerGlow.position.set(extWallX, facadeH / 2, facadeZ - 0.22);
+        entranceGroup.add(innerGlow);
+
+        // 2. 下層落地玻璃（高度 0 ~ 2.75，與大門左右固定玻璃一致）
+        const lowerPane = new THREE.Mesh(
+          new THREE.BoxGeometry(extWallW - 0.12, lowerGlassH - 0.1, 0.08),
+          sideLowerGlassMat
+        );
+        lowerPane.position.set(extWallX, lowerGlassH / 2, facadeZ + 0.04);
+        entranceGroup.add(lowerPane);
+
+        // 3. 上層深色氣窗玻璃（高度 2.75 ~ 4.65，與大門上方氣窗一致）
+        const upperPane = new THREE.Mesh(
+          new THREE.PlaneGeometry(extWallW - 0.12, upperGlassH - 0.15),
+          sideTransomMat
+        );
+        upperPane.position.set(extWallX, lowerGlassH + upperGlassH / 2, facadeZ + 0.235);
+        entranceGroup.add(upperPane);
+
+        // 4. 深綠色水平橫樑（頂樑、中橫樑、門把高度腰樑、底部踢腳樑）
+        const topFrame = new THREE.Mesh(new THREE.BoxGeometry(extWallW, 0.16, extWallD), darkGreenFrameMat);
+        topFrame.position.set(extWallX, facadeH - 0.08, facadeZ);
+
+        const transomBar = new THREE.Mesh(new THREE.BoxGeometry(extWallW, 0.16, extWallD), darkGreenFrameMat);
+        transomBar.position.set(extWallX, lowerGlassH, facadeZ);
+
+        const midRail = new THREE.Mesh(new THREE.BoxGeometry(extWallW, 0.12, 0.14), darkGreenFrameMat);
+        midRail.position.set(extWallX, 1.15, facadeZ + 0.05);
+
+        const botBase = new THREE.Mesh(new THREE.BoxGeometry(extWallW, 0.22, extWallD + 0.06), concreteBeigeMat);
+        botBase.position.set(extWallX, 0.11, facadeZ);
+
+        entranceGroup.add(topFrame, transomBar, midRail, botBase);
+
+        // 5. 深綠色垂直分割立柱（均分為 4 格玻璃，寬度比例與中央大門 4 格完全一致）
+        const cols = 4;
+        for (let i = 0; i <= cols; i++) {
+          const mullionX = extWallX - extWallW / 2 + (i / cols) * extWallW;
+          const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.11, facadeH, extWallD), darkGreenFrameMat);
+          mullion.position.set(mullionX, facadeH / 2, facadeZ);
+          mullion.castShadow = true;
+          entranceGroup.add(mullion);
+        }
+
+        // 6. 實體碰撞箱防止角色穿牆
+        addCollider(extWallX, facadeZ, extWallW, extWallD, facadeH, '大門左右兩側落地玻璃帷幕');
+      });
+
       const leftCoupletTex = createCoupletTexture(['向', '日', '葵', '園', '護', '百', '姓']);
       const rightCoupletTex = createCoupletTexture(['仁', '心', '醫', '術', '澤', '四', '方']);
 
@@ -4144,172 +4189,311 @@
 
       campusGroup.add(forecourtGroup);
 
-      // (D) 心理健康研究中心
       const mentalGroup = new THREE.Group();
-      const mhCenterX = -113.0;
-      const mhCenterZ = -34.0;
-      mentalGroup.position.set(mhCenterX, 0, mhCenterZ);
+      mentalGroup.position.set(-113.0, 0, -34.0);
       mentalGroup.rotation.y = Math.PI / 2;
+      const mhBeamY = 5.4;
 
-      const mhPlaza = new THREE.Mesh(
-        new THREE.BoxGeometry(44.0, 0.10, 34.0),
-        new THREE.MeshStandardMaterial({ map: entranceTileTex, roughness: 0.78 })
-      );
-      mhPlaza.position.set(0, 0.05, 11.5);
-      mhPlaza.receiveShadow = true;
-      mentalGroup.add(mhPlaza);
+      const extraDepth = 14.0;
 
-      const mhWallTex = createMentalHealthWallTextures(3, 6);
+      const mhWallTex = createMentalHealthWallTextures(4, 6);
       const mhWallMat = new THREE.MeshStandardMaterial({
         map: mhWallTex.map,
-        emissive: new THREE.Color(0xffdfa0),
+        emissive: new THREE.Color(0xffe19c),
         emissiveMap: mhWallTex.emissiveMap,
         emissiveIntensity: 0.0,
         roughness: 0.72
       });
       nightGlowMaterials.push(mhWallMat);
 
-      [-12.8, 12.8].forEach((offsetX, idx) => {
-        const towerX = offsetX;
-        const towerZ = 4.5;
-        const towerW = 11.4;
-        const towerD = 18.5;
-        const towerH = 22.8;
+      const mhSideWideWallTex = createMentalHealthWallTextures(5, 6);
+      const mhSideWideWallMat = new THREE.MeshStandardMaterial({
+        map: mhSideWideWallTex.map,
+        emissive: new THREE.Color(0xffe19c),
+        emissiveMap: mhSideWideWallTex.emissiveMap,
+        emissiveIntensity: 0.0,
+        roughness: 0.72
+      });
+      nightGlowMaterials.push(mhSideWideWallMat);
 
-        const towerBody = new THREE.Mesh(
-          new THREE.BoxGeometry(towerW, towerH, towerD),
-          [mhWallMat, mhWallMat, concreteBeigeMat, concreteBeigeMat, mhWallMat, mhWallMat]
+      const centerDepth = 14.2 + extraDepth;
+      const centerZ = -0.4 - extraDepth / 2;
+      const mhCenterMain = new THREE.Mesh(
+        new THREE.BoxGeometry(15.2, 23.5, centerDepth),
+        [mhSideWideWallMat, mhSideWideWallMat, concreteBeigeMat, concreteBeigeMat, mhWallMat, mhWallMat]
+      );
+      mhCenterMain.position.set(0, 11.75, centerZ);
+      mhCenterMain.castShadow = true;
+      mhCenterMain.receiveShadow = true;
+      mentalGroup.add(mhCenterMain);
+
+      addCollider(-113.0 + centerZ, -34.0, centerDepth + 1.4, 15.0, 23.5, '心理健康研究中心');
+
+
+      const wingWidth = 10.2;
+      const wingDepth = 16.8 + extraDepth;
+      const wingCenterZ = 0.0 - extraDepth / 2;
+      const wingCenterOffset = 7.2 + wingWidth / 2; // 12.3
+
+      [-wingCenterOffset, wingCenterOffset].forEach((wx) => {
+        const wingTower = new THREE.Mesh(
+          new THREE.BoxGeometry(wingWidth, 25.0, wingDepth),
+          [mhSideWideWallMat, mhSideWideWallMat, concreteBeigeMat, concreteBeigeMat, mhWallMat, mhWallMat]
         );
-        towerBody.position.set(towerX, towerH / 2, towerZ);
-        towerBody.castShadow = true;
-        towerBody.receiveShadow = true;
+        wingTower.position.set(wx, 12.5, wingCenterZ);
+        wingTower.castShadow = true;
+        wingTower.receiveShadow = true;
+        mentalGroup.add(wingTower);
 
-        const crownNeck = new THREE.Mesh(
-          new THREE.BoxGeometry(towerW + 0.3, 1.4, towerD + 0.3),
-          concreteBeigeMat
-        );
-        crownNeck.position.set(towerX, towerH + 0.7, towerZ);
-
-        const crownRoof = new THREE.Mesh(
-          new THREE.BoxGeometry(towerW + 1.3, 0.65, towerD + 1.3),
-          new THREE.MeshStandardMaterial({ color: 0x6b4738, roughness: 0.75 })
-        );
-        crownRoof.position.set(towerX, towerH + 1.72, towerZ);
-        crownRoof.castShadow = true;
-
-        mentalGroup.add(towerBody, crownNeck, crownRoof);
-        addCollider(mhCenterX + towerZ, mhCenterZ - towerX, towerD + 0.3, towerW + 0.3, towerH + 2.0, idx === 0 ? '心理健康研究中心北翼塔樓' : '心理健康研究中心南翼塔樓');
+        addCollider(-113.0 + wingCenterZ, -34.0 - wx, wingDepth + 0.2, wingWidth + 0.2, 25.0, '心理健康研究中心');
       });
 
-      const mhCenterBlock = new THREE.Mesh(
-        new THREE.BoxGeometry(16.8, 17.5, 13.0),
-        [mhWallMat, mhWallMat, concreteBeigeMat, concreteBeigeMat, mhWallMat, mhWallMat]
-      );
-      mhCenterBlock.position.set(0, 8.75, 0.5);
-      mhCenterBlock.castShadow = true;
-      mhCenterBlock.receiveShadow = true;
-      mentalGroup.add(mhCenterBlock);
-      addCollider(mhCenterX + 0.5, mhCenterZ, 13.0, 16.8, 17.5, '心理健康研究中心中央連通棟');
+      const mhPorticoW = 15.6;
+      const mhPorticoD = 11.5;
+      const mhPorticoCenterZ = 7.08 + mhPorticoD / 2; // 12.83
 
-      const mhPorticoZ = 14.5;
-      const mhPorticoW = 15.2;
-      const mhPorticoD = 9.2;
-      const mhBeamY = 5.4;
-      const mhBeamH = 1.45;
-
-      const mhSignTex = createMentalHealthSignTexture();
-      const mhSignMat = new THREE.MeshStandardMaterial({ map: mhSignTex, roughness: 0.55 });
-
-      // 1. 前方招牌橫樑
-      const mhFrontBeam = new THREE.Mesh(
-        new THREE.BoxGeometry(mhPorticoW, mhBeamH, 0.85),
-        [concreteBeigeMat, concreteBeigeMat, concreteBeigeMat, concreteBeigeMat, mhSignMat, concreteBeigeMat]
-      );
-      mhFrontBeam.position.set(0, mhBeamY + mhBeamH / 2, mhPorticoZ + mhPorticoD / 2);
-      mhFrontBeam.castShadow = true;
-      mentalGroup.add(mhFrontBeam);
-
-      // 2. 門廊天花板頂板（連接建築本體到前方招牌橫樑）
-      const mhCeilingSlab = new THREE.Mesh(
-        new THREE.BoxGeometry(mhPorticoW + 0.3, 0.55, mhPorticoD + 2.8),
-        concreteBeigeMat
-      );
-      mhCeilingSlab.position.set(0, mhBeamY + mhBeamH - 0.15, mhPorticoZ - 1.0);
-      mhCeilingSlab.castShadow = true;
-      mhCeilingSlab.receiveShadow = true;
-      mentalGroup.add(mhCeilingSlab);
-
-      // 3. 左右兩側邊樑
-      [-mhPorticoW / 2 + 0.425, mhPorticoW / 2 - 0.425].forEach((sideX) => {
-        const mhSideBeam = new THREE.Mesh(
-          new THREE.BoxGeometry(0.85, mhBeamH, mhPorticoD + 2.4),
-          concreteBeigeMat
-        );
-        mhSideBeam.position.set(sideX, mhBeamY + mhBeamH / 2, mhPorticoZ - 1.0);
-        mhSideBeam.castShadow = true;
-        mentalGroup.add(mhSideBeam);
+      const mhBeamSignMat = new THREE.MeshStandardMaterial({
+        map: createMentalHealthSignTexture(),
+        roughness: 0.45
       });
 
-      // 4. 門廊四根紅磚支撐柱與碰撞箱
-      [-5.6, 5.6].forEach((cx) => {
-        [mhPorticoZ + mhPorticoD / 2 - 0.3, mhPorticoZ - mhPorticoD / 2 + 0.5].forEach((cz) => {
-          const brickCol = new THREE.Mesh(new THREE.BoxGeometry(1.02, mhBeamY, 1.02), redBrickMat);
-          brickCol.position.set(cx, mhBeamY / 2, cz);
-          brickCol.castShadow = true;
-          brickCol.receiveShadow = true;
-          mentalGroup.add(brickCol);
-          addCollider(mhCenterX + cz, mhCenterZ - cx, 1.15, 1.15, mhBeamY, '心理研究大樓門廊方柱');
+      const mhPorticoSlab = new THREE.Mesh(
+        new THREE.BoxGeometry(mhPorticoW, 1.35, mhPorticoD),
+        [
+          concreteBeigeMat, // 右側 (+X)
+          concreteBeigeMat, // 左側 (-X)
+          concreteBeigeMat, // 頂面 (+Y)
+          concreteBeigeMat, // 底面 (-Y)
+          mhBeamSignMat,    // 正前方 (+Z)：心理健康研究中心字體直接印在此處
+          concreteBeigeMat  // 後側 (-Z)
+        ]
+      );
+      mhPorticoSlab.position.set(0, mhBeamY + 0.675, mhPorticoCenterZ);
+      mhPorticoSlab.castShadow = true;
+      mhPorticoSlab.receiveShadow = true;
+      mentalGroup.add(mhPorticoSlab);
+
+      // 頂板上方收邊壓頂
+      const mhPorticoCoping = new THREE.Mesh(
+        new THREE.BoxGeometry(mhPorticoW + 0.35, 0.24, mhPorticoD + 0.35),
+        concreteDarkTrimMat
+      );
+      mhPorticoCoping.position.set(0, mhBeamY + 1.45, mhPorticoCenterZ);
+      mhPorticoCoping.castShadow = true;
+      mentalGroup.add(mhPorticoCoping);
+
+      // 底面縱向格柵橫樑
+      [-6.2, -3.1, 0, 3.1, 6.2].forEach((gx) => {
+        const rib = new THREE.Mesh(
+          new THREE.BoxGeometry(0.24, 0.32, mhPorticoD - 0.6),
+          concreteDarkTrimMat
+        );
+        rib.position.set(gx, mhBeamY - 0.12, mhPorticoCenterZ);
+        mentalGroup.add(rib);
+      });
+
+      // 前後雙排紅磚支撐柱（高度皆齊平於頂棚底面 mhBeamY，不再穿出屋頂）
+      const mhColXs = [-6.4, 6.4];
+      const mhColZs = [11.2, 17.8];
+
+      mhColXs.forEach((px) => {
+        mhColZs.forEach((pz) => {
+          const porticoCol = new THREE.Mesh(
+            new THREE.BoxGeometry(1.18, mhBeamY - 0.75, 1.18),
+            redBrickMat
+          );
+          porticoCol.position.set(px, 0.75 + (mhBeamY - 0.75) / 2, pz);
+          porticoCol.castShadow = true;
+          porticoCol.receiveShadow = true;
+
+          const colPlinth = new THREE.Mesh(
+            new THREE.BoxGeometry(1.30, 0.75, 1.30),
+            concreteBeigeMat
+          );
+          colPlinth.position.set(px, 0.375, pz);
+          colPlinth.castShadow = true;
+
+          mentalGroup.add(porticoCol, colPlinth);
+
+          const worldColX = -113.0 + pz;
+          const worldColZ = -34.0 - px;
+          addCollider(worldColX, worldColZ, 1.3, 1.3, mhBeamY, '心理健康研究中心');
         });
       });
 
-      const mhDoorGroup = new THREE.Group();
-      const mhDoorZ = 7.08;
-      mhDoorGroup.position.set(0, 0, mhDoorZ);
-      mentalGroup.add(mhDoorGroup);
+      const floorStartZ = 7.08;
+      const floorEndZ = 28.98; 
+      const floorDepth = floorEndZ - floorStartZ; // 21.90
+      const floorWidth = 34.8;
 
-      const mhDoorFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.75, roughness: 0.25 });
-      const mhDoorGlassMat = new THREE.MeshStandardMaterial({
-        color: 0x7dd3fc,
-        emissive: 0x0369a1,
-        emissiveIntensity: 0.35,
+      const mhFloorTex = entranceTileTex.clone();
+      mhFloorTex.needsUpdate = true;
+      mhFloorTex.repeat.set(11, 7);
+
+      const mhPorticoFloor = new THREE.Mesh(
+        new THREE.PlaneGeometry(floorWidth, floorDepth),
+        new THREE.MeshStandardMaterial({ map: mhFloorTex, roughness: 0.75 })
+      );
+      mhPorticoFloor.rotation.x = -Math.PI / 2;
+      mhPorticoFloor.position.set(0, 0.018, (floorStartZ + floorEndZ) / 2); // Y=0.018 低於馬路(0.020)，避免閃爍重疊
+      mhPorticoFloor.receiveShadow = true;
+      mentalGroup.add(mhPorticoFloor);
+
+      const mhFacadeZ = 7.08;
+      const mhFacadeH = mhBeamY;
+      const mhDoorOpeningH = 2.75;
+      const mhPortalWidth = 6.7;
+
+      const mhSideGlassBackdropMat = new THREE.MeshBasicMaterial({ color: 0xfef3c7 });
+      const mhSideTransomMat = new THREE.MeshStandardMaterial({
+        color: 0x264653,
+        roughness: 0.12,
+        metalness: 0.85
+      });
+      const mhSideLowerGlassMat = new THREE.MeshStandardMaterial({
+        color: 0x1e3a4c,
         transparent: true,
         opacity: 0.72,
-        roughness: 0.1
+        roughness: 0.08,
+        metalness: 0.82
       });
 
-      // 不鏽鋼門框（左右立柱 + 上橫樑 + 感應器黑盒）
-      const mhLeftFrame = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.2, 0.26), mhDoorFrameMat);
-      mhLeftFrame.position.set(-2.3, 1.6, 0);
-      const mhRightFrame = new THREE.Mesh(new THREE.BoxGeometry(0.18, 3.2, 0.26), mhDoorFrameMat);
-      mhRightFrame.position.set(2.3, 1.6, 0);
-      const mhTopFrame = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.28, 0.3), mhDoorFrameMat);
-      mhTopFrame.position.set(0, 3.15, 0);
-      const mhSensorBox = new THREE.Mesh(
-        new THREE.BoxGeometry(0.65, 0.14, 0.18),
-        new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 })
-      );
-      mhSensorBox.position.set(0, 3.32, 0.14);
-      mhDoorGroup.add(mhLeftFrame, mhRightFrame, mhTopFrame, mhSensorBox);
+      [-4.15, 4.15].forEach((wx) => {
+        const wallPier = new THREE.Mesh(new THREE.BoxGeometry(1.6, mhFacadeH, 0.9), redBrickMat);
+        wallPier.position.set(wx, mhFacadeH / 2, mhFacadeZ);
+        wallPier.castShadow = true;
+        wallPier.receiveShadow = true;
+        mentalGroup.add(wallPier);
 
-      // 左右雙開玻璃門扇（閉合時 X = ±1.1，開啟時滑向 X = ±2.15）
-      const mhLeftLeaf = new THREE.Mesh(new THREE.BoxGeometry(2.15, 2.98, 0.08), mhDoorGlassMat);
-      mhLeftLeaf.position.set(-1.1, 1.5, 0.02);
-      const mhRightLeaf = new THREE.Mesh(new THREE.BoxGeometry(2.15, 2.98, 0.08), mhDoorGlassMat);
-      mhRightLeaf.position.set(1.1, 1.5, 0.02);
+        const wallBase = new THREE.Mesh(new THREE.BoxGeometry(1.66, 0.82, 0.96), concreteBeigeMat);
+        wallBase.position.set(wx, 0.41, mhFacadeZ);
+        mentalGroup.add(wallBase);
+      });
+
+
+      [-1, 1].forEach((sideSign) => {
+        const extWallW = 2.25;
+        const extWallX = sideSign * (4.95 + extWallW / 2); // ±6.075
+        const extWallD = 0.5;
+        const upperGlassH = mhFacadeH - mhDoorOpeningH;
+
+        const innerGlow = new THREE.Mesh(
+          new THREE.PlaneGeometry(extWallW - 0.12, mhFacadeH - 0.1),
+          mhSideGlassBackdropMat
+        );
+        innerGlow.position.set(extWallX, mhFacadeH / 2, mhFacadeZ - 0.22);
+        mentalGroup.add(innerGlow);
+
+        const lowerPane = new THREE.Mesh(
+          new THREE.BoxGeometry(extWallW - 0.1, mhDoorOpeningH - 0.1, 0.08),
+          mhSideLowerGlassMat
+        );
+        lowerPane.position.set(extWallX, mhDoorOpeningH / 2, mhFacadeZ + 0.04);
+        mentalGroup.add(lowerPane);
+
+        const upperPane = new THREE.Mesh(
+          new THREE.PlaneGeometry(extWallW - 0.1, upperGlassH - 0.15),
+          mhSideTransomMat
+        );
+        upperPane.position.set(extWallX, mhDoorOpeningH + upperGlassH / 2, mhFacadeZ + 0.235);
+        mentalGroup.add(upperPane);
+
+        const topFrame = new THREE.Mesh(new THREE.BoxGeometry(extWallW, 0.16, extWallD), darkGreenFrameMat);
+        topFrame.position.set(extWallX, mhFacadeH - 0.08, mhFacadeZ);
+
+        const transomBar = new THREE.Mesh(new THREE.BoxGeometry(extWallW, 0.16, extWallD), darkGreenFrameMat);
+        transomBar.position.set(extWallX, mhDoorOpeningH, mhFacadeZ);
+
+        const midRail = new THREE.Mesh(new THREE.BoxGeometry(extWallW, 0.12, 0.14), darkGreenFrameMat);
+        midRail.position.set(extWallX, 1.15, mhFacadeZ + 0.05);
+
+        const botBase = new THREE.Mesh(new THREE.BoxGeometry(extWallW, 0.22, extWallD + 0.06), concreteBeigeMat);
+        botBase.position.set(extWallX, 0.11, mhFacadeZ);
+
+        mentalGroup.add(topFrame, transomBar, midRail, botBase);
+
+        for (let i = 0; i <= 2; i++) {
+          const mullionX = extWallX - extWallW / 2 + (i / 2) * extWallW;
+          const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.11, mhFacadeH, extWallD), darkGreenFrameMat);
+          mullion.position.set(mullionX, mhFacadeH / 2, mhFacadeZ);
+          mullion.castShadow = true;
+          mentalGroup.add(mullion);
+        }
+      });
+
+      const mhTopTransomFrame = new THREE.Mesh(
+        new THREE.BoxGeometry(mhPortalWidth, mhFacadeH - mhDoorOpeningH, 0.45),
+        darkGreenFrameMat
+      );
+      mhTopTransomFrame.position.set(0, mhDoorOpeningH + (mhFacadeH - mhDoorOpeningH) / 2, mhFacadeZ);
+      mentalGroup.add(mhTopTransomFrame);
+
+      const mhTransomGlass = new THREE.Mesh(
+        new THREE.PlaneGeometry(mhPortalWidth - 0.3, mhFacadeH - mhDoorOpeningH - 0.35),
+        mhSideTransomMat
+      );
+      mhTransomGlass.position.set(0, mhDoorOpeningH + (mhFacadeH - mhDoorOpeningH) / 2, mhFacadeZ + 0.235);
+      mentalGroup.add(mhTransomGlass);
+
+      [-3.25, -1.65, 0, 1.65, 3.25].forEach((mx) => {
+        const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.11, mhFacadeH, 0.5), darkGreenFrameMat);
+        mullion.position.set(mx, mhFacadeH / 2, mhFacadeZ);
+        mentalGroup.add(mullion);
+      });
+
+      const mhLobbyGlowBackdrop = new THREE.Mesh(
+        new THREE.PlaneGeometry(mhPortalWidth - 0.2, mhDoorOpeningH),
+        mhSideGlassBackdropMat
+      );
+      mhLobbyGlowBackdrop.position.set(0, mhDoorOpeningH / 2, mhFacadeZ - 0.22);
+      mentalGroup.add(mhLobbyGlowBackdrop);
+
+      [-2.45, 2.45].forEach((fx) => {
+        const fixedPane = new THREE.Mesh(new THREE.BoxGeometry(1.48, mhDoorOpeningH - 0.1, 0.08), mhSideLowerGlassMat);
+        fixedPane.position.set(fx, mhDoorOpeningH / 2, mhFacadeZ + 0.04);
+        const midRail = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.12, 0.12), darkGreenFrameMat);
+        midRail.position.set(fx, 1.15, mhFacadeZ + 0.05);
+        mentalGroup.add(fixedPane, midRail);
+      });
+
+      const mhDoorGroup = new THREE.Group();
+      mhDoorGroup.position.set(0, 0, mhFacadeZ + 0.10);
+      mentalGroup.add(mhDoorGroup);
+
+      const mhLeftLeaf = buildGreenFrameDoorLeaf(-0.78, 0, mhDoorOpeningH);
+      const mhRightLeaf = buildGreenFrameDoorLeaf(0.78, 0, mhDoorOpeningH);
       mhDoorGroup.add(mhLeftLeaf, mhRightLeaf);
 
-      // 儲存心理健康研究中心電動門狀態（含世界座標換算供感應偵測）
+      const mhWelcomeMat = new THREE.Mesh(
+        new THREE.BoxGeometry(3.25, 0.025, 1.45),
+        new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.92 })
+      );
+      mhWelcomeMat.position.set(0, 0.11, mhFacadeZ + 1.05);
+      mhWelcomeMat.receiveShadow = true;
+      mentalGroup.add(mhWelcomeMat);
+
+      const mhSensorRingMat = new THREE.MeshBasicMaterial({
+        color: 0x10b981,
+        transparent: true,
+        opacity: 0.85,
+        side: THREE.DoubleSide
+      });
+      const mhSensorRing = new THREE.Mesh(new THREE.RingGeometry(1.45, 1.72, 32), mhSensorRingMat);
+      mhSensorRing.rotation.x = -Math.PI / 2;
+      mhSensorRing.position.set(0, 0.115, mhFacadeZ + 2.1);
+      mentalGroup.add(mhSensorRing);
+
       window.mhAutoDoor = {
         doorGroup: mhDoorGroup,
         leftLeaf: mhLeftLeaf,
         rightLeaf: mhRightLeaf,
+        sensorRing: mhSensorRing,
         openRatio: 0,
         _worldPos: new THREE.Vector3()
       };
 
       campusGroup.add(mentalGroup);
 
-      // (E) 亞洲遠距微創手術中心 (Asia IRCAD Taiwan)
       const ircadGroup = new THREE.Group();
       const irX = -114.0;
       const irZ = 24.5;
@@ -4328,18 +4512,22 @@
       });
       nightGlowMaterials.push(irGlassMat);
 
-      const glassBoxW = 24.0;
+      // 1. 下層金色玻璃幕牆：左緣延伸至 -124.45 緊貼翼樓東牆(-124.5)，完整補齊洞口，右緣維持原本 -99.5
+      const glassLeftX = -124.45;
+      const glassRightX = irX + 2.5 + 24.0 / 2; // -99.5
+      const glassBoxW = glassRightX - glassLeftX;          // 24.95
+      const glassBoxX = (glassRightX + glassLeftX) / 2;    // -111.975
       const glassBoxD = 22.0;
       const glassBoxH = 7.4;
       const glassBox = new THREE.Mesh(
         new THREE.BoxGeometry(glassBoxW, glassBoxH, glassBoxD),
         irGlassMat
       );
-      glassBox.position.set(irX + 2.5, glassBoxH / 2, irZ - 2.0);
+      glassBox.position.set(glassBoxX, glassBoxH / 2, irZ - 2.0);
       glassBox.castShadow = true;
       glassBox.receiveShadow = true;
       ircadGroup.add(glassBox);
-      addCollider(irX + 2.5, irZ - 2.0, glassBoxW, glassBoxD, glassBoxH, '亞洲遠距微創手術中心玻璃帷幕大廳');
+      addCollider(glassBoxX, irZ - 2.0, glassBoxW, glassBoxD, glassBoxH, '亞洲遠距微創手術中心玻璃帷幕大廳');
 
       const irUpperTex = createIrcadUpperWallTextures(6);
       const irUpperMat = new THREE.MeshStandardMaterial({
@@ -4401,8 +4589,9 @@
       eastSignBoard.rotation.y = Math.PI / 2;
       ircadGroup.add(eastSignBoard);
 
-      const irDomeX = irX + 2.2;
-      const irDomeZ = irZ + 1.5;
+      // 2. 屋頂圓盤：往右(東側)移至 irX + 6.5，並對齊東側招牌 Z 軸(irZ - 6.8)，讓圓盤外緣緊貼 Ircad Taiwan 字體
+      const irDomeX = irX + 6.3;
+      const irDomeZ = irZ - 2.6;
       const irDomeDrum = new THREE.Mesh(
         new THREE.CylinderGeometry(11.5, 11.5, 2.2, 44),
         new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.45, metalness: 0.4 })
@@ -4418,19 +4607,8 @@
       irDomeCap.castShadow = true;
       ircadGroup.add(irDomeDrum, irDomeCap);
 
-      const irWestBrickWing = new THREE.Mesh(
-        new THREE.BoxGeometry(16.5, 13.5, 24.0),
-        [wingWallMat, wingWallMat, creamStoneMat, creamStoneMat, wingWallMat, wingWallMat]
-      );
-      irWestBrickWing.position.set(irX - 18.5, 6.75, irZ + 1.5);
-      irWestBrickWing.castShadow = true;
-      irWestBrickWing.receiveShadow = true;
-      ircadGroup.add(irWestBrickWing);
-      addCollider(irX - 18.5, irZ + 1.5, 16.5, 24.0, 13.5, '亞洲微創中心西側紅磚實驗棟');
-
       campusGroup.add(ircadGroup);
 
-      // (F) 核心實驗大樓 (Core Research & Lab Building)
       const coreLabGroup = new THREE.Group();
       const clX = -144.0;
 
@@ -4486,21 +4664,48 @@
       });
       nightGlowMaterials.push(clWingMat);
 
-      const clWingW = 10.5;
-      const clWingD = 31.0;
+      // 1. 左右(X軸)：從微創中心西側(-124.5)延伸至核心實驗主塔西側最外緣(-149.75)，絕不超過
+      const clWingRightX = -124.5;
+      const clWingLeftX = -149.75;
+      const clWingW = clWingRightX - clWingLeftX;
+      const clWingX = (clWingRightX + clWingLeftX) / 2;
+
+      // 2. 前後(Z軸)：北緣退至實驗主塔南牆(14.25)之外的 14.35（保留 0.1 間隙，徹底解決左側重疊破圖），南緣齊平微創中心(36.50)
+      const clWingNorthZ = 14.35;
+      const clWingSouthZ = 36.50;
+      const clWingD = clWingSouthZ - clWingNorthZ;         // 22.15
+      const clWingZ = (clWingNorthZ + clWingSouthZ) / 2;   // 25.425
       const clWingH = 14.5;
-      const clWingX = clX - 9.0;
-      const clWingZ = 12.0;
+
+      const clWingFrontTex = createCoreLabSideWingTextures(14, 3);
+      const clWingFrontMat = new THREE.MeshStandardMaterial({
+        map: clWingFrontTex.map,
+        emissive: new THREE.Color(0xffe19c),
+        emissiveMap: clWingFrontTex.emissiveMap,
+        emissiveIntensity: 0.0,
+        roughness: 0.65
+      });
+      nightGlowMaterials.push(clWingFrontMat);
+
+      const clWingSideTex = createCoreLabSideWingTextures(10, 3);
+      const clWingSideMat = new THREE.MeshStandardMaterial({
+        map: clWingSideTex.map,
+        emissive: new THREE.Color(0xffe19c),
+        emissiveMap: clWingSideTex.emissiveMap,
+        emissiveIntensity: 0.0,
+        roughness: 0.65
+      });
+      nightGlowMaterials.push(clWingSideMat);
 
       const clWing = new THREE.Mesh(
         new THREE.BoxGeometry(clWingW, clWingH, clWingD),
-        [clWingMat, clWingMat, creamStoneMat, creamStoneMat, clWingMat, clWingMat]
+        [clWingSideMat, clWingSideMat, creamStoneMat, creamStoneMat, clWingFrontMat, clWingFrontMat]
       );
       clWing.position.set(clWingX, clWingH / 2, clWingZ);
       clWing.castShadow = true;
       clWing.receiveShadow = true;
       coreLabGroup.add(clWing);
-      addCollider(clWingX, clWingZ, clWingW, clWingD, clWingH, '核心實驗大樓連通實驗翼樓');
+      addCollider(clWingX, clWingZ, clWingW, clWingD, clWingH, '核心實驗大樓連通實驗翼樓（零重疊完整版）');
 
       const palmTrunkMat = new THREE.MeshStandardMaterial({ color: 0x6b5344, roughness: 0.9 });
       const palmLeafMat = new THREE.MeshStandardMaterial({ color: 0x3b6e32, roughness: 0.75 });
@@ -6434,6 +6639,38 @@ if (linkEl) linkEl.href = targetUrl;
         triggerEnterLobby1F('急診自動電動門');
       }
 
+      if (window.mhAutoDoor) {
+        const door = window.mhAutoDoor;
+        door.doorGroup.getWorldPosition(door._worldPos);
+
+        const distToPlayer = Math.hypot(
+          activeEntityPos.x - door._worldPos.x,
+          activeEntityPos.z - door._worldPos.z
+        );
+
+        let npcNear = false;
+        const allCampusPeople = [...patientNPCs, ...securityGuards];
+        for (let i = 0; i < allCampusPeople.length; i++) {
+          const p = allCampusPeople[i].pos;
+          if (p && Math.hypot(p.x - door._worldPos.x, p.z - door._worldPos.z) < 6.0) {
+            npcNear = true;
+            break;
+          }
+        }
+
+        const targetOpen = (distToPlayer < 6.2 || npcNear) ? 1 : 0;
+        door.openRatio += (targetOpen - door.openRatio) * Math.min(1, dt * 6);
+
+        const offset = 0.78 + door.openRatio * 1.36;
+        door.leftLeaf.position.x = -offset;
+        door.rightLeaf.position.x = offset;
+
+        if (door.sensorRing) {
+          door.sensorRing.material.color.setHex(targetOpen > 0 ? 0xfbbf24 : 0x10b981);
+          door.sensorRing.scale.setScalar(1 + Math.sin(performance.now() * 0.006) * 0.05);
+        }
+      }
+
       if (!player.inVehicle) {
         const isSprinting = keys['ShiftLeft'] || keys['ShiftRight'];
         const moveSpeed = isSprinting ? 8.8 : 5.0;
@@ -6981,16 +7218,16 @@ if (linkEl) linkEl.href = targetUrl;
       });
 
       document.getElementById('tp-plaza').addEventListener('click', () => {
-        teleportTo(0.0, 2.2, Math.PI, '大門迎賓雨庇區（靠近玻璃大門自動進入 1F.html）');
+        teleportTo(0.0, 2.2, Math.PI, '大門迎賓雨庇區');
       });
       document.getElementById('tp-temple').addEventListener('click', () => {
-        teleportTo(48.5, 19.2, Math.PI, '彰濱天后宮（靠近銅製天公爐按 E 上香祈福）');
+        teleportTo(48.5, 19.2, Math.PI, '天后宮');
       });
       document.getElementById('tp-emergency').addEventListener('click', () => {
-        teleportTo(32.8, -40.5, -Math.PI / 2, '急診自動電動門（向前走入即進入 1F 急診大廳）', Math.PI / 2);
+        teleportTo(32.8, -40.5, -Math.PI / 2, '急診自動電動門', Math.PI / 2);
       });
       document.getElementById('tp-trafficjam').addEventListener('click', () => {
-        teleportTo(-62.0, 38.5, Math.PI * 0.78, '塞車十字路口（紅綠燈動態車流）');
+        teleportTo(-62.0, 38.5, Math.PI * 0.78, '塞車十字路口');
       });
       document.getElementById('tp-mental').addEventListener('click', () => {
         teleportTo(-90.5, -34.0, -Math.PI / 2, '心理健康研究中心');
@@ -6999,7 +7236,7 @@ if (linkEl) linkEl.href = targetUrl;
         teleportTo(-91.5, 24.5, -Math.PI / 2, '亞洲遠距微創手術中心 (Asia IRCAD Taiwan)');
       });
       document.getElementById('tp-corelab').addEventListener('click', () => {
-        teleportTo(-130.5, 4.6, -Math.PI / 2, '核心實驗大樓 (R+D+M 研發中心)');
+        teleportTo(-130.5, 4.6, -Math.PI / 2, '核心實驗大樓');
       });
 
       document.querySelectorAll('.touch-dir').forEach((btn) => {
