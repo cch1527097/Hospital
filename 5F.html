@@ -6,6 +6,7 @@
   <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <!-- Three.js r128 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Google Fonts -->
@@ -13,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 
-  <style>
+    <style>
     * {
       box-sizing: border-box;
       user-select: none;
@@ -85,6 +86,38 @@
     <h1 class="text-2xl sm:text-3xl font-black tracking-wider text-teal-300 mb-1">向日葵醫院-模擬人生</h1>
     <p class="text-xs sm:text-sm text-slate-300">正在載入...</p>
   </div>
+
+<!-- 左下角（小地圖正上方）：5F 員工識別證與即時聊天室面板（已同步 3F.html 大小） -->
+<div class="fixed bottom-44 sm:bottom-52 left-4 z-20 w-64 sm:w-72 hud-glass rounded-xl p-2.5 text-white shadow-xl pointer-events-auto border border-teal-400/35">
+  <!-- 頂部連線狀態列 -->
+  <div class="flex items-center justify-between border-b border-white/10 pb-1.5 mb-1.5">
+    <span id="mp-status-dot" class="text-[11px] font-bold text-teal-300">
+      ● 5F 醫療樓層連線中...
+    </span>
+    <span id="mp-peer-count" class="px-1.5 py-0.5 rounded bg-teal-500/20 text-[10px] font-bold text-teal-300">
+      1 人在線
+    </span>
+  </div>
+
+  <!-- 員工識別證資訊（對應 3F 線上玩家名單區域高度） -->
+  <div id="mp-badge-card" class="text-[10px] text-slate-300 max-h-14 overflow-y-auto mb-1.5">
+    🪪 職員登入中
+  </div>
+
+  <!-- 5F 室內即時聊天訊息區（同步 3F 的 h-16 與 text-[11px]） -->
+  <div id="mp-chat-log" class="h-16 overflow-y-auto bg-black/40 rounded p-1.5 text-[11px] space-y-1 mb-1.5 select-text">
+    <div class="text-slate-400">系統：已連線至 5F 病房區頻道</div>
+  </div>
+
+  <!-- 輸入框與送出按鈕（同步 3F 的精簡輸入列與按鈕樣式） -->
+  <div class="flex gap-1">
+    <input id="mp-chat-input" type="text" maxlength="80" placeholder="按 Enter 發送訊息..."
+      class="flex-1 bg-slate-900/90 border border-white/15 rounded px-2 py-1 text-[11px] text-white focus:border-teal-400 focus:outline-none" />
+    <button id="mp-chat-send" class="px-2 py-1 rounded bg-teal-600 hover:bg-teal-500 text-[11px] font-bold cursor-pointer">
+      送出
+    </button>
+  </div>
+</div>
 
   <!-- 頂部橫向：全院各科區域與電梯快速傳送列 -->
   <div class="fixed top-2.5 left-1/2 -translate-x-1/2 z-20 w-[96vw] max-w-6xl">
@@ -303,6 +336,67 @@
 
     const slashEffects = [];
     const hitParticles = [];
+
+    // 讀取 index.html 登入的員工識別證資訊（支援網址參數、vh_user_session 與 localStorage）
+const urlParams5F = new URLSearchParams(window.location.search);
+let vhSession5F = null;
+try {
+  vhSession5F = JSON.parse(sessionStorage.getItem('vh_user_session') || 'null');
+} catch (e) {}
+
+const ROLE_NAME_MAP_5F = {
+  nurse: '護理師',
+  doctor: '醫師',
+  it_engineer: '資訊工程師',
+  educator: '衛教師'
+};
+
+const rawRole5F =
+  urlParams5F.get('role') ||
+  (vhSession5F && vhSession5F.roleId) ||
+  localStorage.getItem('vh_last_role') ||
+  sessionStorage.getItem('staff_role') ||
+  'nurse';
+
+const resolvedRoleName5F = ROLE_NAME_MAP_5F[rawRole5F] || rawRole5F;
+const resolvedCard5F =
+  urlParams5F.get('card') ||
+  (vhSession5F && vhSession5F.cardNumber) ||
+  localStorage.getItem('vh_last_card') ||
+  sessionStorage.getItem('staff_card') ||
+  '';
+
+const resolvedName5F =
+  urlParams5F.get('name') ||
+  (vhSession5F && vhSession5F.staffName) ||
+  localStorage.getItem('vh_last_name') ||
+  sessionStorage.getItem('staff_name') ||
+  '';
+
+// 若尚未透過 index.html 刷卡登入，自動導回門禁首頁（本機預覽或已登入則放行）
+if (!resolvedCard5F || !resolvedName5F) {
+  window.location.href = 'index.html';
+}
+
+const staffAuth5F = {
+  card: resolvedCard5F || 'SF-5001',
+  name: resolvedName5F || '5F 值班同仁',
+  roleId: rawRole5F,
+  role: resolvedRoleName5F
+};
+
+sessionStorage.setItem('staff_card', staffAuth5F.card);
+sessionStorage.setItem('staff_name', staffAuth5F.name);
+sessionStorage.setItem('staff_role', staffAuth5F.role);
+
+// 5F 專屬 PeerJS 星狀網路房間 ID（與 2F 區隔）
+const ROOM_HOST_ID_5F = 'sunflower-hospital-5f-indoor-v1';
+let peer5F = null;
+let isHost5F = false;
+let hostConn5F = null;
+const clientConns5F = new Map();
+const remotePlayers5F = new Map();
+let myPeerId5F = '';
 
     // 全院 1F ~ 5F 快速傳送座標表
     const ZONES = {
@@ -2620,6 +2714,169 @@
       player.rightFootAura = rightFootAura;
     }
 
+      function getRoleOutfit5F(role) {
+  if (role.includes('醫')) return { coatColor: 0xffffff, pantsColor: 0x1e293b, isDoctor: true };
+  if (role.includes('護')) return { coatColor: 0x38bdf8, pantsColor: 0x0284c7, isNurse: true };
+  if (role.includes('警') || role.includes('保')) return { coatColor: 0x1e3a8a, pantsColor: 0x0f172a, isSecurity: true };
+  return { coatColor: 0x0d9488, pantsColor: 0x1e293b };
+}
+
+function appendChat5F(sender, role, text, isSystem = false) {
+  const log = document.getElementById('mp-chat-log');
+  if (!log) return;
+  const row = document.createElement('div');
+  if (isSystem) {
+    row.className = 'text-amber-300/90';
+    row.textContent = `系統：${text}`;
+  } else {
+    row.innerHTML = `<span class="font-bold text-teal-300">[${role}] ${sender}：</span><span class="text-slate-100"></span>`;
+    row.querySelector('span:last-child').textContent = text;
+  }
+  log.appendChild(row);
+  log.scrollTop = log.scrollHeight;
+}
+
+function updatePeerCountUI5F() {
+  const el = document.getElementById('mp-peer-count');
+  if (el) el.textContent = `${remotePlayers5F.size + 1} 人在線`;
+}
+
+function upsertRemotePlayer5F(data) {
+  if (!data || !data.id || data.id === myPeerId5F) return;
+  let rp = remotePlayers5F.get(data.id);
+  if (!rp) {
+    const rig = createRoundedCharacterRig(getRoleOutfit5F(data.role || '同仁'));
+    const sprite = createNpcNameSprite(data.name || '同仁', `${data.role || '職員'}`, '#38bdf8');
+    rig.group.add(sprite);
+    rig.group.position.set(data.x ?? 16.5, data.y ?? 13.8, data.z ?? -23.5);
+    scene.add(rig.group);
+    rp = {
+      rig,
+      mesh: rig.group,
+      targetPos: new THREE.Vector3(data.x ?? 16.5, data.y ?? 13.8, data.z ?? -23.5),
+      targetYaw: data.yaw ?? Math.PI,
+      walkCycle: 0,
+      moving: false,
+      lastSeen: performance.now()
+    };
+    remotePlayers5F.set(data.id, rp);
+    updatePeerCountUI5F();
+  }
+  rp.targetPos.set(data.x, data.y, data.z);
+  rp.targetYaw = data.yaw;
+  rp.moving = !!data.moving;
+  rp.lastSeen = performance.now();
+}
+
+function removeRemotePlayer5F(peerId) {
+  const rp = remotePlayers5F.get(peerId);
+  if (rp) {
+    scene.remove(rp.mesh);
+    remotePlayers5F.delete(peerId);
+    updatePeerCountUI5F();
+  }
+}
+
+function broadcastFromHost5F(payload, excludeId = null) {
+  clientConns5F.forEach((conn, id) => {
+    if (id !== excludeId && conn.open) conn.send(payload);
+  });
+}
+
+function handleNetworkPacket5F(data, fromId) {
+  if (!data || !data.type) return;
+  if (data.type === 'state') {
+    upsertRemotePlayer5F(data);
+    if (isHost5F) broadcastFromHost5F(data, fromId);
+  } else if (data.type === 'chat') {
+    appendChat5F(data.name, data.role, data.text, false);
+    if (isHost5F) broadcastFromHost5F(data, fromId);
+  } else if (data.type === 'leave') {
+    removeRemotePlayer5F(data.id);
+    if (isHost5F) broadcastFromHost5F(data, fromId);
+  }
+}
+
+function sendNetworkPacket5F(payload) {
+  if (isHost5F) {
+    broadcastFromHost5F(payload, null);
+  } else if (hostConn5F && hostConn5F.open) {
+    hostConn5F.send(payload);
+  }
+}
+
+function initMultiplayer5F() {
+  document.getElementById('mp-badge-card').textContent = `🪪 ${staffAuth5F.card}・${staffAuth5F.name}`;
+  if (typeof Peer === 'undefined') return;
+
+  const tryConnectAsClient = () => {
+    isHost5F = false;
+    peer5F = new Peer({ debug: 0 });
+    peer5F.on('open', (id) => {
+      myPeerId5F = id;
+      hostConn5F = peer5F.connect(ROOM_HOST_ID_5F, { reliable: true });
+      hostConn5F.on('open', () => {
+        document.getElementById('mp-status-dot').innerHTML = '● 5F 醫療樓層連線正常 (已加入)';
+        appendChat5F('', '', '已加入 5F 病房區多人頻道', true);
+      });
+      hostConn5F.on('data', (d) => handleNetworkPacket5F(d, ROOM_HOST_ID_5F));
+      hostConn5F.on('close', () => {
+        document.getElementById('mp-badge-card').textContent = `🪪 ${staffAuth5F.name}（${staffAuth5F.role}・${staffAuth5F.card}）`;
+        setTimeout(() => { peer5F.destroy(); initMultiplayer5F(); }, 1500);
+      });
+    });
+  };
+
+  // 嘗試搶佔 5F 房間主節點 (Host)
+  peer5F = new Peer(ROOM_HOST_ID_5F, { debug: 0 });
+  peer5F.on('open', (id) => {
+    isHost5F = true;
+    myPeerId5F = id;
+    document.getElementById('mp-status-dot').innerHTML = '● 5F 房主 (Host)';
+    appendChat5F('', '', '您已建立 5F 病房區多人房間', true);
+  });
+
+  peer5F.on('connection', (conn) => {
+    conn.on('open', () => {
+      clientConns5F.set(conn.peer, conn);
+    });
+    conn.on('data', (d) => handleNetworkPacket5F(d, conn.peer));
+    conn.on('close', () => {
+      clientConns5F.delete(conn.peer);
+      removeRemotePlayer5F(conn.peer);
+      broadcastFromHost5F({ type: 'leave', id: conn.peer });
+    });
+  });
+
+  peer5F.on('error', (err) => {
+    if (err.type === 'unavailable-id') {
+      peer5F.destroy();
+      tryConnectAsClient();
+    }
+  });
+
+  // 每 60ms 廣播自身座標與狀態（不廣播卡號以保護隱私）
+  setInterval(() => {
+    if (!myPeerId5F || !player.mesh) return;
+    const isMoving = !!(keys['KeyW'] || keys['KeyA'] || keys['KeyS'] || keys['KeyD'] || keys['ArrowUp'] || keys['ArrowDown'] || keys['ArrowLeft'] || keys['ArrowRight']);
+    sendNetworkPacket5F({
+      type: 'state',
+      id: myPeerId5F,
+      name: staffAuth5F.name,
+      role: staffAuth5F.role,
+      x: Number(player.pos.x.toFixed(3)),
+      y: Number(player.pos.y.toFixed(3)),
+      z: Number(player.pos.z.toFixed(3)),
+      yaw: Number(player.yaw.toFixed(3)),
+      moving: isMoving
+    });
+  }, 60);
+
+  window.addEventListener('beforeunload', () => {
+    sendNetworkPacket5F({ type: 'leave', id: myPeerId5F });
+  });
+}
+
     function spawnAllNpcs() {
       const f5Y = 13.8;
       const npcDefinitions = [
@@ -3354,7 +3611,13 @@
       }
 
       setTimeout(() => {
-        window.location.href = floorItem.file;
+        const q = new URLSearchParams({
+  from: '5F',
+  card: staffAuth5F.card,
+  name: staffAuth5F.name,
+  role: staffAuth5F.roleId
+});
+window.location.href = `${floorItem.file}?${q.toString()}`;
       }, 220);
     }
 
@@ -4020,6 +4283,11 @@
       const canvas = document.getElementById('game-canvas');
 
       window.addEventListener('keydown', (e) => {
+        if (document.activeElement && document.activeElement.id === 'mp-chat-input') {
+          if (e.code === 'Enter') document.getElementById('mp-chat-send').click();
+          return;
+        }
+
         if (e.code === 'Escape') {
           if (activeTalkNpc) closeDialogue();
           return;
@@ -4229,6 +4497,21 @@
       createPlayableCharacter();
       spawnAllNpcs();
       setupInputsAndUI();
+      initMultiplayer5F();
+
+      document.getElementById('mp-chat-send').addEventListener('click', () => {
+  const input = document.getElementById('mp-chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  appendChat5F(staffAuth5F.name, staffAuth5F.role, text, false);
+  sendNetworkPacket5F({
+    type: 'chat',
+    name: staffAuth5F.name,
+    role: staffAuth5F.role,
+    text
+  });
+});
 
       window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -4246,6 +4529,26 @@
     function animate() {
       requestAnimationFrame(animate);
       const dt = Math.min(clock.getDelta(), 0.05);
+
+      // ▼▼▼ 加在這裡 ▼▼▼
+      const nowMs = performance.now();
+      remotePlayers5F.forEach((rp, id) => {
+        if (nowMs - rp.lastSeen > 8000) { removeRemotePlayer5F(id); return; }
+        rp.mesh.position.lerp(rp.targetPos, Math.min(1, dt * 14));
+        rp.mesh.rotation.y += (rp.targetYaw - rp.mesh.rotation.y) * Math.min(1, dt * 14);
+        if (rp.moving) {
+          rp.walkCycle += dt * 10;
+          const sw = Math.sin(rp.walkCycle) * 0.5;
+          rp.rig.leftHip.rotation.x = sw;
+          rp.rig.rightHip.rotation.x = -sw;
+          rp.rig.leftShoulder.rotation.x = -sw * 0.7;
+          rp.rig.rightShoulder.rotation.x = sw * 0.7;
+        } else {
+          rp.rig.leftHip.rotation.x *= 0.82;
+          rp.rig.rightHip.rotation.x *= 0.82;
+        }
+      });
+
       updateSimulation(dt);
       renderMinimap();
       renderer.render(scene, camera);
