@@ -6,6 +6,7 @@
   <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <!-- Three.js r128 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Google Fonts: Noto Sans TC & Chakra Petch -->
@@ -201,6 +202,28 @@
       <!-- ==================================================================== -->
       <div id="gameplay-hud" class="absolute inset-0 pointer-events-none">
         <!-- ❌ 移除頂部中央：預覽模式狀態與比例切換小膠囊（將 hidden sm:flex 改為 hidden） -->
+
+        <!-- 多人連線狀態與聊天面板 (左下角小地圖上方) -->
+        <div id="multiplayer-panel" class="absolute bottom-40 sm:bottom-48 left-3.5 z-20 w-64 sm:w-72 hud-panel rounded-xl p-2.5 text-white shadow-xl pointer-events-auto border border-emerald-400/30">
+          <div class="flex items-center justify-between border-b border-white/10 pb-1.5 mb-1.5">
+            <div class="flex items-center gap-1.5">
+              <span id="mp-status-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+              <span id="mp-status-text" class="text-[11px] font-bold text-emerald-300">正在連線至園區伺服器...</span>
+            </div>
+            <span id="mp-online-count" class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-[10px] font-bold text-emerald-300">1 人在線</span>
+          </div>
+          <!-- 線上玩家名單 -->
+          <div id="mp-player-list" class="text-[10px] text-slate-300 max-h-14 overflow-y-auto space-y-0.5 mb-1.5"></div>
+          <!-- 簡易即時頻道 -->
+          <div id="mp-chat-box" class="h-16 overflow-y-auto bg-black/40 rounded p-1.5 text-[11px] space-y-1 mb-1.5 select-text">
+            <div class="text-slate-400">系統：歡迎進入向日葵醫院多人園區！</div>
+          </div>
+          <form id="mp-chat-form" class="flex gap-1">
+            <input id="mp-chat-input" type="text" maxlength="50" placeholder="按 Enter 發送訊息..." class="flex-1 bg-slate-900/90 border border-white/15 rounded px-2 py-1 text-[11px] text-white focus:border-emerald-400 focus:outline-none" />
+            <button type="submit" class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-[11px] font-bold">送出</button>
+          </form>
+        </div>
+
         <div class="hidden absolute top-3 left-1/2 -translate-x-1/2 z-20 items-center gap-1.5 px-2.5 py-1 rounded-full hud-panel text-[11px] text-slate-200 pointer-events-auto shadow-lg">
           <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           <span class="font-bold text-sky-300">預覽模式</span>
@@ -384,6 +407,296 @@
   </div>
 
   <script>
+
+    // ==========================================================================
+    // 0. 強制檢查是否從 index.html 完成刷卡登入
+    // ==========================================================================
+    const loginParams = new URLSearchParams(window.location.search);
+    let currentUserSession = null;
+    try {
+      currentUserSession = JSON.parse(sessionStorage.getItem('vh_user_session'));
+    } catch (e) {}
+
+    const authCard = loginParams.get('card') || (currentUserSession && currentUserSession.cardNumber);
+    const authName = loginParams.get('name') || (currentUserSession && currentUserSession.staffName);
+    const authRole = loginParams.get('role') || (currentUserSession && currentUserSession.roleId) || 'nurse';
+
+    // 若沒有卡號（直接開啟 1index.html），強制導回 index.html 登入頁
+    if (!authCard || !authName) {
+      alert('⚠️ 門禁系統提示：請先於入口大門刷卡驗證員工識別證！');
+      window.location.href = 'index.html';
+    }
+
+    // ==========================================================================
+    // 多人連線同步系統 (PeerJS 房主中繼架構)
+    // ==========================================================================
+    const ROOM_HOST_ID = 'sunflower-hospital-main-lobby-v1';
+    const remotePlayers = new Map(); // peerId -> { group, parts, nameSprite, targetPos, targetYaw, walkCycle, roleId, name }
+    let peer = null;
+    let isHost = false;
+    let hostConn = null;
+    const clientConns = new Map(); // 房主儲存所有連線的客戶端
+
+    // 建立玩家頭頂姓名與職業標籤 (3D Sprite)
+    function createPlayerNameTag(staffName, roleName) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = 'rgba(10, 17, 26, 0.78)';
+      ctx.beginPath();
+      ctx.roundRect(46, 18, 420, 92, 24);
+      ctx.fill();
+      ctx.strokeStyle = '#34d399';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      ctx.font = '900 34px "Noto Sans TC", sans-serif';
+      ctx.fillStyle = '#fbbf24';
+      ctx.textAlign = 'center';
+      ctx.fillText(staffName, 256, 58);
+
+      ctx.font = 'bold 22px "Noto Sans TC", sans-serif';
+      ctx.fillStyle = '#a7f3d0';
+      ctx.fillText(roleName, 256, 94);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+      const sprite = new THREE.Sprite(mat);
+      sprite.scale.set(2.2, 0.55, 1);
+      sprite.position.set(0, 2.15, 0);
+      return sprite;
+    }
+
+    // 生成或更新遠端玩家 3D 模型
+    function upsertRemotePlayer(peerId, state) {
+      if (!peerId || peerId === (peer && peer.id)) return;
+
+      let rp = remotePlayers.get(peerId);
+      if (!rp) {
+        const roleCfg = CHARACTER_ROLES.find(r => r.id === state.roleId) || CHARACTER_ROLES[0];
+        const charObj = createHumanCharacter(roleCfg);
+        const nameTag = createPlayerNameTag(state.name || '院區同仁', roleCfg.name);
+        charObj.group.add(nameTag);
+        charObj.group.position.set(state.x || 48.5, state.y || 0, state.z || 19.2);
+        scene.add(charObj.group);
+
+        rp = {
+          id: peerId,
+          group: charObj.group,
+          parts: charObj,
+          nameTag,
+          roleId: state.roleId,
+          name: state.name,
+          card: state.card,
+          targetPos: new THREE.Vector3(state.x, state.y, state.z),
+          targetYaw: state.yaw || 0,
+          isMoving: false,
+          walkCycle: 0
+        };
+        remotePlayers.set(peerId, rp);
+        appendChatMessage('系統', `${state.name} (${roleCfg.name}) 已刷卡進入園區！`, 'text-emerald-300');
+        updateOnlineListUI();
+      }
+
+      rp.targetPos.set(state.x, state.y, state.z);
+      rp.targetYaw = state.yaw;
+      rp.isMoving = state.isMoving;
+    }
+
+    function removeRemotePlayer(peerId) {
+      const rp = remotePlayers.get(peerId);
+      if (rp) {
+        scene.remove(rp.group);
+        appendChatMessage('系統', `${rp.name} 已離開園區。`, 'text-slate-400');
+        remotePlayers.delete(peerId);
+        updateOnlineListUI();
+      }
+    }
+
+    function appendChatMessage(sender, text, colorClass = 'text-white') {
+      const box = document.getElementById('mp-chat-box');
+      if (!box) return;
+      const div = document.createElement('div');
+      div.className = colorClass;
+      div.innerHTML = `<span class="font-bold text-amber-300">[${sender}]</span> ${text}`;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function updateOnlineListUI() {
+      const countEl = document.getElementById('mp-online-count');
+      const listEl = document.getElementById('mp-player-list');
+      const total = remotePlayers.size + 1;
+      if (countEl) countEl.textContent = `${total} 人在線`;
+      if (listEl) {
+        let html = `<div class="text-emerald-300 font-bold">● ${authName} (我 • ${authCard})</div>`;
+        remotePlayers.forEach((rp) => {
+          html += `<div>● ${rp.name} (${rp.card || '同仁'})</div>`;
+        });
+        listEl.innerHTML = html;
+      }
+    }
+
+    // 啟動多人連線
+    function initMultiplayer() {
+      const statusDot = document.getElementById('mp-status-dot');
+      const statusText = document.getElementById('mp-status-text');
+      updateOnlineListUI();
+
+      // 嘗試搶先成為園區主伺服器 (Host)
+      peer = new Peer(ROOM_HOST_ID, { debug: 0 });
+
+      peer.on('open', () => {
+        isHost = true;
+        statusDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        statusText.textContent = '園區連線正常 (主節點)';
+        appendChatMessage('系統', `已開啟園區連線大廳，歡迎 ${authName}！`, 'text-emerald-300');
+      });
+
+      // 當有其他玩家連入時（房主模式）
+      peer.on('connection', (conn) => {
+        clientConns.set(conn.peer, conn);
+        conn.on('data', (data) => {
+          if (data.type === 'state') {
+            upsertRemotePlayer(conn.peer, data.payload);
+            // 房主將所有玩家狀態廣播給其他人
+            broadcastFromHost(data, conn.peer);
+          } else if (data.type === 'chat') {
+            appendChatMessage(data.sender, data.text);
+            broadcastFromHost(data, conn.peer);
+          }
+        });
+        conn.on('close', () => {
+          clientConns.delete(conn.peer);
+          removeRemotePlayer(conn.peer);
+          broadcastFromHost({ type: 'leave', peerId: conn.peer });
+        });
+      });
+
+      // 若 ROOM_HOST_ID 已被佔用，表示大廳已存在，改以一般玩家身分連入
+      peer.on('error', (err) => {
+        if (err.type === 'unavailable-id') {
+          peer.destroy();
+          peer = new Peer(undefined, { debug: 0 });
+          peer.on('open', () => {
+            hostConn = peer.connect(ROOM_HOST_ID, { reliable: false });
+            hostConn.on('open', () => {
+              statusDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+              statusText.textContent = '園區連線正常 (已加入大廳)';
+              appendChatMessage('系統', `成功連線至向日葵醫院多人園區！`, 'text-emerald-300');
+            });
+            hostConn.on('data', (data) => {
+              if (data.type === 'state') {
+                upsertRemotePlayer(data.peerId, data.payload);
+              } else if (data.type === 'chat') {
+                appendChatMessage(data.sender, data.text);
+              } else if (data.type === 'leave') {
+                removeRemotePlayer(data.peerId);
+              }
+            });
+            hostConn.on('close', () => {
+              statusDot.className = 'w-2 h-2 rounded-full bg-rose-500';
+              statusText.textContent = '與園區主機斷線';
+            });
+          });
+        }
+      });
+
+      // 聊天室發送事件
+      const chatForm = document.getElementById('mp-chat-form');
+      const chatInput = document.getElementById('mp-chat-input');
+      if (chatForm && chatInput) {
+        chatForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const msg = chatInput.value.trim();
+          if (!msg) return;
+          chatInput.value = '';
+          appendChatMessage(authName, msg, 'text-sky-200');
+          const packet = { type: 'chat', sender: authName, text: msg, peerId: peer.id };
+          if (isHost) {
+            broadcastFromHost(packet);
+          } else if (hostConn && hostConn.open) {
+            hostConn.send(packet);
+          }
+        });
+      }
+
+      // 每 60ms (約 16 FPS) 傳送一次自身座標與動作給其他玩家
+      setInterval(() => {
+        if (!peer || !peer.id || !player.mesh) return;
+        const isMoving = Math.hypot(player.vel.x, player.vel.z) > 0.25;
+        const packet = {
+          type: 'state',
+          peerId: peer.id,
+          payload: {
+            x: Number(player.pos.x.toFixed(2)),
+            y: Number(player.pos.y.toFixed(2)),
+            z: Number(player.pos.z.toFixed(2)),
+            yaw: Number(player.yaw.toFixed(2)),
+            roleId: gameState.selectedRoleId,
+            name: authName,
+            card: authCard,
+            isMoving
+          }
+        };
+
+        if (isHost) {
+          broadcastFromHost(packet);
+        } else if (hostConn && hostConn.open) {
+          hostConn.send(packet);
+        }
+      }, 60);
+    }
+
+    function broadcastFromHost(packet, excludePeerId = null) {
+      clientConns.forEach((conn, id) => {
+        if (id !== excludePeerId && conn.open) {
+          conn.send(packet);
+        }
+      });
+    }
+
+    // 在每一幀動畫中平滑插值更新遠端玩家位置與四肢擺動
+    function updateRemotePlayersAnimation(dt) {
+      remotePlayers.forEach((rp) => {
+        rp.group.position.lerp(rp.targetPos, Math.min(1, dt * 12));
+        // 角度平滑插值
+        let diff = rp.targetYaw - rp.group.rotation.y;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        rp.group.rotation.y += diff * Math.min(1, dt * 12);
+
+        // 擺手擺腳動畫
+        if (rp.isMoving) {
+          rp.walkCycle += dt * 10;
+          const swing = Math.sin(rp.walkCycle) * 0.55;
+          if (rp.parts.leftLeg) rp.parts.leftLeg.rotation.x = swing;
+          if (rp.parts.rightLeg) rp.parts.rightLeg.rotation.x = -swing;
+          if (rp.parts.leftArm) rp.parts.leftArm.rotation.x = -swing * 0.75;
+          if (rp.parts.rightArm) rp.parts.rightArm.rotation.x = swing * 0.75;
+        } else {
+          if (rp.parts.leftLeg) rp.parts.leftLeg.rotation.x *= 0.85;
+          if (rp.parts.rightLeg) rp.parts.rightLeg.rotation.x *= 0.85;
+          if (rp.parts.leftArm) rp.parts.leftArm.rotation.x *= 0.85;
+          if (rp.parts.rightArm) rp.parts.rightArm.rotation.x *= 0.85;
+        }
+      });
+    }
+
+    // 啟動多人連線並在主角頭頂也加上自己的識別名牌
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (player.mesh) {
+          const roleCfg = CHARACTER_ROLES.find(r => r.id === gameState.selectedRoleId) || CHARACTER_ROLES[0];
+          const myTag = createPlayerNameTag(`${authName} (${authCard})`, roleCfg.name);
+          player.mesh.add(myTag);
+        }
+        initMultiplayer();
+      }, 600);
+    });
+
     /**
      * ============================================================================
      * 向日葵醫院健康園區 (Clover Hospital Health Park) - 3D 開放世界
@@ -399,6 +712,26 @@
 
     // 8 種園區角色造型設定（預設為參考圖主角：橘黑拼色帽T青年）
     const CHARACTER_ROLES = [
+       {
+        id: 'educator',
+        name: '衛教師 (健康諮詢服)',
+        en: 'Health Educator',
+        icon: '📋',
+        cash: 7800,
+        health: 100,
+        armor: 88,
+        outfitStyle: 'dress_shirt',
+        jacketColor: 0xf59e0b,
+        teeColor: 0xffffff,
+        pantsColor: 0x1e293b,
+        shoeColor: 0xf8fafc,
+        badgeColor: 0x10b981,
+        hasHood: false,
+        hasMask: true,
+        hasGlasses: false,
+        hasStethoscope: false,
+        hasCap: false
+      },
       {
         id: 'it_engineer',
         name: '橘黑拼色帽T青年',
@@ -5101,7 +5434,7 @@
 
     function applyPlayerRole(roleId, showNotify = true) {
       const role = CHARACTER_ROLES.find((r) => r.id === roleId) || CHARACTER_ROLES[0];
-      gameState.selectedRoleId = role.id;
+      gameState.selectedRoleId = authRole;
 
       try {
     localStorage.setItem('clover_hospital_role', role.id);
@@ -6498,8 +6831,8 @@
       }
 
       const entryType = sourceLabel.includes('急診') ? 'er' : 'main';
-const currentRole = encodeURIComponent(gameState.selectedRoleId || 'it_engineer');
-const targetUrl = `1F.html?entry=${entryType}&role=${currentRole}`;
+const currentRole = encodeURIComponent(gameState.selectedRoleId || authRole || 'it_engineer');
+const targetUrl = `1F.html?entry=${entryType}&role=${currentRole}&card=${encodeURIComponent(authCard)}&name=${encodeURIComponent(authName)}`;
 if (linkEl) linkEl.href = targetUrl;
 
       overlay.classList.remove('hidden');
@@ -7370,6 +7703,7 @@ if (linkEl) linkEl.href = targetUrl;
       const dt = Math.min(clock.getDelta(), 0.05);
 
       updateTrafficLightsAndVehicles(dt);
+      updateRemotePlayersAnimation(dt);
       updatePlayerAndVehicles(dt);
       updateNPCsAndEffects(dt);
       updateCamera(dt);
