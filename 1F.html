@@ -503,7 +503,6 @@ function upsertRemotePlayer1F(peerId, state) {
       group: built.group,
       parts: built,
       name: state.name,
-      card: state.card,
       targetPos: new THREE.Vector3(state.x, state.y, state.z),
       targetYaw: state.yaw || 0,
       isMoving: false,
@@ -545,10 +544,16 @@ function updateOnlineList1F() {
   const total = remotePlayers1F.size + 1;
   if (countEl) countEl.textContent = `${total} 人在線`;
   if (listEl) {
-    let html = `<div class="text-teal-300 font-bold">● ${authName} (我 • ${authCard})</div>`;
+    const myRoleObj = (typeof ROLES !== 'undefined') ? ROLES.find(r => r.id === authRole) : null;
+    const myRoleLabel = myRoleObj ? myRoleObj.label : '同仁';
+
+    let html = `<div class="text-teal-300 font-bold">● ${authName} (${myRoleLabel} - 我)</div>`;
+
     remotePlayers1F.forEach((rp) => {
-      html += `<div>● ${rp.name} (${rp.card || '同仁'})</div>`;
+      const roleLabel = rp.parts ? rp.parts.roleLabel : '同仁';
+      html += `<div>● ${rp.name} (${roleLabel})</div>`;
     });
+
     listEl.innerHTML = html;
   }
 }
@@ -576,7 +581,6 @@ function initMultiplayer1F() {
     }
   };
 
-  // 打包自身目前狀態的輔助函式
   const getMyStatePacket = () => ({
     type: 'state',
     peerId: peer1F.id,
@@ -587,7 +591,6 @@ function initMultiplayer1F() {
       yaw: Number(player.yaw.toFixed(2)),
       roleId: authRole,
       name: authName,
-      card: authCard,
       isMoving: Math.hypot(player.vel.x, player.vel.z) > 0.25
     }
   });
