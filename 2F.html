@@ -523,7 +523,7 @@ function upsertRemotePlayer2F(peerId, state) {
       group: built.group,
       parts: built,
       name: state.name,
-      card: state.card,
+      roleLabel: built.roleLabel, // 改存職稱而非卡號
       targetPos: new THREE.Vector3(state.x ?? 0, state.y ?? 4.6, state.z ?? 7.2),
       targetYaw: state.yaw || 0,
       isMoving: false,
@@ -534,43 +534,45 @@ function upsertRemotePlayer2F(peerId, state) {
     updateOnlineList2F();
   }
 
+function removeRemotePlayer2F(peerId) {
+  const rp = remotePlayers2F.get(peerId);
+  if (!rp) return;
+  scene.remove(rp.group);
+  remotePlayers2F.delete(peerId);
+  appendChat2F('系統', `${rp.name || '同仁'} 離開了 2F 醫療樓層。`, 'text-slate-400');
+  updateOnlineList2F();
+}
+
   rp.targetPos.set(state.x, state.y, state.z);
   rp.targetYaw = state.yaw;
   rp.isMoving = state.isMoving;
-}
-
-function removeRemotePlayer2F(peerId) {
-  const rp = remotePlayers2F.get(peerId);
-  if (rp) {
-    scene.remove(rp.group);
-    appendChat2F('系統', `${rp.name} 已離開 2F 醫療樓層。`, 'text-slate-400');
-    remotePlayers2F.delete(peerId);
-    updateOnlineList2F();
-  }
-}
-
-function appendChat2F(sender, text, colorClass = 'text-white') {
-  const box = document.getElementById('mp-chat-box');
-  if (!box) return;
-  const div = document.createElement('div');
-  div.className = colorClass;
-  div.innerHTML = `<span class="font-bold text-amber-300">[${sender}]</span> ${text}`;
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
 }
 
 function updateOnlineList2F() {
   const countEl = document.getElementById('mp-online-count');
   const listEl = document.getElementById('mp-player-list');
   const total = remotePlayers2F.size + 1;
+  const myRoleLabel = (ROLE_STYLES_2F[authRole] || ROLE_STYLES_2F.nurse).label;
+
   if (countEl) countEl.textContent = `${total} 人在線`;
   if (listEl) {
-    let html = `<div class="text-teal-300 font-bold">● ${authName} (我 • ${authCard})</div>`;
+    // 隱藏卡號，改為顯示職稱
+    let html = `<div class="text-teal-300 font-bold">● ${authName} (我 • ${myRoleLabel})</div>`;
     remotePlayers2F.forEach((rp) => {
-      html += `<div>● ${rp.name} (${rp.card || '同仁'})</div>`;
+      html += `<div>● ${rp.name} (${rp.roleLabel || '同仁'})</div>`;
     });
     listEl.innerHTML = html;
   }
+}
+
+function appendChat2F(sender, text, colorClass = 'text-slate-200') {
+  const box = document.getElementById('mp-chat-box');
+  if (!box) return;
+  const line = document.createElement('div');
+  line.className = colorClass;
+  line.textContent = `${sender}：${text}`;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
 }
 
 function broadcastFromHost2F(packet, excludePeerId = null) {
@@ -667,7 +669,6 @@ function initMultiplayer2F() {
     });
   }
 
-  // 每 60ms 同步一次自身在 2F 的座標與朝向
   setInterval(() => {
     if (!peer2F || !peer2F.id || !player.mesh) return;
     const isMoving = Boolean(
@@ -684,7 +685,6 @@ function initMultiplayer2F() {
         yaw: Number(player.yaw.toFixed(2)),
         roleId: authRole,
         name: authName,
-        card: authCard,
         isMoving
       }
     };
@@ -5490,10 +5490,6 @@ function updateRemotePlayers2F(dt) {
       spawnAllNpcs();
       setupControlsAndUI();
 
-      if (player.mesh) {
-        const roleInfo = ROLE_STYLES_2F[authRole] || ROLE_STYLES_2F.nurse;
-        player.mesh.add(createNameTag2F(`${authName} (${authCard})`, roleInfo.label));
-      }
       initMultiplayer2F();
 
       window.addEventListener('resize', () => {
