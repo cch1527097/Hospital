@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>幸運草醫院-模擬人生</title>
+  <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js r128 -->
@@ -82,7 +82,7 @@
   </style>
 </head>
 <body>
-  <!-- 3D 幸運草醫院健康園區背景畫布 -->
+  <!-- 3D 向日葵醫院健康園區背景畫布（完整比照 1index.html 實景建構） -->
   <canvas id="bg-canvas"></canvas>
 
   <!-- 暗角與漸層遮罩提升文字閱讀度 -->
@@ -100,11 +100,11 @@
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-lg sm:text-2xl font-black tracking-wider text-white gta-shadow">幸運草醫院-模擬人生</h1>
+            <h1 class="text-lg sm:text-2xl font-black tracking-wider text-white gta-shadow">向日葵醫院-模擬人生</h1>
             <span class="hidden sm:inline-block px-2 py-0.5 text-[11px] font-bold rounded bg-amber-400 text-slate-950">VIRTUAL HOSPITAL</span>
           </div>
           <p class="gta-font text-[11px] sm:text-xs text-emerald-300/90 tracking-widest uppercase">
-            Clover Hospital Health Park • Smart Access Portal
+            Sunflower Hospital Health Park • Smart Access Portal
           </p>
         </div>
       </div>
@@ -135,7 +135,7 @@
 
         <h2 class="text-3xl sm:text-4xl font-black leading-tight gta-shadow">
           歡迎蒞臨<br/>
-          幸運草醫院-模擬人生
+          向日葵醫院-模擬人生
         </h2>
 
         <p class="text-xs sm:text-sm text-slate-200/90 leading-relaxed">
@@ -299,7 +299,7 @@
 
     <!-- 底部版權與操作提示 -->
     <footer class="flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-400">
-      <div>© 2026 幸運草醫院健康園區 Virtual Hospital 3D 智慧導覽系統</div>
+      <div>© 2026 向日葵醫院健康園區 Virtual Hospital 3D 智慧導覽系統</div>
       <div class="flex items-center gap-3">
         <span>背景 3D 場景可拖曳旋轉預覽</span>
         <span>•</span>
@@ -315,7 +315,7 @@
     <div class="relative w-72 h-44 rounded-2xl bg-gradient-to-br from-emerald-900/90 to-slate-900 border-2 border-emerald-400 p-4 shadow-[0_0_40px_rgba(16,185,129,0.5)] overflow-hidden mb-5">
       <div class="scan-beam absolute inset-x-0 h-8 bg-gradient-to-b from-transparent via-emerald-400/40 to-transparent pointer-events-none"></div>
       <div class="flex items-center justify-between">
-        <span class="text-xs font-black text-amber-300">幸運草醫院-模擬人生識別證</span>
+        <span class="text-xs font-black text-amber-300">向日葵醫院-模擬人生識別證</span>
         <span class="text-lg">🏥</span>
       </div>
       <div class="mt-3 flex items-center gap-3">
@@ -332,9 +332,9 @@
       </div>
     </div>
 
-    <h2 id="overlay-welcome-title" class="text-xl sm:text-2xl font-black tracking-wide text-emerald-400 mb-1">門禁驗證成功！正在載入幸運草醫院-模擬人生</h2>
+    <h2 id="overlay-welcome-title" class="text-xl sm:text-2xl font-black tracking-wide text-emerald-400 mb-1">門禁驗證成功！正在載入向日葵醫院-模擬人生</h2>
     <p class="text-xs sm:text-sm text-slate-300 text-center">
-      已為您配置專屬執勤外觀，即將進入幸運草醫院-模擬人生...
+      已為您配置專屬執勤外觀，即將進入向日葵醫院-模擬人生...
     </p>
   </div>
 
@@ -375,7 +375,7 @@
         cash: 12000,
         armor: 95,
         gear: '醫師白袍 / 聽診器',
-        desc: '幸運草醫療大樓主治醫師，身著專業白色醫師袍與天藍刷手服內搭，頸部配戴聽診器隨時支援臨床診療。'
+        desc: '向日葵醫療大樓主治醫師，身著專業白色醫師袍與天藍刷手服內搭，頸部配戴聽診器隨時支援臨床診療。'
       },
       it_engineer: {
         id: 'it_engineer',
@@ -386,7 +386,7 @@
         cash: 8800,
         armor: 90,
         gear: '行動筆電 / 資訊證',
-        desc: '負責園區智慧醫療系統與核心機房維運，身穿深藍科技外套、配戴識別證並手持行動工作筆電。'
+        desc: '負責園區智慧醫療系統與核心機房維運，身穿橘黑拼色連帽外套、配戴識別證並執行園區巡檢。'
       },
       educator: {
         id: 'educator',
@@ -403,7 +403,6 @@
 
     let selectedRoleKey = 'nurse';
 
-    // 更新左側識別證預覽卡片
     function updateRolePreview(roleKey) {
       const role = ROLES_CONFIG[roleKey];
       if (!role) return;
@@ -428,7 +427,6 @@
       document.getElementById('preview-gear').textContent = role.gear;
     }
 
-    // 綁定職業卡片點擊
     document.querySelectorAll('.role-card').forEach((btn) => {
       btn.addEventListener('click', () => {
         updateRolePreview(btn.dataset.role);
@@ -436,7 +434,6 @@
       });
     });
 
-    // 卡號輸入框互動
     const cardInput = document.getElementById('card-number-input');
     const clearBtn = document.getElementById('clear-card-btn');
     const errorMsg = document.getElementById('form-error-msg');
@@ -473,7 +470,6 @@
       cardInput.focus();
     });
 
-    // 表單送出驗證與跳轉至主園區 1index.html
     document.getElementById('access-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const rawCard = cardInput.value.trim().toUpperCase();
@@ -493,7 +489,6 @@
         return;
       }
 
-      // 驗證是否在授權名單中
       const staffInfo = AUTHORIZED_STAFF[rawCard];
       if (!staffInfo) {
         showError(`查無卡號「${rawCard}」或尚未開通門禁權限！`);
@@ -502,7 +497,6 @@
 
       const role = ROLES_CONFIG[selectedRoleKey];
 
-      // 將職業、卡號與員工姓名儲存至 sessionStorage 與 localStorage
       const sessionData = {
         roleId: role.id,
         roleName: role.name,
@@ -517,7 +511,6 @@
         localStorage.setItem('vh_last_name', staffInfo.name);
       } catch (err) {}
 
-      // 顯示刷卡通過動畫遮罩
       document.getElementById('overlay-role-icon').textContent = role.icon;
       document.getElementById('overlay-staff-name').textContent = `${staffInfo.name}（授權人員）`;
       document.getElementById('overlay-role-name').textContent = `${role.name} • ${role.dept}`;
@@ -531,7 +524,6 @@
         overlay.classList.remove('opacity-0');
       });
 
-      // 跳轉至主園區場景 1index.html（附帶 role, card, name 參數）
       setTimeout(() => {
         const params = new URLSearchParams({
           role: role.id,
@@ -544,225 +536,2206 @@
 
     /**
      * ==========================================================================
-     * 2. 背景 3D 幸運草醫院健康園區實景預覽 (Three.js)
+     * 2. 背景 3D 向日葵醫院健康園區實景預覽（完全比照 1index.html 建築群與材質）
      * ==========================================================================
      */
     let scene, camera, renderer, sunLight, hemiLight;
     const nightGlowMaterials = [];
-    let orbitAngle = 0.35;
+    const streetLampLights = [];
+    const canopyCeilingLights = [];
+    const templeSmokeParticles = [];
+    const perimeterBounds = { minX: -185, maxX: 105, minZ: -86, maxZ: 68 };
+
+    let orbitAngle = 0.28;
     let isDraggingBg = false;
     let prevMouseX = 0;
 
-    function createCloverCrownTexture() {
+    // --- 紋理工廠（比照 1index.html） ---
+    function createAsphaltPavingTexture(repeatX = 12, repeatY = 8) {
+      const w = 512, h = 512;
       const canvas = document.createElement('canvas');
-      canvas.width = 1024;
-      canvas.height = 256;
+      canvas.width = w;
+      canvas.height = h;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#153b30';
-      ctx.fillRect(0, 0, 1024, 256);
 
-      const cx = 512, cy = 128;
-      ctx.fillStyle = '#e6c245';
+      ctx.fillStyle = '#363b42';
+      ctx.fillRect(0, 0, w, h);
+
+      for (let i = 0; i < 6500; i++) {
+        const x = (i * 73) % w;
+        const y = Math.floor((i * 137) / 11) % h;
+        const shade = (i % 7) - 3;
+        ctx.fillStyle = shade > 0
+          ? `rgba(210, 218, 228, ${0.025 + shade * 0.012})`
+          : `rgba(12, 16, 22, ${0.06 + Math.abs(shade) * 0.02})`;
+        ctx.fillRect(x, y, (i % 2) + 1, (i % 2) + 1);
+      }
+      ctx.fillStyle = 'rgba(20, 24, 30, 0.28)';
+      ctx.fillRect(0, 254, w, 2);
+      ctx.fillRect(254, 0, 2, h);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(repeatX, repeatY);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createRedBrickTexture(repeatX = 3, repeatY = 5) {
+      const w = 512, h = 512;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#b35634';
+      ctx.fillRect(0, 0, w, h);
+
+      const rows = 16, cols = 8;
+      const rowH = h / rows, colW = w / cols;
+      for (let r = 0; r < rows; r++) {
+        const y = r * rowH;
+        const offsetX = (r % 2) * (colW / 2);
+        for (let c = -1; c <= cols; c++) {
+          const x = c * colW + offsetX;
+          const shade = ((r * 7 + c * 13) % 5) - 2;
+          ctx.fillStyle = `rgb(${182 + shade * 4}, ${88 + shade * 3}, ${54 + shade * 2})`;
+          ctx.fillRect(x + 2, y + 2, colW - 4, rowH - 4);
+        }
+        ctx.fillStyle = 'rgba(72, 28, 14, 0.42)';
+        ctx.fillRect(0, y, w, 2);
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(repeatX, repeatY);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createEntranceTileTexture() {
+      const w = 512, h = 512;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#d4cabd';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = 'rgba(120, 110, 98, 0.35)';
+      ctx.lineWidth = 2;
+      const step = 32;
+      for (let x = 0; x <= w; x += step) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+      for (let y = 0; y <= h; y += step) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(6, 3);
+      return tex;
+    }
+
+    function createDiamondCrosshatchRoadTexture() {
+      const w = 1024, h = 256;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#3b4048';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = '#f8fafc';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(18, 14, w - 36, h - 28);
+
+      ctx.save();
       ctx.beginPath();
-      ctx.arc(cx, cy, 46, 0, Math.PI * 2);
+      ctx.rect(18, 14, w - 36, h - 28);
+      ctx.clip();
+
+      ctx.strokeStyle = 'rgba(248, 250, 252, 0.85)';
+      ctx.lineWidth = 4;
+      const spacing = 42;
+      for (let x = -h; x < w + h; x += spacing) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + h, h); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x, h); ctx.lineTo(x + h, 0); ctx.stroke();
+      }
+      ctx.restore();
+
+      [180, w - 230].forEach((zx) => {
+        ctx.fillStyle = '#3b4048';
+        ctx.fillRect(zx - 8, 10, 66, h - 20);
+        ctx.fillStyle = '#f8fafc';
+        for (let y = 22; y < h - 28; y += 26) {
+          ctx.fillRect(zx, y, 50, 14);
+        }
+      });
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createAnniversaryBannerTexture(yearsText = '42') {
+      const w = 256, h = 1024;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      const bgGrad = ctx.createLinearGradient(0, 0, w, h);
+      bgGrad.addColorStop(0, '#1b8a4b');
+      bgGrad.addColorStop(0.5, '#29a35b');
+      bgGrad.addColorStop(1, '#16753e');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#f3f7ee';
+      ctx.beginPath();
+      ctx.moveTo(28, 130);
+      ctx.quadraticCurveTo(w * 0.85, 360, 32, 620);
+      ctx.quadraticCurveTo(w * 0.92, 760, w - 26, 860);
+      ctx.lineTo(w - 22, 130);
+      ctx.closePath();
       ctx.fill();
 
-      ctx.fillStyle = '#1d6b47';
-      ctx.fillRect(cx - 12, cy - 30, 24, 60);
-      ctx.fillRect(cx - 30, cy - 12, 60, 24);
-
-      ctx.font = '900 132px "Noto Sans TC", sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 20px "Noto Sans TC", sans-serif';
       ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#ffd63b';
-      ctx.font = '900 108px "Noto Sans TC", sans-serif';
-      ctx.fillText('幸運', cx - 220, cy + 6);
-      ctx.fillText('草醫院', cx + 240, cy + 6);
-      return new THREE.CanvasTexture(canvas);
+      ctx.fillText('🌻 向日葵醫療體系', w / 2, 54);
+      ctx.font = 'bold 16px "Chakra Petch", sans-serif';
+      ctx.fillStyle = '#fef08a';
+      ctx.fillText('SUNFLOWER HEALTH PARK', w / 2, 82);
+
+      const chars = ['向', '日', '葵', '健', '康', '園', '區'];
+      ctx.font = '900 54px "Noto Sans TC", sans-serif';
+      chars.forEach((ch, idx) => {
+        const cy = 185 + idx * 66;
+        ctx.fillStyle = '#14532d';
+        ctx.fillText(ch, w / 2 + 2, cy + 2);
+        ctx.fillStyle = '#b93829';
+        ctx.fillText(ch, w / 2, cy);
+      });
+
+      const badgeY = 675;
+      ctx.fillStyle = '#0369a1';
+      ctx.beginPath();
+      ctx.arc(w / 2, badgeY, 44, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 42px "Chakra Petch", sans-serif';
+      ctx.fillText(yearsText, w / 2, badgeY + 14);
+
+      ctx.fillStyle = '#15803d';
+      ctx.font = '900 46px "Noto Sans TC", sans-serif';
+      ctx.fillText('週', w / 2, 765);
+      ctx.fillText('年', w / 2, 822);
+
+      ctx.fillStyle = '#fef08a';
+      ctx.font = '900 26px "Noto Sans TC", sans-serif';
+      ctx.fillText('守護健康 • 幸福同行', w / 2, 982);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.anisotropy = 4;
+      return tex;
     }
 
-    function createMonumentTexture() {
+    function createCoupletTexture(lines = ['向', '日', '葵', '園', '區', '護', '安', '康']) {
+      const w = 128, h = 768;
       const canvas = document.createElement('canvas');
-      canvas.width = 2048;
-      canvas.height = 320;
+      canvas.width = w;
+      canvas.height = h;
       const ctx = canvas.getContext('2d');
 
-      const skyGrad = ctx.createLinearGradient(0, 0, 0, 250);
-      skyGrad.addColorStop(0, '#99c9e8');
-      skyGrad.addColorStop(1, '#f0f7fc');
-      ctx.fillStyle = skyGrad;
-      ctx.fillRect(0, 0, 2048, 320);
+      ctx.fillStyle = '#b91c1c';
+      ctx.fillRect(0, 0, w, h);
 
-      ctx.fillStyle = '#59a822';
-      ctx.fillRect(0, 236, 2048, 84);
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(8, 8, w - 16, h - 16);
 
-      const chars = ['幸', '運', '草', '醫', '院', '園', '區', '🍀'];
-      ctx.font = '900 106px "Noto Sans TC", sans-serif';
+      ctx.fillStyle = '#111827';
+      ctx.font = '900 54px "Noto Sans TC", serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      chars.forEach((ch, i) => {
-        const cx = 300 + i * 206;
-        ctx.fillStyle = '#3d271a';
-        ctx.fillText(ch, cx + 4, 174);
-        ctx.fillStyle = '#694732';
-        ctx.fillText(ch, cx, 170);
+
+      const step = (h - 90) / lines.length;
+      lines.forEach((ch, idx) => {
+        ctx.fillText(ch, w / 2, 65 + idx * step);
       });
+
       return new THREE.CanvasTexture(canvas);
     }
 
-    function createWallTexture(cols = 6, rows = 3) {
+    function createNoticeStandTexture(titleText, accentColor) {
+      const w = 256, h = 384;
       const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 256;
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = accentColor;
+      ctx.fillRect(0, 0, w, 68);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 28px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(titleText, w / 2, 44);
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillRect(20, 88, w - 40, 110);
+      ctx.fillStyle = '#cbd5e1';
+      for (let y = 218; y < 350; y += 26) {
+        ctx.fillRect(20, y, w - 40, 14);
+      }
+
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    function createRotundaCurtainWallTextures() {
+      const w = 1024, h = 512;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
       const ctx = canvas.getContext('2d');
 
       const emCanvas = document.createElement('canvas');
-      emCanvas.width = 512;
-      emCanvas.height = 256;
+      emCanvas.width = w;
+      emCanvas.height = h;
       const ectx = emCanvas.getContext('2d');
-      ectx.fillStyle = '#000';
-      ectx.fillRect(0, 0, 512, 256);
 
-      ctx.fillStyle = '#c86d44';
-      ctx.fillRect(0, 0, 512, 256);
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#5f828c');
+      grad.addColorStop(0.32, '#8faeb6');
+      grad.addColorStop(0.55, '#c4bdb0');
+      grad.addColorStop(0.82, '#76959e');
+      grad.addColorStop(1, '#526f78');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
 
-      const rowH = 256 / rows;
-      const colW = 512 / cols;
+      const emGrad = ectx.createLinearGradient(0, 0, 0, h);
+      emGrad.addColorStop(0, '#78b8c9');
+      emGrad.addColorStop(0.5, '#ffe5a8');
+      emGrad.addColorStop(1, '#ffcf70');
+      ectx.fillStyle = emGrad;
+      ectx.fillRect(0, 0, w, h);
+
+      const vCols = 28, hRows = 9;
+      ectx.fillStyle = '#000000';
+      for (let i = 0; i <= vCols; i++) {
+        const x = (i / vCols) * w;
+        ctx.fillStyle = '#4c6356';
+        ctx.fillRect(x - 2.5, 0, 5, h);
+        ectx.fillRect(x - 2.5, 0, 5, h);
+      }
+      for (let j = 0; j <= hRows; j++) {
+        const y = (j / hRows) * h;
+        const isMainBand = j === 0 || j === 3 || j === 6 || j === hRows;
+        const thick = isMainBand ? 12 : 4;
+        ctx.fillStyle = isMainBand ? '#6c8275' : '#485e52';
+        ctx.fillRect(0, y - thick / 2, w, thick);
+        ectx.fillRect(0, y - thick / 2, w, thick);
+      }
+
+      const map = new THREE.CanvasTexture(canvas);
+      map.wrapS = THREE.RepeatWrapping;
+      map.anisotropy = 4;
+      const emissiveMap = new THREE.CanvasTexture(emCanvas);
+      emissiveMap.wrapS = THREE.RepeatWrapping;
+      return { map, emissiveMap };
+    }
+
+    function createColumnPlaqueTexture() {
+      const w = 128, h = 256;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#9d2b6b';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = '#f8fafc';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(6, 6, w - 12, h - 12);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(w / 2, 62, 26, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#9d2b6b';
+      ctx.fillRect(w / 2 - 6, 46, 12, 32);
+      ctx.fillRect(w / 2 - 16, 56, 32, 12);
+
+      ctx.fillStyle = '#fef08a';
+      ctx.font = 'bold 26px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('臨停', w / 2, 132);
+      ctx.fillText('停車格', w / 2, 168);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 18px "Chakra Petch", sans-serif';
+      ctx.fillText('PARKING', w / 2, 212);
+
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    function createHospitalWallTextures(cols = 6, rows = 3, isMainTower = false) {
+      const w = 1024, h = 512;
+      const diffCanvas = document.createElement('canvas');
+      diffCanvas.width = w;
+      diffCanvas.height = h;
+      const ctx = diffCanvas.getContext('2d');
+
+      const emCanvas = document.createElement('canvas');
+      emCanvas.width = w;
+      emCanvas.height = h;
+      const ectx = emCanvas.getContext('2d');
+      ectx.fillStyle = '#000000';
+      ectx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#b45836';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = 'rgba(110, 42, 20, 0.28)';
+      for (let y = 0; y < h; y += 7) {
+        ctx.fillRect(0, y, w, 1.5);
+      }
+
+      const rowH = h / rows;
+      const colW = w / cols;
+      ctx.fillStyle = '#ddd3bf';
+      ctx.fillRect(0, 0, w, 10);
+
       for (let r = 0; r < rows; r++) {
-        ctx.fillStyle = '#e8dec8';
-        ctx.fillRect(0, r * rowH, 512, rowH * 0.14);
+        const y0 = r * rowH;
+        for (let c = 0; c <= cols; c++) {
+          const px = c * colW;
+          ctx.fillStyle = 'rgba(85, 30, 14, 0.35)';
+          ctx.fillRect(px - 10, y0, 20, rowH);
+          ctx.fillStyle = '#c56742';
+          ctx.fillRect(px - 7, y0, 14, rowH);
+        }
+
+        if (r > 0) {
+          ctx.fillStyle = '#dfd5c0';
+          ctx.fillRect(0, y0 - 4, w, 8);
+          ctx.fillStyle = 'rgba(0,0,0,0.22)';
+          ctx.fillRect(0, y0 + 4, w, 3);
+        }
+
         for (let c = 0; c < cols; c++) {
-          const wx = c * colW + colW * 0.22;
-          const wy = r * rowH + rowH * 0.36;
-          const ww = colW * 0.56;
-          const wh = rowH * 0.44;
-          ctx.fillStyle = '#5c8999';
-          ctx.fillRect(wx, wy, ww, wh);
-          if ((r + c) % 2 === 0) {
-            ectx.fillStyle = '#ffe6a3';
-            ectx.fillRect(wx, wy, ww, wh);
+          const x0 = c * colW;
+          const winW = colW * 0.64;
+          const winH = r === 0 && !isMainTower ? rowH * 0.26 : rowH * 0.48;
+          const winX = x0 + (colW - winW) / 2;
+          const winY = r === 0 && !isMainTower ? y0 + rowH * 0.24 : y0 + rowH * 0.28;
+
+          ctx.fillStyle = '#e5dcc8';
+          ctx.fillRect(winX - 6, winY + winH, winW + 12, 8);
+
+          ctx.fillStyle = '#1b2c29';
+          ctx.fillRect(winX - 4, winY - 4, winW + 8, winH + 8);
+
+          const grad = ctx.createLinearGradient(winX, winY, winX + winW, winY + winH);
+          grad.addColorStop(0, '#5d8494');
+          grad.addColorStop(0.5, '#8bb2c2');
+          grad.addColorStop(1, '#3d5e6b');
+          ctx.fillStyle = grad;
+          ctx.fillRect(winX, winY, winW, winH);
+
+          ctx.fillStyle = '#1b2c29';
+          ctx.fillRect(winX + winW * 0.48, winY, 4, winH);
+          if (winH > 45) {
+            ctx.fillRect(winX, winY + winH * 0.28, winW, 3.5);
+          }
+
+          const seed = (r * 17 + c * 31 + (isMainTower ? 7 : 3)) % 11;
+          if (seed < 7) {
+            ectx.fillStyle = seed % 2 === 0 ? '#ffe6a3' : '#d4f3ff';
+            ectx.fillRect(winX + 2, winY + 2, winW - 4, winH - 4);
+            ectx.fillStyle = '#000000';
+            ectx.fillRect(winX + winW * 0.48, winY, 4, winH);
+            if (winH > 45) {
+              ectx.fillRect(winX, winY + winH * 0.28, winW, 3.5);
+            }
           }
         }
       }
-      return {
-        map: new THREE.CanvasTexture(canvas),
-        emissiveMap: new THREE.CanvasTexture(emCanvas)
-      };
+
+      const map = new THREE.CanvasTexture(diffCanvas);
+      map.wrapS = THREE.RepeatWrapping;
+      map.wrapT = THREE.ClampToEdgeWrapping;
+      map.anisotropy = 4;
+
+      const emissiveMap = new THREE.CanvasTexture(emCanvas);
+      emissiveMap.wrapS = THREE.RepeatWrapping;
+      emissiveMap.wrapT = THREE.ClampToEdgeWrapping;
+      return { map, emissiveMap };
+    }
+
+    function createMentalHealthWallTextures(cols = 4, rows = 6) {
+      const w = 1024, h = 1024;
+      const diffCanvas = document.createElement('canvas');
+      diffCanvas.width = w;
+      diffCanvas.height = h;
+      const ctx = diffCanvas.getContext('2d');
+
+      const emCanvas = document.createElement('canvas');
+      emCanvas.width = w;
+      emCanvas.height = h;
+      const ectx = emCanvas.getContext('2d');
+      ectx.fillStyle = '#000000';
+      ectx.fillRect(0, 0, w, h);
+
+      const splitY = h * 0.52;
+      ctx.fillStyle = '#bd7b57';
+      ctx.fillRect(0, 0, w, splitY);
+
+      ctx.fillStyle = '#8b4d38';
+      ctx.fillRect(0, splitY, w, h - splitY);
+
+      ctx.fillStyle = 'rgba(55, 22, 12, 0.22)';
+      for (let y = 0; y < h; y += 8) {
+        ctx.fillRect(0, y, w, 1.5);
+      }
+
+      ctx.fillStyle = '#dfd8c8';
+      ctx.fillRect(0, splitY - 12, w, 24);
+      ctx.fillRect(0, h * 0.84 - 10, w, 20);
+      ctx.fillRect(0, 0, w, 18);
+
+      const rowH = h / rows;
+      const colW = w / cols;
+      for (let r = 0; r < rows; r++) {
+        const y0 = r * rowH;
+        for (let c = 0; c < cols; c++) {
+          const x0 = c * colW;
+          const winW = colW * 0.54;
+          const winH = rowH * 0.44;
+          const winX = x0 + (colW - winW) / 2;
+          const winY = y0 + rowH * 0.28;
+
+          ctx.fillStyle = '#e6dfd0';
+          ctx.fillRect(winX - 6, winY + winH, winW + 12, 9);
+
+          ctx.fillStyle = '#172e28';
+          ctx.fillRect(winX - 4, winY - 4, winW + 8, winH + 8);
+
+          const grad = ctx.createLinearGradient(winX, winY, winX + winW, winY + winH);
+          grad.addColorStop(0, '#446874');
+          grad.addColorStop(0.5, '#739aa6');
+          grad.addColorStop(1, '#2b4752');
+          ctx.fillStyle = grad;
+          ctx.fillRect(winX, winY, winW, winH);
+
+          ctx.fillStyle = '#172e28';
+          ctx.fillRect(winX + winW * 0.48, winY, 4, winH);
+          ctx.fillRect(winX, winY + winH * 0.46, winW, 4);
+
+          if ((r * 5 + c * 9) % 3 !== 0) {
+            ectx.fillStyle = (r + c) % 2 === 0 ? '#ffe59e' : '#cfefff';
+            ectx.fillRect(winX + 2, winY + 2, winW - 4, winH - 4);
+            ectx.fillStyle = '#000000';
+            ectx.fillRect(winX + winW * 0.48, winY, 4, winH);
+            ectx.fillRect(winX, winY + winH * 0.46, winW, 4);
+          }
+        }
+      }
+
+      const map = new THREE.CanvasTexture(diffCanvas);
+      map.wrapS = THREE.RepeatWrapping;
+      map.wrapT = THREE.ClampToEdgeWrapping;
+      map.anisotropy = 4;
+
+      const emissiveMap = new THREE.CanvasTexture(emCanvas);
+      emissiveMap.wrapS = THREE.RepeatWrapping;
+      emissiveMap.wrapT = THREE.ClampToEdgeWrapping;
+      return { map, emissiveMap };
+    }
+
+    function createMentalHealthSignTexture() {
+      const w = 1024, h = 256;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#d3cbbd';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#9c9384';
+      ctx.fillRect(0, 14, w, 6);
+      ctx.fillRect(0, h - 20, w, 6);
+
+      ctx.font = '900 72px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const chars = ['心', '理', '健', '康', '研', '究', '中', '心'];
+      chars.forEach((ch, idx) => {
+        const cx = 140 + idx * 106;
+        const cy = h * 0.43;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+        ctx.fillText(ch, cx + 4, cy + 4);
+        ctx.fillStyle = '#231f20';
+        ctx.fillText(ch, cx, cy);
+      });
+
+      ctx.font = '700 26px "Chakra Petch", Georgia, serif';
+      ctx.fillStyle = '#332e2c';
+      ctx.fillText('Mental   Health   and   Research   Center', w / 2, h * 0.78);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createIrcadUpperWallTextures(cols = 6) {
+      const w = 1024, h = 512;
+      const diffCanvas = document.createElement('canvas');
+      diffCanvas.width = w;
+      diffCanvas.height = h;
+      const ctx = diffCanvas.getContext('2d');
+
+      const emCanvas = document.createElement('canvas');
+      emCanvas.width = w;
+      emCanvas.height = h;
+      const ectx = emCanvas.getContext('2d');
+      ectx.fillStyle = '#000000';
+      ectx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#e5dfd3';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#b8b0a2';
+      ctx.fillRect(0, 14, w, 6);
+      ctx.fillRect(0, h * 0.56, w, 10);
+      ctx.fillRect(0, h - 16, w, 8);
+
+      const colW = w / cols;
+      for (let c = 0; c < cols; c++) {
+        const x0 = c * colW;
+        const winW = colW * 0.34;
+        const winH = h * 0.40;
+        const winX = x0 + (colW - winW) / 2;
+        const winY = h * 0.12;
+
+        ctx.fillStyle = '#9e9688';
+        ctx.fillRect(winX - 6, winY - 4, winW + 12, winH + 8);
+
+        const grad = ctx.createLinearGradient(winX, winY, winX + winW, winY + winH);
+        grad.addColorStop(0, '#234742');
+        grad.addColorStop(0.5, '#3b6e66');
+        grad.addColorStop(1, '#18332f');
+        ctx.fillStyle = grad;
+        ctx.fillRect(winX, winY, winW, winH);
+
+        ctx.fillStyle = '#182b28';
+        ctx.fillRect(winX, winY + winH * 0.33, winW, 4);
+        ctx.fillRect(winX, winY + winH * 0.66, winW, 4);
+
+        ectx.fillStyle = c % 2 === 0 ? '#ffe7a6' : '#c7f5ff';
+        ectx.fillRect(winX + 2, winY + 2, winW - 4, winH - 4);
+        ectx.fillStyle = '#000000';
+        ectx.fillRect(winX, winY + winH * 0.33, winW, 4);
+        ectx.fillRect(winX, winY + winH * 0.66, winW, 4);
+      }
+
+      const map = new THREE.CanvasTexture(diffCanvas);
+      map.wrapS = THREE.RepeatWrapping;
+      map.anisotropy = 4;
+      const emissiveMap = new THREE.CanvasTexture(emCanvas);
+      emissiveMap.wrapS = THREE.RepeatWrapping;
+      return { map, emissiveMap };
+    }
+
+    function createIrcadGlassCurtainTextures() {
+      const w = 1024, h = 512;
+      const diffCanvas = document.createElement('canvas');
+      diffCanvas.width = w;
+      diffCanvas.height = h;
+      const ctx = diffCanvas.getContext('2d');
+
+      const emCanvas = document.createElement('canvas');
+      emCanvas.width = w;
+      emCanvas.height = h;
+      const ectx = emCanvas.getContext('2d');
+
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, '#1e4640');
+      grad.addColorStop(0.45, '#2f665d');
+      grad.addColorStop(0.8, '#1b3d38');
+      grad.addColorStop(1, '#142e2a');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      ectx.fillStyle = '#ffd98e';
+      ectx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#122623';
+      ectx.fillStyle = '#000000';
+      const vCols = 14, hRows = 6;
+      for (let i = 0; i <= vCols; i++) {
+        const x = (i / vCols) * w;
+        ctx.fillRect(x - 3, 0, 6, h);
+        ectx.fillRect(x - 3, 0, 6, h);
+      }
+      for (let j = 0; j <= hRows; j++) {
+        const y = (j / hRows) * h;
+        const thick = j === 3 ? 12 : 5;
+        ctx.fillRect(0, y - thick / 2, w, thick);
+        ectx.fillRect(0, y - thick / 2, w, thick);
+      }
+
+      const map = new THREE.CanvasTexture(diffCanvas);
+      map.wrapS = THREE.RepeatWrapping;
+      map.anisotropy = 4;
+      const emissiveMap = new THREE.CanvasTexture(emCanvas);
+      emissiveMap.wrapS = THREE.RepeatWrapping;
+      return { map, emissiveMap };
+    }
+
+    function createIrcadSignTexture(mode = 'asia') {
+      const w = 1024, h = 256;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.clearRect(0, 0, w, h);
+      if (mode === 'asia') {
+        ctx.font = '900 138px "Chakra Petch", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        ctx.fillStyle = '#1e293b';
+        ctx.fillText('Asia', 256, 136);
+        ctx.fillStyle = '#dc2626';
+        ctx.fillText('Asia', 250, 130);
+
+        ctx.fillStyle = '#1e293b';
+        ctx.fillText('Ircad', 716, 136);
+        ctx.fillStyle = '#15803d';
+        ctx.fillText('Ircad', 710, 130);
+      } else {
+        ctx.font = '900 132px "Chakra Petch", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        ctx.fillStyle = '#1e293b';
+        ctx.fillText('Ircad', w / 2 + 5, 92);
+        ctx.fillStyle = '#15803d';
+        ctx.fillText('Ircad', w / 2, 86);
+
+        ctx.fillStyle = '#b91c1c';
+        ctx.fillRect(w / 2 - 220, 162, 440, 66);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(w / 2 - 220, 162, 440, 66);
+
+        ctx.font = '900 44px "Chakra Petch", Arial, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText('Taiwan', w / 2, 196);
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createCoreLabTowerTextures() {
+      const w = 1024, h = 1024;
+      const diffCanvas = document.createElement('canvas');
+      diffCanvas.width = w;
+      diffCanvas.height = h;
+      const ctx = diffCanvas.getContext('2d');
+
+      const emCanvas = document.createElement('canvas');
+      emCanvas.width = w;
+      emCanvas.height = h;
+      const ectx = emCanvas.getContext('2d');
+      ectx.fillStyle = '#000000';
+      ectx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#d3cbbd';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = 'rgba(130, 122, 108, 0.35)';
+      ctx.lineWidth = 2;
+      for (let y = 160; y < h; y += 168) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w * 0.78, y); ctx.stroke();
+      }
+      for (let x = 260; x <= 780; x += 260) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+
+      const logoX = 720, logoY = 82;
+      ctx.fillStyle = '#15803d';
+      [[-14, -14], [14, -14], [-14, 14], [14, 14]].forEach(([ox, oy]) => {
+        ctx.beginPath(); ctx.arc(logoX + ox, logoY + oy, 13, 0, Math.PI * 2); ctx.fill();
+      });
+
+      ctx.font = '900 42px "Chakra Petch", sans-serif';
+      ctx.fillStyle = '#b91c1c';
+      ctx.textAlign = 'left';
+      ctx.fillText('R+D+M', 762, 78);
+      ctx.font = '900 32px "Noto Sans TC", sans-serif';
+      ctx.fillText('研 發', 775, 118);
+
+      const stairX = 835, stairY = 230, stairW = 145, stairH = 770;
+      ctx.fillStyle = '#1e3a36';
+      ctx.fillRect(stairX - 6, stairY - 6, stairW + 12, stairH + 12);
+
+      const stairGrad = ctx.createLinearGradient(stairX, stairY, stairX + stairW, stairY + stairH);
+      stairGrad.addColorStop(0, '#366860');
+      stairGrad.addColorStop(0.5, '#538a80');
+      stairGrad.addColorStop(1, '#264d47');
+      ctx.fillStyle = stairGrad;
+      ctx.fillRect(stairX, stairY, stairW, stairH);
+
+      ectx.fillStyle = '#ffe59e';
+      ectx.fillRect(stairX + 4, stairY + 4, stairW - 8, stairH - 8);
+
+      ctx.fillStyle = '#2d4742';
+      ectx.fillStyle = '#000000';
+      for (let sy = stairY; sy <= stairY + stairH; sy += 96) {
+        ctx.fillRect(stairX - 6, sy - 4, stairW + 12, 8);
+        ectx.fillRect(stairX - 6, sy - 4, stairW + 12, 8);
+      }
+
+      const floorConfigs = [
+        { y: 78, h: 36, label: '', color: '' },
+        { y: 245, h: 42, label: '', color: '' },
+        { y: 405, h: 48, label: '細胞治療培養室', color: '#1e3a8a' },
+        { y: 565, h: 48, label: '共同研究室', color: '#57534e' },
+        { y: 725, h: 48, label: '組織銀行', color: '#dc2626' },
+        { y: 885, h: 48, label: '', color: '' }
+      ];
+
+      floorConfigs.forEach((fc, idx) => {
+        if (fc.label) {
+          ctx.font = '900 32px "Noto Sans TC", sans-serif';
+          ctx.fillStyle = fc.color;
+          ctx.textAlign = 'left';
+          ctx.fillText(fc.label, 42, fc.y - 18);
+        }
+        [42, 330].forEach((wx) => {
+          const ww = 235;
+          ctx.fillStyle = '#172e28';
+          ctx.fillRect(wx - 3, fc.y - 3, ww + 6, fc.h + 6);
+          ctx.fillStyle = '#335952';
+          ctx.fillRect(wx, fc.y, ww, fc.h);
+          ctx.fillStyle = '#172e28';
+          ctx.fillRect(wx + ww * 0.5, fc.y, 4, fc.h);
+
+          if (idx >= 1) {
+            ectx.fillStyle = '#ffdfa0';
+            ectx.fillRect(wx + 2, fc.y + 2, ww - 4, fc.h - 4);
+            ectx.fillStyle = '#000000';
+            ectx.fillRect(wx + ww * 0.5, fc.y, 4, fc.h);
+          }
+        });
+      });
+
+      const doorX = 485, doorY = 865;
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(doorX, doorY, 120, 159);
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillRect(doorX + 10, doorY + 12, 46, 140);
+      ctx.fillRect(doorX + 64, doorY + 12, 46, 140);
+      ectx.fillStyle = '#fff3c4';
+      ectx.fillRect(doorX + 10, doorY + 12, 100, 140);
+
+      const map = new THREE.CanvasTexture(diffCanvas);
+      map.anisotropy = 4;
+      const emissiveMap = new THREE.CanvasTexture(emCanvas);
+      return { map, emissiveMap };
+    }
+
+    function createCoreLabSideWingTextures(cols = 5, rows = 3) {
+      const w = 1024, h = 512;
+      const diffCanvas = document.createElement('canvas');
+      diffCanvas.width = w;
+      diffCanvas.height = h;
+      const ctx = diffCanvas.getContext('2d');
+
+      const emCanvas = document.createElement('canvas');
+      emCanvas.width = w;
+      emCanvas.height = h;
+      const ectx = emCanvas.getContext('2d');
+      ectx.fillStyle = '#000000';
+      ectx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#d3cbbd';
+      ctx.fillRect(0, 0, w, h);
+
+      const colW = w / cols;
+      const rowH = h / rows;
+      for (let c = 0; c < cols; c++) {
+        const x0 = c * colW;
+        ctx.fillStyle = '#6e685c';
+        ctx.fillRect(x0 + 14, 24, colW - 28, h - 42);
+        for (let r = 0; r < rows; r++) {
+          const y0 = r * rowH;
+          const winX = x0 + 24, winY = y0 + 34, winW = colW - 48, winH = rowH - 54;
+          ctx.fillStyle = '#294741';
+          ctx.fillRect(winX, winY, winW, winH);
+          ectx.fillStyle = '#ffe5a3';
+          ectx.fillRect(winX + 2, winY + 2, winW - 4, winH - 4);
+        }
+      }
+
+      const map = new THREE.CanvasTexture(diffCanvas);
+      map.anisotropy = 4;
+      const emissiveMap = new THREE.CanvasTexture(emCanvas);
+      return { map, emissiveMap };
+    }
+
+    function createEmergencySignTexture() {
+      const w = 1024, h = 256;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.font = '900 165px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      ctx.fillStyle = '#450a0a';
+      ctx.fillText('急   診', w / 2 + 6, h / 2 + 6);
+      ctx.fillStyle = '#dc2626';
+      ctx.fillText('急   診', w / 2, h / 2);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createCloverCrownTexture() {
+      const w = 1024, h = 256;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#153b30';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = '#255c4c';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(6, 6, w - 12, h - 12);
+
+      const lx = 155, ly = h / 2;
+      ctx.fillStyle = '#34d399';
+      [[-22, -22], [22, -22], [-22, 22], [22, 22]].forEach(([ox, oy]) => {
+        ctx.beginPath(); ctx.arc(lx + ox, ly + oy, 22, 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(lx, ly);
+      ctx.quadraticCurveTo(lx + 8, ly + 42, lx + 26, ly + 56);
+      ctx.stroke();
+
+      ctx.font = '900 104px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const textX = w / 2 + 65;
+      ctx.shadowColor = 'rgba(255, 210, 60, 0.85)';
+      ctx.shadowBlur = 18;
+      ctx.fillStyle = '#ffd63b';
+      ctx.fillText('向日葵醫院', textX, ly + 4);
+
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#b88614';
+      ctx.lineWidth = 3;
+      ctx.strokeText('向日葵醫院', textX, ly + 4);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createMonumentWallTexture() {
+      const w = 2048, h = 320;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.78);
+      skyGrad.addColorStop(0, '#99c9e8');
+      skyGrad.addColorStop(0.6, '#d9eef9');
+      skyGrad.addColorStop(1, '#f0f7fc');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
+      [[220, 75, 90], [640, 60, 110], [1120, 70, 100], [1620, 65, 115]].forEach(([cx, cy, r]) => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r * 0.5, 0, Math.PI * 2);
+        ctx.arc(cx + r * 0.45, cy + 8, r * 0.4, 0, Math.PI * 2);
+        ctx.arc(cx - r * 0.45, cy + 10, r * 0.38, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      const grassGrad = ctx.createLinearGradient(0, h * 0.72, 0, h);
+      grassGrad.addColorStop(0, '#82c936');
+      grassGrad.addColorStop(0.5, '#59a822');
+      grassGrad.addColorStop(1, '#3b7d14');
+      ctx.fillStyle = grassGrad;
+      ctx.fillRect(0, h * 0.74, w, h * 0.26);
+
+      const chars = ['向', '日', '葵', '醫', '院', '健', '康', '園', '區'];
+      ctx.font = '900 96px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      chars.forEach((ch, i) => {
+        const cx = 270 + i * 188;
+        const cy = h * 0.53;
+        ctx.fillStyle = '#261810';
+        ctx.fillText(ch, cx + 6, cy + 6);
+        ctx.fillStyle = '#694732';
+        ctx.fillText(ch, cx, cy);
+      });
+
+      ctx.font = '700 22px "Chakra Petch", sans-serif';
+      ctx.fillStyle = '#284726';
+      ctx.fillText('S u n f l o w e r   H o s p i t a l   H e a l t h   P a r k', w / 2, h * 0.85);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createRoadTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#3b4048';
+      ctx.fillRect(0, 0, 512, 512);
+
+      for (let i = 0; i < 3500; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.08)';
+        ctx.fillRect(x, y, 2, 2);
+      }
+
+      ctx.fillStyle = '#e5e9f0';
+      ctx.fillRect(14, 0, 8, 512);
+      ctx.fillRect(490, 0, 8, 512);
+
+      ctx.fillStyle = '#f5b82e';
+      ctx.fillRect(248, 0, 6, 512);
+      ctx.fillRect(258, 0, 6, 512);
+
+      ctx.fillStyle = '#dce2eb';
+      for (let y = 20; y < 512; y += 96) {
+        ctx.fillRect(130, y, 6, 48);
+        ctx.fillRect(376, y, 6, 48);
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(1, 14);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createTemplePlaqueTexture() {
+      const w = 512, h = 160;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#3b0a0a';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 12;
+      ctx.strokeRect(8, 8, w - 16, h - 16);
+
+      ctx.strokeStyle = '#fef08a';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(18, 18, w - 36, h - 36);
+
+      ctx.font = '900 68px "Noto Sans TC", serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      ctx.fillStyle = '#111827';
+      ctx.fillText('天 后 宮', w / 2 + 4, h / 2 + 4);
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillText('天 后 宮', w / 2, h / 2);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    function createIntersectionYellowGridTexture() {
+      const w = 512, h = 512;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#3b4048';
+      ctx.fillRect(0, 0, w, h);
+
+      const pad = 18;
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 10;
+      ctx.strokeRect(pad, pad, w - pad * 2, h - pad * 2);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(pad, pad, w - pad * 2, h - pad * 2);
+      ctx.clip();
+
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 7;
+      const step = 46;
+      for (let offset = -h; offset < w + h; offset += step) {
+        ctx.beginPath(); ctx.moveTo(offset, 0); ctx.lineTo(offset + h, h); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(offset, h); ctx.lineTo(offset + h, 0); ctx.stroke();
+      }
+      ctx.restore();
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    // --- 輔助幾何：停放載具與機車雕塑 ---
+    function createSmoothCapsuleGeometry(radius, cylinderLength, capSegments = 8, radialSegments = 16) {
+      const points = [];
+      const halfLen = Math.max(0.001, cylinderLength / 2);
+      for (let i = 0; i <= capSegments; i++) {
+        const theta = -Math.PI / 2 + (i / capSegments) * (Math.PI / 2);
+        points.push(new THREE.Vector2(Math.cos(theta) * radius, -halfLen + Math.sin(theta) * radius));
+      }
+      for (let i = 0; i <= capSegments; i++) {
+        const theta = (i / capSegments) * (Math.PI / 2);
+        points.push(new THREE.Vector2(Math.cos(theta) * radius, halfLen + Math.sin(theta) * radius));
+      }
+      const geom = new THREE.LatheGeometry(points, radialSegments);
+      geom.computeVertexNormals();
+      return geom;
+    }
+
+    function createSideExtrudedMesh(shape, width, bevelSize, bevelThickness, material) {
+      const innerDepth = Math.max(0.05, width - bevelSize * 2);
+      const geom = new THREE.ExtrudeGeometry(shape, {
+        depth: innerDepth,
+        bevelEnabled: true,
+        bevelThickness: bevelThickness,
+        bevelSize: bevelSize,
+        bevelSegments: 4,
+        curveSegments: 18
+      });
+      geom.translate(0, 0, -innerDepth / 2);
+      geom.rotateY(-Math.PI / 2);
+      geom.computeVertexNormals();
+      const mesh = new THREE.Mesh(geom, material);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      return mesh;
+    }
+
+    function createDetailedWheel(radius = 0.38, width = 0.26, rimColor = 0xdbe4ee) {
+      const group = new THREE.Group();
+      const tireMat = new THREE.MeshStandardMaterial({ color: 0x14181f, roughness: 0.85, metalness: 0.08 });
+      const rimMat = new THREE.MeshStandardMaterial({ color: rimColor, roughness: 0.22, metalness: 0.88 });
+
+      const tire = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, width, 20), tireMat);
+      tire.rotation.z = Math.PI / 2;
+      const rim = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.65, radius * 0.65, width * 1.03, 18), rimMat);
+      rim.rotation.z = Math.PI / 2;
+
+      group.add(tire, rim);
+      return group;
+    }
+
+    function createSportsSedanMesh(colorHex = 0x38bdf8) {
+      const car = new THREE.Group();
+      const paintMat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.2, metalness: 0.68 });
+      const glassMat = new THREE.MeshStandardMaterial({ color: 0x132030, roughness: 0.08, metalness: 0.88 });
+      const trimMat = new THREE.MeshStandardMaterial({ color: 0x181c24, roughness: 0.55, metalness: 0.35 });
+      const headLightMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xe0f2fe, emissiveIntensity: 0.95 });
+      const tailLightMat = new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0xff1e1e, emissiveIntensity: 0.9 });
+
+      const bodyShape = new THREE.Shape();
+      bodyShape.moveTo(-2.22, 0.30);
+      bodyShape.quadraticCurveTo(-2.36, 0.48, -2.30, 0.78);
+      bodyShape.quadraticCurveTo(-2.26, 0.90, -2.12, 0.92);
+      bodyShape.lineTo(-1.62, 0.92);
+      bodyShape.quadraticCurveTo(-0.50, 0.90, 0.92, 0.84);
+      bodyShape.quadraticCurveTo(1.75, 0.78, 2.26, 0.58);
+      bodyShape.quadraticCurveTo(2.40, 0.44, 2.30, 0.26);
+      bodyShape.lineTo(-2.22, 0.26);
+      bodyShape.closePath();
+      car.add(createSideExtrudedMesh(bodyShape, 1.98, 0.11, 0.13, paintMat));
+
+      const cabinShape = new THREE.Shape();
+      cabinShape.moveTo(-1.74, 0.85);
+      cabinShape.quadraticCurveTo(-1.26, 1.24, -0.78, 1.38);
+      cabinShape.quadraticCurveTo(-0.12, 1.45, 0.48, 1.36);
+      cabinShape.quadraticCurveTo(0.96, 1.15, 1.34, 0.81);
+      cabinShape.lineTo(-1.74, 0.85);
+      car.add(createSideExtrudedMesh(cabinShape, 1.54, 0.08, 0.10, glassMat));
+
+      const grille = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.22, 0.12), trimMat);
+      grille.position.set(0, 0.44, 2.31);
+      car.add(grille);
+
+      [-0.68, 0.68].forEach((hx) => {
+        const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.12, 0.24), headLightMat);
+        lamp.position.set(hx, 0.58, 2.22);
+        car.add(lamp);
+      });
+
+      const tailBar = new THREE.Mesh(new THREE.BoxGeometry(1.66, 0.09, 0.10), tailLightMat);
+      tailBar.position.set(0, 0.78, -2.29);
+      car.add(tailBar);
+
+      [
+        { x: -0.92, y: 0.37, z: 1.42 },
+        { x: 0.92, y: 0.37, z: 1.42 },
+        { x: -0.92, y: 0.37, z: -1.42 },
+        { x: 0.92, y: 0.37, z: -1.42 }
+      ].forEach((wc) => {
+        const w = createDetailedWheel(0.37, 0.26, 0xe2e8f0);
+        w.position.set(wc.x, wc.y, wc.z);
+        car.add(w);
+      });
+
+      return car;
+    }
+
+    function createAmbulanceMesh() {
+      const amb = new THREE.Group();
+      const whiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.26, metalness: 0.22 });
+      const redStripeMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.32, metalness: 0.15 });
+      const glassMat = new THREE.MeshStandardMaterial({ color: 0x132030, roughness: 0.08, metalness: 0.88 });
+
+      const vanShape = new THREE.Shape();
+      vanShape.moveTo(-2.55, 0.42);
+      vanShape.quadraticCurveTo(-2.64, 0.56, -2.60, 0.82);
+      vanShape.lineTo(-2.56, 2.26);
+      vanShape.quadraticCurveTo(-2.54, 2.46, -2.30, 2.48);
+      vanShape.lineTo(0.88, 2.48);
+      vanShape.quadraticCurveTo(1.26, 2.46, 1.46, 2.18);
+      vanShape.lineTo(1.96, 1.32);
+      vanShape.quadraticCurveTo(2.44, 1.18, 2.62, 0.86);
+      vanShape.quadraticCurveTo(2.70, 0.64, 2.58, 0.38);
+      vanShape.lineTo(-2.55, 0.38);
+      vanShape.closePath();
+      amb.add(createSideExtrudedMesh(vanShape, 2.18, 0.12, 0.14, whiteMat));
+
+      const windshield = new THREE.Mesh(new THREE.BoxGeometry(1.86, 0.86, 0.08), glassMat);
+      windshield.position.set(0, 1.74, 1.72);
+      windshield.rotation.x = -0.52;
+      amb.add(windshield);
+
+      [-1.095, 1.095].forEach((sx) => {
+        const sideStripe = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.28, 3.45), redStripeMat);
+        sideStripe.position.set(sx, 1.15, -0.78);
+        const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.64, 0.22), redStripeMat);
+        crossV.position.set(sx, 1.76, -0.82);
+        const crossH = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.22, 0.64), redStripeMat);
+        crossH.position.set(sx, 1.76, -0.82);
+        amb.add(sideStripe, crossV, crossH);
+      });
+
+      const redBeacon = new THREE.Mesh(
+        new THREE.BoxGeometry(0.56, 0.16, 0.28),
+        new THREE.MeshStandardMaterial({ color: 0xff1e1e, emissive: 0xff0000, emissiveIntensity: 1.6 })
+      );
+      redBeacon.position.set(-0.46, 2.61, 0.82);
+      const blueBeacon = new THREE.Mesh(
+        new THREE.BoxGeometry(0.56, 0.16, 0.28),
+        new THREE.MeshStandardMaterial({ color: 0x1e90ff, emissive: 0x0066ff, emissiveIntensity: 1.6 })
+      );
+      blueBeacon.position.set(0.46, 2.61, 0.82);
+      amb.add(redBeacon, blueBeacon);
+
+      [
+        { x: -0.98, y: 0.43, z: 1.68 },
+        { x: 0.98, y: 0.43, z: 1.68 },
+        { x: -0.98, y: 0.43, z: -1.48 },
+        { x: 0.98, y: 0.43, z: -1.48 }
+      ].forEach((wc) => {
+        const w = createDetailedWheel(0.43, 0.30, 0xcbd5e1);
+        w.position.set(wc.x, wc.y, wc.z);
+        amb.add(w);
+      });
+
+      return amb;
+    }
+
+    function createScooterMesh(bodyMat, tireMat, seatMat, mirrorMat) {
+      const scooter = new THREE.Group();
+      const frontWheel = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.11, 14), tireMat);
+      frontWheel.rotation.z = Math.PI / 2;
+      frontWheel.position.set(0, 0.22, 0.56);
+
+      const rearWheel = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.12, 14), tireMat);
+      rearWheel.rotation.z = Math.PI / 2;
+      rearWheel.position.set(0, 0.22, -0.54);
+
+      const floorboard = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.08, 0.72), tireMat);
+      floorboard.position.set(0, 0.28, 0.02);
+
+      const rearBody = new THREE.Mesh(createSmoothCapsuleGeometry(0.22, 0.46, 8, 16), bodyMat);
+      rearBody.rotation.x = Math.PI / 2;
+      rearBody.scale.set(1.0, 1.0, 0.82);
+      rearBody.position.set(0, 0.52, -0.34);
+
+      const seat = new THREE.Mesh(createSmoothCapsuleGeometry(0.18, 0.44, 8, 16), seatMat);
+      seat.rotation.x = Math.PI / 2;
+      seat.scale.set(1.05, 1.0, 0.45);
+      seat.position.set(0, 0.73, -0.28);
+
+      const frontApron = new THREE.Mesh(createSmoothCapsuleGeometry(0.19, 0.42, 8, 16), bodyMat);
+      frontApron.position.set(0, 0.58, 0.44);
+      frontApron.rotation.x = -0.22;
+
+      const handlebar = new THREE.Mesh(createSmoothCapsuleGeometry(0.055, 0.56, 8, 12), bodyMat);
+      handlebar.rotation.z = Math.PI / 2;
+      handlebar.position.set(0, 0.96, 0.38);
+
+      [-0.28, 0.28].forEach((mx) => {
+        const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.16, 8), mirrorMat);
+        stem.position.set(mx, 1.08, 0.38);
+        scooter.add(stem);
+      });
+
+      scooter.add(frontWheel, rearWheel, floorboard, rearBody, seat, frontApron, handlebar);
+      return scooter;
+    }
+
+    // --- 建構彰濱天后宮（比照 1index.html） ---
+    function buildChangbinMazuTemple(parentGroup) {
+      const templeGroup = new THREE.Group();
+      const tx = 48.5, tz = 12.5;
+      templeGroup.position.set(tx, 0, tz);
+
+      const greenLawnMat = new THREE.MeshStandardMaterial({ color: 0x4d7c4f, roughness: 0.92 });
+      const stoneBaseMat = new THREE.MeshStandardMaterial({ color: 0xd6d1c4, roughness: 0.78 });
+      const redWallMat = new THREE.MeshStandardMaterial({ color: 0x881313, roughness: 0.55 });
+      const darkWoodMat = new THREE.MeshStandardMaterial({ color: 0x3b1808, roughness: 0.62 });
+      const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.25, metalness: 0.72 });
+      const glazeGreenRoofMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.24, metalness: 0.28 });
+      const glazeTileRibMat = new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.22, metalness: 0.32 });
+      const ridgeOrangeMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.34 });
+      const dragonStoneMat = new THREE.MeshStandardMaterial({ color: 0x3f6254, roughness: 0.52, metalness: 0.18 });
+      const bronzeMat = new THREE.MeshStandardMaterial({ color: 0x5c6652, roughness: 0.32, metalness: 0.75 });
+
+      const courtBase = new THREE.Mesh(new THREE.BoxGeometry(11.4, 0.05, 14.2), new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.85 }));
+      courtBase.position.set(0, 0.025, 1.4);
+      courtBase.receiveShadow = true;
+
+      const greenCarpet = new THREE.Mesh(new THREE.BoxGeometry(9.2, 0.06, 12.2), greenLawnMat);
+      greenCarpet.position.set(0, 0.032, 1.5);
+
+      const plinth = new THREE.Mesh(new THREE.BoxGeometry(7.8, 0.34, 6.4), stoneBaseMat);
+      plinth.position.set(0, 0.17, -1.6);
+      plinth.castShadow = true;
+
+      const frontStep = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.17, 0.70), stoneBaseMat);
+      frontStep.position.set(0, 0.085, 1.85);
+
+      const backWall = new THREE.Mesh(new THREE.BoxGeometry(7.0, 3.65, 0.36), redWallMat);
+      backWall.position.set(0, 2.16, -4.4);
+      backWall.castShadow = true;
+
+      templeGroup.add(courtBase, greenCarpet, plinth, frontStep, backWall);
+
+      [-3.35, 3.35].forEach((wx) => {
+        const sideWall = new THREE.Mesh(new THREE.BoxGeometry(0.36, 3.65, 5.4), redWallMat);
+        sideWall.position.set(wx, 2.16, -1.8);
+        sideWall.castShadow = true;
+
+        const gableShape = new THREE.Shape();
+        gableShape.moveTo(-3.45, 0);
+        gableShape.lineTo(3.45, 0);
+        gableShape.lineTo(0, 1.68);
+        gableShape.closePath();
+
+        const gableGeom = new THREE.ExtrudeGeometry(gableShape, { depth: 0.36, bevelEnabled: false });
+        gableGeom.translate(0, 0, -0.18);
+        gableGeom.rotateY(Math.PI / 2);
+        const gableMesh = new THREE.Mesh(gableGeom, redWallMat);
+        gableMesh.position.set(wx, 3.96, -1.65);
+        templeGroup.add(sideWall, gableMesh);
+      });
+
+      [-1.78, 1.78].forEach((dx, idx) => {
+        const doorJamb = new THREE.Mesh(new THREE.BoxGeometry(0.45, 3.45, 0.32), darkWoodMat);
+        doorJamb.position.set(dx, 2.06, 0.72);
+        const coupletLines = idx === 0
+          ? ['后', '垂', '聖', '德', '口', '碑', '傳']
+          : ['天', '護', '生', '靈', '慈', '航', '普'];
+        const coupletMesh = new THREE.Mesh(
+          new THREE.PlaneGeometry(0.32, 2.65),
+          new THREE.MeshStandardMaterial({ map: createCoupletTexture(coupletLines), roughness: 0.5 })
+        );
+        coupletMesh.position.set(dx, 2.08, 0.89);
+        templeGroup.add(doorJamb, coupletMesh);
+      });
+
+      [-2.82, 2.82].forEach((px) => {
+        const lionBase = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.42, 0.68), goldMat);
+        lionBase.position.set(px, 0.55, 0.98);
+        const dragonCol = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 3.18, 16), dragonStoneMat);
+        dragonCol.position.set(px, 2.34, 0.98);
+        templeGroup.add(lionBase, dragonCol);
+      });
+
+      // 屋頂與燕尾脊
+      const roofGroup = new THREE.Group();
+      const roofCenterZ = -1.65, eaveBaseY = 3.98, roofWidthX = 8.4;
+      const eaveFrieze = new THREE.Mesh(new THREE.BoxGeometry(8.1, 0.34, 7.2), darkWoodMat);
+      eaveFrieze.position.set(0, eaveBaseY - 0.08, roofCenterZ + 0.15);
+      roofGroup.add(eaveFrieze);
+
+      const slopeAngle = 0.44, slopeLen = 4.15;
+      const ridgeTopY = eaveBaseY + Math.sin(slopeAngle) * slopeLen * 0.96;
+
+      [-1, 1].forEach((dirZ) => {
+        const slopePivot = new THREE.Group();
+        slopePivot.position.set(0, ridgeTopY, roofCenterZ);
+        slopePivot.rotation.x = dirZ * slopeAngle;
+
+        const roofDeck = new THREE.Mesh(new THREE.BoxGeometry(roofWidthX, 0.22, slopeLen), glazeGreenRoofMat);
+        roofDeck.position.set(0, -0.06, dirZ * (slopeLen / 2 - 0.08));
+        roofDeck.castShadow = true;
+        slopePivot.add(roofDeck);
+
+        for (let txTile = -roofWidthX / 2 + 0.18; txTile <= roofWidthX / 2 - 0.18; txTile += 0.28) {
+          const tileRow = new THREE.Mesh(new THREE.CylinderGeometry(0.068, 0.075, slopeLen + 0.06, 8), glazeTileRibMat);
+          tileRow.rotation.x = Math.PI / 2;
+          tileRow.position.set(txTile, 0.08, dirZ * (slopeLen / 2 - 0.06));
+          slopePivot.add(tileRow);
+        }
+        roofGroup.add(slopePivot);
+      });
+
+      const mainRidge = new THREE.Mesh(new THREE.BoxGeometry(roofWidthX + 0.2, 0.42, 0.44), ridgeOrangeMat);
+      mainRidge.position.set(0, ridgeTopY + 0.16, roofCenterZ);
+      const flamingPearl = new THREE.Mesh(new THREE.SphereGeometry(0.26, 16, 14), goldMat);
+      flamingPearl.position.set(0, ridgeTopY + 0.68, roofCenterZ);
+      roofGroup.add(mainRidge, flamingPearl);
+
+      [-1, 1].forEach((sideSign) => {
+        const mainSwallowTail = new THREE.Mesh(new THREE.ConeGeometry(0.26, 1.35, 6), ridgeOrangeMat);
+        mainSwallowTail.position.set(sideSign * (roofWidthX / 2 + 0.25), ridgeTopY + 0.65, roofCenterZ);
+        mainSwallowTail.rotation.z = sideSign < 0 ? 0.56 : -0.56;
+        roofGroup.add(mainSwallowTail);
+      });
+      templeGroup.add(roofGroup);
+
+      // 天后宮匾額與燈籠
+      const plaqueMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(2.85, 0.86, 0.16),
+        new THREE.MeshStandardMaterial({ map: createTemplePlaqueTexture(), roughness: 0.32 })
+      );
+      plaqueMesh.position.set(0, 3.68, 1.48);
+      templeGroup.add(plaqueMesh);
+
+      const lanternMat = new THREE.MeshStandardMaterial({
+        color: 0xdc2626,
+        emissive: 0xff2a2a,
+        emissiveIntensity: 0.72
+      });
+      nightGlowMaterials.push(lanternMat);
+      [-3.55, 3.55].forEach((lx) => {
+        for (let k = 0; k < 4; k++) {
+          const lantern = new THREE.Mesh(new THREE.SphereGeometry(0.19, 12, 12), lanternMat);
+          lantern.scale.set(1.0, 1.18, 1.0);
+          lantern.position.set(lx, 3.52 - k * 0.42, 1.52);
+          templeGroup.add(lantern);
+        }
+      });
+
+      // 天公爐與香煙
+      const censerGroup = new THREE.Group();
+      censerGroup.position.set(0, 0.06, 3.85);
+      const cauldronBody = new THREE.Mesh(new THREE.SphereGeometry(0.56, 20, 16), bronzeMat);
+      cauldronBody.scale.set(1.05, 0.78, 1.05);
+      cauldronBody.position.y = 0.74;
+      const lowerPavilionRoof = new THREE.Mesh(new THREE.ConeGeometry(0.86, 0.42, 8), glazeGreenRoofMat);
+      lowerPavilionRoof.position.y = 2.15;
+      censerGroup.add(cauldronBody, lowerPavilionRoof);
+      templeGroup.add(censerGroup);
+
+      const smokeMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc, transparent: true, opacity: 0.48 });
+      for (let s = 0; s < 14; s++) {
+        const puff = new THREE.Mesh(new THREE.SphereGeometry(0.11 + (s % 4) * 0.04, 8, 8), smokeMat);
+        puff.position.set(tx, 1.35 + s * 0.22, tz + 3.85);
+        scene.add(puff);
+        templeSmokeParticles.push({
+          mesh: puff,
+          baseX: tx,
+          baseZ: tz + 3.85,
+          phase: s * 0.65,
+          speed: 0.45 + Math.random() * 0.25
+        });
+      }
+
+      parentGroup.add(templeGroup);
+    }
+
+    // --- 建構完整向日葵醫院健康園區（比照 1index.html buildMedicalComplex） ---
+    function buildMedicalComplex() {
+      const campusGroup = new THREE.Group();
+
+      const concreteBeigeMat = new THREE.MeshStandardMaterial({ color: 0xcfc7b8, roughness: 0.78, metalness: 0.05 });
+      const concreteDarkTrimMat = new THREE.MeshStandardMaterial({ color: 0xb0a798, roughness: 0.85 });
+      const darkGreenFrameMat = new THREE.MeshStandardMaterial({ color: 0x18382c, roughness: 0.38, metalness: 0.45 });
+      const sageGreenSteelMat = new THREE.MeshStandardMaterial({ color: 0x5c7365, roughness: 0.48, metalness: 0.32 });
+      const redBrickMat = new THREE.MeshStandardMaterial({ map: createRedBrickTexture(3, 5), roughness: 0.82 });
+
+      // (A) 主醫療大樓圓柱玻璃帷幕塔樓與大圓盤屋頂
+      const rotundaTex = createRotundaCurtainWallTextures();
+      const rotundaMat = new THREE.MeshStandardMaterial({
+        map: rotundaTex.map,
+        emissive: new THREE.Color(0xffe299),
+        emissiveMap: rotundaTex.emissiveMap,
+        emissiveIntensity: 0.25,
+        roughness: 0.18,
+        metalness: 0.62
+      });
+      nightGlowMaterials.push(rotundaMat);
+
+      const rotundaX = 0.0, rotundaZ = -9.1, rotundaRadius = 8.8, rotundaBaseY = 6.15, rotundaHeight = 16.5;
+      const rotundaCyl = new THREE.Mesh(
+        new THREE.CylinderGeometry(rotundaRadius, rotundaRadius, rotundaHeight, 44),
+        rotundaMat
+      );
+      rotundaCyl.position.set(rotundaX, rotundaBaseY + rotundaHeight / 2, rotundaZ);
+      rotundaCyl.castShadow = true;
+      campusGroup.add(rotundaCyl);
+
+      for (let i = 0; i < 20; i++) {
+        const ang = (i / 20) * Math.PI * 2;
+        const rib = new THREE.Mesh(new THREE.BoxGeometry(0.28, rotundaHeight + 0.5, 0.58), sageGreenSteelMat);
+        rib.position.set(
+          rotundaX + Math.cos(ang) * (rotundaRadius + 0.28),
+          rotundaBaseY + rotundaHeight / 2 + 0.2,
+          rotundaZ + Math.sin(ang) * (rotundaRadius + 0.28)
+        );
+        rib.rotation.y = -ang;
+        campusGroup.add(rib);
+      }
+
+      const discTopY = rotundaBaseY + rotundaHeight;
+      const discSoffit = new THREE.Mesh(new THREE.CylinderGeometry(11.4, 10.6, 0.85, 48), sageGreenSteelMat);
+      discSoffit.position.set(rotundaX, discTopY + 0.45, rotundaZ);
+      const discRim = new THREE.Mesh(new THREE.CylinderGeometry(11.65, 11.65, 0.42, 48), concreteBeigeMat);
+      discRim.position.set(rotundaX, discTopY + 0.92, rotundaZ);
+      const discUpperCap = new THREE.Mesh(new THREE.CylinderGeometry(9.0, 10.4, 0.72, 44), sageGreenSteelMat);
+      discUpperCap.position.set(rotundaX, discTopY + 1.45, rotundaZ);
+      campusGroup.add(discSoffit, discRim, discUpperCap);
+
+      // (B) 主醫療大樓迎賓雨庇與自動玻璃大門
+      const entranceGroup = new THREE.Group();
+      const entranceTileTex = createEntranceTileTexture();
+      const porticoFloor = new THREE.Mesh(
+        new THREE.PlaneGeometry(24, 9.5),
+        new THREE.MeshStandardMaterial({ map: entranceTileTex, roughness: 0.75 })
+      );
+      porticoFloor.rotation.x = -Math.PI / 2;
+      porticoFloor.position.set(0, 0.032, -1.8);
+      porticoFloor.receiveShadow = true;
+      entranceGroup.add(porticoFloor);
+
+      const canopyW = 19.6, canopyD = 18.4, canopyCenterZ = 3.0, beamBottomY = 4.65, beamHeight = 1.15;
+      const frontBeam = new THREE.Mesh(new THREE.BoxGeometry(canopyW, beamHeight, 0.75), concreteBeigeMat);
+      frontBeam.position.set(0, beamBottomY + beamHeight / 2, canopyCenterZ + canopyD / 2 - 0.375);
+      frontBeam.castShadow = true;
+
+      const backBeam = new THREE.Mesh(new THREE.BoxGeometry(canopyW, beamHeight, 0.65), concreteBeigeMat);
+      backBeam.position.set(0, beamBottomY + beamHeight / 2, canopyCenterZ - canopyD / 2 + 0.325);
+
+      const leftEdgeBeam = new THREE.Mesh(new THREE.BoxGeometry(0.75, beamHeight, canopyD), concreteBeigeMat);
+      leftEdgeBeam.position.set(-canopyW / 2 + 0.375, beamBottomY + beamHeight / 2, canopyCenterZ);
+
+      const rightEdgeBeam = new THREE.Mesh(new THREE.BoxGeometry(0.75, beamHeight, canopyD), concreteBeigeMat);
+      rightEdgeBeam.position.set(canopyW / 2 - 0.375, beamBottomY + beamHeight / 2, canopyCenterZ);
+
+      const canopyRoofSlab = new THREE.Mesh(new THREE.BoxGeometry(canopyW + 0.4, 0.65, canopyD + 0.4), concreteDarkTrimMat);
+      canopyRoofSlab.position.set(0, beamBottomY + beamHeight + 0.25, canopyCenterZ);
+      canopyRoofSlab.castShadow = true;
+
+      entranceGroup.add(frontBeam, backBeam, leftEdgeBeam, rightEdgeBeam, canopyRoofSlab);
+
+      const ceilingLampMat = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        emissive: 0xfff3cc,
+        emissiveIntensity: 0.45
+      });
+      nightGlowMaterials.push(ceilingLampMat);
+      [-4.4, 0, 4.4].forEach((lx) => {
+        [-3.2, 0.8, 4.8, 8.8].forEach((lz) => {
+          const lampFixture = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.08, 0.45), ceilingLampMat);
+          lampFixture.position.set(lx, beamBottomY + 0.78, lz);
+          entranceGroup.add(lampFixture);
+        });
+      });
+
+      const canopyPointLight = new THREE.PointLight(0xfff0d4, 0.75, 28, 1.4);
+      canopyPointLight.position.set(0, 4.4, 2.5);
+      entranceGroup.add(canopyPointLight);
+      canopyCeilingLights.push(canopyPointLight);
+
+      // 迎賓紅磚柱與週年慶掛旗
+      const bannerMatRight = new THREE.MeshStandardMaterial({ map: createAnniversaryBannerTexture('42'), roughness: 0.55 });
+      const bannerMatLeft = new THREE.MeshStandardMaterial({ map: createAnniversaryBannerTexture('08'), roughness: 0.55 });
+
+      [
+        { x: -5.35, z: 1.45, bannerMat: bannerMatLeft, isRight: false, hasBanner: true },
+        { x: 5.35, z: 1.45, bannerMat: bannerMatRight, isRight: true, hasBanner: true },
+        { x: -5.35, z: 11.45, bannerMat: null, isRight: false, hasBanner: false },
+        { x: 5.35, z: 11.45, bannerMat: null, isRight: true, hasBanner: false }
+      ].forEach((cp) => {
+        const plinth = new THREE.Mesh(new THREE.BoxGeometry(1.26, 0.85, 1.26), concreteBeigeMat);
+        plinth.position.set(cp.x, 0.425, cp.z);
+        const brickShaft = new THREE.Mesh(new THREE.BoxGeometry(1.18, beamBottomY - 0.85, 1.18), redBrickMat);
+        brickShaft.position.set(cp.x, 0.85 + (beamBottomY - 0.85) / 2, cp.z);
+        brickShaft.castShadow = true;
+        entranceGroup.add(plinth, brickShaft);
+
+        if (cp.hasBanner && cp.bannerMat) {
+          const bannerH = beamBottomY - 0.97;
+          const frontBanner = new THREE.Mesh(new THREE.PlaneGeometry(1.08, bannerH), cp.bannerMat);
+          frontBanner.position.set(cp.x, 0.91 + bannerH / 2, cp.z + 0.605);
+          entranceGroup.add(frontBanner);
+        }
+      });
+
+      // 大門玻璃立面與春聯
+      const facadeZ = -6.2;
+      [-4.15, 4.15].forEach((wx) => {
+        const wallPier = new THREE.Mesh(new THREE.BoxGeometry(1.6, 4.65, 0.9), redBrickMat);
+        wallPier.position.set(wx, 2.325, facadeZ);
+        entranceGroup.add(wallPier);
+      });
+
+      const leftCouplet = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.28, 2.15),
+        new THREE.MeshStandardMaterial({ map: createCoupletTexture(['向', '日', '葵', '園', '護', '百', '姓']), roughness: 0.6 })
+      );
+      leftCouplet.position.set(-3.75, 2.35, facadeZ + 0.465);
+      const rightCouplet = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.28, 2.15),
+        new THREE.MeshStandardMaterial({ map: createCoupletTexture(['仁', '心', '醫', '術', '澤', '四', '方']), roughness: 0.6 })
+      );
+      rightCouplet.position.set(3.75, 2.35, facadeZ + 0.465);
+      entranceGroup.add(leftCouplet, rightCouplet);
+
+      const lobbyGlowBackdrop = new THREE.Mesh(
+        new THREE.PlaneGeometry(6.5, 2.75),
+        new THREE.MeshBasicMaterial({ color: 0xfef3c7 })
+      );
+      lobbyGlowBackdrop.position.set(0, 1.375, facadeZ - 0.1);
+      entranceGroup.add(lobbyGlowBackdrop);
+
+      const redWelcomeMat = new THREE.Mesh(
+        new THREE.BoxGeometry(3.25, 0.025, 1.45),
+        new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.92 })
+      );
+      redWelcomeMat.position.set(0, 0.04, facadeZ + 1.05);
+      entranceGroup.add(redWelcomeMat);
+
+      // 公告立牌
+      const blackMetalMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.6, roughness: 0.4 });
+      [
+        { x: -2.85, mat: new THREE.MeshStandardMaterial({ map: createNoticeStandTexture('門診時刻表', '#0284c7') }) },
+        { x: -2.12, mat: new THREE.MeshStandardMaterial({ map: createNoticeStandTexture('就醫服務指南', '#eab308') }) }
+      ].forEach((st) => {
+        const board = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.92, 0.05), st.mat);
+        board.position.set(st.x, 1.02, facadeZ + 0.85);
+        entranceGroup.add(board);
+      });
+
+      campusGroup.add(entranceGroup);
+
+      // 左右對稱牛腿齒飾挑簷迴廊
+      const plaqueMat = new THREE.MeshStandardMaterial({ map: createColumnPlaqueTexture(), roughness: 0.4 });
+      [-1, 1].forEach((sideSign) => {
+        const centerX = sideSign * 27.1;
+        const arcadeBeam = new THREE.Mesh(new THREE.BoxGeometry(33.8, 1.12, 6.2), concreteBeigeMat);
+        arcadeBeam.position.set(centerX, 4.65 + 0.56, -2.4);
+        arcadeBeam.castShadow = true;
+        campusGroup.add(arcadeBeam);
+
+        for (let offset = 10.8; offset <= 43.4; offset += 1.08) {
+          const bracket = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.96, 6.54), concreteBeigeMat);
+          bracket.position.set(sideSign * offset, 4.65 + 0.52, -2.4);
+          campusGroup.add(bracket);
+        }
+
+        [10.8, 16.2, 21.6, 27.0, 32.4, 37.8, 43.2].map((x) => sideSign * x).forEach((cx) => {
+          const shaftF = new THREE.Mesh(new THREE.BoxGeometry(0.80, 4.65, 0.80), redBrickMat);
+          shaftF.position.set(cx, 2.325, 0.35);
+          shaftF.castShadow = true;
+          const plaque = new THREE.Mesh(new THREE.PlaneGeometry(0.36, 0.68), plaqueMat);
+          plaque.position.set(cx, 1.92, 0.765);
+          campusGroup.add(shaftF, plaque);
+        });
+      });
+
+      // 醫療大樓主體與兩翼
+      const wingWallTex = createHospitalWallTextures(8, 3, false);
+      const wingWallMat = new THREE.MeshStandardMaterial({
+        map: wingWallTex.map,
+        emissive: new THREE.Color(0xffdfa0),
+        emissiveMap: wingWallTex.emissiveMap,
+        emissiveIntensity: 0.25,
+        roughness: 0.72
+      });
+      nightGlowMaterials.push(wingWallMat);
+
+      const centerWing = new THREE.Mesh(
+        new THREE.BoxGeometry(22.0, 14.5, 16.0),
+        [wingWallMat, wingWallMat, concreteBeigeMat, concreteBeigeMat, wingWallMat, wingWallMat]
+      );
+      centerWing.position.set(0, 4.65 + 14.5 / 2, -14.2);
+      centerWing.castShadow = true;
+      campusGroup.add(centerWing);
+
+      [
+        { x: -27.5, z: -13.5, w: 33.0, d: 17.5, h: 16.2 },
+        { x: 27.5, z: -13.5, w: 33.0, d: 17.5, h: 16.2 }
+      ].forEach((cfg) => {
+        const wing = new THREE.Mesh(
+          new THREE.BoxGeometry(cfg.w, cfg.h, cfg.d),
+          [wingWallMat, wingWallMat, concreteBeigeMat, concreteBeigeMat, wingWallMat, wingWallMat]
+        );
+        wing.position.set(cfg.x, cfg.h / 2, cfg.z);
+        wing.castShadow = true;
+        campusGroup.add(wing);
+      });
+
+      const towerTex = createHospitalWallTextures(10, 7, true);
+      const towerMat = new THREE.MeshStandardMaterial({
+        map: towerTex.map,
+        emissive: new THREE.Color(0xffdfa0),
+        emissiveMap: towerTex.emissiveMap,
+        emissiveIntensity: 0.25,
+        roughness: 0.72
+      });
+      nightGlowMaterials.push(towerMat);
+
+      const mainTower = new THREE.Mesh(
+        new THREE.BoxGeometry(56, 31.5, 36),
+        [towerMat, towerMat, concreteBeigeMat, concreteBeigeMat, towerMat, towerMat]
+      );
+      mainTower.position.set(0, 15.75, -40.5);
+      mainTower.castShadow = true;
+      campusGroup.add(mainTower);
+
+      // 頂部「向日葵醫院」招牌塔樓
+      const crownTex = createCloverCrownTexture();
+      const crownSignMat = new THREE.MeshStandardMaterial({
+        map: crownTex,
+        emissive: new THREE.Color(0xffd23f),
+        emissiveMap: crownTex,
+        emissiveIntensity: 0.45,
+        roughness: 0.35
+      });
+      nightGlowMaterials.push(crownSignMat);
+
+      const crownBox = new THREE.Mesh(
+        new THREE.BoxGeometry(21, 5.2, 24),
+        [crownSignMat, crownSignMat, darkGreenFrameMat, darkGreenFrameMat, crownSignMat, crownSignMat]
+      );
+      crownBox.position.set(0, 34.6, -38.5);
+      campusGroup.add(crownBox);
+
+      // 急診雨庇與待命救護車
+      const erFrontGroup = new THREE.Group();
+      erFrontGroup.position.set(19.8, 0, -40.5);
+      erFrontGroup.rotation.y = Math.PI / 2;
+
+      const erSignTex = createEmergencySignTexture();
+      const erSignMat = new THREE.MeshStandardMaterial({
+        map: erSignTex,
+        transparent: true,
+        emissive: new THREE.Color(0xef4444),
+        emissiveMap: erSignTex,
+        emissiveIntensity: 0.45,
+        side: THREE.DoubleSide
+      });
+      nightGlowMaterials.push(erSignMat);
+
+      const erCanopySlab = new THREE.Mesh(new THREE.BoxGeometry(17.5, 1.35, 12.2), concreteBeigeMat);
+      erCanopySlab.position.set(0, 5.275, 13.8);
+      const erCanopySign = new THREE.Mesh(new THREE.PlaneGeometry(6.8, 1.85), erSignMat);
+      erCanopySign.position.set(0, 6.75, 19.6);
+      erFrontGroup.add(erCanopySlab, erCanopySign);
+
+      [-7.85, 7.85].forEach((cxOffset) => {
+        const erCol = new THREE.Mesh(new THREE.BoxGeometry(1.15, 4.6, 1.15), redBrickMat);
+        erCol.position.set(cxOffset, 2.3, 19.15);
+        erFrontGroup.add(erCol);
+      });
+      campusGroup.add(erFrontGroup);
+
+      const parkedAmb = createAmbulanceMesh();
+      parkedAmb.position.set(34.5, 0, -44.7);
+      parkedAmb.rotation.y = Math.PI / 2;
+      campusGroup.add(parkedAmb);
+
+      // 彰濱天后宮
+      buildChangbinMazuTemple(campusGroup);
+
+      // (C) 前院廣場、機車停車區、雙側綠樹島與轎車、紀念矮牆與道路網
+      const forecourtGroup = new THREE.Group();
+      const walkwayTileTex = createEntranceTileTexture();
+      walkwayTileTex.repeat.set(18, 3);
+
+      const checkeredPlaza = new THREE.Mesh(
+        new THREE.PlaneGeometry(68, 8.6),
+        new THREE.MeshStandardMaterial({ map: walkwayTileTex, roughness: 0.78 })
+      );
+      checkeredPlaza.rotation.x = -Math.PI / 2;
+      checkeredPlaza.position.set(0, 0.028, 6.8);
+      checkeredPlaza.receiveShadow = true;
+      forecourtGroup.add(checkeredPlaza);
+
+      // 機車停車場與停放速克達
+      const motoLotFloor = new THREE.Mesh(
+        new THREE.BoxGeometry(23.0, 0.10, 18.6),
+        new THREE.MeshStandardMaterial({ color: 0x8e9399, roughness: 0.85 })
+      );
+      motoLotFloor.position.set(0, 0.05, 24.5);
+      motoLotFloor.receiveShadow = true;
+      forecourtGroup.add(motoLotFloor);
+
+      const scooterColors = [
+        new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35 }),
+        new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }),
+        new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.35 }),
+        new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.35 })
+      ];
+      const sTireMat = new THREE.MeshStandardMaterial({ color: 0x111827 });
+      const sSeatMat = new THREE.MeshStandardMaterial({ color: 0x1f2937 });
+      const sMirrorMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1 });
+
+      [17.4, 21.4, 25.4, 29.4].forEach((rz, rIdx) => {
+        for (let sx = -9.8; sx <= 9.8; sx += 1.4) {
+          if ((Math.round(sx * 10) + rIdx * 3) % 9 === 0) continue;
+          const scooter = createScooterMesh(scooterColors[(rIdx + Math.abs(Math.round(sx))) % scooterColors.length], sTireMat, sSeatMat, sMirrorMat);
+          scooter.position.set(sx, 0.10, rz);
+          scooter.rotation.y = rIdx % 2 === 0 ? 0 : Math.PI;
+          forecourtGroup.add(scooter);
+        }
+      });
+
+      // 左右綠化樹叢島與停放轎車
+      const darkTreeMat = new THREE.MeshStandardMaterial({ color: 0x264b22, roughness: 0.88 });
+      const lightShrubMat = new THREE.MeshStandardMaterial({ color: 0x5c9638, roughness: 0.8 });
+      const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4a3525, roughness: 0.9 });
+
+      [-1, 1].forEach((sideSign) => {
+        const centerX = sideSign * 16.8;
+        const centerZ = 22.8;
+        const baseMesh = new THREE.Mesh(
+          new THREE.BoxGeometry(9.6, 0.24, 21.5),
+          new THREE.MeshStandardMaterial({ color: 0x4b7a38, roughness: 0.9 })
+        );
+        baseMesh.position.set(centerX, 0.12, centerZ);
+        forecourtGroup.add(baseMesh);
+
+        [18.8, 26.8].forEach((sz) => {
+          const shrub = new THREE.Mesh(new THREE.CylinderGeometry(2.3, 2.7, 0.72, 16), lightShrubMat);
+          shrub.position.set(centerX - sideSign * 1.4, 0.52, sz);
+          forecourtGroup.add(shrub);
+        });
+
+        [
+          { dx: 0.8, dz: -8.2, r: 3.1, h: 6.2 },
+          { dx: 2.2, dz: -3.0, r: 2.8, h: 5.8 },
+          { dx: 2.4, dz: 2.5, r: 3.0, h: 6.0 },
+          { dx: 1.6, dz: 7.4, r: 3.2, h: 6.4 }
+        ].forEach((tc) => {
+          const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.34, tc.h * 0.45, 10), trunkMat);
+          trunk.position.set(centerX + tc.dx, tc.h * 0.225, centerZ + tc.dz);
+          const canopy = new THREE.Mesh(new THREE.DodecahedronGeometry(tc.r, 1), darkTreeMat);
+          canopy.position.set(centerX + tc.dx, tc.h * 0.65, centerZ + tc.dz);
+          canopy.castShadow = true;
+          forecourtGroup.add(trunk, canopy);
+        });
+      });
+
+      const sideLaneAsphaltMat = new THREE.MeshStandardMaterial({
+        map: createAsphaltPavingTexture(3, 8),
+        roughness: 0.88
+      });
+      [-1, 1].forEach((sideSign) => {
+        const sideRoad = new THREE.Mesh(new THREE.PlaneGeometry(12.2, 29.5), sideLaneAsphaltMat);
+        sideRoad.rotation.x = -Math.PI / 2;
+        sideRoad.position.set(sideSign * 27.8, 0.022, 25.0);
+        sideRoad.receiveShadow = true;
+        forecourtGroup.add(sideRoad);
+      });
+
+      [
+        { x: -23.6, z: 14.8, color: 0xf8fafc },
+        { x: -23.6, z: 20.2, color: 0x111827 },
+        { x: -23.6, z: 25.6, color: 0x334155 },
+        { x: 23.6, z: 14.8, color: 0xf8fafc },
+        { x: 23.6, z: 20.2, color: 0x1e293b },
+        { x: 23.6, z: 25.6, color: 0xdbeafe }
+      ].forEach((pc) => {
+        const carMesh = createSportsSedanMesh(pc.color);
+        carMesh.position.set(pc.x, 0, pc.z);
+        forecourtGroup.add(carMesh);
+      });
+
+      // 道路網與菱形交叉網狀線
+      const diamondJunctionRoad = new THREE.Mesh(
+        new THREE.PlaneGeometry(76, 13.5),
+        new THREE.MeshStandardMaterial({ map: createDiamondCrosshatchRoadTexture(), roughness: 0.82 })
+      );
+      diamondJunctionRoad.rotation.x = -Math.PI / 2;
+      diamondJunctionRoad.position.set(0, 0.026, 46.2);
+      forecourtGroup.add(diamondJunctionRoad);
+
+      const roadMat = new THREE.MeshStandardMaterial({ map: createRoadTexture(), roughness: 0.85 });
+      const westSouthMainRoad = new THREE.Mesh(new THREE.PlaneGeometry(13.5, 145), roadMat);
+      westSouthMainRoad.rotation.x = -Math.PI / 2;
+      westSouthMainRoad.rotation.z = Math.PI / 2;
+      westSouthMainRoad.position.set(-110, 0.022, 46.2);
+
+      const eastSouthMainRoad = new THREE.Mesh(new THREE.PlaneGeometry(13.5, 134), roadMat);
+      eastSouthMainRoad.rotation.x = -Math.PI / 2;
+      eastSouthMainRoad.rotation.z = Math.PI / 2;
+      eastSouthMainRoad.position.set(105, 0.022, 46.2);
+
+      const westNorthSouthRoad = new THREE.Mesh(new THREE.PlaneGeometry(18, 182.75), roadMat);
+      westNorthSouthRoad.rotation.x = -Math.PI / 2;
+      westNorthSouthRoad.position.set(-75, 0.02, 18.625);
+
+      const eastNorthSouthRoad = new THREE.Mesh(new THREE.PlaneGeometry(18, 182.75), roadMat);
+      eastNorthSouthRoad.rotation.x = -Math.PI / 2;
+      eastNorthSouthRoad.position.set(75, 0.02, 18.625);
+
+      const northBoundRoad = new THREE.Mesh(new THREE.PlaneGeometry(13.5, 150), roadMat);
+      northBoundRoad.rotation.x = -Math.PI / 2;
+      northBoundRoad.rotation.z = Math.PI / 2;
+      northBoundRoad.position.set(0, 0.021, -66);
+
+      forecourtGroup.add(westSouthMainRoad, eastSouthMainRoad, westNorthSouthRoad, eastNorthSouthRoad, northBoundRoad);
+
+      // 十字路口黃網線
+      const intersectionGridMat = new THREE.MeshStandardMaterial({ map: createIntersectionYellowGridTexture(), roughness: 0.82 });
+      [
+        { ix: -75, iz: 46.2 }, { ix: 75, iz: 46.2 },
+        { ix: -75, iz: -66 }, { ix: 75, iz: -66 }
+      ].forEach(({ ix, iz }) => {
+        const yellowGridMesh = new THREE.Mesh(new THREE.PlaneGeometry(18.0, 13.5), intersectionGridMat);
+        yellowGridMesh.rotation.x = -Math.PI / 2;
+        yellowGridMesh.position.set(ix, 0.031, iz);
+        forecourtGroup.add(yellowGridMesh);
+      });
+
+      // 「向日葵醫院健康園區」彩繪入口矮牆
+      const monumentFrontMat = new THREE.MeshStandardMaterial({ map: createMonumentWallTexture(), roughness: 0.55 });
+      const monWall = new THREE.Mesh(
+        new THREE.BoxGeometry(16.5, 1.65, 0.75),
+        [concreteBeigeMat, concreteBeigeMat, concreteBeigeMat, concreteBeigeMat, monumentFrontMat, concreteBeigeMat]
+      );
+      monWall.position.set(0, 1.025, 36.2);
+      monWall.castShadow = true;
+      forecourtGroup.add(monWall);
+
+      // 園區路燈
+      const poleMat = new THREE.MeshStandardMaterial({ color: 0x4b5563, metalness: 0.6, roughness: 0.4 });
+      const bulbMat = new THREE.MeshStandardMaterial({ color: 0xfff3c4, emissive: 0xffd166, emissiveIntensity: 0.25 });
+      nightGlowMaterials.push(bulbMat);
+      [[-12.5, 11.5], [12.5, 11.5], [-22.5, 36.5], [22.5, 36.5], [-84.5, 22.5]].forEach(([lx, lz]) => {
+        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.14, 7.2, 8), poleMat);
+        pole.position.set(lx, 3.6, lz);
+        const bulb = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.14, 0.65), bulbMat);
+        bulb.position.set(lx, 7.0, lz + 1.35);
+        const pLight = new THREE.PointLight(0xffcf70, 0, 24, 1.6);
+        pLight.position.set(lx, 6.6, lz + 1.3);
+        forecourtGroup.add(pole, bulb, pLight);
+        streetLampLights.push(pLight);
+      });
+
+      campusGroup.add(forecourtGroup);
+
+      // (D) 心理健康研究中心
+      const mentalGroup = new THREE.Group();
+      mentalGroup.position.set(-113.0, 0, -34.0);
+      mentalGroup.rotation.y = Math.PI / 2;
+
+      const mhWallTex = createMentalHealthWallTextures(3, 6);
+      const mhWallMat = new THREE.MeshStandardMaterial({
+        map: mhWallTex.map,
+        emissive: new THREE.Color(0xffdfa0),
+        emissiveMap: mhWallTex.emissiveMap,
+        emissiveIntensity: 0.25,
+        roughness: 0.72
+      });
+      nightGlowMaterials.push(mhWallMat);
+
+      [-12.8, 12.8].forEach((offsetX) => {
+        const towerBody = new THREE.Mesh(
+          new THREE.BoxGeometry(11.4, 22.8, 18.5),
+          [mhWallMat, mhWallMat, concreteBeigeMat, concreteBeigeMat, mhWallMat, mhWallMat]
+        );
+        towerBody.position.set(offsetX, 11.4, 4.5);
+        const crownRoof = new THREE.Mesh(
+          new THREE.BoxGeometry(12.7, 0.65, 19.8),
+          new THREE.MeshStandardMaterial({ color: 0x6b4738, roughness: 0.75 })
+        );
+        crownRoof.position.set(offsetX, 24.52, 4.5);
+        mentalGroup.add(towerBody, crownRoof);
+      });
+
+      const mhCenterBlock = new THREE.Mesh(
+        new THREE.BoxGeometry(16.8, 17.5, 13.0),
+        [mhWallMat, mhWallMat, concreteBeigeMat, concreteBeigeMat, mhWallMat, mhWallMat]
+      );
+      mhCenterBlock.position.set(0, 8.75, 0.5);
+      mentalGroup.add(mhCenterBlock);
+
+      const mhSignMat = new THREE.MeshStandardMaterial({ map: createMentalHealthSignTexture(), roughness: 0.55 });
+      const mhFrontBeam = new THREE.Mesh(
+        new THREE.BoxGeometry(15.2, 1.45, 0.85),
+        [concreteBeigeMat, concreteBeigeMat, concreteBeigeMat, concreteBeigeMat, mhSignMat, concreteBeigeMat]
+      );
+      mhFrontBeam.position.set(0, 6.125, 19.1);
+      mentalGroup.add(mhFrontBeam);
+
+      [-5.6, 5.6].forEach((cx) => {
+        const brickCol = new THREE.Mesh(new THREE.BoxGeometry(1.02, 5.4, 1.02), redBrickMat);
+        brickCol.position.set(cx, 2.7, 18.8);
+        mentalGroup.add(brickCol);
+      });
+      campusGroup.add(mentalGroup);
+
+      // (E) 亞洲遠距微創手術中心 (Asia IRCAD Taiwan)
+      const ircadGroup = new THREE.Group();
+      const irX = -114.0, irZ = 24.5;
+      const creamStoneMat = new THREE.MeshStandardMaterial({ color: 0xe6e0d4, roughness: 0.62 });
+      const irGlassTex = createIrcadGlassCurtainTextures();
+      const irGlassMat = new THREE.MeshStandardMaterial({
+        map: irGlassTex.map,
+        emissive: new THREE.Color(0xffe19c),
+        emissiveMap: irGlassTex.emissiveMap,
+        emissiveIntensity: 0.25,
+        roughness: 0.14,
+        metalness: 0.78
+      });
+      nightGlowMaterials.push(irGlassMat);
+
+      const glassBox = new THREE.Mesh(new THREE.BoxGeometry(24.0, 7.4, 22.0), irGlassMat);
+      glassBox.position.set(irX + 2.5, 3.7, irZ - 2.0);
+      ircadGroup.add(glassBox);
+
+      const irUpperTex = createIrcadUpperWallTextures(6);
+      const irUpperMat = new THREE.MeshStandardMaterial({
+        map: irUpperTex.map,
+        emissive: new THREE.Color(0xffe19c),
+        emissiveMap: irUpperTex.emissiveMap,
+        emissiveIntensity: 0.25,
+        roughness: 0.58
+      });
+      nightGlowMaterials.push(irUpperMat);
+
+      const upperBlock = new THREE.Mesh(
+        new THREE.BoxGeometry(28.5, 6.8, 26.5),
+        [irUpperMat, irUpperMat, creamStoneMat, creamStoneMat, irUpperMat, irUpperMat]
+      );
+      upperBlock.position.set(irX + 3.8, 10.8, irZ - 1.2);
+      ircadGroup.add(upperBlock);
+
+      const asiaSignMat = new THREE.MeshStandardMaterial({
+        map: createIrcadSignTexture('asia'),
+        transparent: true,
+        side: THREE.DoubleSide
+      });
+      const northSignBoard = new THREE.Mesh(new THREE.PlaneGeometry(15.5, 3.8), asiaSignMat);
+      northSignBoard.position.set(irX + 9.2, 16.05, irZ - 14.35);
+      northSignBoard.rotation.y = Math.PI;
+      ircadGroup.add(northSignBoard);
+
+      const irDomeCap = new THREE.Mesh(
+        new THREE.SphereGeometry(12.8, 36, 18, 0, Math.PI * 2, 0, Math.PI * 0.24),
+        new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.38, metalness: 0.52 })
+      );
+      irDomeCap.scale.set(1.0, 0.38, 1.0);
+      irDomeCap.position.set(irX + 2.2, 13.0, irZ + 1.5);
+      ircadGroup.add(irDomeCap);
+      campusGroup.add(ircadGroup);
+
+      // (F) 核心實驗大樓 (R+D+M 研發中心)
+      const coreLabGroup = new THREE.Group();
+      const clX = -144.0;
+      const clTowerTex = createCoreLabTowerTextures();
+      const clTowerMat = new THREE.MeshStandardMaterial({
+        map: clTowerTex.map,
+        emissive: new THREE.Color(0xffe19c),
+        emissiveMap: clTowerTex.emissiveMap,
+        emissiveIntensity: 0.25,
+        roughness: 0.62
+      });
+      nightGlowMaterials.push(clTowerMat);
+
+      const clTower = new THREE.Mesh(
+        new THREE.BoxGeometry(14.5, 22.0, 19.25),
+        [clTowerMat, creamStoneMat, creamStoneMat, creamStoneMat, clTowerMat, creamStoneMat]
+      );
+      clTower.position.set(clX + 1.5, 11.0, 4.625);
+      coreLabGroup.add(clTower);
+
+      const clWingTex = createCoreLabSideWingTextures(8, 3);
+      const clWingMat = new THREE.MeshStandardMaterial({
+        map: clWingTex.map,
+        emissive: new THREE.Color(0xffe19c),
+        emissiveMap: clWingTex.emissiveMap,
+        emissiveIntensity: 0.25,
+        roughness: 0.65
+      });
+      nightGlowMaterials.push(clWingMat);
+
+      const clWing = new THREE.Mesh(
+        new THREE.BoxGeometry(10.5, 14.5, 31.0),
+        [clWingMat, clWingMat, creamStoneMat, creamStoneMat, clWingMat, clWingMat]
+      );
+      clWing.position.set(clX - 9.0, 7.25, 12.0);
+      coreLabGroup.add(clWing);
+
+      campusGroup.add(coreLabGroup);
+      scene.add(campusGroup);
+    }
+
+    // --- 園區周圍大樹綠籬圍牆（比照 1index.html createPerimeterTreeWall） ---
+    function createPerimeterTreeWall() {
+      const wallGroup = new THREE.Group();
+      const { minX, maxX, minZ, maxZ } = perimeterBounds;
+
+      const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4b3621, roughness: 0.92 });
+      const canopyMats = [
+        new THREE.MeshStandardMaterial({ color: 0x265423, roughness: 0.85 }),
+        new THREE.MeshStandardMaterial({ color: 0x31692c, roughness: 0.82 }),
+        new THREE.MeshStandardMaterial({ color: 0x1e441c, roughness: 0.88 })
+      ];
+      const shrubMat = new THREE.MeshStandardMaterial({ color: 0x3f7a34, roughness: 0.88 });
+
+      const treePositions = [];
+      const spacing = 6.2;
+
+      for (let x = minX; x <= maxX; x += spacing) {
+        if (Math.abs(x - (-75)) > 11.5 && Math.abs(x - 75) > 11.5) {
+          treePositions.push({ x, z: minZ }, { x, z: maxZ });
+        }
+      }
+      for (let z = minZ + spacing; z <= maxZ - spacing; z += spacing) {
+        if (Math.abs(z - 46.2) > 9.5 && Math.abs(z - (-66)) > 9.5) {
+          treePositions.push({ x: minX, z }, { x: maxX, z });
+        }
+      }
+
+      treePositions.forEach((pt, idx) => {
+        const scale = 0.92 + ((idx * 17) % 7) * 0.05;
+        const trunkH = 3.2 * scale;
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.32 * scale, 0.48 * scale, trunkH, 8), trunkMat);
+        trunk.position.set(pt.x, trunkH / 2, pt.z);
+
+        const lowerCanopy = new THREE.Mesh(new THREE.DodecahedronGeometry(3.3 * scale, 1), canopyMats[idx % canopyMats.length]);
+        lowerCanopy.scale.set(1.15, 0.85, 1.15);
+        lowerCanopy.position.set(pt.x, trunkH + 1.8 * scale, pt.z);
+
+        const upperCanopy = new THREE.Mesh(new THREE.DodecahedronGeometry(2.4 * scale, 1), canopyMats[(idx + 1) % canopyMats.length]);
+        upperCanopy.position.set(pt.x + 0.35, trunkH + 3.8 * scale, pt.z - 0.25);
+
+        const hedgeBase = new THREE.Mesh(new THREE.BoxGeometry(5.8, 1.35, 3.2), shrubMat);
+        hedgeBase.position.set(pt.x, 0.675, pt.z);
+
+        wallGroup.add(trunk, lowerCanopy, upperCanopy, hedgeBase);
+      });
+
+      scene.add(wallGroup);
     }
 
     function initBackground3D() {
       const canvas = document.getElementById('bg-canvas');
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x6db3eb);
-      scene.fog = new THREE.FogExp2(0x8ec5f0, 0.0032);
+      scene.background = new THREE.Color(0x9dc6e8);
+      scene.fog = new THREE.FogExp2(0x9dc6e8, 0.0022);
 
-      camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.5, 400);
+      camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.5, 450);
 
-      renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.08;
 
-      hemiLight = new THREE.HemisphereLight(0xbbe3ff, 0x4d6b47, 0.8);
+      hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x475569, 0.85);
       scene.add(hemiLight);
 
-      sunLight = new THREE.DirectionalLight(0xfff6e5, 1.3);
+      sunLight = new THREE.DirectionalLight(0xfffaf0, 1.38);
       sunLight.position.set(55, 85, 65);
       sunLight.castShadow = true;
+      sunLight.shadow.mapSize.width = 2048;
+      sunLight.shadow.mapSize.height = 2048;
+      sunLight.shadow.camera.near = 10;
+      sunLight.shadow.camera.far = 260;
+      const d = 145;
+      sunLight.shadow.camera.left = -d;
+      sunLight.shadow.camera.right = d;
+      sunLight.shadow.camera.top = d;
+      sunLight.shadow.camera.bottom = -d;
+      sunLight.shadow.bias = -0.0005;
       scene.add(sunLight);
 
-      // 草地與廣場
       const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(360, 360),
-        new THREE.MeshStandardMaterial({ color: 0x4b7a3e, roughness: 0.92 })
+        new THREE.PlaneGeometry(520, 520),
+        new THREE.MeshStandardMaterial({ color: 0x3f6e33, roughness: 0.92, metalness: 0.02 })
       );
       ground.rotation.x = -Math.PI / 2;
       ground.receiveShadow = true;
       scene.add(ground);
 
-      const plaza = new THREE.Mesh(
-        new THREE.PlaneGeometry(118, 56),
-        new THREE.MeshStandardMaterial({ color: 0xbec5cc, roughness: 0.78 })
-      );
-      plaza.rotation.x = -Math.PI / 2;
-      plaza.position.set(0, 0.02, 6);
-      scene.add(plaza);
-
-      // 中央圓柱玻璃塔樓
-      const rotundaMat = new THREE.MeshStandardMaterial({
-        color: 0x6ea8b8,
-        emissive: 0xffe299,
-        emissiveIntensity: 0.08,
-        roughness: 0.2,
-        metalness: 0.65
-      });
-      nightGlowMaterials.push(rotundaMat);
-
-      const rotunda = new THREE.Mesh(new THREE.CylinderGeometry(10.5, 10.5, 23.5, 36), rotundaMat);
-      rotunda.position.set(0, 11.75, -15);
-      scene.add(rotunda);
-
-      const darkGreenMat = new THREE.MeshStandardMaterial({ color: 0x184236, roughness: 0.45 });
-      const discRoof = new THREE.Mesh(new THREE.CylinderGeometry(12.6, 12.2, 1.3, 40), darkGreenMat);
-      discRoof.position.set(0, 24.15, -15);
-      scene.add(discRoof);
-
-      // 左右前翼大樓與主塔樓
-      const wallTex = createWallTexture(6, 3);
-      const wingMat = new THREE.MeshStandardMaterial({
-        map: wallTex.map,
-        emissive: 0xffdfa0,
-        emissiveMap: wallTex.emissiveMap,
-        emissiveIntensity: 0.08
-      });
-      nightGlowMaterials.push(wingMat);
-
-      const leftWing = new THREE.Mesh(new THREE.BoxGeometry(26, 14.2, 20), wingMat);
-      leftWing.position.set(-25.5, 7.1, -15.5);
-      const rightWing = new THREE.Mesh(new THREE.BoxGeometry(26, 14.2, 20), wingMat);
-      rightWing.position.set(25.5, 7.1, -15.5);
-      const mainTower = new THREE.Mesh(new THREE.BoxGeometry(54, 31.5, 20), wingMat);
-      mainTower.position.set(3, 15.75, -33);
-      scene.add(leftWing, rightWing, mainTower);
-
-      // 頂部「幸運草醫院」皇冠塔樓
-      const crownTex = createCloverCrownTexture();
-      const crownMat = new THREE.MeshStandardMaterial({
-        map: crownTex,
-        emissive: 0xffd23f,
-        emissiveMap: crownTex,
-        emissiveIntensity: 0.45
-      });
-      nightGlowMaterials.push(crownMat);
-      const crownBox = new THREE.Mesh(new THREE.BoxGeometry(21, 5.4, 15), crownMat);
-      crownBox.position.set(-1.5, 35.5, -29.5);
-      scene.add(crownBox);
-
-      // 迎賓車道雨庇與紅柱
-      const canopy = new THREE.Mesh(
-        new THREE.BoxGeometry(28, 1.4, 9.6),
-        new THREE.MeshStandardMaterial({ color: 0xe8dec8 })
-      );
-      canopy.position.set(0, 6.2, 1.2);
-      scene.add(canopy);
-
-      const redColMat = new THREE.MeshStandardMaterial({ color: 0xb81d18 });
-      [-11.8, -5.2, 5.2, 11.8].forEach((px) => {
-        [-2.15, 5.35].forEach((pz) => {
-          const col = new THREE.Mesh(new THREE.BoxGeometry(0.85, 5.5, 0.85), redColMat);
-          col.position.set(px, 3.1, pz);
-          scene.add(col);
-        });
-      });
-
-      // 中央「幸運草醫院健康園區」彩繪紀念牆
-      const monTex = createMonumentTexture();
-      const monWall = new THREE.Mesh(
-        new THREE.BoxGeometry(29, 4.2, 1.3),
-        new THREE.MeshStandardMaterial({ map: monTex })
-      );
-      monWall.position.set(0, 2.6, 15.0);
-      scene.add(monWall);
+      buildMedicalComplex();
+      createPerimeterTreeWall();
 
       // 支援滑鼠拖曳旋轉背景視角
       canvas.addEventListener('mousedown', (e) => {
@@ -785,7 +2758,7 @@
       });
     }
 
-    // 日夜時段切換按鈕
+    // 日夜時段切換按鈕（同步 1index.html 光影與發光材質設定）
     document.querySelectorAll('.time-toggle').forEach((btn) => {
       btn.addEventListener('click', () => {
         const mode = btn.dataset.time;
@@ -797,25 +2770,43 @@
         });
 
         if (mode === 'day') {
-          scene.background.setHex(0x6db3eb);
-          scene.fog.color.setHex(0x8ec5f0);
-          sunLight.color.setHex(0xfff6e5);
-          sunLight.intensity = 1.3;
-          nightGlowMaterials.forEach((m) => (m.emissiveIntensity = 0.08));
+          scene.background.setHex(0x9dc6e8);
+          scene.fog = new THREE.FogExp2(0x9dc6e8, 0.0022);
+          sunLight.color.setHex(0xfffaf0);
+          sunLight.intensity = 1.38;
+          sunLight.position.set(55, 85, 65);
+          hemiLight.color.setHex(0xdbeafe);
+          hemiLight.groundColor.setHex(0x475569);
+          hemiLight.intensity = 0.85;
+          nightGlowMaterials.forEach((m) => (m.emissiveIntensity = 0.25));
+          streetLampLights.forEach((l) => (l.intensity = 0));
+          canopyCeilingLights.forEach((l) => (l.intensity = 0.7));
           document.getElementById('portal-clock').textContent = '14:30';
         } else if (mode === 'dusk') {
-          scene.background.setHex(0xd9734e);
-          scene.fog.color.setHex(0xc96b53);
-          sunLight.color.setHex(0xff944d);
-          sunLight.intensity = 1.0;
-          nightGlowMaterials.forEach((m) => (m.emissiveIntensity = 0.65));
+          scene.background.setHex(0xc97b53);
+          scene.fog = new THREE.FogExp2(0x9e5d40, 0.0028);
+          sunLight.color.setHex(0xff9e44);
+          sunLight.intensity = 1.25;
+          sunLight.position.set(-70, 32, 68);
+          hemiLight.color.setHex(0xffb480);
+          hemiLight.groundColor.setHex(0x2d3748);
+          hemiLight.intensity = 0.72;
+          nightGlowMaterials.forEach((m) => (m.emissiveIntensity = 0.75));
+          streetLampLights.forEach((l) => (l.intensity = 1.1));
+          canopyCeilingLights.forEach((l) => (l.intensity = 1.2));
           document.getElementById('portal-clock').textContent = '17:50';
         } else {
           scene.background.setHex(0x0b1526);
-          scene.fog.color.setHex(0x0b1526);
-          sunLight.color.setHex(0x6b93d6);
-          sunLight.intensity = 0.35;
-          nightGlowMaterials.forEach((m) => (m.emissiveIntensity = 1.15));
+          scene.fog = new THREE.FogExp2(0x0b1526, 0.0038);
+          sunLight.color.setHex(0x6488ea);
+          sunLight.intensity = 0.36;
+          sunLight.position.set(-40, 60, 45);
+          hemiLight.color.setHex(0x1e293b);
+          hemiLight.groundColor.setHex(0x090d16);
+          hemiLight.intensity = 0.42;
+          nightGlowMaterials.forEach((m) => (m.emissiveIntensity = 1.25));
+          streetLampLights.forEach((l) => (l.intensity = 2.4));
+          canopyCeilingLights.forEach((l) => (l.intensity = 1.6));
           document.getElementById('portal-clock').textContent = '21:15';
         }
       });
@@ -823,16 +2814,28 @@
 
     function animateBg() {
       requestAnimationFrame(animateBg);
-      if (!isDraggingBg) {
-        orbitAngle += 0.0018;
+      const tNow = performance.now() * 0.001;
+
+      if (templeSmokeParticles.length > 0) {
+        templeSmokeParticles.forEach((sp) => {
+          const cycle = (tNow * sp.speed + sp.phase) % 1.0;
+          sp.mesh.position.y = 1.32 + cycle * 2.4;
+          sp.mesh.position.x = sp.baseX + Math.sin(tNow * 1.8 + sp.phase * 4) * (0.08 + cycle * 0.25);
+          sp.mesh.position.z = sp.baseZ + Math.cos(tNow * 1.5 + sp.phase * 3) * (0.08 + cycle * 0.25);
+          sp.mesh.scale.setScalar(0.75 + cycle * 1.35);
+        });
       }
-      const radius = 46;
+
+      if (!isDraggingBg) {
+        orbitAngle += 0.0016;
+      }
+      const radius = 58;
       camera.position.set(
         Math.sin(orbitAngle) * radius,
-        15.5,
-        Math.cos(orbitAngle) * radius + 4
+        18.5,
+        Math.cos(orbitAngle) * radius + 12
       );
-      camera.lookAt(0, 10, -14);
+      camera.lookAt(0, 9.5, -12);
       renderer.render(scene, camera);
     }
 
