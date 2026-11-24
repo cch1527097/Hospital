@@ -489,7 +489,6 @@
           nameTag,
           roleId: state.roleId,
           name: state.name,
-          card: state.card,
           targetPos: new THREE.Vector3(state.x, state.y, state.z),
           targetYaw: state.yaw || 0,
           isMoving: false,
@@ -533,7 +532,9 @@
       if (listEl) {
         let html = `<div class="text-emerald-300 font-bold">● ${authName} (我 • ${authCard})</div>`;
         remotePlayers.forEach((rp) => {
-          html += `<div>● ${rp.name} (${rp.card || '同仁'})</div>`;
+          const roleCfg = CHARACTER_ROLES.find(r => r.id === rp.roleId);
+          const roleLabel = roleCfg ? roleCfg.name.split(' ')[0] : '院區同仁';
+          html += `<div>● ${rp.name} (${roleLabel})</div>`;
         });
         listEl.innerHTML = html;
       }
@@ -637,7 +638,6 @@
             yaw: Number(player.yaw.toFixed(2)),
             roleId: gameState.selectedRoleId,
             name: authName,
-            card: authCard,
             isMoving
           }
         };
@@ -688,11 +688,6 @@
     // 啟動多人連線並在主角頭頂也加上自己的識別名牌
     window.addEventListener('load', () => {
       setTimeout(() => {
-        if (player.mesh) {
-          const roleCfg = CHARACTER_ROLES.find(r => r.id === gameState.selectedRoleId) || CHARACTER_ROLES[0];
-          const myTag = createPlayerNameTag(`${authName} (${authCard})`, roleCfg.name);
-          player.mesh.add(myTag);
-        }
         initMultiplayer();
       }, 600);
     });
