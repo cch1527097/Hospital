@@ -438,9 +438,10 @@ function updateOnlineList3F() {
   const total = remotePlayers3F.size + 1;
   if (countEl) countEl.textContent = `${total} 人在線`;
   if (listEl) {
-    let html = `<div class="text-teal-300 font-bold">● ${authName} (我 • ${authCard})</div>`;
+    const myRoleLabel = (ROLE_STYLES_3F[authRole] || ROLE_STYLES_3F.nurse).label;
+    let html = `<div class="text-teal-300 font-bold">● ${authName} (我 • ${myRoleLabel})</div>`;
     remotePlayers3F.forEach((rp) => {
-      html += `<div>● ${rp.name} (${rp.card || '同仁'})</div>`;
+      html += `<div>● ${rp.name} (${rp.roleLabel || '同仁'})</div>`;
     });
     listEl.innerHTML = html;
   }
@@ -537,19 +538,18 @@ function initMultiplayer3F() {
     if (!peer3F || !peer3F.id || !player.mesh) return;
     const isMoving = Math.hypot(player.vel.x, player.vel.z) > 0.25;
     const packet = {
-      type: 'state',
-      peerId: peer3F.id,
-      payload: {
-        x: Number(player.pos.x.toFixed(2)),
-        y: Number(player.pos.y.toFixed(2)),
-        z: Number(player.pos.z.toFixed(2)),
-        yaw: Number(player.yaw.toFixed(2)),
-        roleId: authRole,
-        name: authName,
-        card: authCard,
-        isMoving
-      }
-    };
+  type: 'state',
+  peerId: peer3F.id,
+  payload: {
+    x: Number(player.pos.x.toFixed(2)),
+    y: Number(player.pos.y.toFixed(2)),
+    z: Number(player.pos.z.toFixed(2)),
+    yaw: Number(player.yaw.toFixed(2)),
+    roleId: authRole,
+    name: authName,
+    isMoving
+  }
+};
     if (isHost3F) {
       broadcastFromHost3F(packet);
     } else if (hostConn3F && hostConn3F.open) {
@@ -6471,11 +6471,7 @@ thyroidBenches.forEach((b, bIdx) => {
       bindControls();
       updateCombatHud();
 
-      if (player.mesh) {
-  const roleInfo = ROLE_STYLES_3F[authRole] || ROLE_STYLES_3F.nurse;
-  player.mesh.add(createNameTag3F(`${authName} (${authCard})`, roleInfo.label));
-}
-initMultiplayer3F();
+      initMultiplayer3F();
 
       // 初始化樓層剔除狀態並烘焙一次靜態建築陰影
       updateFloorVisibilityCulling(true);
