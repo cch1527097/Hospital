@@ -474,6 +474,7 @@ function upsertRemotePlayer3F(peerId, state) {
       group: built.group,
       parts: built.parts,
       name: state.name,
+      roleLabel: built.roleLabel,
       card: state.card,
       targetPos: new THREE.Vector3(state.x, state.y, state.z),
       targetYaw: state.yaw || 0,
@@ -671,15 +672,6 @@ function updateRemotePlayers3F(dt) {
   });
 }
 
-    /**
-     * ============================================================================
-     * 向日葵醫院-模擬人生 (高效能批次合併 + 樓層視錐剔除 + 靜態陰影烘焙優化版)
-     * ============================================================================
-     */
-
-    // --------------------------------------------------------------------------
-    // 1. 全域場景變數、樓層管理群組、碰撞分層與效能監控狀態
-    // --------------------------------------------------------------------------
     let scene, camera, renderer;
     const clock = new THREE.Clock();
     const keys = {};
@@ -687,7 +679,6 @@ function updateRemotePlayers3F(dt) {
     let rightSlidingDoor = null;
     let gameClockMinutes = 10 * 60 + 25;
 
-    // 樓層分層群組 (0: 全樓層共用外牆/結構, 1: 1F細節, 2: 2F細節, 3: 3F細節)
     const floorGroups = {
       0: new THREE.Group(),
       1: new THREE.Group(),
@@ -697,7 +688,6 @@ function updateRemotePlayers3F(dt) {
     const floorPointLights = { 1: [], 2: [], 3: [] };
     let activeRenderedFloor = -1;
 
-    // 依樓層預先分組的碰撞器 (0: 全樓層通用牆體)
     const collidersByFloor = { 0: [], 1: [], 2: [], 3: [] };
     function registerCollider(boxObj) {
       const fl = (typeof boxObj.floor === 'number') ? boxObj.floor : 1;
@@ -705,33 +695,27 @@ function updateRemotePlayers3F(dt) {
       collidersByFloor[fl].push(boxObj);
     }
 
-    // 貼圖快取池（避免重複生成相同告示牌與裝飾畫紋理）
     const signTextureCache = new Map();
     const galleryTextureCache = new Map();
 
-    // NPC 陣列與標籤/互動狀態
     const npcs = [];
     let showNpcLabels = true;
     let activeTalkNpc = null;
     let nearestNpc = null;
 
-    // 中央電梯廳接觸感應狀態
     let currentTransportZone = null;
     let inTransportZone = false;
 
-    // 戰鬥特效、粒子與螢幕震動
     const slashEffects = [];
     const impactParticles = [];
     let camShake = 0;
 
-    // FPS 幀率計數器與小地圖節流狀態
     let frameCounter = 0;
     let fpsFrames = 0;
     let fpsLastTime = performance.now();
     let cachedMinimapFloor = -1;
     let cachedMinimapCanvas = null;
 
-    // 全院 B1 ~ 8F 樓層與 HTML 檔案自動連結表
     const FLOOR_DESTINATIONS = [
       { code: 'B1', file: 'B1.html', name: 'B1 地下一樓', desc: '美食街・立體停車場・核子醫學科・放射腫瘤科', key: 'Digit0', keyHint: '0', localY: null },
       { code: '1F', file: '1F.html', name: '1F 一樓大廳', desc: '入口門廳・批價掛號・門診區・急診室・放射科・檢驗/藥劑科', key: 'Digit1', keyHint: '1', localY: 0.0 },
@@ -758,7 +742,7 @@ function updateRemotePlayers3F(dt) {
       rightFistAura: null,
       leftFistAura: null,
       rightFootAura: null,
-      pos: new THREE.Vector3(-28.2, 9.2, 32.2),
+      pos: new THREE.Vector3(-2.0, 9.2, 39.0),
       vel: new THREE.Vector3(0, 0, 0),
       yaw: Math.PI,
       radius: 0.44,
@@ -783,7 +767,7 @@ function updateRemotePlayers3F(dt) {
       totalHitsLanded: 0
     };
 
-    // 高靈活度阻尼平滑相機軌道參數
+    // 高靈活度阻尼平滑相機軌道參數（鏡頭與人物正中央對齊）
     const camState = {
       yaw: 0,
       targetYaw: 0,
@@ -793,7 +777,7 @@ function updateRemotePlayers3F(dt) {
       targetDistance: 4.8,
       safeDist: 4.8,
       sensitivity: 1.0,
-      targetPos: new THREE.Vector3(-28.2, 10.62, 32.2),
+      targetPos: new THREE.Vector3(-2.0, 10.64, 39.0),
       isPointerLocked: false,
       isDragging: false,
       dragButton: -1,
@@ -2580,7 +2564,7 @@ function updateRemotePlayers3F(dt) {
       });
     }
 
-    function buildShowChwanDoubleWardRoom(centerX, baseY, centerZ, roomNumber = '367') {
+    function buildShowChwanDoubleWardRoom(centerX, baseY, centerZ, roomNumber = '367', isNorthRow = true) {
       const group = new THREE.Group();
       const bedHeadboardMat = new THREE.MeshStandardMaterial({ color: 0xd8c3a5, roughness: 0.48 });
       const bedRailMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.35 });
@@ -2751,33 +2735,6 @@ function updateRemotePlayers3F(dt) {
       privacyCurtain.position.set(1.02, 1.45, 0);
       group.add(curtainTrack, privacyCurtain);
 
-      const winFrame = new THREE.Mesh(
-        new THREE.BoxGeometry(2.65, 1.72, 0.14),
-        new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.55, roughness: 0.3 })
-      );
-      winFrame.position.set(0.15, 1.82, -3.18);
-      const winSkyGlass = new THREE.Mesh(
-        new THREE.PlaneGeometry(2.48, 1.56),
-        new THREE.MeshBasicMaterial({ color: 0xbae6fd })
-      );
-      winSkyGlass.position.set(0.15, 1.82, -3.10);
-      const mullionH = new THREE.Mesh(
-        new THREE.BoxGeometry(2.55, 0.06, 0.16),
-        new THREE.MeshStandardMaterial({ color: 0x1e293b })
-      );
-      mullionH.position.set(0.15, 2.15, -3.16);
-      const mullionV = new THREE.Mesh(
-        new THREE.BoxGeometry(0.06, 1.65, 0.16),
-        new THREE.MeshStandardMaterial({ color: 0x1e293b })
-      );
-      mullionV.position.set(-0.35, 1.82, -3.16);
-
-      const curtainLeft = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.05, 0.12), ArchMaterials.wardCurtainGreen);
-      curtainLeft.position.set(-1.12, 1.78, -3.05);
-      const curtainRight = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.05, 0.12), ArchMaterials.wardCurtainGreen);
-      curtainRight.position.set(1.38, 1.78, -3.05);
-      group.add(winFrame, winSkyGlass, mullionH, mullionV, curtainLeft, curtainRight);
-
       const reclinerMat = new THREE.MeshStandardMaterial({ color: 0x3b2314, roughness: 0.55 });
       const recSeat = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.24, 0.68), reclinerMat);
       recSeat.position.set(1.22, 0.32, -2.55);
@@ -2814,7 +2771,12 @@ function updateRemotePlayers3F(dt) {
         new THREE.BoxGeometry(0.88, 0.24, 0.08),
         new THREE.MeshStandardMaterial({ map: roomPlaqueTex, emissive: 0xffffff, emissiveMap: roomPlaqueTex, emissiveIntensity: 0.3 })
       );
-      roomPlaque.position.set(-0.75, 2.52, 3.35);
+      if (isNorthRow) {
+        roomPlaque.position.set(-0.75, 2.52, 3.60);
+      } else {
+        roomPlaque.position.set(-0.75, 2.52, -3.60);
+        roomPlaque.rotation.y = Math.PI;
+      }
       group.add(roomPlaque);
 
       group.position.set(centerX, baseY, centerZ);
@@ -2823,6 +2785,7 @@ function updateRemotePlayers3F(dt) {
       registerCollider({ minX: centerX - 0.58, maxX: centerX + 1.62, minZ: centerZ - 2.18, maxZ: centerZ - 1.12, floor: 3, label: `${roomNumber} 病房 2號床` });
       registerCollider({ minX: centerX - 0.58, maxX: centerX + 1.62, minZ: centerZ + 1.12, maxZ: centerZ + 2.18, floor: 3, label: `${roomNumber} 病房 1號床` });
       registerCollider({ minX: centerX + 1.05, maxX: centerX + 1.66, minZ: centerZ - 0.65, maxZ: centerZ + 0.65, floor: 3, label: `${roomNumber} 病房床頭衣櫃` });
+      return group;
     }
 
     function buildOperatingTableUnit(x, z, labelText = 'OR-1', baseY = 4.6) {
@@ -2939,7 +2902,7 @@ function updateRemotePlayers3F(dt) {
       addTransportSensorPad(0, 0, 4.9, 19.6, 1.8, 0x2dd4bf);
       addTransportSensorPad(0, 4.6, 4.9, 19.6, 1.8, 0x2dd4bf);
       addTransportSensorPad(0, 9.2, 4.9, 19.6, 1.8, 0x2dd4bf);
-      addHangingSign(0, 9.2 + 3.65, 4.4, 7.6, 0.85, '3F 中央電梯廳', 'ELEVATORS', '#0f4c5c', '#fbbf24');
+      addHangingSign(0, 9.2 + 3.65, 4.4, 7.6, 0.85, '中央電梯廳', 'ELEVATORS', '#0f4c5c', '#fbbf24');
 
       [-8.5, -2.8, 2.8, 8.5].forEach((elX, idx) => {
         const doorFrame = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.45, 0.15), darkFrameMat);
@@ -3091,7 +3054,7 @@ function updateRemotePlayers3F(dt) {
         addZoneFloor(27.5, 31.5, 17.5, 20.0, ArchMaterials.woodFloorWarm);
         addZoneFloor(-31.0, 31.5, 28.0, 20.0, new THREE.MeshStandardMaterial({ color: 0xf7e3eb, roughness: 0.42 }));
       } else if (floorNum === 3) {
-        addZoneFloor(-31.5, 32.5, 34.0, 19.5, ArchMaterials.woodFloorWard);
+        addZoneFloor(-33.5, 33.2, 39.0, 21.5, ArchMaterials.woodFloorWard);
         addZoneFloor(-24.5, -24.0, 46.0, 28.0, ArchMaterials.woodFloorWarm);
         addZoneFloor(24.5, -24.0, 46.0, 28.0, ArchMaterials.woodFloorWarm);
         addZoneFloor(-5.65, 28.7, 11.7, 9.0, ArchMaterials.woodFloorWard);
@@ -3105,44 +3068,9 @@ function updateRemotePlayers3F(dt) {
       }
     }
 
-    function buildTwinAtriums(glassMat, darkFrameMat, ceilingMat) {
+function buildTwinAtriums(glassMat, darkFrameMat, ceilingMat) {
       [-24.7, 24.7].forEach((ax) => {
-        const skylightRoof = new THREE.Mesh(new THREE.BoxGeometry(19.6, 0.25, 12.2), glassMat);
-        skylightRoof.position.set(ax, 11.5, 15.5);
-        addToFloorGroup(skylightRoof, 0);
-
-        for (let gx = -9.6; gx <= 9.6; gx += 3.2) {
-          const beam = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.36, 12.2), ceilingMat);
-          beam.position.set(ax + gx, 11.35, 15.5);
-          addToFloorGroup(beam, 0);
-        }
-        for (let gz = -6.0; gz <= 6.0; gz += 3.0) {
-          const purlin = new THREE.Mesh(new THREE.BoxGeometry(19.6, 0.28, 0.14), ceilingMat);
-          purlin.position.set(ax, 11.38, 15.5 + gz);
-          addToFloorGroup(purlin, 0);
-        }
-
-        const wellFront = new THREE.Mesh(new THREE.BoxGeometry(19.8, 2.5, 0.3), ceilingMat);
-        wellFront.position.set(ax, 10.25, 21.5);
-        const wellBack = new THREE.Mesh(new THREE.BoxGeometry(19.8, 2.5, 0.3), ceilingMat);
-        wellBack.position.set(ax, 10.25, 9.5);
-        const wellLeft = new THREE.Mesh(new THREE.BoxGeometry(0.3, 2.5, 12.2), ceilingMat);
-        wellLeft.position.set(ax - 9.8, 10.25, 15.5);
-        const wellRight = new THREE.Mesh(new THREE.BoxGeometry(0.3, 2.5, 12.2), ceilingMat);
-        wellRight.position.set(ax + 9.8, 10.25, 15.5);
-        addToFloorGroup(wellFront, 3);
-        addToFloorGroup(wellBack, 3);
-        addToFloorGroup(wellLeft, 3);
-        addToFloorGroup(wellRight, 3);
-
-        const coveF = new THREE.Mesh(new THREE.BoxGeometry(19.4, 0.08, 0.12), ArchMaterials.coveWarmGlow);
-        coveF.position.set(ax, 9.15, 21.3);
-        const coveB = coveF.clone();
-        coveB.position.set(ax, 9.15, 9.7);
-        addToFloorGroup(coveF, 3);
-        addToFloorGroup(coveB, 3);
-
-        [8.4, 7.2].forEach((hy, idx) => {
+        [8.4, 7.6].forEach((hy, idx) => {
           const radius = idx === 0 ? 2.4 : 1.55;
           const halo = new THREE.Mesh(
             new THREE.TorusGeometry(radius, 0.06, 10, 32),
@@ -3330,25 +3258,9 @@ function updateRemotePlayers3F(dt) {
 
       addFloorSlab3F(0, -18.75, 107, 56.5);
       addFloorSlab3F(0, 32.85, 107, 22.7);
-      addFloorSlab3F(-44.0, 15.5, 19.0, 12.0);
-      addFloorSlab3F(44.0, 15.5, 19.0, 12.0);
-      addFloorSlab3F(0, 15.5, 29.8, 12.0);
+      addFloorSlab3F(0, 15.5, 107, 12.0);
 
       buildFloorGraniteInlays(f3Y + 0.008, 3);
-
-      [-24.7, 24.7].forEach((ax) => {
-        addWall(ax, 9.6, 19.4, 0.22, 2.2, glassMat, '3F 採光天井玻璃帷幕', 3, f3Y, false);
-        addWall(ax, 21.4, 19.4, 0.22, 2.2, glassMat, '3F 採光天井玻璃帷幕', 3, f3Y, false);
-        addWall(ax > 0 ? 15.0 : -15.0, 15.5, 0.22, 11.8, glassMat, '3F 採光天井玻璃帷幕', 3, f3Y, false);
-        addWall(ax > 0 ? 34.4 : -34.4, 15.5, 0.22, 11.8, glassMat, '3F 採光天井玻璃帷幕', 3, f3Y, false);
-
-        const railF = new THREE.Mesh(new THREE.BoxGeometry(19.5, 0.06, 0.24), ArchMaterials.stainlessSteel);
-        railF.position.set(ax, f3Y + 1.15, 9.6);
-        const railB = railF.clone();
-        railB.position.set(ax, f3Y + 1.15, 21.4);
-        addToFloorGroup(railF, 3);
-        addToFloorGroup(railB, 3);
-      });
 
       const ceil3F = new THREE.Mesh(new THREE.PlaneGeometry(108, 93), ceilMat);
       ceil3F.rotation.x = Math.PI / 2;
@@ -3452,8 +3364,6 @@ function updateRemotePlayers3F(dt) {
         addToFloorGroup(lowerWainscot, 3);
         addToFloorGroup(crashRail, 3);
       });
-
-      addHangingSign(-32.8, f3Y + 2.65, -18.15, 3.3, 0.62, '產 房', 'Delivery Room', '#f5f0e6', '#0f766e', Math.PI / 2);
      
       const thyroidRooms = ['甲狀腺 1診', '甲狀腺 2診', '甲狀腺檢查室'];
 [-33.5, -25.5, -17.5].forEach((dx, idx) => addClinicDoorSet(dx, f3Y, -13.15, 0, thyroidRooms[idx]));
@@ -3696,7 +3606,7 @@ registerCollider({
 });
 
       addHangingSign(-22.5, f3Y + 3.65, -28.0, 5.4, 0.88, '睡眠中心', 'SLEEP CENTER・多導睡眠生理檢查 (PSG)', '#0369a1', '#7dd3fc', Math.PI / 2);
-      addHangingSign(-23.5, f3Y + 3.65, -18.15, 6.8, 0.88, '產房・婦產科 VIP 病房', 'OB/GYN VIP WARDS & NURSERY', '#be185d', '#f9a8d4');
+      addHangingSign(-23.5, f3Y + 3.65, -18.15, 3.2, 0.88, 'VIP 病房', 'VIP WARDS', '#be185d', '#f9a8d4', Math.PI / 2);
 
       addWall(18.5, -34.5, 34.0, 6.8, 4.4, wardBeigeMat, '總務課收發處/社工辦公室', 3, f3Y);
       addWall(44.5, -23.5, 11.5, 12.0, 4.4, wardBeigeMat, '東側病房', 3, f3Y);
@@ -3709,9 +3619,9 @@ registerCollider({
       addHangingSign(21.5, f3Y + 3.65, -27.5, 7.2, 0.88, '總務課收發處・社工辦公室', '績效組・醫療委員會', '#1d4ed8', '#93c5fd');
       addHangingSign(23.5, f3Y + 3.65, -15.5, 7.2, 0.88, '總務處勞安課・品管中心', '社工辦公室・志工室', '#0f766e', '#5eead4');
 
-      addWall(-2.5, 15.5, 7.2, 9.2, 4.4, wallMintMat, '小兒科醫師辦公室', 3, f3Y);
-      addWall(7.5, 16.5, 3.6, 11.5, 4.4, wallBlueMat, '醫師值班室與出院準備服務', 3, f3Y);
-      addHangingSign(-2.5, f3Y + 3.65, 21.2, 6.8, 0.88, '小兒科醫師辦公室', '醫師值班室・出院準備服務', '#065f46', '#6ee7b7');
+      addWall(-29.5, 3.2, 11.2, 9.2, 4.4, wallMintMat, '小兒科醫師辦公室', 3, f3Y);
+      addWall(27.5, 9.8, 11.5, 11.0, 4.4, wallBlueMat, '醫師值班室與出院準備服務', 3, f3Y);
+      addHangingSign(-29.5, f3Y + 3.65, 8.4, 5.4, 0.72, '小兒科醫師辦公室', '醫師值班室・出院準備服務', '#065f46', '#6ee7b7');
 
       build3FNursingDepartmentWing(f3Y, wallCreamMat, wallMintMat, ArchMaterials.wallLavender, glassMat);
       build3FRealistWardWing(f3Y, wallCreamMat, wallMintMat);
@@ -3720,19 +3630,22 @@ registerCollider({
       [
         { x: -16, z: 43.9, rotY: Math.PI },
         { x: 16, z: 43.9, rotY: Math.PI },
-        { x: -34, z: 10.2, rotY: 0 },
-        { x: 34, z: 10.2, rotY: 0 }
+        { x: -41.7, z: 34.70, rotY: Math.PI },
+        { x: 34, z: 22.33, rotY: Math.PI }
       ].forEach((hp) => addFireHydrantCabinet(hp.x, hp.z, hp.rotY, f3Y));
     }
 
     function build3FRealistWardWing(f3Y, wallCreamMat, wallMintMat) {
-      addWall(-32.0, 23.4, 18.0, 0.36, 4.4, wallCreamMat, '雙人病房北向窗牆', 3, f3Y, false);
-      addWall(-41.0, 26.8, 0.36, 6.8, 4.4, wallCreamMat, '367 病房西牆', 3, f3Y, false);
-      addWall(-32.0, 26.8, 0.36, 6.8, 4.4, wallCreamMat, '367 與 369 病房隔牆', 3, f3Y, false);
-      addWall(-23.0, 26.8, 0.36, 6.8, 4.4, wallCreamMat, '369 病房東牆', 3, f3Y, false);
+      // 1. 北排病房 (365, 367, 369 房：x 從 -50.0 延伸到 -23.0，寬度擴大至 27m)
+      addWall(-36.5, 23.4, 27.0, 0.36, 4.4, wallCreamMat, '北排雙人病房北向窗牆', 3, f3Y, false);
+      [-50.0, -41.0, -32.0, -23.0].forEach((wx) => {
+        addWall(wx, 26.8, 0.36, 6.8, 4.4, wallCreamMat, '北排病房隔間牆', 3, f3Y, false);
+      });
 
       [
-        { cx: -32.0, cz: 23.62, w: 17.6, d: 0.05 },
+        { cx: -36.5, cz: 23.62, w: 26.6, d: 0.05 },
+        { cx: -49.78, cz: 26.8, w: 0.05, d: 6.4 },
+        { cx: -41.22, cz: 26.8, w: 0.05, d: 6.4 },
         { cx: -40.78, cz: 26.8, w: 0.05, d: 6.4 },
         { cx: -32.22, cz: 26.8, w: 0.05, d: 6.4 },
         { cx: -31.78, cz: 26.8, w: 0.05, d: 6.4 },
@@ -3743,60 +3656,106 @@ registerCollider({
         addToFloorGroup(wain, 3);
       });
 
-      addWall(-39.5, 30.2, 3.0, 0.36, 4.4, wallCreamMat, '367 病房走廊牆西段', 3, f3Y, false);
-      addWall(-32.7, 30.2, 7.4, 0.36, 4.4, wallCreamMat, '367-369 病房走廊牆中段', 3, f3Y, false);
-      addWall(-25.2, 30.2, 4.4, 0.36, 4.4, wallCreamMat, '369 病房走廊牆東段', 3, f3Y, false);
-
-      [-37.2, -28.2].forEach((doorX) => {
-        const lintel = new THREE.Mesh(new THREE.BoxGeometry(1.7, 1.98, 0.36), wallCreamMat);
-        lintel.position.set(doorX, f3Y + 3.41, 30.2);
-        const frameTop = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.10, 0.24), ArchMaterials.greyDoorFrame);
-        frameTop.position.set(doorX, f3Y + 2.40, 30.2);
-        const openLeaf = new THREE.Mesh(new THREE.BoxGeometry(1.42, 2.30, 0.08), ArchMaterials.salmonDoor);
-        openLeaf.position.set(doorX - 0.72, f3Y + 1.15, 29.52);
-        openLeaf.rotation.y = Math.PI * 0.48;
-        addToFloorGroup(lintel, 3);
-        addToFloorGroup(frameTop, 3);
-        addToFloorGroup(openLeaf, 3);
-      });
-
       [
-        { cx: -39.5, cz: 30.41, w: 3.0 },
-        { cx: -32.7, cz: 30.41, w: 7.4 },
-        { cx: -25.2, cz: 30.41, w: 4.4 }
+        { cx: -48.5, w: 3.0 },
+        { cx: -41.7, w: 7.4 },
+        { cx: -32.7, w: 7.4 },
+        { cx: -25.2, w: 4.4 }
       ].forEach((seg) => {
+        addWall(seg.cx, 30.2, seg.w, 0.36, 4.4, wallCreamMat, '北排病房走廊牆', 3, f3Y, false);
         const botBand = new THREE.Mesh(new THREE.BoxGeometry(seg.w, 1.05, 0.05), ArchMaterials.wardSalmonWainscot);
-        botBand.position.set(seg.cx, f3Y + 0.525, seg.cz);
+        botBand.position.set(seg.cx, f3Y + 0.525, 30.41);
         const midBand = new THREE.Mesh(new THREE.BoxGeometry(seg.w, 0.65, 0.05), ArchMaterials.wardTerracottaBand);
-        midBand.position.set(seg.cx, f3Y + 1.375, seg.cz);
+        midBand.position.set(seg.cx, f3Y + 1.375, 30.41);
         const topBand = new THREE.Mesh(new THREE.BoxGeometry(seg.w, 0.68, 0.05), ArchMaterials.wardSalmonWainscot);
-        topBand.position.set(seg.cx, f3Y + 2.04, seg.cz);
+        topBand.position.set(seg.cx, f3Y + 2.04, 30.41);
         const rail = new THREE.Mesh(new THREE.BoxGeometry(seg.w, 0.075, 0.14), ArchMaterials.stainlessSteel);
-        rail.position.set(seg.cx, f3Y + 0.96, seg.cz + 0.06);
+        rail.position.set(seg.cx, f3Y + 0.96, 30.47);
         addToFloorGroup(botBand, 3);
         addToFloorGroup(midBand, 3);
         addToFloorGroup(topBand, 3);
         addToFloorGroup(rail, 3);
       });
 
-      addWall(-32.0, 35.0, 18.0, 0.42, 4.4, wallMintMat, '慢性病房南側走廊牆', 3, f3Y, false);
-      const southBot = new THREE.Mesh(new THREE.BoxGeometry(18.0, 1.05, 0.05), ArchMaterials.wardSalmonWainscot);
-      southBot.position.set(-32.0, f3Y + 0.525, 34.76);
-      const southMid = new THREE.Mesh(new THREE.BoxGeometry(18.0, 0.65, 0.05), ArchMaterials.wardTerracottaBand);
-      southMid.position.set(-32.0, f3Y + 1.375, 34.76);
-      const southTop = new THREE.Mesh(new THREE.BoxGeometry(18.0, 0.68, 0.05), ArchMaterials.wardSalmonWainscot);
-      southTop.position.set(-32.0, f3Y + 2.04, 34.76);
-      const southRail = new THREE.Mesh(new THREE.BoxGeometry(18.0, 0.075, 0.14), ArchMaterials.stainlessSteel);
-      southRail.position.set(-32.0, f3Y + 0.96, 34.70);
-      addToFloorGroup(southBot, 3);
-      addToFloorGroup(southMid, 3);
-      addToFloorGroup(southTop, 3);
-      addToFloorGroup(southRail, 3);
+      [-46.2, -37.2, -28.2].forEach((doorX) => {
+        const lintel = new THREE.Mesh(new THREE.BoxGeometry(1.7, 1.98, 0.36), wallCreamMat);
+        lintel.position.set(doorX, f3Y + 3.41, 30.2); // 原本誤寫為 35.0，改為 30.2
+        const frameTop = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.10, 0.24), ArchMaterials.greyDoorFrame);
+        frameTop.position.set(doorX, f3Y + 2.40, 30.2); // 原本誤寫為 35.0，改為 30.2
+        addToFloorGroup(lintel, 3);
+        addToFloorGroup(frameTop, 3);
+      });
 
-      buildShowChwanDoubleWardRoom(-36.5, f3Y, 26.8, '367');
-      buildShowChwanDoubleWardRoom(-27.5, f3Y, 26.8, '369');
+      addWall(-36.5, 41.8, 27.0, 0.36, 4.4, wallCreamMat, '南排雙人病房南向窗牆', 3, f3Y, false);
+      [-50.0, -41.0, -32.0, -23.0].forEach((wx) => {
+        addWall(wx, 38.4, 0.36, 6.8, 4.4, wallCreamMat, '南排病房隔間牆', 3, f3Y, false);
+      });
 
-      addHangingSign(-32.0, f3Y + 3.65, 32.6, 4.2, 0.88, '一般慢性病房', 'WOODEN FLOOR WARDS', '#b45309', '#fde047', Math.PI / 2);
+      [
+        { cx: -48.5, w: 3.0 },
+        { cx: -41.7, w: 7.4 },
+        { cx: -32.7, w: 7.4 },
+        { cx: -25.2, w: 4.4 }
+      ].forEach((seg) => {
+        addWall(seg.cx, 35.0, seg.w, 0.36, 4.4, wallCreamMat, '南排病房走廊牆', 3, f3Y, false);
+        const botBand = new THREE.Mesh(new THREE.BoxGeometry(seg.w, 1.05, 0.05), ArchMaterials.wardSalmonWainscot);
+        botBand.position.set(seg.cx, f3Y + 0.525, 34.79);
+        const midBand = new THREE.Mesh(new THREE.BoxGeometry(seg.w, 0.65, 0.05), ArchMaterials.wardTerracottaBand);
+        midBand.position.set(seg.cx, f3Y + 1.375, 34.79);
+        const topBand = new THREE.Mesh(new THREE.BoxGeometry(seg.w, 0.68, 0.05), ArchMaterials.wardSalmonWainscot);
+        topBand.position.set(seg.cx, f3Y + 2.04, 34.79);
+        const rail = new THREE.Mesh(new THREE.BoxGeometry(seg.w, 0.075, 0.14), ArchMaterials.stainlessSteel);
+        rail.position.set(seg.cx, f3Y + 0.96, 34.73);
+        addToFloorGroup(botBand, 3);
+        addToFloorGroup(midBand, 3);
+        addToFloorGroup(topBand, 3);
+        addToFloorGroup(rail, 3);
+      });
+
+      [-46.2, -37.2, -28.2].forEach((doorX) => {
+        const lintel = new THREE.Mesh(new THREE.BoxGeometry(1.7, 1.98, 0.36), wallCreamMat);
+        lintel.position.set(doorX, f3Y + 3.41, 35.0);
+        const frameTop = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.10, 0.24), ArchMaterials.greyDoorFrame);
+        frameTop.position.set(doorX, f3Y + 2.40, 35.0);
+        const openLeaf = new THREE.Mesh(new THREE.BoxGeometry(1.42, 2.30, 0.08), ArchMaterials.salmonDoor);
+        openLeaf.position.set(doorX - 0.72, f3Y + 1.15, 35.68);
+        openLeaf.rotation.y = -Math.PI * 0.48;
+        addToFloorGroup(lintel, 3);
+        addToFloorGroup(frameTop, 3);
+        addToFloorGroup(openLeaf, 3);
+      });
+
+      buildShowChwanDoubleWardRoom(-45.5, f3Y, 26.8, '365', true);
+      buildShowChwanDoubleWardRoom(-36.5, f3Y, 26.8, '367', true);
+      buildShowChwanDoubleWardRoom(-27.5, f3Y, 26.8, '369', true);
+
+      const room368 = buildShowChwanDoubleWardRoom(-45.5, f3Y, 38.4, '368', false);
+      const room370 = buildShowChwanDoubleWardRoom(-36.5, f3Y, 38.4, '370', false);
+      const room372 = buildShowChwanDoubleWardRoom(-27.5, f3Y, 38.4, '372', false);
+
+      addHangingSign(-24.5, f3Y + 3.65, 32.6, 4.2, 0.88, '一般慢性病房', 'CHRONIC WARDS', '#b45309', '#fde047', Math.PI / 2);
+
+[
+        { cx: -22.80, cz: 26.8, bw: 0.05, bd: 7.26, rx: -22.74, rz: 26.8, rw: 0.14, rd: 7.36 },
+        { cx: -22.80, cz: 38.4, bw: 0.05, bd: 7.26, rx: -22.74, rz: 38.4, rw: 0.14, rd: 7.36 },
+        { cx: -36.50, cz: 23.20, bw: 27.44, bd: 0.05, rx: -36.50, rz: 23.14, rw: 27.56, rd: 0.14 },
+        { cx: -36.50, cz: 42.00, bw: 27.44, bd: 0.05, rx: -36.50, rz: 42.06, rw: 27.56, rd: 0.14 },
+        { cx: -50.20, cz: 26.8, bw: 0.05, bd: 7.26, rx: -50.26, rz: 26.8, rw: 0.14, rd: 7.36 },
+        { cx: -50.20, cz: 38.4, bw: 0.05, bd: 7.26, rx: -50.26, rz: 38.4, rw: 0.14, rd: 7.36 }
+      ].forEach((w) => {
+        const botBand = new THREE.Mesh(new THREE.BoxGeometry(w.bw, 1.05, w.bd), ArchMaterials.wardSalmonWainscot);
+        botBand.position.set(w.cx, f3Y + 0.525, w.cz);
+        const midBand = new THREE.Mesh(new THREE.BoxGeometry(w.bw, 0.65, w.bd), ArchMaterials.wardTerracottaBand);
+        midBand.position.set(w.cx, f3Y + 1.375, w.cz);
+        const topBand = new THREE.Mesh(new THREE.BoxGeometry(w.bw, 0.68, w.bd), ArchMaterials.wardSalmonWainscot);
+        topBand.position.set(w.cx, f3Y + 2.04, w.cz);
+        const rail = new THREE.Mesh(new THREE.BoxGeometry(w.rw, 0.075, w.rd), ArchMaterials.stainlessSteel);
+        rail.position.set(w.rx, f3Y + 0.96, w.rz);
+        addToFloorGroup(botBand, 3);
+        addToFloorGroup(midBand, 3);
+        addToFloorGroup(topBand, 3);
+        addToFloorGroup(rail, 3);
+      });
     }
 
     function build3FNursingDepartmentWing(f3Y, wallCreamMat, wallMintMat, wallLavenderMat, glassMat) {
@@ -3847,7 +3806,7 @@ registerCollider({
 
       addReliefHeaderFacade(-3.3, f3Y + 3.42, 33.42, '護理部', 'D E P A R T M E N T   O F   N U R S I N G', 4.6, 0, '#3b0764');
       addCorridorFlagSign(-5.0, f3Y + 2.68, 33.38, '護理部', false, 1);
-      addHangingSign(2.35, f3Y + 3.45, 33.52, 3.6, 0.72, '護理部主任室', 'DIRECTOR OF NURSING・陳淑芬 主任', '#4c1d95', '#fbbf24');
+      addHangingSign(2.35, f3Y + 3.45, 33.52, 3.6, 0.72, '護理部主任室', 'DIRECTOR OF NURSING', '#4c1d95', '#fbbf24');
 
       addWall(0.2, 26.7, 0.24, 5.0, 1.0, wallMintMat, '護理部主任室木框隔間底座', 3, f3Y, false);
       const divGlass = new THREE.Mesh(new THREE.BoxGeometry(0.08, 1.65, 4.9), glassMat);
@@ -4048,7 +4007,7 @@ registerCollider({
       nutriDoorOpen.rotation.y = -Math.PI * 0.48;
       addToFloorGroup(nutriDoorOpen, 3);
 
-      addHangingSign(32.6, f3Y + 3.45, 34.65, 4.8, 0.78, '營養科衛教室', 'NUTRITION EDUCATION ROOM・均衡飲食衛教', '#0f766e', '#5eead4');
+      addHangingSign(32.6, f3Y + 3.45, 34.65, 4.8, 0.78, '營養科衛教室', 'NUTRITION EDUCATION ROOM', '#0f766e', '#5eead4');
       addCorridorFlagSign(30.6, f3Y + 2.68, 34.82, '營養科衛教室', false, -1);
 
       addEducationDeskWithProps(32.5, f3Y, 38.9, 'nutrition', Math.PI);
@@ -4078,7 +4037,7 @@ registerCollider({
       cvDoorOpen.rotation.y = -Math.PI * 0.48;
       addToFloorGroup(cvDoorOpen, 3);
 
-      addHangingSign(45.8, f3Y + 3.45, 34.65, 4.8, 0.78, '心血管衛教室', 'CARDIOVASCULAR EDUCATION・三高與心臟照護', '#be123c', '#fda4af');
+      addHangingSign(45.8, f3Y + 3.45, 34.65, 4.8, 0.78, '心血管衛教室', 'CARDIOVASCULAR EDUCATION', '#be123c', '#fda4af');
       addCorridorFlagSign(43.8, f3Y + 2.68, 34.82, '心血管衛教室', false, -1);
 
       addEducationDeskWithProps(45.8, f3Y, 38.9, 'cardio', Math.PI);
@@ -4176,7 +4135,7 @@ registerCollider({
 
       [4.32, 8.92, 13.55].forEach((cy, fIdx) => {
         addCofferedCeilingBay(0, cy, 32.0, 12.5, 19.5, fIdx === 0);
-        addCofferedCeilingBay(-32.0, cy, 32.6, 17.5, 4.4, false);
+        addCofferedCeilingBay(-36.5, cy, 32.6, 26.5, 4.4, false);
         addCofferedCeilingBay(-3.5, cy, 28.7, 15.0, 8.2, true);
         addCofferedCeilingBay(34.0, cy, 31.4, 36.0, 5.8, fIdx === 2);
         addCofferedCeilingBay(-24.0, cy, -12.0, 42.0, 4.8, false);
@@ -4481,13 +4440,14 @@ registerCollider({
     // 6. 建立全院醫護人員、3F 雙人病房臥床患者、護理部8督導+主任與衛教中心角色
     // --------------------------------------------------------------------------
     function createHospitalCharacters() {
+      const myStyle = ROLE_STYLES_3F[authRole] || ROLE_STYLES_3F.nurse;
       const playerRig = createArticulatedCharacterMesh({
         skinColor: 0xf4c29f,
-        shirtColor: 0x0f766e,
-        pantsColor: 0x1e293b,
+        shirtColor: myStyle.coat,
+        pantsColor: myStyle.pants,
         shoeColor: 0xf8fafc,
         hairColor: 0x1e293b,
-        roleType: 'civilian'
+        roleType: authRole === 'doctor' ? 'doctor' : (authRole === 'nurse' ? 'nurse' : 'civilian')
       });
       playerRig.root.position.copy(player.pos);
       scene.add(playerRig.root);
@@ -5415,6 +5375,96 @@ registerCollider({
       }
     }
 
+// --------------------------------------------------------------------------
+    // 9.5 角色與角色之間實體碰撞推擠（防止玩家、NPC、連線玩家互相穿越）
+    // --------------------------------------------------------------------------
+    function resolveCharacterCollisions() {
+      const playerFl = getFloorNumber(player.pos.y);
+      const minCharDist = 0.78; // 兩人中心最小安全距離（約為雙人半徑總和）
+
+      // 1. 玩家 ⇄ 同樓層站立 NPC 碰撞推擠
+      for (let i = 0; i < npcs.length; i++) {
+        const npc = npcs[i];
+        if (npc.floorNum !== playerFl) continue;
+        // 臥床患者（在病床上）或倒地眩暈的 NPC 不阻擋地面行走
+        if (npc.isBedridden || npc.state === 'ko') continue;
+        if (Math.abs(player.pos.y - npc.pos.y) > 1.5) continue;
+
+        const dx = player.pos.x - npc.pos.x;
+        const dz = player.pos.z - npc.pos.z;
+        const distSq = dx * dx + dz * dz;
+
+        if (distSq < minCharDist * minCharDist) {
+          const dist = Math.sqrt(distSq);
+          const nx = dist > 0.0001 ? dx / dist : 1;
+          const nz = dist > 0.0001 ? dz / dist : 0;
+          const overlap = minCharDist - dist;
+
+          // 玩家承受 75% 推擠、NPC 承受 25% 微幅讓位，避免把 NPC 擠進牆角
+          player.pos.x += nx * overlap * 0.75;
+          player.pos.z += nz * overlap * 0.75;
+          npc.pos.x -= nx * overlap * 0.25;
+          npc.pos.z -= nz * overlap * 0.25;
+
+          // 推擠後再次確保雙方不會被擠入牆壁或家具內
+          resolveCircleWallCollisions(npc.pos, 0.4, npc.floorNum);
+          resolveCircleWallCollisions(player.pos, player.radius, playerFl);
+        }
+      }
+
+      // 2. NPC ⇄ NPC 之間互相碰撞推擠（避免多個 NPC 走在一起時重疊）
+      for (let i = 0; i < npcs.length; i++) {
+        const a = npcs[i];
+        if (a.floorNum !== playerFl || a.isBedridden || a.state === 'ko') continue;
+
+        for (let j = i + 1; j < npcs.length; j++) {
+          const b = npcs[j];
+          if (b.floorNum !== playerFl || b.isBedridden || b.state === 'ko') continue;
+
+          const dx = a.pos.x - b.pos.x;
+          const dz = a.pos.z - b.pos.z;
+          const distSq = dx * dx + dz * dz;
+
+          if (distSq < minCharDist * minCharDist) {
+            const dist = Math.sqrt(distSq);
+            const nx = dist > 0.0001 ? dx / dist : 1;
+            const nz = dist > 0.0001 ? dz / dist : 0;
+            const halfOverlap = (minCharDist - dist) * 0.5;
+
+            a.pos.x += nx * halfOverlap;
+            a.pos.z += nz * halfOverlap;
+            b.pos.x -= nx * halfOverlap;
+            b.pos.z -= nz * halfOverlap;
+
+            resolveCircleWallCollisions(a.pos, 0.4, a.floorNum);
+            resolveCircleWallCollisions(b.pos, 0.4, b.floorNum);
+          }
+        }
+      }
+
+      remotePlayers3F.forEach((rp) => {
+        if (!rp.group) return;
+        const rPos = rp.group.position;
+        if (Math.abs(player.pos.y - rPos.y) > 1.5) return;
+
+        const dx = player.pos.x - rPos.x;
+        const dz = player.pos.z - rPos.z;
+        const distSq = dx * dx + dz * dz;
+
+        if (distSq < minCharDist * minCharDist) {
+          const dist = Math.sqrt(distSq);
+          const nx = dist > 0.0001 ? dx / dist : 1;
+          const nz = dist > 0.0001 ? dz / dist : 0;
+          const overlap = minCharDist - dist;
+
+          // 本地端推動自己的座標（對方客戶端也會同步推開自己，形成雙向實體阻擋）
+          player.pos.x += nx * overlap;
+          player.pos.z += nz * overlap;
+          resolveCircleWallCollisions(player.pos, player.radius, playerFl);
+        }
+      });
+    }
+
     function computeCameraSafeDistance(origin, dir, desiredDist, entityFloor = 1) {
       let safeDist = desiredDist;
       const step = 0.35;
@@ -5479,8 +5529,8 @@ registerCollider({
           player.mesh.rotation.z = 0;
           player.pos.set(-3.3, 9.2, 32.2);
           player.yaw = Math.PI;
-          camState.targetYaw = Math.PI;
-          camState.yaw = Math.PI;
+          camState.targetYaw = 0;
+          camState.yaw = 0;
           document.getElementById('ko-overlay').classList.add('hidden');
           updateCombatHud();
           updateFloorVisibilityCulling(true);
@@ -5675,15 +5725,11 @@ registerCollider({
         camera.lookAt(eyePos.clone().add(lookDir));
       } else {
         player.mesh.visible = true;
-        const shoulderOffset = new THREE.Vector3(
-          Math.cos(camState.yaw) * 0.35,
-          0,
-          -Math.sin(camState.yaw) * 0.35
-        );
+        // 移除側邊越肩偏移，使人物精準位於畫面正中央
         const headTarget = new THREE.Vector3(
-          player.pos.x + shoulderOffset.x,
+          player.pos.x,
           player.pos.y + 1.44,
-          player.pos.z + shoulderOffset.z
+          player.pos.z
         );
         camState.targetPos.lerp(headTarget, 1 - Math.exp(-20 * dt));
 
@@ -5941,9 +5987,9 @@ registerCollider({
       if (y >= 7.8) {
         if (tz) zone = `3F 中央電梯廳 (B1~8F 全院直達)`;
         else if (z > 41.0 && Math.abs(x) < 7.0) zone = '3F 南側・中央圓弧玻璃展望廳';
-        else if (x >= -41.2 && x <= -32.0 && z >= 23.4 && z <= 30.2) zone = '3F 實景 367 雙人病房（臥床患者與吊點滴護理師）';
-        else if (x > -32.0 && x <= -23.0 && z >= 23.4 && z <= 30.2) zone = '3F 實景 369 雙人病房（臥床患者與吊點滴護理師）';
-        else if (x >= -41.5 && x <= -22.5 && z > 30.2 && z <= 35.4) zone = '3F 一般慢性病房木質地板走廊 (367 / 369 房前)';
+        else if (x >= -50.2 && x <= -23.0 && z >= 23.4 && z <= 30.2) zone = '3F 北排慢性雙人病房（365 / 367 / 369 房）';
+        else if (x >= -50.2 && x <= -23.0 && z >= 35.0 && z <= 41.8) zone = '3F 南排慢性雙人病房（368 / 370 / 372 房）';
+        else if (x >= -50.5 && x <= -22.5 && z > 30.2 && z < 35.0) zone = '3F 一般慢性病房木質地板走廊 (365 ~ 372 房)';
         else if (x >= -11.5 && x <= 4.5 && z >= 24.2 && z <= 33.4) {
           zone = x > 0.2 ? '3F 護理部主任室（陳淑芬 主任）' : '3F 護理部辦公室（8 位護理督導區）';
         }
@@ -6126,7 +6172,8 @@ registerCollider({
       };
 
       if (floorCode === '3F') {
-        drawZone(-41.0, 23.4, 18.0, 6.8, '#fde68a');
+        drawZone(-50.0, 23.4, 27.0, 6.8, '#fde68a');
+        drawZone(-50.0, 35.0, 27.0, 6.8, '#fde68a');
         drawZone(-11.5, 24.2, 16.0, 9.0, '#ddd6fe');
         drawZone(15.5, 22.6, 10.2, 5.4, '#fbcfe8');
         drawZone(25.8, 22.6, 12.4, 5.4, '#bbf7d0');
@@ -6537,6 +6584,11 @@ registerCollider({
       updatePlayerAndCamera(dt);
       updateRemotePlayers3F(dt);
       updateNPCs(dt);
+
+      resolveCharacterCollisions();
+      if (player.mesh) {
+        player.mesh.position.copy(player.pos);
+      }
 
       // 小地圖每 3 幀更新一次 (~20fps)，搭配離屏底圖快取極致絲滑
       if (frameCounter % 3 === 0) {
