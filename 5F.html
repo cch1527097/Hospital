@@ -318,6 +318,9 @@
       isKneeling: false
     };
 
+    let prayerAutoDoor = { leftLeaf: null, rightLeaf: null, openAmount: 0 };
+    const prayerCushionSpots = [];
+
     // 免鎖定滑鼠平滑相機軌道狀態
     const camState = {
       yaw: Math.PI,
@@ -2402,7 +2405,7 @@ let myPeerId5F = '';
       );
       doorHeader.position.set(0, f5Y + 3.4, -9.4);
       scene.add(doorHeader);
-      addHangingSign(0, f5Y + 3.15, -9.6, 3.2, 0.52, '祈禱室・佛堂', 'PRAYER & BUDDHIST HALL', '#b45309', '#fde047', Math.PI);
+      addHangingSign(0, f5Y + 3.15, -9.6, 3.2, 0.52, '祈禱室', 'PRAYER ROOM', '#b45309', '#fde047', Math.PI);
 
       // 2) 雙開感應電動玻璃門（Z = -9.4）
       const doorFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.7, roughness: 0.25 });
@@ -2421,6 +2424,9 @@ let myPeerId5F = '';
       rightDoorLeaf.position.set(0.59, f5Y + 1.17, -9.4);
       scene.add(leftDoorLeaf, rightDoorLeaf);
       prayerAutoDoor = { leftLeaf: leftDoorLeaf, rightLeaf: rightDoorLeaf, openAmount: 0 };
+      const doorBarrierCollider = { minX: -1.2, maxX: 1.2, minZ: -9.55, maxZ: -9.25, floor: 5, label: '佛堂電動玻璃門' };
+      colliders.push(doorBarrierCollider);
+      prayerAutoDoor.collider = doorBarrierCollider;
 
       // 3) 內部佛堂（木雕供桌、蓮花座金身佛像、香爐、蓮花燈與三座蒲團拜墊）
       const altarWoodMat = new THREE.MeshStandardMaterial({ color: 0x5c2d16, roughness: 0.38 });
@@ -4102,7 +4108,12 @@ window.location.href = `${floorItem.file}?${q.toString()}`;
         prayerAutoDoor.openAmount += (targetOpen - prayerAutoDoor.openAmount) * Math.min(1, dt * 7);
         prayerAutoDoor.leftLeaf.position.x = -0.59 - prayerAutoDoor.openAmount;
         prayerAutoDoor.rightLeaf.position.x = 0.59 + prayerAutoDoor.openAmount;
-      }
+        }
+        if (prayerAutoDoor.collider) {
+          const isOpen = prayerAutoDoor.openAmount > 0.65;
+          prayerAutoDoor.collider.minX = isOpen ? 999 : -1.2;
+          prayerAutoDoor.collider.maxX = isOpen ? 999 : 1.2;
+        }
 
       let nearCushion = null;
       if (pFloor === 5) {
