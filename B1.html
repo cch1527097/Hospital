@@ -2474,11 +2474,169 @@ function normalizeRoleTitle(rawRole) {
       addCorridorHandrail(-41.0, -34.15, -18.0, -34.15, b1Y);
       addHangingSign(-17.46, b1Y + 3.55, -39.5, 6.4, 0.85, '資材處', 'Materials Department', '#1d4ed8', '#93c5fd', Math.PI / 2);
 
-      addWall(-43.5, -26.5, 9.5, 14.5, 4.4, texIvoryWoodWall, '小兒科與護理長辦公室', 'B1', b1Y);
+      // 門診辦公室（環狀外牆，南側正面 x = -43.5, z = -19.45 預留寬 3.2 的東西向電動門開口）
+      addWall(-43.5, -33.55, 9.5, 0.4, 4.4, texIvoryWoodWall, '門診辦公室北牆', 'B1', b1Y);
+      addWall(-48.05, -26.5, 0.4, 14.5, 4.4, texIvoryWoodWall, '門診辦公室西牆', 'B1', b1Y);
+      addWall(-38.95, -26.5, 0.4, 14.5, 4.4, texIvoryWoodWall, '門診辦公室東牆', 'B1', b1Y);
+      addWall(-46.675, -19.45, 3.15, 0.4, 4.4, texIvoryWoodWall, '門診辦公室南側西牆', 'B1', b1Y);
+      addWall(-40.325, -19.45, 3.15, 0.4, 4.4, texIvoryWoodWall, '門診辦公室南側東牆', 'B1', b1Y);
+
+      // 電動門上方門楣牆
+      const officeLintel = new THREE.Mesh(
+        new THREE.BoxGeometry(3.2, 1.9, 0.42),
+        createScaledWallMaterial(texIvoryWoodWall, 3.2, 0.45)
+      );
+      officeLintel.position.set(-43.5, b1Y + 3.45, -19.45);
+      activeBuildGroup.add(officeLintel);
+
       addWall(-35.5, -29.5, 5.5, 6.5, 4.4, texAestheticPinkWall, '預防注射室', 'B1', b1Y);
-      addCorridorHandrail(-48.0, -19.15, -39.0, -19.15, b1Y);
-      buildWallSconce(-43.5, b1Y + 2.25, -19.15, 0, 0xfef3c7);
+
+      // 👉 扶手與壁燈移至左側（西側）牆面 (x = -48.35, z = -33.2 ~ -19.8)
+      addCorridorHandrail(-48.35, -33.2, -48.35, -19.8, b1Y);
+      buildWallSconce(-48.35, b1Y + 2.25, -29.5, Math.PI / 2, 0xfef3c7);
+      buildWallSconce(-48.35, b1Y + 2.25, -23.5, Math.PI / 2, 0xfef3c7);
+
+      // 招牌維持在南側正面牆上方
       addHangingSign(-43.5, b1Y + 3.55, -19.22, 6.8, 0.85, '門診辦公室', 'Outpatient Department Office', '#0f766e', '#5eead4');
+
+      // 👉 招牌底下的雙開玻璃感應電動門（東西向滑動）
+      const offFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.25 });
+      const offGlassMat = new THREE.MeshStandardMaterial({
+        color: 0x99f6e4,
+        transparent: true,
+        opacity: 0.44,
+        roughness: 0.1
+      });
+
+      const offPostW = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.5, 0.46), offFrameMat);
+      offPostW.position.set(-45.05, b1Y + 1.25, -19.45);
+      const offPostE = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.5, 0.46), offFrameMat);
+      offPostE.position.set(-41.95, b1Y + 1.25, -19.45);
+      const offHeader = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.16, 0.5), offFrameMat);
+      offHeader.position.set(-43.5, b1Y + 2.5, -19.45);
+      const offSensor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.32, 0.08, 0.14),
+        new THREE.MeshStandardMaterial({ color: 0x090d16, emissive: 0x10b981, emissiveIntensity: 0.85 })
+      );
+      offSensor.position.set(-43.5, b1Y + 2.48, -19.2);
+      activeBuildGroup.add(offPostW, offPostE, offHeader, offSensor);
+
+      const createOfficeDoorLeaf = () => {
+        const leaf = new THREE.Group();
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2.42, 0.06), offGlassMat);
+        const topRail = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 0.09), offFrameMat);
+        topRail.position.y = 1.16;
+        const botRail = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.14, 0.09), offFrameMat);
+        botRail.position.y = -1.14;
+        const stripe = new THREE.Mesh(
+          new THREE.BoxGeometry(1.48, 0.12, 0.075),
+          new THREE.MeshStandardMaterial({ color: 0x0f766e, emissive: 0x0d9488, emissiveIntensity: 0.4 })
+        );
+        stripe.position.y = 0.05;
+        leaf.add(pane, topRail, botRail, stripe);
+        return leaf;
+      };
+
+      const offLeftLeaf = createOfficeDoorLeaf();
+      offLeftLeaf.position.set(-44.25, b1Y + 1.21, -19.45);
+      const offRightLeaf = createOfficeDoorLeaf();
+      offRightLeaf.position.set(-42.75, b1Y + 1.21, -19.45);
+      activeBuildGroup.add(offLeftLeaf, offRightLeaf);
+
+      const offLeftCol = { minX: -45.0, maxX: -43.5, minZ: -19.65, maxZ: -19.25, floor: 'B1', label: '門診辦公室電動門' };
+      const offRightCol = { minX: -43.5, maxX: -42.0, minZ: -19.65, maxZ: -19.25, floor: 'B1', label: '門診辦公室電動門' };
+      colliders.push(offLeftCol, offRightCol);
+
+      slidingDoors.push({
+        axis: 'x',
+        sensorPos: new THREE.Vector3(-43.5, b1Y, -19.25),
+        leftLeaf: offLeftLeaf,
+        rightLeaf: offRightLeaf,
+        leftClosedPos: -44.25,
+        rightClosedPos: -42.75,
+        openOffset: 1.38,
+        openProgress: 0,
+        leftCollider: offLeftCol,
+        rightCollider: offRightCol,
+        centerCoord: -43.5
+      });
+
+      // 👉 辦公室內部照明與四組電腦辦公桌椅（左右各兩排對坐工作站）
+      const officeLight = new THREE.PointLight(0xfffbeb, 1.15, 18, 1.4);
+      officeLight.position.set(-43.5, b1Y + 3.8, -26.5);
+      activeBuildGroup.add(officeLight);
+
+      const deskWoodMat = new THREE.MeshStandardMaterial({ color: 0xd6b892, roughness: 0.45 });
+      const deskMetalMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.7, roughness: 0.3 });
+      const pcCaseMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35, metalness: 0.5 });
+      const screenGlowMat = new THREE.MeshStandardMaterial({
+        color: 0x0f172a,
+        emissive: 0x38bdf8,
+        emissiveIntensity: 0.78,
+        roughness: 0.15
+      });
+      const chairFabricMat = new THREE.MeshStandardMaterial({ color: 0x0f766e, roughness: 0.55 });
+
+      const buildComputerWorkstation = (wx, wz, rotY) => {
+        const ws = new THREE.Group();
+
+        // 辦公桌桌面與桌腳
+        const top = new THREE.Mesh(new THREE.BoxGeometry(1.75, 0.06, 0.85), deskWoodMat);
+        top.position.set(0, 0.75, 0);
+        const legL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.74, 0.78), deskMetalMat);
+        legL.position.set(-0.8, 0.37, 0);
+        const legR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.74, 0.78), deskMetalMat);
+        legR.position.set(0.8, 0.37, 0);
+        ws.add(top, legL, legR);
+
+        // 電腦螢幕底座、支架與發光顯示器
+        const standBase = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.02, 0.18), pcCaseMat);
+        standBase.position.set(0, 0.79, -0.18);
+        const standNeck = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.18, 0.05), pcCaseMat);
+        standNeck.position.set(0, 0.88, -0.22);
+        const monitorFrame = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.4, 0.04), pcCaseMat);
+        monitorFrame.position.set(0, 1.06, -0.18);
+        const monitorScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.61, 0.35), screenGlowMat);
+        monitorScreen.position.set(0, 1.06, -0.158);
+
+        // 電腦主機機殼、鍵盤與滑鼠
+        const tower = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.44, 0.44), pcCaseMat);
+        tower.position.set(0.62, 1.0, -0.12);
+        const keyboard = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.02, 0.15), deskMetalMat);
+        keyboard.position.set(-0.05, 0.79, 0.12);
+        const mouse = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.025, 0.11), pcCaseMat);
+        mouse.position.set(0.28, 0.79, 0.12);
+
+        // 辦公旋轉椅
+        const chairSeat = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.07, 0.46), chairFabricMat);
+        chairSeat.position.set(0, 0.46, 0.56);
+        const chairBack = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.46, 0.06), chairFabricMat);
+        chairBack.position.set(0, 0.72, 0.78);
+        const chairStem = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.44, 10), deskMetalMat);
+        chairStem.position.set(0, 0.23, 0.56);
+        const chairBase = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.04, 12), deskMetalMat);
+        chairBase.position.set(0, 0.02, 0.56);
+
+        ws.add(standBase, standNeck, monitorFrame, monitorScreen, tower, keyboard, mouse, chairSeat, chairBack, chairStem, chairBase);
+        ws.position.set(wx, b1Y, wz);
+        ws.rotation.y = rotY;
+        activeBuildGroup.add(ws);
+
+        colliders.push({
+          minX: wx - 0.9,
+          maxX: wx + 0.9,
+          minZ: wz - 0.85,
+          maxZ: wz + 0.85,
+          floor: 'B1',
+          label: '門診辦公室電腦桌'
+        });
+      };
+
+      // 擺放四台電腦工作站（西側 2 台面朝東、東側 2 台面朝西）
+      buildComputerWorkstation(-46.3, -24.2, Math.PI / 2);
+      buildComputerWorkstation(-46.3, -29.2, Math.PI / 2);
+      buildComputerWorkstation(-40.7, -24.2, -Math.PI / 2);
+      buildComputerWorkstation(-40.7, -29.2, -Math.PI / 2);
 
       buildClinicWallFacade(-24.5, -23.5, [
         { code: '胸腔 101診', dept: '胸腔內科', doctor: '林俊傑 醫師', queueNum: '0048' },
@@ -4382,7 +4540,7 @@ function normalizeRoleTitle(rawRole) {
         st.mesh.position.y = st.baseY + 0.16 + st.t * st.riseY;
       }
 
-      // ✅ 只保留這一份正確的電動門開合與碰撞更新邏輯
+      // 多組雙開感應電動門自動開關邏輯（支援南北向 Z 與東西向 X）
       for (let i = 0; i < slidingDoors.length; i++) {
         const d = slidingDoors[i];
         let triggerOpen = player.pos.distanceTo(d.sensorPos) < 3.6;
@@ -4398,15 +4556,23 @@ function normalizeRoleTitle(rawRole) {
         d.openProgress += (targetOpen - d.openProgress) * Math.min(1, dt * 6.5);
 
         const shift = d.openProgress * d.openOffset;
-        d.leftLeaf.position.z = d.leftClosedZ - shift;
-        d.rightLeaf.position.z = d.rightClosedZ + shift;
 
-        const doorMidZ = d.centerZ !== undefined ? d.centerZ : -39.5;
-        d.leftCollider.maxZ = doorMidZ - shift;
-        d.rightCollider.minZ = doorMidZ + shift;
+        if (d.axis === 'x') {
+          d.leftLeaf.position.x = d.leftClosedPos - shift;
+          d.rightLeaf.position.x = d.rightClosedPos + shift;
+          d.leftCollider.maxX = d.centerCoord - shift;
+          d.rightCollider.minX = d.centerCoord + shift;
+        } else {
+          const lClosed = d.leftClosedZ !== undefined ? d.leftClosedZ : d.leftClosedPos;
+          const rClosed = d.rightClosedZ !== undefined ? d.rightClosedZ : d.rightClosedPos;
+          const midZ = d.centerZ !== undefined ? d.centerZ : (d.centerCoord !== undefined ? d.centerCoord : -39.5);
+          d.leftLeaf.position.z = lClosed - shift;
+          d.rightLeaf.position.z = rClosed + shift;
+          d.leftCollider.maxZ = midZ - shift;
+          d.rightCollider.minZ = midZ + shift;
+        }
       }
-
-      // ✅ 下面緊接這行（把原本多出來那一段重複的刪掉）
+      
       for (let i = slashEffects.length - 1; i >= 0; i--) {
         const s = slashEffects[i];
         s.life -= dt;
