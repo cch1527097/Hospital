@@ -547,6 +547,11 @@ function upsertRemotePlayer2F(peerId, state) {
     updateOnlineList2F();
   }
 
+rp.targetPos.set(state.x, state.y, state.z);
+  rp.targetYaw = state.yaw;
+  rp.isMoving = state.isMoving;
+}
+
 function removeRemotePlayer2F(peerId) {
   const rp = remotePlayers2F.get(peerId);
   if (!rp) return;
@@ -554,11 +559,6 @@ function removeRemotePlayer2F(peerId) {
   remotePlayers2F.delete(peerId);
   appendChat2F('系統', `${rp.name || '同仁'} 離開了 2F 醫療樓層。`, 'text-slate-400');
   updateOnlineList2F();
-}
-
-  rp.targetPos.set(state.x, state.y, state.z);
-  rp.targetYaw = state.yaw;
-  rp.isMoving = state.isMoving;
 }
 
 function updateOnlineList2F() {
@@ -3339,7 +3339,7 @@ function updateRemotePlayers2F(dt) {
           waypoints: [new THREE.Vector3(30.5, 4.6, -33.2)],
           speed: 0,
           yaw: 0,
-          dialogue: '我在血液透析中心洗腎好幾年了，李文清醫師、許麗美醫師跟透析護理師都很親切細心！',
+          dialogue: '我在血液透析中心洗腎好幾年了，李汶情醫師、許小美醫師跟透析護理師都很親切細心！',
           options: []
         },
         {
@@ -4886,11 +4886,6 @@ function updateRemotePlayers2F(dt) {
           fromFloor: '2F'
         }));
       } catch (e) {}
-
-      // 若前往 1F.html，可透過網址參數 ?from=2F&entry=elevator 讓 1F 知道玩家從二樓下來
-      const targetUrl = floorCode === '1F'
-        ? `${targetFile}?from=2F&entry=elevator`
-        : targetFile;
 
       const overlay = document.getElementById('floor-transition-overlay');
       document.getElementById('transition-target-title').textContent = `正在前往 ${floorCode} 樓層...`;
