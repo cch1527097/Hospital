@@ -2148,34 +2148,174 @@
         (activeBuildGroup || scene).add(wallTextMesh);
       })();
       
-      const loungeFloor = new THREE.Mesh(
-        new THREE.PlaneGeometry(18.0, 13.0),
+      // ================= 愛愛俱樂部 內部空間完整裝潢 (x: -7.0 ~ 13.5, z: 4.2 ~ 22.0) =================
+      const clubGroup = activeBuildGroup || scene;
+
+      // 1. 俱樂部全區深胡桃木人字拼地板 (覆蓋 x = -7.0 ~ 13.5, z = 4.0 ~ 22.0)
+      const clubFloor = new THREE.Mesh(
+        new THREE.PlaneGeometry(20.6, 18.0),
         vipWoodFloorMat
       );
-      loungeFloor.rotation.x = -Math.PI / 2;
-      loungeFloor.position.set(2.5, f7Y + 0.015, 15.2);
-      activeBuildGroup.add(loungeFloor);
+      clubFloor.rotation.x = -Math.PI / 2;
+      clubFloor.position.set(3.25, f7Y + 0.015, 13.0);
+      clubFloor.receiveShadow = true;
+      clubGroup.add(clubFloor);
 
-      [-2.2, 7.2].forEach((sx) => {
-        const sofa = new THREE.Mesh(
-          createSmoothCapsuleGeometry(0.45, 1.6, 16, 8),
-          new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.5 })
-        );
-        sofa.rotation.z = Math.PI / 2;
-        sofa.position.set(sx, f7Y + 0.45, 15.5);
-        activeBuildGroup.add(sofa);
-        colliders.push({ minX: sx - 1.25, maxX: sx + 1.25, minZ: 14.95, maxZ: 16.05, floor: 7, label: '7F 交誼廳沙發' });
+      // 2. 西側隔間牆（封閉通往西南柱列區的開放側邊，讓俱樂部成為獨立空間）
+      addWall(-7.1, 13.0, 0.35, 18.2, 4.4, loungeBlueMat, '愛愛俱樂部西側隔間牆', 7, f7Y);
 
-        const table = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.65, 0.65, 0.45, 18),
-          new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25 })
-        );
-        table.position.set(sx, f7Y + 0.225, 17.2);
-        activeBuildGroup.add(table);
-        colliders.push({ minX: sx - 0.65, maxX: sx + 0.65, minZ: 16.55, maxZ: 17.85, floor: 7, label: '7F 交誼廳茶几' });
+      // 常用材質定義
+      const counterWoodMat = new THREE.MeshStandardMaterial({ color: 0x3e2723, roughness: 0.4 });
+      const marbleTopMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.2, metalness: 0.1 });
+      const neonPinkMat = new THREE.MeshStandardMaterial({ color: 0xf43f5e, emissive: 0xe11d48, emissiveIntensity: 0.75 });
+      const goldTrimMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.75, roughness: 0.25 });
+      const pcScreenMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x38bdf8, emissiveIntensity: 0.65 });
+      const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.6, roughness: 0.35 });
+
+      // 3. 【門口櫃台】電動門進門右側 (x = -1.2, z = 6.2)
+      const receptionGroup = new THREE.Group();
+      const recBody = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.08, 0.85), counterWoodMat);
+      recBody.position.y = 0.54;
+      const recTop = new THREE.Mesh(new THREE.BoxGeometry(2.72, 0.08, 0.96), marbleTopMat);
+      recTop.position.y = 1.12;
+      const recNeon = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.06, 0.88), neonPinkMat);
+      recNeon.position.y = 0.98;
+      // 櫃台登記螢幕與 POS 機
+      const recMon = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.38, 0.05), pcScreenMat);
+      recMon.position.set(-0.5, 1.38, 0.1);
+      const recStand = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.25, 0.08), darkMetalMat);
+      recStand.position.set(-0.5, 1.24, 0.1);
+      receptionGroup.add(recBody, recTop, recNeon, recMon, recStand);
+      receptionGroup.position.set(-1.2, f7Y, 6.2);
+      clubGroup.add(receptionGroup);
+      colliders.push({ minX: -2.55, maxX: 0.15, minZ: 5.75, maxZ: 6.65, floor: 7, label: '愛愛俱樂部門口櫃台' });
+
+      // 4. 【吧檯區】進門左側區域 (x = 7.8, z = 7.2) + 高腳吧檯椅 + 酒櫃背牆
+      const barGroup = new THREE.Group();
+      const barCounter = new THREE.Mesh(new THREE.BoxGeometry(4.4, 1.15, 0.9), counterWoodMat);
+      barCounter.position.y = 0.575;
+      const barTop = new THREE.Mesh(new THREE.BoxGeometry(4.55, 0.09, 1.05), marbleTopMat);
+      barTop.position.y = 1.18;
+      const barLed = new THREE.Mesh(new THREE.BoxGeometry(4.45, 0.06, 0.94), neonPinkMat);
+      barLed.position.y = 1.05;
+      // 後方酒架與咖啡機吧台背櫃
+      const backBar = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.95, 0.65), counterWoodMat);
+      backBar.position.set(0, 0.475, -1.55);
+      const wineShelf = new THREE.Mesh(new THREE.BoxGeometry(4.0, 1.35, 0.32), darkMetalMat);
+      wineShelf.position.set(0, 1.85, -1.7);
+      barGroup.add(barCounter, barTop, barLed, backBar, wineShelf);
+
+      // 吧檯前方 4 張高腳椅
+      [-1.5, -0.5, 0.5, 1.5].forEach((sx) => {
+        const stoolLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.18, 0.78, 12), goldTrimMat);
+        stoolLeg.position.set(sx, 0.39, 0.75);
+        const stoolSeat = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.09, 16), neonPinkMat);
+        stoolSeat.position.set(sx, 0.8, 0.75);
+        barGroup.add(stoolLeg, stoolSeat);
+      });
+      barGroup.position.set(8.2, f7Y, 7.6);
+      clubGroup.add(barGroup);
+      colliders.push({ minX: 5.95, maxX: 10.45, minZ: 5.75, maxZ: 8.45, floor: 7, label: '愛愛俱樂部吧檯' });
+
+      // 5. 【用餐區】東南靠窗區 3 組四人餐桌椅 (x = 6.5 ~ 11.2, z = 12.2 ~ 19.5)
+      const tableTopMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.35 });
+      const chairMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.5 });
+
+      [12.5, 16.0, 19.5].forEach((tz, idx) => {
+        const tx = 9.2;
+        const diningGroup = new THREE.Group();
+        const tTop = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.08, 1.0), tableTopMat);
+        tTop.position.y = 0.76;
+        const tLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.28, 0.75, 12), darkMetalMat);
+        tLeg.position.y = 0.375;
+        diningGroup.add(tTop, tLeg);
+
+        // 餐桌兩側各放 2 張餐椅
+        [[-0.45, -0.72], [0.45, -0.72], [-0.45, 0.72], [0.45, 0.72]].forEach(([cx, cz]) => {
+          const seat = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.06, 0.42), chairMat);
+          seat.position.set(cx, 0.45, cz);
+          const back = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.45, 0.06), chairMat);
+          back.position.set(cx, 0.68, cz + (cz > 0 ? 0.18 : -0.18));
+          diningGroup.add(seat, back);
+        });
+
+        diningGroup.position.set(tx, f7Y, tz);
+        clubGroup.add(diningGroup);
+        colliders.push({ minX: tx - 1.0, maxX: tx + 1.0, minZ: tz - 0.85, maxZ: tz + 0.85, floor: 7, label: `用餐區餐桌 ${idx + 1}` });
       });
 
-      addHangingSign(2.5, f7Y + 3.65, 9.2, 7.6, 0.92, '7F 全景交誼廳・貴賓休憩區', '7F SKY SOCIAL LOUNGE・實木人字拼地板', '#0369a1', '#38bdf8', Math.PI);
+      // 6. 【三台電腦網咖/商務工作站】沿西側隔間牆一字排開 (x = -6.1, z = 9.2 ~ 13.8)
+      const deskMesh = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.08, 5.2), counterWoodMat);
+      deskMesh.position.set(-6.2, f7Y + 0.76, 11.5);
+      const deskSideL = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.76, 0.12), darkMetalMat);
+      deskSideL.position.set(-6.2, f7Y + 0.38, 8.95);
+      const deskSideR = deskSideL.clone();
+      deskSideR.position.z = 14.05;
+      clubGroup.add(deskMesh, deskSideL, deskSideR);
+
+      [9.7, 11.5, 13.3].forEach((pz) => {
+        const pcGroup = new THREE.Group();
+        // 寬螢幕顯示器 + 支架 + 鍵盤 + 主機 + 電競座椅
+        const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 0.68), pcScreenMat);
+        monitor.position.set(-0.18, 1.08, 0);
+        const stand = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.22, 0.1), darkMetalMat);
+        stand.position.set(-0.22, 0.88, 0);
+        const keyboard = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.03, 0.44), darkMetalMat);
+        keyboard.position.set(0.12, 0.81, 0);
+        const tower = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.46, 0.2), darkMetalMat);
+        tower.position.set(-0.1, 1.02, 0.52);
+
+        // 電腦椅
+        const cSeat = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.08, 16), neonPinkMat);
+        cSeat.position.set(0.75, 0.48, 0);
+        const cBase = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.22, 0.46, 12), darkMetalMat);
+        cBase.position.set(0.75, 0.23, 0);
+        const cBack = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.55, 0.44), neonPinkMat);
+        cBack.position.set(0.96, 0.76, 0);
+
+        pcGroup.add(monitor, stand, keyboard, tower, cSeat, cBase, cBack);
+        pcGroup.position.set(-6.2, f7Y, pz);
+        clubGroup.add(pcGroup);
+      });
+      colliders.push({ minX: -6.8, maxX: -5.2, minZ: 8.9, maxZ: 14.1, floor: 7, label: '愛愛俱樂部三台電腦區' });
+
+      // 7. 【雙層膠囊旅館艙房區】西南靠窗區 3 組雙層艙 (共 6 個睡眠艙，x = -4.2 ~ 2.8, z = 19.6)
+      const podShellMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.15 });
+      const podInnerMat = new THREE.MeshStandardMaterial({ color: 0x1e1b4b, roughness: 0.6 });
+      const podGlowMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.8 });
+      const mattressMat = new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.7 });
+
+      [-3.8, -1.4, 1.0].forEach((cx, idx) => {
+        const podUnit = new THREE.Group();
+        // 外殼主體（寬 2.1m, 高 2.4m, 深 2.3m，上下雙層結構）
+        const outerBox = new THREE.Mesh(new THREE.BoxGeometry(2.15, 2.45, 2.3), podShellMat);
+        outerBox.position.y = 1.225;
+        podUnit.add(outerBox);
+
+        // 上層與下層睡眠艙開口 (開口朝北 -Z 方向，方便走道觀看)
+        [0.18, 1.32].forEach((py) => {
+          const cavity = new THREE.Mesh(new THREE.BoxGeometry(1.85, 0.92, 2.15), podInnerMat);
+          cavity.position.set(0, py + 0.46, -0.1);
+          const mattress = new THREE.Mesh(new THREE.BoxGeometry(1.78, 0.14, 2.05), mattressMat);
+          mattress.position.set(0, py + 0.08, -0.08);
+          const pillow = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.12, 0.35), marbleTopMat);
+          pillow.position.set(0, py + 0.18, 0.68);
+          const ledStrip = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.05, 0.06), podGlowMat);
+          ledStrip.position.set(0, py + 0.88, -1.14);
+          podUnit.add(cavity, mattress, pillow, ledStrip);
+        });
+
+        // 艙體中間攀爬梯
+        const ladderL = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.5, 8), goldTrimMat);
+        ladderL.position.set(-0.95, 0.85, -1.22);
+        const ladderR = ladderL.clone();
+        ladderR.position.x = -0.65;
+        podUnit.add(ladderL, ladderR);
+
+        podUnit.position.set(cx, f7Y, 20.2);
+        clubGroup.add(podUnit);
+        colliders.push({ minX: cx - 1.1, maxX: cx + 1.1, minZ: 19.0, maxZ: 21.4, floor: 7, label: `膠囊旅館艙房組 ${idx + 1}` });
+      });
 
       // 14. 南東排可走入式「701 雙人病房」＋「702~710 一般病房」
       buildWalkInDoubleWard(17.15, 7.9, f7Y, '701', false);
