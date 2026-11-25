@@ -3050,9 +3050,185 @@ function normalizeRoleTitle(rawRole) {
 
       buildHyperbaricChamber(-45.2, 11.5, b1Y);
 
-      addWall(-44.5, 31.5, 13.5, 16.5, 4.4, texMedBlueGrayWall, '核子醫學部', 'B1', b1Y);
+      // 核子醫學部（環狀外牆，北側正面 z = 23.45 中央 x = -44.5 預留寬 3.2 的電動門開口）
+      // 1. 外圍環狀牆體（X: -51.25 ~ -37.75，寬 13.5；Z: 23.25 ~ 39.75，深 16.5）
+      addWall(-44.5, 39.55, 13.5, 0.4, 4.4, texMedBlueGrayWall, '核子醫學部南牆', 'B1', b1Y);
+      addWall(-51.05, 31.5, 0.4, 16.5, 4.4, texMedBlueGrayWall, '核子醫學部西牆', 'B1', b1Y);
+      addWall(-37.95, 31.5, 0.4, 16.5, 4.4, texMedBlueGrayWall, '核子醫學部東牆', 'B1', b1Y);
+      addWall(-48.675, 23.45, 5.15, 0.4, 4.4, texMedBlueGrayWall, '核子醫學部北側西牆', 'B1', b1Y);
+      addWall(-40.325, 23.45, 5.15, 0.4, 4.4, texMedBlueGrayWall, '核子醫學部北側東牆', 'B1', b1Y);
+
+      // 電動門上方門楣牆
+      const nucLintel = new THREE.Mesh(
+        new THREE.BoxGeometry(3.2, 1.9, 0.42),
+        createScaledWallMaterial(texMedBlueGrayWall, 3.2, 0.45)
+      );
+      nucLintel.position.set(-44.5, b1Y + 3.45, 23.45);
+      activeBuildGroup.add(nucLintel);
+
+      // 東側走道扶手與壁燈維持在東牆
       addCorridorHandrail(-37.65, 24.0, -37.65, 39.0, b1Y);
-      addHangingSign(-37.4, b1Y + 3.55, 31.5, 6.4, 0.85, '核子醫學部', 'NUCLEAR MEDICINE', '#1d4ed8', '#93c5fd', Math.PI / 2);
+      buildWallSconce(-37.65, b1Y + 2.25, 31.5, Math.PI / 2, 0xbae6fd);
+
+      // 👉 招牌移動至右側（北側）面朝走道正中央 (x = -44.5, z = 23.21)，旋轉 Math.PI 朝北正面顯示
+      addHangingSign(-44.5, b1Y + 3.55, 23.21, 6.4, 0.85, '核子醫學部', 'NUCLEAR MEDICINE', '#1d4ed8', '#93c5fd', Math.PI);
+
+      // 2. 招牌底下的雙開玻璃感應電動門（東西向滑動 axis: 'x'）
+      const nucFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.25 });
+      const nucGlassMat = new THREE.MeshStandardMaterial({
+        color: 0xbae6fd,
+        transparent: true,
+        opacity: 0.44,
+        roughness: 0.1
+      });
+
+      const nucPostW = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.5, 0.46), nucFrameMat);
+      nucPostW.position.set(-46.05, b1Y + 1.25, 23.45);
+      const nucPostE = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.5, 0.46), nucFrameMat);
+      nucPostE.position.set(-42.95, b1Y + 1.25, 23.45);
+      const nucHeader = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.16, 0.5), nucFrameMat);
+      nucHeader.position.set(-44.5, b1Y + 2.5, 23.45);
+      const nucSensor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.32, 0.08, 0.14),
+        new THREE.MeshStandardMaterial({ color: 0x090d16, emissive: 0x38bdf8, emissiveIntensity: 0.85 })
+      );
+      nucSensor.position.set(-44.5, b1Y + 2.48, 23.2);
+      activeBuildGroup.add(nucPostW, nucPostE, nucHeader, nucSensor);
+
+      const createNucDoorLeaf = () => {
+        const leaf = new THREE.Group();
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2.42, 0.06), nucGlassMat);
+        const topRail = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 0.09), nucFrameMat);
+        topRail.position.y = 1.16;
+        const botRail = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.14, 0.09), nucFrameMat);
+        botRail.position.y = -1.14;
+        const radStripe = new THREE.Mesh(
+          new THREE.BoxGeometry(1.48, 0.12, 0.075),
+          new THREE.MeshStandardMaterial({ color: 0x1d4ed8, emissive: 0x2563eb, emissiveIntensity: 0.45 })
+        );
+        radStripe.position.y = 0.05;
+        leaf.add(pane, topRail, botRail, radStripe);
+        return leaf;
+      };
+
+      const nucLeftLeaf = createNucDoorLeaf();
+      nucLeftLeaf.position.set(-45.25, b1Y + 1.21, 23.45);
+      const nucRightLeaf = createNucDoorLeaf();
+      nucRightLeaf.position.set(-43.75, b1Y + 1.21, 23.45);
+      activeBuildGroup.add(nucLeftLeaf, nucRightLeaf);
+
+      const nucLeftCol = { minX: -46.0, maxX: -44.5, minZ: 23.25, maxZ: 23.65, floor: 'B1', label: '核子醫學部電動門' };
+      const nucRightCol = { minX: -44.5, maxX: -43.0, minZ: 23.25, maxZ: 23.65, floor: 'B1', label: '核子醫學部電動門' };
+      colliders.push(nucLeftCol, nucRightCol);
+
+      slidingDoors.push({
+        axis: 'x',
+        sensorPos: new THREE.Vector3(-44.5, b1Y, 23.25),
+        leftLeaf: nucLeftLeaf,
+        rightLeaf: nucRightLeaf,
+        leftClosedPos: -45.25,
+        rightClosedPos: -43.75,
+        openOffset: 1.38,
+        openProgress: 0,
+        leftCollider: nucLeftCol,
+        rightCollider: nucRightCol,
+        centerCoord: -44.5
+      });
+
+      // 3. 內部照明與核子醫學大型 PET-CT / 雙探頭加馬攝影機 (SPECT-CT) 與操作控制台
+      const nucLight1 = new THREE.PointLight(0xe0f2fe, 1.25, 22, 1.4);
+      nucLight1.position.set(-44.5, b1Y + 3.8, 28.5);
+      const nucLight2 = new THREE.PointLight(0xf8fafc, 1.05, 22, 1.4);
+      nucLight2.position.set(-44.5, b1Y + 3.8, 35.0);
+      activeBuildGroup.add(nucLight1, nucLight2);
+
+      const gantryWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.25 });
+      const gantryBlueMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.35 });
+      const gantryDarkMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.6 });
+      const laserRingMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.9 });
+
+      // (A) 正對電動門口（z = 30.2）：大型 PET-CT 正子斷層掃描儀
+      const buildPetCtScanner = (sx, sz) => {
+        const scanner = new THREE.Group();
+
+        // 環形掃描機架主體 (Gantry)
+        const outerRing = new THREE.Mesh(new THREE.TorusGeometry(1.18, 0.38, 20, 36), gantryWhiteMat);
+        outerRing.position.set(0, 1.48, 0);
+        const sideRing = new THREE.Mesh(new THREE.TorusGeometry(1.18, 0.39, 12, 36), gantryBlueMat);
+        sideRing.scale.set(1, 1, 0.35);
+        sideRing.position.set(0, 1.48, -0.22);
+        const boreGlow = new THREE.Mesh(new THREE.TorusGeometry(0.84, 0.03, 10, 32), laserRingMat);
+        boreGlow.position.set(0, 1.48, 0);
+
+        // 機架底座
+        const gantryBase = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.55, 0.95), gantryDarkMat);
+        gantryBase.position.set(0, 0.275, 0);
+
+        // 延伸檢查病床與床墊
+        const tablePedestal = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.85, 2.2), gantryWhiteMat);
+        tablePedestal.position.set(0, 0.425, -1.65);
+        const tableCradle = new THREE.Mesh(
+          new THREE.BoxGeometry(0.68, 0.12, 3.6),
+          new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.4 })
+        );
+        tableCradle.position.set(0, 0.92, -1.05);
+
+        scanner.add(outerRing, sideRing, boreGlow, gantryBase, tablePedestal, tableCradle);
+        scanner.position.set(sx, b1Y, sz);
+        activeBuildGroup.add(scanner);
+
+        colliders.push({
+          minX: sx - 1.55,
+          maxX: sx + 1.55,
+          minZ: sz - 2.9,
+          maxZ: sz + 0.65,
+          floor: 'B1',
+          label: 'PET-CT 正子斷層掃描儀'
+        });
+      };
+
+      buildPetCtScanner(-44.5, 30.8);
+
+      // (B) 深處（z = 36.2）：雙探頭核醫加馬攝影機 (SPECT Gamma Camera)
+      const spectGroup = new THREE.Group();
+      const spectStand = new THREE.Mesh(new THREE.BoxGeometry(2.6, 2.3, 0.8), gantryWhiteMat);
+      spectStand.position.set(0, 1.15, 0.4);
+      const spectRing = new THREE.Mesh(new THREE.TorusGeometry(1.05, 0.22, 16, 32), gantryBlueMat);
+      spectRing.position.set(0, 1.42, -0.1);
+      // 上下兩組核醫閃爍晶體探測頭
+      const detectorTop = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.26, 0.75), gantryDarkMat);
+      detectorTop.position.set(0, 2.02, -0.15);
+      const detectorBot = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.26, 0.75), gantryDarkMat);
+      detectorBot.position.set(0, 0.82, -0.15);
+      const spectBed = new THREE.Mesh(
+        new THREE.BoxGeometry(0.62, 0.85, 2.6),
+        new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.45 })
+      );
+      spectBed.position.set(0, 0.425, -1.2);
+      spectGroup.add(spectStand, spectRing, detectorTop, detectorBot, spectBed);
+      spectGroup.position.set(-46.5, b1Y, 36.8);
+      activeBuildGroup.add(spectGroup);
+      colliders.push({ minX: -48.0, maxX: -45.0, minZ: 34.3, maxZ: 37.8, floor: 'B1', label: '核醫加馬攝影機 (SPECT)' });
+
+      // (C) 右側（東側內牆旁 x = -39.6, z = 34.5）：輻射防護鉛玻璃操作控制室與雙螢幕工作站
+      const ctrlDesk = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.82, 3.2), gantryWhiteMat);
+      ctrlDesk.position.set(-39.4, b1Y + 0.41, 34.5);
+      const leadGlass = new THREE.Mesh(
+        new THREE.BoxGeometry(0.08, 1.35, 3.0),
+        new THREE.MeshStandardMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.42, roughness: 0.1 })
+      );
+      leadGlass.position.set(-40.0, b1Y + 1.5, 34.5);
+      activeBuildGroup.add(ctrlDesk, leadGlass);
+
+      [33.6, 35.4].forEach((mz) => {
+        const mon = new THREE.Mesh(
+          new THREE.BoxGeometry(0.08, 0.45, 0.68),
+          new THREE.MeshStandardMaterial({ color: 0x090d16, emissive: 0x22c55e, emissiveIntensity: 0.85 })
+        );
+        mon.position.set(-39.35, b1Y + 1.12, mz);
+        activeBuildGroup.add(mon);
+      });
+      colliders.push({ minX: -40.1, maxX: -38.6, minZ: 32.8, maxZ: 36.2, floor: 'B1', label: '核醫影像控制工作站' });
 
       addWall(-24.5, 12.5, 17.5, 9.5, 4.4, texAestheticPinkWall, '維納斯醫學美容中心', 'B1', b1Y);
       addCorridorHandrail(-32.8, 7.65, -16.2, 7.65, b1Y, 0xb45309);
