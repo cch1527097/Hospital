@@ -6,6 +6,7 @@
   <title>向日葵醫院-模擬人生</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <!-- Three.js r128 CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- Google Fonts: 繁體中文思源黑體 & GTA 風格數字字體 -->
@@ -117,80 +118,6 @@
     <p class="text-xs sm:text-sm text-slate-300 text-center px-4">正在載入...</p>
   </div>
 
-  <!-- 頂部橫向：B1 各科區域快速傳送 + B1 ~ 8F 樓層 HTML 直連列 -->
-  <div class="fixed top-2.5 left-1/2 -translate-x-1/2 z-20 w-[97vw] max-w-6xl">
-  </div>
-
-  <!-- 操作提示膠囊 -->
-  <div class="fixed top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-max max-w-[95vw]">
-  </div>
-
-  <!-- 左上角：燈光情境切換、功能開關、滑鼠靈敏度與操作說明面板 -->
-  <div class="fixed top-20 left-3 sm:left-4 z-20 flex flex-col gap-2 max-w-[318px]">
-  </div>
-
-      <!-- 💡 燈光情境切換器 -->
-      <div class="mt-2.5 p-2 rounded-lg bg-slate-900/80 border border-amber-400/30">
-        <div class="flex items-center justify-between text-[11px] mb-1.5">
-          <span class="font-black text-amber-300">💡 燈光情境切換 (L 鍵)</span>
-          <span id="lighting-mode-badge" class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-200 font-bold text-[10px]">
-            日間門診全亮
-          </span>
-        </div>
-        <div class="grid grid-cols-3 gap-1">
-          <button data-light-mode="day" class="light-mode-btn py-1.5 px-1 rounded-md text-[10px] sm:text-[11px] font-black bg-amber-400 text-slate-950 shadow transition">
-            ☀️ 日間全亮
-          </button>
-          <button data-light-mode="warm" class="light-mode-btn py-1.5 px-1 rounded-md text-[10px] sm:text-[11px] font-bold bg-white/10 hover:bg-amber-500/30 text-amber-100 border border-white/10 transition">
-            ✨ 暖金質感
-          </button>
-          <button data-light-mode="night" class="light-mode-btn py-1.5 px-1 rounded-md text-[10px] sm:text-[11px] font-bold bg-white/10 hover:bg-sky-500/30 text-sky-200 border border-white/10 transition">
-            🌙 夜間巡檢
-          </button>
-        </div>
-      </div>
-
-      <!-- 核心互動功能按鈕列 -->
-      <div class="mt-2 grid grid-cols-1 gap-1.5">
-        <div class="grid grid-cols-2 gap-1.5">
-          <button id="btn-toggle-pov" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-sky-700/80 hover:bg-sky-600 border border-sky-400/30 text-white transition">
-            🎥 第三人稱 (V)
-          </button>
-          <button id="btn-toggle-labels" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-emerald-700/80 hover:bg-emerald-600 border border-emerald-400/30 text-white transition">
-            🏷️ 醫護名牌: 開
-          </button>
-        </div>
-
-        <button id="btn-open-elevator" class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-teal-700/85 hover:bg-teal-600 border border-teal-300/40 text-white transition">
-          <span>🛗 手扶梯 / 電梯 (B1 ~ 8F)</span>
-          <span class="px-1.5 py-0.5 rounded bg-black/30 text-[10px]">E 鍵</span>
-        </button>
-
-        <button id="btn-clear-wanted" class="w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-between bg-amber-600/85 hover:bg-amber-500 border border-amber-300/40 text-white transition">
-          <span>🕊️ 消除通緝 / 急救治療</span>
-          <span class="px-1.5 py-0.5 rounded bg-black/30 text-[10px]">C 鍵</span>
-        </button>
-
-        <div class="px-2.5 py-1.5 rounded-lg bg-slate-900/70 border border-white/10">
-          <div class="flex items-center justify-between text-[11px] mb-1">
-            <span class="text-teal-200 font-bold">🖱️ 滑鼠轉向靈敏度</span>
-            <span id="mouse-sens-val" class="font-black text-amber-300 gta-font">1.0x</span>
-          </div>
-          <input id="mouse-sens-slider" type="range" min="0.4" max="2.2" step="0.1" value="1.0" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-teal-400" />
-        </div>
-      </div>
-
-      <div id="help-body" class="mt-2 pt-2 border-t border-white/10 text-[11px] text-slate-200 space-y-1">
-        <div class="flex justify-between"><span class="text-slate-400">轉動視角（免鎖定）</span><span class="font-bold text-teal-300">按住滑鼠左鍵拖曳 / 滾輪縮放</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">地面點擊 / 鍵盤移動</span><span class="font-bold text-amber-300">左鍵點地面自動走 / WASD / Shift</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">跳躍 / 鏡頭回正</span><span class="font-bold text-amber-300">Space 跳躍 / R 回正</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">燈光情境循環切換</span><span class="font-bold text-amber-300">L 鍵（日間 / 暖金 / 夜間）</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">近戰三連擊 / 昇龍重擊</span><span class="font-bold text-rose-300">右鍵點擊(J) / K 鍵</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">與病患醫護交談 / 電梯</span><span class="font-bold text-emerald-300">靠近按 E 鍵</span></div>
-      </div>
-    </div>
-  </div>
-
   <!-- 右上角：GTA 風格狀態欄 + 門診爆滿人潮監控 -->
   <div class="fixed top-3 right-3 sm:right-4 z-20 flex flex-col items-end pointer-events-none">
     <div id="hud-clock" class="gta-font gta-shadow text-xl sm:text-2xl font-bold text-white leading-none">
@@ -267,7 +194,56 @@
   <div id="toast-banner" class="hidden fixed top-48 right-4 z-30 px-4 py-2 rounded-xl hud-glass border-l-4 border-teal-400 text-white text-xs sm:text-sm font-medium shadow-xl">
   </div>
 
-  <!-- 左下角：B1 緊急疏散平面圖同色系圓形雷達小地圖 -->
+<!-- 門禁驗證未通過遮罩 -->
+  <div id="auth-warning-overlay" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/95 backdrop-blur-md text-white text-center px-6">
+    <div class="text-4xl mb-3">🪪</div>
+    <h2 class="text-2xl font-black text-rose-400 mb-2">尚未偵測到員工門禁登入紀錄</h2>
+    <p id="auth-warning-msg" class="text-sm text-slate-300 mb-5">請先由向日葵醫院大門系統刷卡登入，即將為您導回首頁...</p>
+    <a href="index.html" class="px-5 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-sm transition">
+      返回門禁登入頁 (index.html)
+    </a>
+  </div>
+
+  <!-- 左下角：B1 多人連線狀態與即時頻道聊天室（位於小地圖上方） -->
+  <div id="multiplayer-panel" class="fixed bottom-44 sm:bottom-52 left-4 z-20 w-72 sm:w-80 rounded-2xl hud-glass p-3 text-white shadow-2xl border border-teal-400/35">
+    <div class="flex items-center justify-between pb-2 border-b border-white/10">
+      <div class="flex items-center gap-2">
+        <span id="mp-status-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+        <span id="mp-status-text" class="text-xs font-black text-teal-300">連線至 B1 頻道中...</span>
+      </div>
+      <span id="mp-online-count" class="px-2 py-0.5 rounded-full bg-teal-500/20 border border-teal-400/40 text-[11px] font-black text-amber-300">
+        目前線上 1 人
+      </span>
+    </div>
+
+    <div id="mp-user-badge" class="mt-1.5 text-[11px] text-slate-300 truncate">
+      身分：載入中...
+    </div>
+
+    <!-- 聊天訊息捲動區 -->
+    <div id="mp-chat-messages" class="mt-2 h-24 overflow-y-auto space-y-1 pr-1 text-[11px] bg-slate-950/60 rounded-lg p-2 border border-white/10">
+      <div class="text-slate-400">系統：歡迎進入 B1 地下一樓多人連線頻道！</div>
+    </div>
+
+    <!-- 聊天輸入框 -->
+    <div class="mt-2 flex items-center gap-1.5">
+      <input
+        id="mp-chat-input"
+        type="text"
+        maxlength="80"
+        placeholder="輸入訊息按 Enter 發送..."
+        class="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-900/90 border border-white/15 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-teal-400"
+      />
+      <button
+        id="mp-chat-send"
+        type="button"
+        class="px-3 py-1.5 rounded-lg bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-xs transition shrink-0"
+      >
+        發送
+      </button>
+    </div>
+  </div>
+
   <div id="minimap-shell" class="fixed bottom-4 left-4 z-20 w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden bg-amber-50">
     <canvas id="minimap-canvas" width="220" height="220" class="w-full h-full block"></canvas>
     <div class="absolute top-1 left-1/2 -translate-x-1/2 px-1.5 rounded bg-slate-900/85 text-[10px] font-black text-teal-300 pointer-events-none">
@@ -278,14 +254,13 @@
     </div>
   </div>
 
-  <!-- 右下角：桌面與行動裝置皆可點擊的近戰攻擊按鈕組 -->
   <div class="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 z-20 flex flex-col items-end gap-2">
     <div class="flex items-center gap-2">
       <button id="btn-action-heavy" class="px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-xs sm:text-sm shadow-[0_6px_20px_rgba(245,158,11,0.5)] border border-amber-200/60 active:scale-95 transition">
         💥 重擊 (K)
       </button>
       <button id="btn-action-attack" class="px-4 py-2.5 sm:px-5 sm:py-3 rounded-2xl bg-gradient-to-br from-rose-500 to-red-700 hover:from-rose-400 hover:to-red-600 text-white font-black text-xs sm:text-sm shadow-[0_6px_20px_rgba(225,29,72,0.55)] border border-rose-300/60 active:scale-95 transition">
-        👊 攻擊 (J / 右鍵)
+        👊 攻擊 (J / 左鍵)
       </button>
     </div>
 
@@ -306,6 +281,346 @@
   </div>
 
   <script>
+
+// ==========================================
+    // B1 多人連線與門禁驗證模組 (PeerJS WebRTC)
+    // ==========================================
+    const B1_HOST_ID = 'sunflower-hospital-b1-main-lobby';
+    const ROLE_COLOR_MAP = {
+  '護理師': { hex: 0xf472b6, badge: '#f472b6' },
+  '醫師': { hex: 0x38bdf8, badge: '#38bdf8' },
+  '資訊工程師': { hex: 0xa78bfa, badge: '#a78bfa' },
+  '衛教師': { hex: 0x34d399, badge: '#34d399' },
+  '藥師': { hex: 0xfbbf24, badge: '#fbbf24' },
+  '行政人員': { hex: 0x94a3b8, badge: '#94a3b8' },
+  '醫護人員': { hex: 0x2dd4bf, badge: '#2dd4bf' }
+};
+
+const ENGLISH_ROLE_TO_ZH = {
+  nurse: '護理師',
+  rn: '護理師',
+  nursing: '護理師',
+  doctor: '醫師',
+  dr: '醫師',
+  md: '醫師',
+  physician: '醫師',
+  engineer: '資訊工程師',
+  it: '資訊工程師',
+  mis: '資訊工程師',
+  developer: '資訊工程師',
+  educator: '衛教師',
+  health_educator: '衛教師',
+  pharmacist: '藥師',
+  admin: '行政人員',
+  staff: '行政人員',
+  security: '駐衛警',
+  guard: '駐衛警',
+  guest: '院區訪客',
+  visitor: '院區訪客'
+};
+
+function normalizeRoleTitle(rawRole) {
+  if (!rawRole) return '醫護人員';
+  const trimmed = String(rawRole).trim();
+  const lower = trimmed.toLowerCase();
+  if (ENGLISH_ROLE_TO_ZH[lower]) return ENGLISH_ROLE_TO_ZH[lower];
+  if (/^[a-zA-Z0-9_\-\s]+$/.test(trimmed)) return '醫護人員';
+  return trimmed;
+}
+
+    const currentUser = {
+      card: 'GUEST',
+      name: '訪客人員',
+      role: '護理師',
+      colorHex: 0xf472b6,
+      badgeColor: '#f472b6'
+    };
+
+    let peer = null;
+    let myPeerId = null;
+    let isHost = false;
+    let hostConn = null;
+    const clientConns = new Map();     // Host 端保存所有 Client 連線
+    const remotePlayers = new Map();   // peerId -> { rig, mesh, targetPos, targetYaw, walkCycle, role, name }
+    let lastSyncTime = 0;
+
+    function verifyAuthSession() {
+      const params = new URLSearchParams(window.location.search);
+      const qCard = params.get('card');
+      const qRole = params.get('role');
+      const qName = params.get('name');
+
+      let sessionData = null;
+      try {
+        const raw = sessionStorage.getItem('vh_user_session') || localStorage.getItem('vh_user_session');
+        if (raw) sessionData = JSON.parse(raw);
+      } catch (e) {
+        console.warn('讀取登入工作階段失敗:', e);
+      }
+
+      if (qCard && qName) {
+        sessionData = { card: qCard, role: qRole || '護理師', name: qName };
+        try {
+          sessionStorage.setItem('vh_user_session', JSON.stringify(sessionData));
+        } catch (e) {}
+      }
+
+      // 若無登入紀錄，顯示警告並跳轉回 index.html（若在單頁測試可註解掉跳轉）
+      if (!sessionData || !sessionData.name) {
+        const warnEl = document.getElementById('auth-warning-overlay');
+        if (warnEl) warnEl.classList.remove('hidden');
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 2200);
+        return false;
+      }
+
+      currentUser.card = sessionData.card || 'EMP-001';
+      currentUser.name = sessionData.name;
+      currentUser.role = normalizeRoleTitle(sessionData.role);
+      const theme = ROLE_COLOR_MAP[currentUser.role] || { hex: 0x2dd4bf, badge: '#2dd4bf' };
+      currentUser.colorHex = theme.hex;
+      currentUser.badgeColor = theme.badge;
+
+      const badgeEl = document.getElementById('mp-user-badge');
+      if (badgeEl) {
+        badgeEl.innerHTML = `員工：<span class="text-white font-bold">${currentUser.name}</span>（<span style="color:${currentUser.badgeColor}">${currentUser.role}</span>・#${currentUser.card}）`;
+      }
+      return true;
+    }
+
+    function applyLocalPlayerIdentity() {
+      if (!player.mesh) return;
+      player.mesh.traverse((child) => {
+        if (child.isMesh && child.material && child.material.color && child.material.color.getHex() === 0x0284c7) {
+          child.material = child.material.clone();
+          child.material.color.setHex(currentUser.colorHex);
+        }
+      });
+    }
+
+    function updateOnlineCountUI() {
+      const countEl = document.getElementById('mp-online-count');
+      if (countEl) {
+        countEl.textContent = `目前線上 ${remotePlayers.size + 1} 人`;
+      }
+    }
+
+    function appendChatMessage(senderName, role, text, badgeColor = '#2dd4bf', isSystem = false) {
+      const box = document.getElementById('mp-chat-messages');
+      if (!box) return;
+      const line = document.createElement('div');
+      if (isSystem) {
+        line.className = 'text-amber-300/90';
+        line.textContent = `系統：${text}`;
+      } else {
+        line.className = 'leading-snug break-words';
+        line.innerHTML = `<span class="font-bold" style="color:${badgeColor}">[${role}] ${senderName}：</span><span class="text-slate-100"></span>`;
+        line.querySelector('span:last-child').textContent = text;
+      }
+      box.appendChild(line);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function broadcastPacket(packet, excludePeerId = null) {
+      if (isHost) {
+        clientConns.forEach((conn, peerId) => {
+          if (peerId !== excludePeerId && conn.open) {
+            conn.send(packet);
+          }
+        });
+      } else if (hostConn && hostConn.open) {
+        hostConn.send(packet);
+      }
+    }
+
+    function upsertRemotePlayer(data) {
+      if (!data || !data.id || data.id === myPeerId) return;
+
+      const displayRole = normalizeRoleTitle(data.role);
+      let rp = remotePlayers.get(data.id);
+      if (!rp) {
+        const theme = ROLE_COLOR_MAP[displayRole] || { hex: data.colorHex || 0x2dd4bf, badge: '#2dd4bf' };
+        const rig = createRoundedCharacterRig({
+          coatColor: theme.hex,
+          pantsColor: 0x0f172a,
+          isDoctor: displayRole === '醫師',
+          isNurse: displayRole === '護理師',
+          hasMask: true
+        });
+        const sprite = createNpcNameSprite(data.name || '院區同仁', displayRole, theme.badge);
+        rig.group.add(sprite);
+        rig.group.position.set(data.x ?? -8.5, data.y ?? FLOOR_Y.B1, data.z ?? -2.5);
+        scene.add(rig.group);
+
+        rp = {
+          id: data.id,
+          name: data.name || '院區同仁',
+          role: displayRole,
+          rig,
+          mesh: rig.group,
+          targetPos: new THREE.Vector3(data.x ?? -8.5, data.y ?? FLOOR_Y.B1, data.z ?? -2.5),
+          targetYaw: data.rotY ?? Math.PI,
+          walkCycle: 0
+        };
+        remotePlayers.set(data.id, rp);
+        updateOnlineCountUI();
+        appendChatMessage('', '', `${rp.name} (${rp.role}) 進入了 B1 樓層`, '#2dd4bf', true);
+      }
+
+      rp.targetPos.set(data.x, data.y, data.z);
+      rp.targetYaw = data.rotY;
+    }
+
+    function removeRemotePlayer(peerId) {
+      const rp = remotePlayers.get(peerId);
+      if (!rp) return;
+      scene.remove(rp.mesh);
+      remotePlayers.delete(peerId);
+      updateOnlineCountUI();
+      appendChatMessage('', '', `${rp.name} 離開了 B1 頻道`, '#94a3b8', true);
+    }
+
+    function handleIncomingPacket(packet, fromPeerId) {
+      if (!packet || !packet.type) return;
+      if (!packet.id && fromPeerId) packet.id = fromPeerId;
+
+      if (packet.type === 'sync') {
+        upsertRemotePlayer(packet);
+        if (isHost) broadcastPacket(packet, fromPeerId);
+      } else if (packet.type === 'chat') {
+        appendChatMessage(packet.name, packet.role, packet.text, packet.badgeColor);
+        if (isHost) broadcastPacket(packet, fromPeerId);
+      } else if (packet.type === 'leave') {
+        removeRemotePlayer(packet.id);
+        if (isHost) broadcastPacket(packet, fromPeerId);
+      }
+    }
+
+    function bindConnectionEvents(conn) {
+      conn.on('data', (data) => handleIncomingPacket(data, conn.peer));
+      conn.on('close', () => {
+        clientConns.delete(conn.peer);
+        removeRemotePlayer(conn.peer);
+      });
+      conn.on('error', () => {
+        clientConns.delete(conn.peer);
+        removeRemotePlayer(conn.peer);
+      });
+    }
+
+    function setMpStatusUI(connected, label) {
+      const dot = document.getElementById('mp-status-dot');
+      const txt = document.getElementById('mp-status-text');
+      if (dot) {
+        dot.className = connected
+          ? 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]'
+          : 'w-2.5 h-2.5 rounded-full bg-rose-400 animate-pulse';
+      }
+      if (txt) txt.textContent = label;
+    }
+
+    function initMultiplayerPeerJS() {
+      if (typeof Peer === 'undefined') {
+        setMpStatusUI(false, 'PeerJS 載入失敗（離線模式）');
+        return;
+      }
+
+      // 1. 先嘗試搶占 B1 固定主機 ID
+      const hostCandidate = new Peer(B1_HOST_ID);
+
+      hostCandidate.on('open', (id) => {
+        peer = hostCandidate;
+        myPeerId = id;
+        isHost = true;
+        setMpStatusUI(true, '已建立 B1 頻道（主機 Host）');
+        updateOnlineCountUI();
+
+        peer.on('connection', (conn) => {
+          clientConns.set(conn.peer, conn);
+          bindConnectionEvents(conn);
+        });
+      });
+
+      hostCandidate.on('error', (err) => {
+        if (err.type === 'unavailable-id') {
+          // 2. B1 主機已存在，改以隨機 ID 作為 Client 連入
+          hostCandidate.destroy();
+          const clientPeer = new Peer();
+
+          clientPeer.on('open', (id) => {
+            peer = clientPeer;
+            myPeerId = id;
+            isHost = false;
+            hostConn = peer.connect(B1_HOST_ID, { reliable: true });
+
+            hostConn.on('open', () => {
+              setMpStatusUI(true, '已連線至 B1 多人頻道');
+              updateOnlineCountUI();
+              syncMyPosition(true);
+            });
+
+            bindConnectionEvents(hostConn);
+          });
+
+          clientPeer.on('error', () => {
+            setMpStatusUI(false, 'B1 頻道連線異常');
+          });
+        } else {
+          setMpStatusUI(false, 'WebRTC 連線受限');
+        }
+      });
+    }
+
+    function syncMyPosition(force = false) {
+      if (!peer || !myPeerId) return;
+      const now = performance.now();
+      if (!force && now - lastSyncTime < 65) return;
+      lastSyncTime = now;
+
+      broadcastPacket({
+        type: 'sync',
+        id: myPeerId,
+        name: currentUser.name,
+        role: currentUser.role,
+        colorHex: currentUser.colorHex,
+        x: Number(player.pos.x.toFixed(3)),
+        y: Number(player.pos.y.toFixed(3)),
+        z: Number(player.pos.z.toFixed(3)),
+        rotY: Number(player.yaw.toFixed(3))
+      });
+    }
+
+    function updateRemotePlayers(dt) {
+      const lerpAlpha = Math.min(1, dt * 14);
+      remotePlayers.forEach((rp) => {
+        const prevX = rp.mesh.position.x;
+        const prevZ = rp.mesh.position.z;
+
+        rp.mesh.position.lerp(rp.targetPos, lerpAlpha);
+
+        let diff = rp.targetYaw - rp.mesh.rotation.y;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        rp.mesh.rotation.y += diff * lerpAlpha;
+
+        const movedDist = Math.hypot(rp.mesh.position.x - prevX, rp.mesh.position.z - prevZ);
+        if (movedDist > 0.002) {
+          rp.walkCycle += dt * 11;
+          const swing = Math.sin(rp.walkCycle) * 0.55;
+          rp.rig.leftHip.rotation.x = swing;
+          rp.rig.rightHip.rotation.x = -swing;
+          rp.rig.leftShoulder.rotation.x = -swing * 0.7;
+          rp.rig.rightShoulder.rotation.x = swing * 0.7;
+        } else {
+          rp.rig.leftHip.rotation.x *= 0.82;
+          rp.rig.rightHip.rotation.x *= 0.82;
+          rp.rig.leftShoulder.rotation.x *= 0.82;
+          rp.rig.rightShoulder.rotation.x *= 0.82;
+        }
+      });
+    }
+
     // ==========================================
     // 0. 2D Canvas roundRect 跨瀏覽器 Polyfill 相容性強化
     // ==========================================
@@ -420,6 +735,8 @@
       comboStep: 0,
       comboResetTimer: 0,
       hitRegisteredThisSwing: false,
+      attackRangeMult: 2.5,
+      rangeRing: null,
       hurtCooldown: 0,
       lastTriggeredTransportId: null,
       autoMoveTarget: null,
@@ -2110,7 +2427,7 @@
       addCorridorHandrail(-32.8, 7.65, -16.2, 7.65, b1Y, 0xb45309);
       buildWallSconce(-29.5, b1Y + 2.25, 7.65, 0, 0xfbcfe8);
       buildWallSconce(-19.5, b1Y + 2.25, 7.65, 0, 0xfbcfe8);
-      addHangingSign(-24.5, b1Y + 3.65, 7.5, 8.2, 0.9, '維納斯醫學美容中心', 'VENUS AESTHETIC MEDICINE, '#be185d', '#f9a8d4');
+      addHangingSign(-24.5, b1Y + 3.65, 7.5, 8.2, 0.9, '維納斯醫學美容中心', 'VENUS AESTHETIC MEDICINE', '#be185d', '#f9a8d4');
 
       buildClinicWallFacade(-22.5, 33.5, [
         { code: '神內 201診', dept: '神經內科', doctor: '黃柏翰 醫師', queueNum: '0064' },
@@ -2979,8 +3296,10 @@
       return null;
     }
 
-    function spawnSlashTrail(originPos, yaw, colorHex, radius = 1.35) {
-      const arcGeom = new THREE.RingGeometry(radius * 0.55, radius, 24, 1, -Math.PI * 0.45, Math.PI * 0.9);
+    function spawnSlashTrail(originPos, yaw, colorHex, radius = 3.5, isFullCircle = false) {
+      const thetaStart = isFullCircle ? 0 : -Math.PI * 0.65;
+      const thetaLength = isFullCircle ? Math.PI * 2 : Math.PI * 1.3;
+      const arcGeom = new THREE.RingGeometry(radius * 0.45, radius, 36, 1, thetaStart, thetaLength);
       const arcMat = new THREE.MeshBasicMaterial({
         color: colorHex,
         side: THREE.DoubleSide,
@@ -2989,10 +3308,10 @@
       });
       const mesh = new THREE.Mesh(arcGeom, arcMat);
       mesh.rotation.x = -Math.PI / 2;
-      mesh.rotation.z = -yaw + Math.PI * 0.5;
+      mesh.rotation.z = yaw - Math.PI * 0.5;
       mesh.position.set(originPos.x, originPos.y + 1.15, originPos.z);
       scene.add(mesh);
-      slashEffects.push({ mesh, life: 0.24, maxLife: 0.24 });
+      slashEffects.push({ mesh, life: 0.28, maxLife: 0.28 });
     }
 
     function spawnHitSparks(worldPos, colorHex = 0xfbbf24) {
@@ -3051,12 +3370,17 @@
       }
       player.attackTimer = player.attackDuration;
 
+      const baseRadius = type === 'heavy' ? 2.2 : player.comboStep === 3 ? 1.9 : 1.65;
+      const visualRadius = baseRadius * player.attackRangeMult;
+      const isFullCircle = type === 'heavy' || player.comboStep === 3;
+
       SoundFX.playSwing(type === 'heavy');
       spawnSlashTrail(
         player.pos,
         player.yaw,
         type === 'heavy' ? 0xf59e0b : player.comboStep === 3 ? 0xf43f5e : 0x38bdf8,
-        type === 'heavy' ? 1.65 : 1.35
+        visualRadius,
+        isFullCircle
       );
     }
 
@@ -3439,10 +3763,13 @@
         }
 
         if (!player.hitRegisteredThisSwing && progress >= 0.25 && progress <= 0.7) {
-          const hitRange = player.attackType === 'heavy' ? 2.15 : 1.75;
+          const baseRange = player.attackType === 'heavy' ? 2.2 : player.comboStep === 3 ? 1.9 : 1.65;
+          const hitRange = baseRange * player.attackRangeMult;
           const damage = player.attackType === 'heavy' ? 42 : player.comboStep === 3 ? 32 : 22;
           const forwardDirX = Math.sin(player.yaw);
           const forwardDirZ = Math.cos(player.yaw);
+          const isFullCircle = player.attackType === 'heavy' || player.comboStep === 3;
+          let anyHitThisSwing = false;
 
           npcs.forEach((npc) => {
             if (npc.floor !== pFloor || npc.knockdownTimer > 0) return;
@@ -3451,15 +3778,14 @@
             const dist = Math.hypot(toNpcX, toNpcZ);
             if (dist <= hitRange) {
               const dot = (toNpcX * forwardDirX + toNpcZ * forwardDirZ) / (dist || 1);
-              if (dot > 0.15 || player.comboStep === 3) {
-                player.hitRegisteredThisSwing = true;
+              if (isFullCircle || dot > -0.35) {
+                anyHitThisSwing = true;
                 npc.hp = Math.max(0, npc.hp - damage);
                 if (!npc.appearance.isSeated) {
-                  const kbForce = player.attackType === 'heavy' ? 7.5 : 4.5;
+                  const kbForce = player.attackType === 'heavy' ? 8.5 : 5.2;
                   npc.knockbackVel.set((toNpcX / (dist || 1)) * kbForce, 0, (toNpcZ / (dist || 1)) * kbForce);
                 }
 
-                SoundFX.playImpact(player.attackType === 'heavy');
                 spawnHitSparks(npc.pos, player.attackType === 'heavy' ? 0xf59e0b : 0x38bdf8);
                 spawnFloatingDamage(npc.pos, damage, false);
                 alertNearbyGuardsAndMakeHostile(npc);
@@ -3472,6 +3798,11 @@
               }
             }
           });
+
+          if (anyHitThisSwing) {
+            player.hitRegisteredThisSwing = true;
+            SoundFX.playImpact(player.attackType === 'heavy');
+          }
         }
 
         if (player.attackTimer <= 0) {
@@ -3865,7 +4196,8 @@
       });
 
       window.addEventListener('keydown', (e) => {
-        keys[e.code] = true;
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  keys[e.code] = true;
 
         if (e.code === 'Escape') {
           const transferOverlay = document.getElementById('floor-transfer-overlay');
@@ -3911,6 +4243,7 @@
         }
         if (e.code === 'KeyJ') triggerPlayerAttack('light');
         if (e.code === 'KeyK') triggerPlayerAttack('heavy');
+        if (e.code === 'KeyG') cycleAttackRangeMode();
         if (e.code === 'KeyC') clearWantedAndHeal();
         if (e.code === 'KeyV') {
   firstPersonMode = !firstPersonMode;
@@ -3970,16 +4303,12 @@
 
       window.addEventListener('mouseup', (e) => {
         if (e.button === 0) {
-          if (camState.leftMouseDragging && leftDragDist < 6 && !activeTalkNpc) {
-            setAutoMoveDestination(e.clientX, e.clientY);
+          if (camState.leftMouseDragging && leftDragDist < 5 && !activeTalkNpc) {
+            triggerPlayerAttack('light');
           }
           camState.leftMouseDragging = false;
           leftDragDist = 0;
         } else if (e.button === 2) {
-          // 僅在右鍵未拖曳（移動距離 < 4px）時才觸發近戰攻擊，避免拖曳視角誤觸發攻擊
-          if (camState.rightMouseDragging && rightDragDist < 4 && !activeTalkNpc) {
-            triggerPlayerAttack('light');
-          }
           camState.rightMouseDragging = false;
           rightDragDist = 0;
         }
@@ -4041,10 +4370,7 @@
           camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * 0.004, -0.35, 1.15);
         }
       }, { passive: true });
-      canvas.addEventListener('touchend', () => {
-        if (touchMovedDist < 8 && lastTouchX !== null && !activeTalkNpc) {
-          setAutoMoveDestination(lastTouchX, lastTouchY);
-        }
+canvas.addEventListener('touchend', () => {
         lastTouchX = null;
         lastTouchY = null;
       }, { passive: true });
@@ -4064,6 +4390,21 @@
 
       document.getElementById('btn-action-attack').addEventListener('click', () => triggerPlayerAttack('light'));
       document.getElementById('btn-action-heavy').addEventListener('click', () => triggerPlayerAttack('heavy'));
+
+      function cycleAttackRangeMode() {
+        const tiers = [
+          { mult: 1.0, label: '標準 (1.0x)', color: 0x94a3b8 },
+          { mult: 2.5, label: '廣域 (2.5x)', color: 0x38bdf8 },
+          { mult: 4.0, label: '超廣域 (4.0x)', color: 0xf59e0b }
+        ];
+        const curIdx = tiers.findIndex((t) => Math.abs(t.mult - player.attackRangeMult) < 0.05);
+        const next = tiers[(curIdx + 1) % tiers.length];
+        player.attackRangeMult = next.mult;
+
+        const rangeBtn = document.getElementById('btn-toggle-range');
+        if (rangeBtn) rangeBtn.textContent = `🎯 範圍: ${next.mult.toFixed(1)}x (G)`;
+        showToast(`🎯 攻擊模式範圍已切換為：【${next.label}】`);
+      }
 
       document.querySelectorAll('.tp-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
@@ -4172,10 +4513,51 @@ document.getElementById('btn-toggle-help')?.addEventListener('click', () => {
       setupZonalLightingSystem();
       buildHospitalB1Interior();
       createMoveTargetMarker();
-      createPlayableCharacter();
       spawnAllNpcs();
       applyLightingPreset('day', true);
       setupUIAndInputs();
+
+      if (!verifyAuthSession()) {
+        const loader = document.getElementById('loading-overlay');
+        if (loader) loader.remove();
+        return;
+      }
+
+      createPlayableCharacter();
+      applyLocalPlayerIdentity();
+      initMultiplayerPeerJS();
+
+      const chatInput = document.getElementById('mp-chat-input');
+const chatSendBtn = document.getElementById('mp-chat-send');
+const sendChat = () => {
+  if (!chatInput) return;
+  const text = chatInput.value.trim();
+  if (!text) return;
+  chatInput.value = '';
+  appendChatMessage(currentUser.name, currentUser.role, text, currentUser.badgeColor);
+  broadcastPacket({
+    type: 'chat',
+    id: myPeerId,
+    name: currentUser.name,
+    role: currentUser.role,
+    badgeColor: currentUser.badgeColor,
+    text
+  });
+};
+if (chatSendBtn) chatSendBtn.addEventListener('click', sendChat);
+if (chatInput) {
+  chatInput.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if (e.key === 'Enter') sendChat();
+  });
+}
+
+window.addEventListener('beforeunload', () => {
+  if (peer && myPeerId) {
+    broadcastPacket({ type: 'leave', id: myPeerId });
+    peer.destroy();
+  }
+});
 
       window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -4198,6 +4580,8 @@ document.getElementById('btn-toggle-help')?.addEventListener('click', () => {
       requestAnimationFrame(animate);
       const dt = Math.min(0.05, clock.getDelta());
       updateSimulation(dt);
+      syncMyPosition();
+      updateRemotePlayers(dt);
       renderer.render(scene, camera);
       renderMinimap();
     }
