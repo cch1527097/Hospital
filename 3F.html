@@ -3793,23 +3793,10 @@ registerCollider({
       addToFloorGroup(southTop, 3);
       addToFloorGroup(southRail, 3);
 
-      const endDoorFrame = new THREE.Mesh(
-        new THREE.BoxGeometry(0.18, 2.55, 3.6),
-        new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.35 })
-      );
-      endDoorFrame.position.set(-42.5, f3Y + 1.28, 32.6);
-      const endDoorGlass = new THREE.Mesh(
-        new THREE.BoxGeometry(0.08, 2.35, 3.3),
-        new THREE.MeshStandardMaterial({ color: 0xcffafe, transparent: true, opacity: 0.42, roughness: 0.15 })
-      );
-      endDoorGlass.position.set(-42.5, f3Y + 1.25, 32.6);
-      addToFloorGroup(endDoorFrame, 3);
-      addToFloorGroup(endDoorGlass, 3);
-
       buildShowChwanDoubleWardRoom(-36.5, f3Y, 26.8, '367');
       buildShowChwanDoubleWardRoom(-27.5, f3Y, 26.8, '369');
 
-      addHangingSign(-32.0, f3Y + 3.65, 32.6, 7.2, 0.88, '一般慢性病房', 'WOODEN FLOOR WARDS・臥床患者與護理師吊點滴照護區', '#b45309', '#fde047');
+      addHangingSign(-32.0, f3Y + 3.65, 32.6, 4.2, 0.88, '一般慢性病房', 'WOODEN FLOOR WARDS', '#b45309', '#fde047', Math.PI / 2);
     }
 
     function build3FNursingDepartmentWing(f3Y, wallCreamMat, wallMintMat, wallLavenderMat, glassMat) {
