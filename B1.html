@@ -2510,12 +2510,233 @@ function normalizeRoleTitle(rawRole) {
       allWaitingSeats.push(...buildHospitalWaitingBench(-15.5, -8.8, 0, b1Y));
       allWaitingSeats.push(...buildHospitalWaitingBench(-11.5, -8.8, 0, b1Y));
 
-      // D. 北中翼：中央供應室
-      addWall(11.5, -36.5, 22.0, 16.5, 4.4, texCleanTealWall, 'B1 中央供應室', 'B1', b1Y);
+      // D. 北中翼：中央供應室 (CSSD) — 含雙開感應電動門、刷手洗手台與高壓滅菌鍋
+      // 1. 外圍環狀牆體（西側牆面 x = 0.7 中央 z = -36.5 預留寬 3.2 的電動門開口）
+      addWall(11.5, -44.55, 22.0, 0.4, 4.4, texCleanTealWall, '中央供應室北牆', 'B1', b1Y);
+      addWall(11.5, -28.45, 22.0, 0.4, 4.4, texCleanTealWall, '中央供應室南牆', 'B1', b1Y);
+      addWall(22.3, -36.5, 0.4, 16.5, 4.4, texCleanTealWall, '中央供應室東牆', 'B1', b1Y);
+      addWall(0.7, -41.4, 0.4, 6.7, 4.4, texCleanTealWall, '中央供應室西側北牆', 'B1', b1Y);
+      addWall(0.7, -31.6, 0.4, 6.7, 4.4, texCleanTealWall, '中央供應室西側南牆', 'B1', b1Y);
+
+      // 電動門上方門楣牆
+      const cssdLintel = new THREE.Mesh(
+        new THREE.BoxGeometry(0.42, 1.9, 3.2),
+        createScaledWallMaterial(texCleanTealWall, 3.2, 0.45)
+      );
+      cssdLintel.position.set(0.7, b1Y + 3.45, -36.5);
+      activeBuildGroup.add(cssdLintel);
+
+      // 南側與西側牆面扶手及壁燈（避開西側電動門開口 -38.1 ~ -34.9）
       addCorridorHandrail(1.0, -28.15, 22.0, -28.15, b1Y);
       buildWallSconce(4.5, b1Y + 2.25, -28.15, 0, 0x99f6e4);
       buildWallSconce(18.5, b1Y + 2.25, -28.15, 0, 0x99f6e4);
+      addCorridorHandrail(0.35, -44.2, 0.35, -38.3, b1Y);
+      addCorridorHandrail(0.35, -34.7, 0.35, -28.8, b1Y);
+      buildWallSconce(0.35, b1Y + 2.25, -41.2, -Math.PI / 2, 0x99f6e4);
+      buildWallSconce(0.35, b1Y + 2.25, -31.8, -Math.PI / 2, 0x99f6e4);
+
+      // 招牌正對西側牆面中央 (x = 0.46, z = -36.5)
       addHangingSign(0.46, b1Y + 3.65, -36.5, 8.6, 0.9, '滅菌品存放室', 'CENTRAL STERILE SUPPLY DEPARTMENT (CSSD)', '#0369a1', '#7dd3fc', -Math.PI / 2);
+
+      // 2. 招牌底下的雙開玻璃感應電動門
+      const cssdFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.25 });
+      const cssdGlassMat = new THREE.MeshStandardMaterial({
+        color: 0x99f6e4,
+        transparent: true,
+        opacity: 0.42,
+        roughness: 0.1
+      });
+
+      const cssdPostN = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), cssdFrameMat);
+      cssdPostN.position.set(0.7, b1Y + 1.25, -38.05);
+      const cssdPostS = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), cssdFrameMat);
+      cssdPostS.position.set(0.7, b1Y + 1.25, -34.95);
+      const cssdHeader = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.16, 3.2), cssdFrameMat);
+      cssdHeader.position.set(0.7, b1Y + 2.5, -36.5);
+      const cssdSensor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.14, 0.08, 0.32),
+        new THREE.MeshStandardMaterial({ color: 0x090d16, emissive: 0x10b981, emissiveIntensity: 0.85 })
+      );
+      cssdSensor.position.set(0.44, b1Y + 2.48, -36.5);
+      activeBuildGroup.add(cssdPostN, cssdPostS, cssdHeader, cssdSensor);
+
+      const createCssdDoorLeaf = () => {
+        const leaf = new THREE.Group();
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.42, 1.5), cssdGlassMat);
+        const topRail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.1, 1.5), cssdFrameMat);
+        topRail.position.y = 1.16;
+        const botRail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.14, 1.5), cssdFrameMat);
+        botRail.position.y = -1.14;
+        const cleanStripe = new THREE.Mesh(
+          new THREE.BoxGeometry(0.075, 0.12, 1.48),
+          new THREE.MeshStandardMaterial({ color: 0x0d9488, emissive: 0x0f766e, emissiveIntensity: 0.4 })
+        );
+        cleanStripe.position.y = 0.05;
+        leaf.add(pane, topRail, botRail, cleanStripe);
+        return leaf;
+      };
+
+      const cssdLeftLeaf = createCssdDoorLeaf();
+      cssdLeftLeaf.position.set(0.7, b1Y + 1.21, -37.25);
+      const cssdRightLeaf = createCssdDoorLeaf();
+      cssdRightLeaf.position.set(0.7, b1Y + 1.21, -35.75);
+      activeBuildGroup.add(cssdLeftLeaf, cssdRightLeaf);
+
+      const cssdLeftCol = { minX: 0.5, maxX: 0.9, minZ: -38.0, maxZ: -36.5, floor: 'B1', label: '滅菌室電動門' };
+      const cssdRightCol = { minX: 0.5, maxX: 0.9, minZ: -36.5, maxZ: -35.0, floor: 'B1', label: '滅菌室電動門' };
+      colliders.push(cssdLeftCol, cssdRightCol);
+
+      slidingDoors.push({
+        sensorPos: new THREE.Vector3(0.5, b1Y, -36.5),
+        leftLeaf: cssdLeftLeaf,
+        rightLeaf: cssdRightLeaf,
+        leftClosedZ: -37.25,
+        rightClosedZ: -35.75,
+        openOffset: 1.38,
+        openProgress: 0,
+        leftCollider: cssdLeftCol,
+        rightCollider: cssdRightCol,
+        centerZ: -36.5 // 供動態更新碰撞邊界使用
+      });
+
+      // 3. 內部照明、不鏽鋼感應洗手台、大型高壓蒸氣滅菌鍋與無菌包存放架
+      const cssdLight1 = new THREE.PointLight(0xe0f7fa, 1.2, 24, 1.4);
+      cssdLight1.position.set(6.5, b1Y + 3.8, -36.5);
+      const cssdLight2 = new THREE.PointLight(0xf8fafc, 1.05, 22, 1.4);
+      cssdLight2.position.set(16.0, b1Y + 3.8, -36.5);
+      activeBuildGroup.add(cssdLight1, cssdLight2);
+
+      const ssMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.82, roughness: 0.22 });
+      const darkSteelMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.75, roughness: 0.3 });
+      const basinWaterMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.15, metalness: 0.2 });
+
+      // (A) 進門右側（南牆內側 z = -29.8）：雙槽醫療級感應刷手洗手台與鏡面
+      const buildMedicalScrubSink = (sx, sz) => {
+        const sinkGroup = new THREE.Group();
+        // 下櫃與深水槽台面
+        const cabinet = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.85, 0.85), ssMat);
+        cabinet.position.set(0, 0.425, 0);
+        const splashBack = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.65, 0.08), ssMat);
+        splashBack.position.set(0, 1.15, 0.38);
+        sinkGroup.add(cabinet, splashBack);
+
+        // 鏡子與感應給皂機
+        const mirror = new THREE.Mesh(
+          new THREE.BoxGeometry(3.1, 0.8, 0.04),
+          new THREE.MeshStandardMaterial({ color: 0xbae6fd, metalness: 0.9, roughness: 0.08 })
+        );
+        mirror.position.set(0, 1.88, 0.4);
+        sinkGroup.add(mirror);
+
+        // 兩個獨立刷手水槽盆與鵝頸感應水龍頭
+        [-0.85, 0.85].forEach((bx) => {
+          const basin = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.06, 0.56), basinWaterMat);
+          basin.position.set(bx, 0.86, -0.05);
+
+          const faucetPost = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.03, 0.38, 10), ssMat);
+          faucetPost.position.set(bx, 1.04, 0.25);
+          const faucetSpout = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.22, 10), ssMat);
+          faucetSpout.rotation.x = Math.PI * 0.42;
+          faucetSpout.position.set(bx, 1.2, 0.15);
+
+          const soapBox = new THREE.Mesh(
+            new THREE.BoxGeometry(0.14, 0.24, 0.12),
+            new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 })
+          );
+          soapBox.position.set(bx + 0.45, 1.22, 0.32);
+
+          sinkGroup.add(basin, faucetPost, faucetSpout, soapBox);
+        });
+
+        sinkGroup.position.set(sx, b1Y, sz);
+        activeBuildGroup.add(sinkGroup);
+        colliders.push({ minX: sx - 1.75, maxX: sx + 1.75, minZ: sz - 0.5, maxZ: sz + 0.5, floor: 'B1', label: '無菌刷手洗手台' });
+      };
+
+      buildMedicalScrubSink(4.5, -29.3);
+      buildMedicalScrubSink(8.5, -29.3);
+
+      // (B) 正對電動門口（x = 11.5 ~ 19.5）：三座大型雙門高壓蒸氣滅菌鍋 (Autoclave Sterilizers)
+      [-40.5, -36.5, -32.5].forEach((az, idx) => {
+        const autoGroup = new THREE.Group();
+
+        // 滅菌鍋主機外殼
+        const mainBody = new THREE.Mesh(new THREE.BoxGeometry(2.6, 2.35, 2.2), ssMat);
+        mainBody.position.set(0, 1.175, 0);
+        autoGroup.add(mainBody);
+
+        // 圓形高壓壓力艙門與轉盤手輪（朝西面向電動門口，一眼可見）
+        const chamberRing = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.68, 0.16, 24), darkSteelMat);
+        chamberRing.rotation.z = Math.PI / 2;
+        chamberRing.position.set(-1.32, 1.15, 0);
+
+        const chamberDoor = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.58, 0.58, 0.2, 24),
+          new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.85, roughness: 0.2 })
+        );
+        chamberDoor.rotation.z = Math.PI / 2;
+        chamberDoor.position.set(-1.34, 1.15, 0);
+
+        const wheel = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.025, 8, 18), ssMat);
+        wheel.rotation.y = Math.PI / 2;
+        wheel.position.set(-1.46, 1.15, 0);
+
+        // 數位溫度／壓力監控觸控螢幕（運作綠燈）
+        const ctrlPanel = new THREE.Mesh(
+          new THREE.BoxGeometry(0.08, 0.42, 0.55),
+          new THREE.MeshStandardMaterial({
+            color: 0x090d16,
+            emissive: idx === 1 ? 0x38bdf8 : 0x22c55e,
+            emissiveIntensity: 0.85
+          })
+        );
+        ctrlPanel.position.set(-1.32, 1.98, -0.58);
+
+        // 頂部蒸氣排氣管路
+        const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 2.0, 12), ssMat);
+        pipe.position.set(0.3, 3.35, 0);
+
+        autoGroup.add(chamberRing, chamberDoor, wheel, ctrlPanel, pipe);
+        autoGroup.position.set(16.8, b1Y, az);
+        activeBuildGroup.add(autoGroup);
+
+        colliders.push({ minX: 15.3, maxX: 18.3, minZ: az - 1.15, maxZ: az + 1.15, floor: 'B1', label: '大型高壓蒸氣滅菌鍋' });
+      });
+
+      // (C) 進門左側（北牆內側 z = -43.2）：無菌器械盒與滅菌包存放層架
+      const sterilePackMat = new THREE.MeshStandardMaterial({ color: 0x2dd4bf, roughness: 0.5 });
+      const metalDrumMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.85, roughness: 0.2 });
+      [5.5, 10.5].forEach((rx) => {
+        const shelfUnit = new THREE.Group();
+        [-1.8, 1.8].forEach((px) => {
+          [-0.55, 0.55].forEach((pz) => {
+            const post = new THREE.Mesh(new THREE.BoxGeometry(0.07, 2.8, 0.07), darkSteelMat);
+            post.position.set(px, 1.4, pz);
+            shelfUnit.add(post);
+          });
+        });
+        [0.3, 1.25, 2.2].forEach((sy) => {
+          const plate = new THREE.Mesh(new THREE.BoxGeometry(3.7, 0.05, 1.2), ssMat);
+          plate.position.set(0, sy, 0);
+          shelfUnit.add(plate);
+
+          // 擺放不鏽鋼圓形滅菌鼓與湖水綠無菌器械包
+          for (let ix = -1.3; ix <= 1.3; ix += 0.85) {
+            if (Math.round(ix * 10 + sy * 10) % 2 === 0) {
+              const drum = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.34, 16), metalDrumMat);
+              drum.position.set(ix, sy + 0.19, 0);
+              shelfUnit.add(drum);
+            } else {
+              const pack = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.28, 0.72), sterilePackMat);
+              pack.position.set(ix, sy + 0.16, 0);
+              shelfUnit.add(pack);
+            }
+          }
+        });
+        shelfUnit.position.set(rx, b1Y, -43.4);
+        activeBuildGroup.add(shelfUnit);
+        colliders.push({ minX: rx - 1.9, maxX: rx + 1.9, minZ: -44.1, maxZ: -42.7, floor: 'B1', label: '無菌滅菌包存放架' });
+      });
 
       // E. 北東翼：實景美食街
       const foodBlueSlab = new THREE.Mesh(
