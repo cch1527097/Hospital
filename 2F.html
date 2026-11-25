@@ -2600,7 +2600,7 @@ function updateRemotePlayers2F(dt) {
         addGalleryArtwork(53.02, baseY + 2.15, 2.0, -Math.PI / 2, fIdx + 2);
         addGalleryArtwork(53.02, baseY + 2.15, -12.0, -Math.PI / 2, fIdx + 3);
         addGalleryArtwork(-18.0, baseY + 2.15, 44.02, Math.PI, fIdx + 1);
-        addGalleryArtwork(18.0, baseY + 2.15, 44.02, Math.PI, fIdx + 2);
+        addGalleryArtwork(baseY > 0 ? 28.5 : 18.0, baseY + 2.15, 44.02, Math.PI, fIdx + 2);
       });
 
       const pillarCoords = [
