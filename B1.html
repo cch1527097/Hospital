@@ -2301,7 +2301,176 @@ function normalizeRoleTitle(rawRole) {
       });
 
       // B. 北西翼：實景胸腔科門診候診大廳
-      addWall(-29.5, -39.5, 24.0, 10.5, 4.4, texMedBlueGrayWall, '藥庫 (Pharmacy Warehouse)', 'B1', b1Y);
+      // 1. 藥庫外圍牆體（東側牆面 x = -17.5 中央 z = -39.5 預留寬 3.2 的電動門開口）
+      addWall(-29.5, -44.55, 24.0, 0.4, 4.4, texMedBlueGrayWall, '藥庫北牆', 'B1', b1Y);
+      addWall(-29.5, -34.45, 24.0, 0.4, 4.4, texMedBlueGrayWall, '藥庫南牆', 'B1', b1Y);
+      addWall(-41.3, -39.5, 0.4, 10.5, 4.4, texMedBlueGrayWall, '藥庫西牆', 'B1', b1Y);
+      addWall(-17.7, -42.9, 0.4, 3.7, 4.4, texMedBlueGrayWall, '藥庫東側北牆', 'B1', b1Y);
+      addWall(-17.7, -36.1, 0.4, 3.7, 4.4, texMedBlueGrayWall, '藥庫東側南牆', 'B1', b1Y);
+      // 電動門上方門楣牆
+      const pharmaLintel = new THREE.Mesh(
+        new THREE.BoxGeometry(0.42, 1.9, 3.2),
+        createScaledWallMaterial(texMedBlueGrayWall, 3.2, 0.45)
+      );
+      pharmaLintel.position.set(-17.7, b1Y + 3.45, -39.5);
+      activeBuildGroup.add(pharmaLintel);
+
+      // 招牌正對東側牆面中央 (x = -17.46, z = -39.5)
+      addHangingSign(-17.46, b1Y + 3.55, -39.5, 6.4, 0.85, '藥庫・藥品倉儲中心', 'PHARMACY WAREHOUSE', '#1d4ed8', '#93c5fd', Math.PI / 2);
+
+      // 2. 招牌底下的雙開玻璃感應電動門
+      const doorFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.25 });
+      const autoDoorGlassMat = new THREE.MeshStandardMaterial({
+        color: 0xbae6fd,
+        transparent: true,
+        opacity: 0.45,
+        roughness: 0.1
+      });
+
+      // 不鏽鋼門框與上方紅外線感應器
+      const postN = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), doorFrameMat);
+      postN.position.set(-17.7, b1Y + 1.25, -41.05);
+      const postS = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), doorFrameMat);
+      postS.position.set(-17.7, b1Y + 1.25, -37.95);
+      const transHeader = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.16, 3.2), doorFrameMat);
+      transHeader.position.set(-17.7, b1Y + 2.5, -39.5);
+      const irSensor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.14, 0.08, 0.32),
+        new THREE.MeshStandardMaterial({ color: 0x090d16, emissive: 0xef4444, emissiveIntensity: 0.8 })
+      );
+      irSensor.position.set(-17.44, b1Y + 2.48, -39.5);
+      activeBuildGroup.add(postN, postS, transHeader, irSensor);
+
+      // 門片（含「自動門 AUTO」警示貼條）
+      const createDoorLeaf = () => {
+        const leaf = new THREE.Group();
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.42, 1.5), autoDoorGlassMat);
+        const topRail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.1, 1.5), doorFrameMat);
+        topRail.position.y = 1.16;
+        const botRail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.14, 1.5), doorFrameMat);
+        botRail.position.y = -1.14;
+        const cautionBar = new THREE.Mesh(
+          new THREE.BoxGeometry(0.075, 0.12, 1.48),
+          new THREE.MeshStandardMaterial({ color: 0x0284c7, emissive: 0x0369a1, emissiveIntensity: 0.35 })
+        );
+        cautionBar.position.y = 0.05;
+        leaf.add(pane, topRail, botRail, cautionBar);
+        return leaf;
+      };
+
+      const leftDoorLeaf = createDoorLeaf();
+      leftDoorLeaf.position.set(-17.7, b1Y + 1.21, -40.25);
+      const rightDoorLeaf = createDoorLeaf();
+      rightDoorLeaf.position.set(-17.7, b1Y + 1.21, -38.75);
+      activeBuildGroup.add(leftDoorLeaf, rightDoorLeaf);
+
+      // 加入門片碰撞箱（開門時會自動縮回兩側讓玩家走進去）
+      const leftDoorCollider = { minX: -17.9, maxX: -17.5, minZ: -41.0, maxZ: -39.5, floor: 'B1', label: '藥庫電動門' };
+      const rightDoorCollider = { minX: -17.9, maxX: -17.5, minZ: -39.5, maxZ: -38.0, floor: 'B1', label: '藥庫電動門' };
+      colliders.push(leftDoorCollider, rightDoorCollider);
+
+      slidingDoors.push({
+        sensorPos: new THREE.Vector3(-17.5, b1Y, -39.5),
+        leftLeaf: leftDoorLeaf,
+        rightLeaf: rightDoorLeaf,
+        leftClosedZ: -40.25,
+        rightClosedZ: -38.75,
+        openOffset: 1.38,
+        openProgress: 0,
+        leftCollider: leftDoorCollider,
+        rightCollider: rightDoorCollider
+      });
+
+      // 3. 藥庫內部照明、倉儲層架與大量堆疊藥品紙箱
+      const pharmaLight = new THREE.PointLight(0xf8fafc, 1.15, 22, 1.4);
+      pharmaLight.position.set(-28.5, b1Y + 3.8, -39.5);
+      activeBuildGroup.add(pharmaLight);
+
+      const rackSteelMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.75, roughness: 0.3 });
+      const boxMats = [
+        new THREE.MeshStandardMaterial({ color: 0xd9a066, roughness: 0.75 }), // 牛皮紙箱
+        new THREE.MeshStandardMaterial({ color: 0xc2854c, roughness: 0.8 }),  // 深色瓦楞紙箱
+        new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.45 }), // 白色醫材箱
+        new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.5 })   // 藍色無菌衛材箱
+      ];
+
+      // 建立三排倉儲重型層架
+      [-43.1, -39.5, -35.9].forEach((rz, rowIdx) => {
+        for (let sx = -38.5; sx <= -23.5; sx += 5.0) {
+          const rack = new THREE.Group();
+          [-2.2, 2.2].forEach((px) => {
+            [-0.65, 0.65].forEach((pz) => {
+              const post = new THREE.Mesh(new THREE.BoxGeometry(0.08, 3.2, 0.08), rackSteelMat);
+              post.position.set(px, 1.6, pz);
+              rack.add(post);
+            });
+          });
+          [0.25, 1.25, 2.25, 3.15].forEach((sy) => {
+            const shelf = new THREE.Mesh(new THREE.BoxGeometry(4.5, 0.06, 1.4), rackSteelMat);
+            shelf.position.set(0, sy, 0);
+            rack.add(shelf);
+
+            // 每層架子上擺滿藥箱
+            if (sy < 3.0) {
+              for (let bx = -1.7; bx <= 1.7; bx += 0.85) {
+                const bw = 0.68 + ((rowIdx + Math.abs(bx)) % 3) * 0.05;
+                const bh = 0.52 + ((rowIdx + Math.round(sy)) % 2) * 0.14;
+                const mat = boxMats[(Math.abs(Math.round(sx + bx + sy * 3))) % boxMats.length];
+                const box = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, 1.15), mat);
+                box.position.set(bx, sy + 0.03 + bh / 2, 0);
+                rack.add(box);
+              }
+            }
+          });
+          rack.position.set(sx, b1Y, rz);
+          activeBuildGroup.add(rack);
+          colliders.push({ minX: sx - 2.3, maxX: sx + 2.3, minZ: rz - 0.75, maxZ: rz + 0.75, floor: 'B1', label: '藥庫倉儲層架' });
+        }
+      });
+
+      // 門口走廊與棧板上堆疊的大量待上架紙箱堆（玩家站在電動門外就能一眼看到）
+      const palletMat = new THREE.MeshStandardMaterial({ color: 0x854d0e, roughness: 0.85 });
+      const boxStacks = [
+        { x: -20.2, z: -39.5, cols: 2, rows: 2, layers: 4 },
+        { x: -20.5, z: -41.8, cols: 2, rows: 2, layers: 3 },
+        { x: -20.5, z: -37.2, cols: 2, rows: 2, layers: 5 },
+        { x: -26.0, z: -41.3, cols: 2, rows: 1, layers: 3 },
+        { x: -31.0, z: -37.7, cols: 2, rows: 1, layers: 4 },
+        { x: -36.0, z: -41.3, cols: 3, rows: 1, layers: 3 }
+      ];
+
+      boxStacks.forEach((st, sIdx) => {
+        const palletW = st.cols * 0.78 + 0.15;
+        const palletD = st.rows * 0.78 + 0.15;
+        const pallet = new THREE.Mesh(new THREE.BoxGeometry(palletW, 0.14, palletD), palletMat);
+        pallet.position.set(st.x, b1Y + 0.07, st.z);
+        activeBuildGroup.add(pallet);
+
+        for (let ly = 0; ly < st.layers; ly++) {
+          for (let cx = 0; cx < st.cols; cx++) {
+            for (let cz = 0; cz < st.rows; cz++) {
+              const bx = st.x - (st.cols - 1) * 0.39 + cx * 0.78;
+              const bz = st.z - (st.rows - 1) * 0.39 + cz * 0.78;
+              const mat = boxMats[(sIdx + ly + cx + cz) % boxMats.length];
+              const box = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.54, 0.72), mat);
+              box.position.set(bx, b1Y + 0.14 + 0.27 + ly * 0.55, bz);
+              box.rotation.y = ((ly + cx) % 3 - 1) * 0.05; // 微微錯落更自然
+              box.castShadow = true;
+              activeBuildGroup.add(box);
+            }
+          }
+        }
+        colliders.push({
+          minX: st.x - palletW / 2,
+          maxX: st.x + palletW / 2,
+          minZ: st.z - palletD / 2,
+          maxZ: st.z + palletD / 2,
+          floor: 'B1',
+          label: '藥品棧板紙箱堆'
+        });
+      });
+
+      addCorridorHandrail(-41.0, -34.15, -18.0, -34.15, b1Y);
       addCorridorHandrail(-41.0, -34.15, -18.0, -34.15, b1Y);
       addHangingSign(-17.46, b1Y + 3.55, -39.5, 6.4, 0.85, '資材處', 'Materials Department', '#1d4ed8', '#93c5fd', Math.PI / 2);
 
