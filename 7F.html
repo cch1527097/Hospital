@@ -2215,16 +2215,18 @@
       mctx.lineWidth = 14;
       mctx.strokeRect(18, 18, 988, 476);
 
+      // 1. 標題往下移（y 從 82 改成 104）
       mctx.fillStyle = '#fde047';
-      mctx.font = '900 66px "Chakra Petch", "Noto Sans TC", sans-serif';
+      mctx.font = '900 62px "Chakra Petch", "Noto Sans TC", sans-serif';
       mctx.textAlign = 'center';
-      mctx.fillText('★  MENU  俱樂部精選吧檯  ★', 512, 82);
+      mctx.fillText('★  MENU  俱樂部精選吧檯  ★', 512, 104);
 
+      // 2. 分隔線跟著往下移（y 從 118 改成 138）
       mctx.strokeStyle = 'rgba(244, 63, 94, 0.65)';
       mctx.lineWidth = 4;
       mctx.beginPath();
-      mctx.moveTo(60, 118);
-      mctx.lineTo(964, 118);
+      mctx.moveTo(60, 138);
+      mctx.lineTo(964, 138);
       mctx.stroke();
 
       const leftMenu = [
@@ -2242,7 +2244,7 @@
 
       mctx.font = '700 32px "Noto Sans TC", sans-serif';
       leftMenu.forEach(([item, price], i) => {
-        const y = 185 + i * 74;
+        const y = 205 + i * 68;
         mctx.textAlign = 'left';
         mctx.fillStyle = '#f8fafc';
         mctx.fillText(item, 68, y);
@@ -2252,7 +2254,7 @@
       });
 
       rightMenu.forEach(([item, price], i) => {
-        const y = 185 + i * 74;
+        const y = 205 + i * 68;
         mctx.textAlign = 'left';
         mctx.fillStyle = '#f8fafc';
         mctx.fillText(item, 545, y);
