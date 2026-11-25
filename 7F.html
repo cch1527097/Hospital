@@ -268,29 +268,62 @@
     };
 
     const urlParams7F = new URLSearchParams(window.location.search);
-    const paramCard7F = urlParams7F.get('card');
-    const paramName7F = urlParams7F.get('name');
-    const paramRole7F = urlParams7F.get('role');
+    const paramCard7F = String(urlParams7F.get('card') || '').trim();
+    const paramName7F = String(urlParams7F.get('name') || '').trim();
+    const paramRole7F = String(urlParams7F.get('role') || '').trim();
 
     let vhSession7F = null;
     try {
-      const rawSession = sessionStorage.getItem('vh_user_session');
+      const rawSession = sessionStorage.getItem('vh_user_session') || localStorage.getItem('vh_user_session');
       if (rawSession) vhSession7F = JSON.parse(rawSession);
     } catch (e) {}
 
-    const resolvedCard7F = paramCard7F || (vhSession7F && vhSession7F.cardNumber) || localStorage.getItem('vh_last_card');
-    const resolvedName7F = paramName7F || (vhSession7F && vhSession7F.staffName) || localStorage.getItem('vh_last_name');
-    const rawRole7F = paramRole7F || (vhSession7F && vhSession7F.roleId) || localStorage.getItem('vh_last_role') || 'nurse';
+    const resolvedCard7F = String(
+      paramCard7F ||
+      (vhSession7F && (vhSession7F.cardNumber || vhSession7F.card)) ||
+      sessionStorage.getItem('staff_card') ||
+      localStorage.getItem('vh_last_card') ||
+      localStorage.getItem('vh_card') ||
+      ''
+    ).trim();
+
+    const resolvedName7F = String(
+      paramName7F ||
+      (vhSession7F && (vhSession7F.staffName || vhSession7F.name)) ||
+      sessionStorage.getItem('staff_name') ||
+      localStorage.getItem('vh_last_name') ||
+      (resolvedCard7F ? `院內同仁(${resolvedCard7F})` : '')
+    ).trim();
+
+    const rawRole7F = String(
+      paramRole7F ||
+      (vhSession7F && (vhSession7F.roleId || vhSession7F.role)) ||
+      sessionStorage.getItem('staff_role') ||
+      localStorage.getItem('vh_last_role') ||
+      'nurse'
+    ).trim();
+
     const resolvedRole7F = ROLE_LABEL_MAP_7F[rawRole7F] || (vhSession7F && vhSession7F.roleName) || rawRole7F;
 
-    if (resolvedCard7F && resolvedName7F) {
+    if (resolvedCard7F) {
+      const sessionPayload7F = JSON.stringify({
+        roleId: rawRole7F,
+        role: rawRole7F,
+        roleName: resolvedRole7F,
+        staffName: resolvedName7F,
+        name: resolvedName7F,
+        cardNumber: resolvedCard7F,
+        card: resolvedCard7F
+      });
       try {
-        sessionStorage.setItem('vh_user_session', JSON.stringify({
-          roleId: rawRole7F,
-          roleName: resolvedRole7F,
-          staffName: resolvedName7F,
-          cardNumber: resolvedCard7F
-        }));
+        sessionStorage.setItem('vh_user_session', sessionPayload7F);
+        sessionStorage.setItem('staff_card', resolvedCard7F);
+        sessionStorage.setItem('staff_name', resolvedName7F);
+        sessionStorage.setItem('staff_role', rawRole7F);
+      } catch (e) {}
+      try {
+        localStorage.setItem('vh_user_session', sessionPayload7F);
+        localStorage.setItem('vh_card', resolvedCard7F);
         localStorage.setItem('vh_last_card', resolvedCard7F);
         localStorage.setItem('vh_last_name', resolvedName7F);
         localStorage.setItem('vh_last_role', rawRole7F);
@@ -4544,25 +4577,12 @@
     }
 
     function initMultiplayer7F() {
-      const VALID_CARDS = ['18445', '16661', '10047', '601471', '6513', '11110', 'TEST'];
-      let hasSession = false;
-      try {
-        const raw = sessionStorage.getItem('vh_user_session');
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed && VALID_CARDS.includes(String(parsed.cardNumber || '').toUpperCase())) {
-            hasSession = true;
-          }
-        }
-      } catch (e) {}
+      const currentCard = String(resolvedCard7F || '').trim();
+      const currentName = String(resolvedName7F || staffAuth7F?.name || '').trim();
 
-      const currentCard = String(staffAuth7F?.card || '').trim().toUpperCase();
-      const currentName = String(staffAuth7F?.name || '').trim();
-      const isValidCard = VALID_CARDS.includes(currentCard) && currentName.length > 0;
-
-      if (!isValidCard || (!hasSession && !new URLSearchParams(window.location.search).get('card'))) {
+      if (!currentCard || !currentName) {
         alert('請先於「向日葵醫院-模擬人生」首頁 (index.html) 刷卡登入，方可開啟多人連線！');
-        window.location.href = 'index.html';
+        window.location.replace('index.html');
         return;
       }
 
