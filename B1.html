@@ -4437,9 +4437,19 @@ canvas.addEventListener('touchend', () => {
         document.getElementById('floor-transfer-overlay').classList.add('hidden');
       });
 
+      document.getElementById('dlg-close')?.addEventListener('click', () => {
+        closeDialogue();
+      });
+
+      document.getElementById('dialogue-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'dialogue-modal') {
+          closeDialogue();
+        }
+      });
+
       document.getElementById('btn-open-elevator')?.addEventListener('click', () => {
-  openTransportModal('中央手扶梯 / 電梯');
-});
+        openTransportModal('中央手扶梯 / 電梯');
+      });
 
 document.getElementById('btn-toggle-pov')?.addEventListener('click', () => {
   firstPersonMode = !firstPersonMode;
