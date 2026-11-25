@@ -2585,15 +2585,6 @@ function updateRemotePlayers2F(dt) {
         colliders.push({ minX: 19.8, maxX: 24.6, minZ: wz - 0.45, maxZ: wz + 0.45, floor: 2, label: '牙科候診等待椅' });
       });
 
-      const queueTex = createSignTexture('牙科候診叫號：221診 018號 / 227診 012號', '', '#1e1b4b', '#e879f9');
-      const queueBoard = new THREE.Mesh(
-        new THREE.BoxGeometry(3.2, 0.52, 0.16),
-        new THREE.MeshStandardMaterial({ map: queueTex, emissive: 0xffffff, emissiveMap: queueTex, emissiveIntensity: 0.55 })
-      );
-      queueBoard.position.set(18.35, f2Y + 2.75, 30.8);
-      queueBoard.rotation.y = Math.PI / 2;
-      scene.add(queueBoard);
-
       addClinicDoorSet(37.5, f2Y, 26.5, -Math.PI / 2, '227 診間');
       addClinicDoorSet(37.5, f2Y, 33.5, -Math.PI / 2, '231 診間');
 
