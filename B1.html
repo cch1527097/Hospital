@@ -2961,12 +2961,94 @@ function normalizeRoleTitle(rawRole) {
       allDiningSeats.push(...buildDiningTableSet(12.2, -4.2, b1Y));
       allDiningSeats.push(...buildDiningTableSet(17.8, -4.2, b1Y));
 
-      // F. 南西翼
-      addWall(-43.5, 11.5, 14.5, 9.5, 4.4, texCleanTealWall, 'B1 6+2人高壓氧艙中心', 'B1', b1Y);
-      addCorridorHandrail(-50.2, 6.65, -36.8, 6.65, b1Y);
-      buildWallSconce(-42.5, b1Y + 2.25, 6.65, 0, 0x99f6e4);
-      addHangingSign(-42.5, b1Y + 3.65, 6.5, 6.8, 0.88, '高壓氧艙', 'HYPERBARIC OXYGEN THERAPY CENTER', '#047857', '#6ee7b7', Math.PI);
-      buildHyperbaricChamber(-43.5, 19.5, b1Y);
+      // F. 南西翼：6+2人高壓氧艙中心（東緣與核子醫學部完全齊平於 x = -37.75，高壓氧艙置於建築內部）
+      // 1. 環狀外牆（X: -51.25 ~ -37.75，寬 13.5；Z: 6.75 ~ 16.25，深 9.5）
+      addWall(-44.5, 6.95, 13.5, 0.4, 4.4, texCleanTealWall, '高壓氧艙中心北牆', 'B1', b1Y);
+      addWall(-44.5, 16.05, 13.5, 0.4, 4.4, texCleanTealWall, '高壓氧艙中心南牆', 'B1', b1Y);
+      addWall(-51.05, 11.5, 0.4, 9.5, 4.4, texCleanTealWall, '高壓氧艙中心西牆', 'B1', b1Y);
+      // 東側牆面齊平核子醫學部 (x = -37.95，外緣 -37.75)，中央 z = 11.5 預留寬 3.2 的電動門開口
+      addWall(-37.95, 8.325, 0.4, 3.15, 4.4, texCleanTealWall, '高壓氧艙東側北牆', 'B1', b1Y);
+      addWall(-37.95, 14.675, 0.4, 3.15, 4.4, texCleanTealWall, '高壓氧艙東側南牆', 'B1', b1Y);
+
+      const hbotLintel = new THREE.Mesh(
+        new THREE.BoxGeometry(0.42, 1.9, 3.2),
+        createScaledWallMaterial(texCleanTealWall, 3.2, 0.45)
+      );
+      hbotLintel.position.set(-37.95, b1Y + 3.45, 11.5);
+      activeBuildGroup.add(hbotLintel);
+
+      // 北側走廊扶手、壁燈與招牌對齊中心 x = -44.5
+      addCorridorHandrail(-50.8, 6.65, -38.2, 6.65, b1Y);
+      buildWallSconce(-44.5, b1Y + 2.25, 6.65, 0, 0x99f6e4);
+      addHangingSign(-44.5, b1Y + 3.65, 6.5, 6.8, 0.88, '高壓氧艙', 'HYPERBARIC OXYGEN THERAPY CENTER', '#047857', '#6ee7b7', Math.PI);
+
+      // 2. 東側走道面雙開玻璃感應電動門（齊平核子醫學部走廊）
+      const hbotFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.25 });
+      const hbotGlassMat = new THREE.MeshStandardMaterial({
+        color: 0x99f6e4,
+        transparent: true,
+        opacity: 0.44,
+        roughness: 0.1
+      });
+
+      const hbotPostN = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), hbotFrameMat);
+      hbotPostN.position.set(-37.95, b1Y + 1.25, 9.95);
+      const hbotPostS = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), hbotFrameMat);
+      hbotPostS.position.set(-37.95, b1Y + 1.25, 13.05);
+      const hbotHeader = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.16, 3.2), hbotFrameMat);
+      hbotHeader.position.set(-37.95, b1Y + 2.5, 11.5);
+      const hbotSensor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.14, 0.08, 0.32),
+        new THREE.MeshStandardMaterial({ color: 0x090d16, emissive: 0x10b981, emissiveIntensity: 0.85 })
+      );
+      hbotSensor.position.set(-37.7, b1Y + 2.48, 11.5);
+      activeBuildGroup.add(hbotPostN, hbotPostS, hbotHeader, hbotSensor);
+
+      const createHbotDoorLeaf = () => {
+        const leaf = new THREE.Group();
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.42, 1.5), hbotGlassMat);
+        const topRail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.1, 1.5), hbotFrameMat);
+        topRail.position.y = 1.16;
+        const botRail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.14, 1.5), hbotFrameMat);
+        botRail.position.y = -1.14;
+        const stripe = new THREE.Mesh(
+          new THREE.BoxGeometry(0.075, 0.12, 1.48),
+          new THREE.MeshStandardMaterial({ color: 0x047857, emissive: 0x059669, emissiveIntensity: 0.4 })
+        );
+        stripe.position.y = 0.05;
+        leaf.add(pane, topRail, botRail, stripe);
+        return leaf;
+      };
+
+      const hbotLeftLeaf = createHbotDoorLeaf();
+      hbotLeftLeaf.position.set(-37.95, b1Y + 1.21, 10.75);
+      const hbotRightLeaf = createHbotDoorLeaf();
+      hbotRightLeaf.position.set(-37.95, b1Y + 1.21, 12.25);
+      activeBuildGroup.add(hbotLeftLeaf, hbotRightLeaf);
+
+      const hbotLeftCol = { minX: -38.15, maxX: -37.75, minZ: 10.0, maxZ: 11.5, floor: 'B1', label: '高壓氧艙電動門' };
+      const hbotRightCol = { minX: -38.15, maxX: -37.75, minZ: 11.5, maxZ: 13.0, floor: 'B1', label: '高壓氧艙電動門' };
+      colliders.push(hbotLeftCol, hbotRightCol);
+
+      slidingDoors.push({
+        sensorPos: new THREE.Vector3(-37.75, b1Y, 11.5),
+        leftLeaf: hbotLeftLeaf,
+        rightLeaf: hbotRightLeaf,
+        leftClosedZ: 10.75,
+        rightClosedZ: 12.25,
+        openOffset: 1.38,
+        openProgress: 0,
+        leftCollider: hbotLeftCol,
+        rightCollider: hbotRightCol,
+        centerZ: 11.5
+      });
+
+      // 3. 室內照明與高壓氧艙本體（移入建築內部正中央 x = -45.2, z = 11.5）
+      const hbotLight = new THREE.PointLight(0xe0f7fa, 1.2, 20, 1.4);
+      hbotLight.position.set(-44.5, b1Y + 3.8, 11.5);
+      activeBuildGroup.add(hbotLight);
+
+      buildHyperbaricChamber(-45.2, 11.5, b1Y);
 
       addWall(-44.5, 31.5, 13.5, 16.5, 4.4, texMedBlueGrayWall, '核子醫學部', 'B1', b1Y);
       addCorridorHandrail(-37.65, 24.0, -37.65, 39.0, b1Y);
