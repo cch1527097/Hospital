@@ -4400,6 +4400,31 @@ function normalizeRoleTitle(rawRole) {
         d.leftLeaf.position.z = d.leftClosedZ - shift;
         d.rightLeaf.position.z = d.rightClosedZ + shift;
 
+        const doorMidZ = d.centerZ !== undefined ? d.centerZ : -39.5;
+        d.leftCollider.maxZ = doorMidZ - shift;
+        d.rightCollider.minZ = doorMidZ + shift;
+      }
+
+      for (let i = slashEffects.length - 1; i >= 0; i--) {
+
+      for (let i = 0; i < slidingDoors.length; i++) {
+        const d = slidingDoors[i];
+        let triggerOpen = player.pos.distanceTo(d.sensorPos) < 3.6;
+        if (!triggerOpen) {
+          for (let j = 0; j < npcs.length; j++) {
+            if (npcs[j].floor === pFloor && npcs[j].pos.distanceTo(d.sensorPos) < 3.2) {
+              triggerOpen = true;
+              break;
+            }
+          }
+        }
+        const targetOpen = triggerOpen ? 1 : 0;
+        d.openProgress += (targetOpen - d.openProgress) * Math.min(1, dt * 6.5);
+
+        const shift = d.openProgress * d.openOffset;
+        d.leftLeaf.position.z = d.leftClosedZ - shift;
+        d.rightLeaf.position.z = d.rightClosedZ + shift;
+
         // 同步更新門片碰撞範圍，開門後玩家可直接走進藥庫內部參觀
         d.leftCollider.maxZ = -39.5 - shift;
         d.rightCollider.minZ = -39.5 + shift;
