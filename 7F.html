@@ -1583,7 +1583,7 @@
           totalWidth: 2.55,
           openingWidth: 1.65,
           roomCode,
-          subLabel: 'VIP SUITE・感應電動門',
+          subLabel: 'VIP SUITE',
           isPortal: false,
           triggerRadius: 3.4
         });
@@ -1928,12 +1928,12 @@
 
       // 5. 北西側 10 間 VIP 尊榮套房 (735~755)
       const nwVipRooms = ['735', '736', '737', '738', '739', '750', '751', '752', '753', '755'];
-      addWall(-11.5, -29.0, 35.0, 8.5, 4.4, vipWallMat, '7F 北西 VIP 尊榮病房群 (735~755)', 7, f7Y);
+      addWall(-11.5, -29.0, 35.0, 8.5, 4.4, vipWallMat, 'VIP 尊榮病房群 (735~755)', 7, f7Y);
       nwVipRooms.forEach((rm, idx) => {
         const rx = -29.0 + (idx + 0.5) * 3.5;
         addWardDoorFacade(rx, -24.7, `${rm} VIP`, f7Y, true, true);
       });
-      addHangingSign(-11.5, f7Y + 3.65, -23.6, 7.4, 0.88, '7F 北西 VIP 尊榮病房 (735 ~ 755)', 'VIP PRIVATE SUITES・獨立套房', '#6b21a8', '#fde047');
+      addHangingSign(-11.5, f7Y + 3.65, -23.6, 7.4, 0.88, 'VIP 尊榮病房 (735 ~ 755)', 'VIP PRIVATE SUITES', '#6b21a8', '#fde047');
 
       // 6. 北東側可走入式「727 實景雙人病房」＋「726~717 一般病房群」
       buildWalkInDoubleWard(9.4, -29.0, f7Y, '727', true);
