@@ -1929,8 +1929,38 @@
         isPortal: true,
         triggerRadius: 4.4
       });
-      // 補齊南側電動門兩側實體玻璃碰撞箱
-      addWall(-7.2, -7.85, 0.28, 5.2, 2.5, glassMat, 'VIP 尊榮服務區北側玻璃隔牆', 7, f7Y);
+
+      // 延伸南側電動門的北側玻璃隔牆（跨過電梯廳前方，完整連接至 VIP 服務島牆面）
+      const extLen = 5.4;
+      const extCenterZ = -12.5;
+      const extGlass = new THREE.Mesh(
+        new THREE.BoxGeometry(0.06, 2.34, extLen),
+        new THREE.MeshStandardMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.42, roughness: 0.14, metalness: 0.2 })
+      );
+      extGlass.position.set(-7.2, f7Y + 1.21, extCenterZ);
+
+      const extHeader = new THREE.Mesh(
+        new THREE.BoxGeometry(0.26, 0.26, extLen),
+        new THREE.MeshStandardMaterial({ color: 0x292524, metalness: 0.65, roughness: 0.3 })
+      );
+      extHeader.position.set(-7.2, f7Y + 2.55, extCenterZ);
+
+      const extGoldTrim = new THREE.Mesh(
+        new THREE.BoxGeometry(0.28, 0.04, extLen),
+        new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.82, roughness: 0.22 })
+      );
+      extGoldTrim.position.set(-7.2, f7Y + 2.44, extCenterZ);
+
+      const extBase = new THREE.Mesh(
+        new THREE.BoxGeometry(0.16, 0.14, extLen),
+        new THREE.MeshStandardMaterial({ color: 0x292524, metalness: 0.65, roughness: 0.3 })
+      );
+      extBase.position.set(-7.2, f7Y + 0.07, extCenterZ);
+
+      activeBuildGroup.add(extGlass, extHeader, extGoldTrim, extBase);
+
+      // 補齊南側電動門兩側及延伸段的實體玻璃碰撞箱
+      addWall(-7.2, -10.2, 0.28, 10.0, 2.5, glassMat, 'VIP 尊榮服務區北側延伸玻璃隔牆', 7, f7Y);
       addWall(-7.2, 0.95, 0.28, 5.6, 2.5, glassMat, 'VIP 尊榮服務區南側玻璃隔牆', 7, f7Y);
 
       // 5. 北西側 10 間 VIP 尊榮套房 (735~755)
