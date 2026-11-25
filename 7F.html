@@ -2111,8 +2111,13 @@
         lastDoorGroup.remove(lastDoorGroup.children[lastDoorGroup.children.length - 1]);
       }
 
-      // 3. 補齊電動門上方至天花板的門楣牆面
-      addWall(2.5, 3.85, 3.4, 0.35, 1.72, new THREE.MeshStandardMaterial({ color: 0xe0f2fe, roughness: 0.58 }), '電動門上方牆', 7, f7Y + 2.68);
+      // 3. 補齊電動門上方至天花板的門楣牆面（改用純視覺 Mesh，避免產生空氣牆擋住門洞）
+      const lintelMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(3.4, 1.72, 0.35),
+        new THREE.MeshStandardMaterial({ color: 0xe0f2fe, roughness: 0.58 })
+      );
+      lintelMesh.position.set(2.5, f7Y + 2.68 + 1.72 / 2, 3.85);
+      (activeBuildGroup || scene).add(lintelMesh);
 
       // 4. 在電動門右側（畫面右紅框處，x = -2.2）牆面上直接寫下「愛 愛 俱 樂 部」大字
       (() => {
