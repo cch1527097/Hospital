@@ -2092,21 +2092,7 @@
       // 1. 交誼廳北側隔間牆（拆成左右兩段，中央 x = 2.5 留出 2.8m 門洞給電動門）
       addWall(-3.05, 3.85, 8.3, 0.35, 4.4, loungeBlueMat, '7F 交誼廳北側西段牆', 7, f7Y);
       addWall(8.8, 3.85, 9.8, 0.35, 4.4, loungeBlueMat, '7F 交誼廳北側東段牆', 7, f7Y);
-      addWall(2.5, 3.94, 2.8, 0.16, 1.72, new THREE.MeshStandardMaterial({ color: 0xe0f2fe, roughness: 0.58 }), '愛愛俱樂部電動門上方牆', 7, f7Y + 2.68);
-
-      // 2. 中央感應電動門與上方「愛愛俱樂部」招牌
-      buildVipAutomaticDoor({
-        x: 2.5,
-        z: 3.85,
-        baseY: f7Y,
-        rotY: Math.PI,
-        totalWidth: 2.8,
-        openingWidth: 1.8,
-        roomCode: '愛愛俱樂部',
-        subLabel: 'AUTO SLIDING DOOR・紅外線感應電動門',
-        isPortal: false,
-        triggerRadius: 3.6
-      });
+      addWall(2.5, 3.85, 2.8, 0.35, 1.72, new THREE.MeshStandardMaterial({ color: 0xe0f2fe, roughness: 0.58 }), '愛愛俱樂部電動門上方牆', 7, f7Y + 2.68);
       
       const loungeFloor = new THREE.Mesh(
         new THREE.PlaneGeometry(18.0, 13.0),
