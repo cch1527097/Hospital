@@ -371,30 +371,43 @@
 
   <script>
 
-// ==========================================================================
-// 0. 強制檢查員工刷卡登入狀態（支援 URL 參數與 sessionStorage）
-// ==========================================================================
 const loginParams2F = new URLSearchParams(window.location.search);
 let currentUserSession2F = null;
 try {
-  currentUserSession2F = JSON.parse(sessionStorage.getItem('vh_user_session'));
+  currentUserSession2F =
+    JSON.parse(sessionStorage.getItem('vh_user_session')) ||
+    JSON.parse(localStorage.getItem('vh_user_session'));
 } catch (e) {}
 
-const authCard = loginParams2F.get('card') || (currentUserSession2F && currentUserSession2F.cardNumber);
-const authName = loginParams2F.get('name') || (currentUserSession2F && currentUserSession2F.staffName);
-const authRole = loginParams2F.get('role') || (currentUserSession2F && currentUserSession2F.roleId) || 'nurse';
+const authCard =
+  loginParams2F.get('card') ||
+  loginParams2F.get('cardNumber') ||
+  (currentUserSession2F && (currentUserSession2F.cardNumber || currentUserSession2F.card));
 
-if (!authCard || !authName) {
+const rawAuthName =
+  loginParams2F.get('name') ||
+  loginParams2F.get('staffName') ||
+  (currentUserSession2F && (currentUserSession2F.staffName || currentUserSession2F.name));
+
+const authRole =
+  loginParams2F.get('role') ||
+  loginParams2F.get('roleId') ||
+  (currentUserSession2F && (currentUserSession2F.roleId || currentUserSession2F.role)) ||
+  'nurse';
+
+if (!authCard) {
   alert('⚠️ 門禁系統提示：請先於入口大門刷卡驗證員工識別證！');
   window.location.href = 'index.html';
 } else {
-  try {
-    sessionStorage.setItem('vh_user_session', JSON.stringify({
-      cardNumber: authCard,
-      staffName: authName,
-      roleId: authRole
-    }));
-  } catch (e) {}
+  // 若新卡號在 index.html 未設定姓名，自動補上預設名稱，避免被門禁踢出
+  var authName = (rawAuthName && rawAuthName.trim()) ? rawAuthName.trim() : `院內同仁(${authCard})`;
+  const sessionData = JSON.stringify({
+    cardNumber: authCard,
+    staffName: authName,
+    roleId: authRole
+  });
+  try { sessionStorage.setItem('vh_user_session', sessionData); } catch (e) {}
+  try { localStorage.setItem('vh_user_session', sessionData); } catch (e) {}
 }
 
 // ==========================================================================
@@ -4848,17 +4861,21 @@ function updateRemotePlayers2F(dt) {
     }
 
     function navigateToFloor(floorCode) {
-      const targetFile = `${floorCode}.html`;
-      if (floorCode === '2F') {
-        closeFloorSelectModal();
-        player.pos.set(0, 4.6, 7.2);
-        player.yaw = Math.PI;
-        camState.targetYaw = 0;
-        camState.yaw = 0;
-        return;
-      }
+  const targetFile = `${floorCode}.html`;
+  if (floorCode === '2F') {
+    closeFloorSelectModal();
+    player.pos.set(0, 4.6, 7.2);
+    player.yaw = Math.PI;
+    camState.targetYaw = 0;
+    camState.yaw = 0;
+    return;
+  }
 
-      // 儲存目前角色狀態，方便 1F.html 或其他樓層讀取接續遊玩
+  const authQuery = `card=${encodeURIComponent(authCard)}&name=${encodeURIComponent(authName)}&role=${encodeURIComponent(authRole)}`;
+  const targetUrl = floorCode === '1F'
+    ? `${targetFile}?from=2F&entry=elevator&${authQuery}`
+    : `${targetFile}?${authQuery}`;
+
       try {
         localStorage.setItem('sunflower_hospital_state', JSON.stringify({
           hp: player.hp,
