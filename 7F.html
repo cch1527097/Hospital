@@ -2121,7 +2121,7 @@
       lintelMesh.position.set(2.5, f7Y + 2.68 + 1.72 / 2, 3.85);
       (activeBuildGroup || scene).add(lintelMesh);
 
-      // 4. 在電動門右側（畫面右紅框處，x = -2.2）牆面上直接寫下「愛 愛 俱 樂 部」大字
+      // 4. 在電動門右側（畫面右紅框處，x = -2.2）牆面上寫下「愛 愛 俱 樂 部」（已縮小字體並改為深藍色）
       (() => {
         const wallSignCanvas = document.createElement('canvas');
         wallSignCanvas.width = 1024;
@@ -2129,15 +2129,26 @@
         const wctx = wallSignCanvas.getContext('2d');
         wctx.clearRect(0, 0, 1024, 256);
 
-        wctx.font = '900 120px "Noto Sans TC", sans-serif';
+        wctx.font = '900 84px "Noto Sans TC", sans-serif';
         wctx.textAlign = 'center';
         wctx.textBaseline = 'middle';
-        wctx.lineWidth = 10;
-        wctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+        wctx.lineWidth = 8;
+        wctx.strokeStyle = 'rgba(255, 255, 255, 0.92)';
         wctx.strokeText('愛  愛  俱  樂  部', 512, 128);
 
-        wctx.fillStyle = '#be185d'; // 玫瑰桃紅字體（可依喜好改色）
+        wctx.fillStyle = '#1e3a8a'; // 深藍色字體
         wctx.fillText('愛  愛  俱  樂  部', 512, 128);
+
+        const wallTextTex = new THREE.CanvasTexture(wallSignCanvas);
+        const wallTextMesh = new THREE.Mesh(
+          new THREE.PlaneGeometry(4.0, 1.0),
+          new THREE.MeshBasicMaterial({ map: wallTextTex, transparent: true, depthWrite: false })
+        );
+        // 貼在西段牆面（面對走廊 z = 3.66 的位置）
+        wallTextMesh.position.set(-2.2, f7Y + 2.55, 3.66);
+        wallTextMesh.rotation.y = Math.PI;
+        (activeBuildGroup || scene).add(wallTextMesh);
+      })();
 
         const wallTextTex = new THREE.CanvasTexture(wallSignCanvas);
         const wallTextMesh = new THREE.Mesh(
