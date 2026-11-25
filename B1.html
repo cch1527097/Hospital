@@ -4382,6 +4382,7 @@ function normalizeRoleTitle(rawRole) {
         st.mesh.position.y = st.baseY + 0.16 + st.t * st.riseY;
       }
 
+      // ✅ 只保留這一份正確的電動門開合與碰撞更新邏輯
       for (let i = 0; i < slidingDoors.length; i++) {
         const d = slidingDoors[i];
         let triggerOpen = player.pos.distanceTo(d.sensorPos) < 3.6;
@@ -4400,11 +4401,12 @@ function normalizeRoleTitle(rawRole) {
         d.leftLeaf.position.z = d.leftClosedZ - shift;
         d.rightLeaf.position.z = d.rightClosedZ + shift;
 
-        // 同步更新門片碰撞範圍，開門後玩家可直接走進藥庫內部參觀
-        d.leftCollider.maxZ = -39.5 - shift;
-        d.rightCollider.minZ = -39.5 + shift;
+        const doorMidZ = d.centerZ !== undefined ? d.centerZ : -39.5;
+        d.leftCollider.maxZ = doorMidZ - shift;
+        d.rightCollider.minZ = doorMidZ + shift;
       }
 
+      // ✅ 下面緊接這行（把原本多出來那一段重複的刪掉）
       for (let i = slashEffects.length - 1; i >= 0; i--) {
         const s = slashEffects[i];
         s.life -= dt;
