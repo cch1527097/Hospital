@@ -2965,7 +2965,7 @@ function normalizeRoleTitle(rawRole) {
       addWall(-43.5, 11.5, 14.5, 9.5, 4.4, texCleanTealWall, 'B1 6+2人高壓氧艙中心', 'B1', b1Y);
       addCorridorHandrail(-50.2, 6.65, -36.8, 6.65, b1Y);
       buildWallSconce(-42.5, b1Y + 2.25, 6.65, 0, 0x99f6e4);
-      addHangingSign(-42.5, b1Y + 3.65, 6.5, 6.8, 0.88, '高壓氧艙', 'HYPERBARIC OXYGEN THERAPY CENTER', '#047857', '#6ee7b7');
+      addHangingSign(-42.5, b1Y + 3.65, 6.5, 6.8, 0.88, '高壓氧艙', 'HYPERBARIC OXYGEN THERAPY CENTER', '#047857', '#6ee7b7', Math.PI);
       buildHyperbaricChamber(-43.5, 19.5, b1Y);
 
       addWall(-44.5, 31.5, 13.5, 16.5, 4.4, texMedBlueGrayWall, '核子醫學部', 'B1', b1Y);
@@ -2976,7 +2976,7 @@ function normalizeRoleTitle(rawRole) {
       addCorridorHandrail(-32.8, 7.65, -16.2, 7.65, b1Y, 0xb45309);
       buildWallSconce(-29.5, b1Y + 2.25, 7.65, 0, 0xfbcfe8);
       buildWallSconce(-19.5, b1Y + 2.25, 7.65, 0, 0xfbcfe8);
-      addHangingSign(-24.5, b1Y + 3.65, 7.5, 8.2, 0.9, '維納斯醫學美容中心', 'VENUS AESTHETIC MEDICINE', '#be185d', '#f9a8d4');
+      addHangingSign(-24.5, b1Y + 3.65, 7.5, 8.2, 0.9, '維納斯醫學美容中心', 'VENUS AESTHETIC MEDICINE', '#be185d', '#f9a8d4', Math.PI);
 
       buildClinicWallFacade(-22.5, 33.5, [
         { code: '神內 201診', dept: '神經內科', doctor: '黃柏翰 醫師', queueNum: '0064' },
@@ -3006,7 +3006,7 @@ function normalizeRoleTitle(rawRole) {
       addWall(-4.5, 18.5, 13.5, 11.5, 4.4, texAestheticPinkWall, '耳鼻喉科', 'B1', b1Y);
       addCorridorHandrail(-10.8, 12.65, 1.8, 12.65, b1Y);
       buildWallSconce(-4.5, b1Y + 2.25, 12.65, 0, 0xfbcfe8);
-      addHangingSign(-4.5, b1Y + 3.65, 12.4, 8.4, 0.9, '耳鼻喉科', 'ENT・OPTOMETRY・VERTIGO', '#9d174d', '#f9a8d4');
+      addHangingSign(-4.5, b1Y + 3.65, 12.4, 8.4, 0.9, '耳鼻喉科', 'ENT・OPTOMETRY・VERTIGO', '#9d174d', '#f9a8d4', Math.PI);
       allWaitingSeats.push(...buildHospitalWaitingBench(-6.5, 11.0, Math.PI, b1Y));
       allWaitingSeats.push(...buildHospitalWaitingBench(-2.5, 11.0, Math.PI, b1Y));
 
@@ -3017,13 +3017,13 @@ function normalizeRoleTitle(rawRole) {
       addWall(14.5, 20.5, 12.5, 12.5, 4.4, texMedBlueGrayWall, '消化器中心與超音波室', 'B1', b1Y);
       addCorridorHandrail(8.6, 14.15, 20.4, 14.15, b1Y);
       buildWallSconce(14.5, b1Y + 2.25, 14.15, 0, 0xbae6fd);
-      addHangingSign(14.5, b1Y + 3.65, 13.8, 7.4, 0.9, '消化器中心', 'DIGESTIVE / GI CENTER & ULTRASOUND', '#0369a1', '#7dd3fc');
+      addHangingSign(14.5, b1Y + 3.65, 13.8, 7.4, 0.9, '消化器中心', 'DIGESTIVE / GI CENTER & ULTRASOUND', '#0369a1', '#7dd3fc', Math.PI);
       allWaitingSeats.push(...buildHospitalWaitingBench(12.5, 12.2, Math.PI, b1Y));
       allWaitingSeats.push(...buildHospitalWaitingBench(16.5, 12.2, Math.PI, b1Y));
 
       // H. 南東翼
       addWall(26.5, 20.5, 7.5, 12.5, 4.4, texCleanTealWall, '內視鏡中心', 'B1', b1Y);
-      addHangingSign(26.5, b1Y + 3.65, 13.8, 7.2, 0.9, '內視鏡中心', 'GASTROSCOPY・COLONOSCOPY・ENDOSCOPY SUITE', '#065f46', '#6ee7b7');
+      addHangingSign(26.5, b1Y + 3.65, 13.8, 7.2, 0.9, '內視鏡中心', 'GASTROSCOPY・COLONOSCOPY・ENDOSCOPY SUITE', '#065f46', '#6ee7b7', Math.PI);
 
       addWall(42.5, 12.5, 16.5, 11.5, 4.4, texIvoryWoodWall, '卸貨區', 'B1', b1Y);
       addCorridorHandrail(34.15, 7.2, 34.15, 17.8, b1Y);
