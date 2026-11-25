@@ -2391,10 +2391,10 @@ let myPeerId5F = '';
       addWall(8.5, -18.5, 2.8, 1.15, 1.08, counterWoodMat, '東側護理站櫃檯', 5, f5Y);
       addHangingSign(0, f5Y + 3.65, -21.2, 6.8, 0.88, '輪椅停放區', 'WHEELCHAIR BAY', '#1d4ed8', '#93c5fd');
 
-      // 祈禱室與神明廳局部地板墊高 +0.038 並開啟 polygonOffset，避免與中庭主樓板產生深度衝突
-      addFloorSlab5F(0, -6.8, 11.4, 5.4, 0.038, true);
-      addWall(-3.2, -6.8, 5.6, 5.2, 4.4, null, '祈禱室 (Prayer Room)', 5, f5Y, 'clinical_mint');
-      addWall(3.2, -6.8, 5.6, 5.2, 4.4, null, '神明廳 (Shrine Hall)', 5, f5Y, 'nursing');
+      // 祈禱室局部地板墊高 +0.038 並開啟 polygonOffset，避免與中庭主樓板產生深度衝突
+      addFloorSlab5F(0, -6.8, 12.2, 5.4, 0.038, true);
+      // 移除木頭建築（神明廳），並將白綠祈禱室量體往左（東側）延伸補齊空缺（中心 x=0，總寬度 12.0）
+      addWall(0, -6.8, 12.0, 5.2, 4.4, null, '祈禱室 (Prayer Room)', 5, f5Y, 'clinical_mint');
       addHangingSign(0, f5Y + 3.65, -9.8, 7.2, 0.88, '祈禱室', 'PRAYER ROOM', '#b45309', '#fde047', Math.PI);
 
       const kioskStand = new THREE.Mesh(
@@ -4210,8 +4210,7 @@ window.location.href = `${floorItem.file}?${q.toString()}`;
         drawZoneRect(-26.5, -7.2, 31.0, 6.2, '#fbcfe8');
         drawZoneRect(31.5, -7.2, 41.0, 6.2, '#fbcfe8');
         drawZoneRect(0, -18.5, 13.5, 4.6, '#bae6fd');
-        drawZoneRect(-3.2, -6.8, 5.6, 5.2, '#a7f3d0');
-        drawZoneRect(3.2, -6.8, 5.6, 5.2, '#fde047');
+        drawZoneRect(0, -6.8, 12.0, 5.2, '#a7f3d0');
         drawZoneRect(0, 34.5, 22.0, 14.0, '#bae6fd');
       } else if (pFloor === 3) {
         drawZoneRect(-21.5, -34.5, 38.0, 12.5, '#bae6fd');
