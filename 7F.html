@@ -1900,32 +1900,36 @@
 
       addHangingSign(-33.5, f7Y + 3.65, -4.5, 6.4, 0.88, '7F VIP 尊榮病房區', 'EXECUTIVE VIP SUITES WING', '#581c87', '#fde047', -Math.PI / 2);
 
-      // VIP 尊榮病房管制區主入口雙開感應電動玻璃門（已對齊 x: -7.2 並補滿走道空缺）
+      // VIP 尊榮病房管制區主入口雙開感應電動玻璃門（南北兩道皆已延伸補齊空缺）
       buildVipAutomaticDoor({
         x: -7.2,
-        z: -19.9,
+        z: -19.75,
         baseY: f7Y,
         rotY: Math.PI / 2,
-        totalWidth: 9.4,
+        totalWidth: 10.1,
         openingWidth: 3.2,
         roomCode: '7F VIP 尊榮區',
         subLabel: 'VIP EXECUTIVE ZONE',
         isPortal: true,
         triggerRadius: 4.4
       });
+      // 補齊北側電動門兩側實體玻璃碰撞箱（防止角色從兩側玻璃穿過）
+      addWall(-7.2, -23.1, 0.28, 3.4, 2.5, glassMat, 'VIP 尊榮區北側玻璃隔牆', 7, f7Y);
+      addWall(-7.2, -16.4, 0.28, 3.4, 2.5, glassMat, 'VIP 尊榮區南側玻璃隔牆', 7, f7Y);
+
       buildVipAutomaticDoor({
         x: -7.2,
-        z: -3.1,
+        z: -3.55,
         baseY: f7Y,
         rotY: Math.PI / 2,
-        totalWidth: 13.4,
+        totalWidth: 14.5,
         openingWidth: 3.4,
         roomCode: '7F VIP 尊榮服務區',
         subLabel: 'VIP LOUNGE & SUITES',
         isPortal: true,
         triggerRadius: 4.4
       });
-
+      // 補齊南側電動門兩側實體玻璃碰撞箱
       addWall(-7.2, -7.85, 0.28, 5.2, 2.5, glassMat, 'VIP 尊榮服務區北側玻璃隔牆', 7, f7Y);
       addWall(-7.2, 0.95, 0.28, 5.6, 2.5, glassMat, 'VIP 尊榮服務區南側玻璃隔牆', 7, f7Y);
 
