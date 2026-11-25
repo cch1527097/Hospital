@@ -2202,8 +2202,79 @@
       // 後方酒架與咖啡機吧台背櫃
       const backBar = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.95, 0.65), counterWoodMat);
       backBar.position.set(0, 0.475, -1.55);
-      const wineShelf = new THREE.Mesh(new THREE.BoxGeometry(4.0, 1.35, 0.32), darkMetalMat);
-      wineShelf.position.set(0, 1.85, -1.7);
+
+      // 製作 MENU 價目表看板
+      const menuCanvas = document.createElement('canvas');
+      menuCanvas.width = 1024;
+      menuCanvas.height = 512;
+      const mctx = menuCanvas.getContext('2d');
+
+      mctx.fillStyle = '#0f172a';
+      mctx.fillRect(0, 0, 1024, 512);
+      mctx.strokeStyle = '#f43f5e';
+      mctx.lineWidth = 14;
+      mctx.strokeRect(18, 18, 988, 476);
+
+      mctx.fillStyle = '#fde047';
+      mctx.font = '900 66px "Chakra Petch", "Noto Sans TC", sans-serif';
+      mctx.textAlign = 'center';
+      mctx.fillText('★  MENU  俱樂部精選吧檯  ★', 512, 82);
+
+      mctx.strokeStyle = 'rgba(244, 63, 94, 0.65)';
+      mctx.lineWidth = 4;
+      mctx.beginPath();
+      mctx.moveTo(60, 118);
+      mctx.lineTo(964, 118);
+      mctx.stroke();
+
+      const leftMenu = [
+        ['特調粉紅泡泡香檳', '$ 280'],
+        ['微醺玫瑰荔枝氣泡飲', '$ 220'],
+        ['手沖耶加雪菲精品咖啡', '$ 180'],
+        ['現榨鮮橙百香果綠茶', '$ 150']
+      ];
+      const rightMenu = [
+        ['松露野菇奶油義大利麵', '$ 360'],
+        ['炙燒干貝凱撒沙拉盤', '$ 320'],
+        ['酥炸黃金脆薯拼盤', '$ 200'],
+        ['法式草莓千層蛋糕', '$ 190']
+      ];
+
+      mctx.font = '700 32px "Noto Sans TC", sans-serif';
+      leftMenu.forEach(([item, price], i) => {
+        const y = 185 + i * 74;
+        mctx.textAlign = 'left';
+        mctx.fillStyle = '#f8fafc';
+        mctx.fillText(item, 68, y);
+        mctx.textAlign = 'right';
+        mctx.fillStyle = '#38bdf8';
+        mctx.fillText(price, 475, y);
+      });
+
+      rightMenu.forEach(([item, price], i) => {
+        const y = 185 + i * 74;
+        mctx.textAlign = 'left';
+        mctx.fillStyle = '#f8fafc';
+        mctx.fillText(item, 545, y);
+        mctx.textAlign = 'right';
+        mctx.fillStyle = '#fb7185';
+        mctx.fillText(price, 956, y);
+      });
+
+      const menuTex = new THREE.CanvasTexture(menuCanvas);
+      const menuFrontMat = new THREE.MeshStandardMaterial({
+        map: menuTex,
+        emissive: 0xffffff,
+        emissiveMap: menuTex,
+        emissiveIntensity: 0.35,
+        roughness: 0.25
+      });
+
+      const wineShelf = new THREE.Mesh(
+        new THREE.BoxGeometry(4.0, 1.45, 0.16),
+        [darkMetalMat, darkMetalMat, darkMetalMat, darkMetalMat, menuFrontMat, darkMetalMat]
+      );
+      wineShelf.position.set(0, 1.9, -1.78);
       barGroup.add(barCounter, barTop, barLed, backBar, wineShelf);
 
       // 吧檯前方 4 張高腳椅
