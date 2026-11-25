@@ -2067,10 +2067,10 @@ let myPeerId5F = '';
         scene.add(slab);
       };
 
-      // 嚴格切割北、中、南三塊主樓板（Z: -47.2 ~ -3.52, -3.48 ~ 22.98, 23.02 ~ 44.5），杜絕任何共面 Z-fighting
+      // 嚴格切割北、中、南三塊全寬主樓板（寬度皆為 107，補齊原本東西兩側挑空區），杜絕任何共面 Z-fighting
       addFloorSlab5F(0, -25.36, 107, 43.68, 0, false);
-      addFloorSlab5F(0, 9.75, 36.0, 26.46, 0, false);
-      addFloorSlab5F(0, 33.76, 42.0, 21.48, 0, false);
+      addFloorSlab5F(0, 9.75, 107, 26.46, 0, false);
+      addFloorSlab5F(0, 33.76, 107, 21.48, 0, false);
 
       // 走廊深灰岩板金屬收邊壓條：墊高 +0.025 並開啟 depthWrite: false 防止遠景閃頻
       const inlayBorderMat = new THREE.MeshStandardMaterial({
@@ -2095,19 +2095,12 @@ let myPeerId5F = '';
       addFloorInlay(-5.6, 6.0, 0.18, 34.0);
       addFloorInlay(5.6, 6.0, 0.18, 34.0);
 
-      addWall(-17.8, 9.75, 0.22, 26.5, 1.35, frostedGlassMat, '西側空中露台玻璃護欄', 5, f5Y, 'glass');
-      addWall(17.8, 9.75, 0.22, 26.5, 1.35, frostedGlassMat, '東側空中露台玻璃護欄', 5, f5Y, 'glass');
-      addWall(-20.8, 33.75, 0.22, 21.5, 1.35, frostedGlassMat, '南側西露台玻璃護欄', 5, f5Y, 'glass');
-      addWall(20.8, 33.75, 0.22, 21.5, 1.35, frostedGlassMat, '南側東露台玻璃護欄', 5, f5Y, 'glass');
-      addWall(-35.5, -3.6, 35.5, 0.22, 1.35, frostedGlassMat, '西翼南側玻璃護欄', 5, f5Y, 'glass');
-      addWall(35.5, -3.6, 35.5, 0.22, 1.35, frostedGlassMat, '東翼南側玻璃護欄', 5, f5Y, 'glass');
-
       const ceil5FNorth = new THREE.Mesh(new THREE.PlaneGeometry(108, 45), ceilMat);
       ceil5FNorth.rotation.x = Math.PI / 2;
       ceil5FNorth.position.set(0, f5Y + 4.6, -25.5);
       scene.add(ceil5FNorth);
 
-      const ceil5FSouth = new THREE.Mesh(new THREE.PlaneGeometry(44, 49), ceilMat);
+      const ceil5FSouth = new THREE.Mesh(new THREE.PlaneGeometry(108, 49), ceilMat);
       ceil5FSouth.rotation.x = Math.PI / 2;
       ceil5FSouth.position.set(0, f5Y + 4.6, 20.5);
       scene.add(ceil5FSouth);
@@ -4098,9 +4091,7 @@ window.location.href = `${floorItem.file}?${q.toString()}`;
           camState.targetPos.z + offsetZ
         );
 
-        const wallBounds = pFloor === 5 && player.pos.z > -3.5
-          ? { minX: -20.2, maxX: 20.2, minZ: -46.8, maxZ: 44.2 }
-          : { minX: -52.8, maxX: 52.8, minZ: -46.8, maxZ: 43.8 };
+        const wallBounds = { minX: -52.8, maxX: 52.8, minZ: -46.8, maxZ: 44.2 };
 
         desiredCamPos.x = THREE.MathUtils.clamp(desiredCamPos.x, wallBounds.minX, wallBounds.maxX);
         desiredCamPos.z = THREE.MathUtils.clamp(desiredCamPos.z, wallBounds.minZ, wallBounds.maxZ);
