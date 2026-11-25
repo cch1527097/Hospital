@@ -314,7 +314,7 @@
       comboStep: 0,
       comboResetTimer: 0,
       hitRegisteredThisSwing: false,
-      hurtCooldown: 0
+      hurtCooldown: 0,
       isKneeling: false
     };
 
@@ -2385,11 +2385,105 @@ let myPeerId5F = '';
       addWall(8.5, -18.5, 2.8, 1.15, 1.08, counterWoodMat, '東側護理站櫃檯', 5, f5Y);
       addHangingSign(0, f5Y + 3.65, -21.2, 6.8, 0.88, '輪椅停放區', 'WHEELCHAIR BAY', '#1d4ed8', '#93c5fd');
 
-      // 祈禱室局部地板墊高 +0.038 並開啟 polygonOffset，避免與中庭主樓板產生深度衝突
+      // 祈禱室／佛堂可走入式空間（中心 x=0, z=-6.8，寬 12.0，深 5.2）
       addFloorSlab5F(0, -6.8, 12.2, 5.4, 0.038, true);
-      // 移除木頭建築（神明廳），並將白綠祈禱室量體往左（東側）延伸補齊空缺（中心 x=0，總寬度 12.0）
-      addWall(0, -6.8, 12.0, 5.2, 4.4, null, '祈禱室 (Prayer Room)', 5, f5Y, 'clinical_mint');
-      addHangingSign(0, f5Y + 3.55, -9.6, 3.6, 0.56, '祈禱室', 'PRAYER ROOM', '#b45309', '#fde047', Math.PI);
+
+      // 1) 四面圍牆（北牆 Z=-9.4 中央留 2.4 寬電動門開口）
+      addWall(0, -4.2, 12.0, 0.3, 4.4, null, '佛堂南側主牆', 5, f5Y, 'nursing', false);
+      addWall(-5.85, -6.8, 0.3, 5.2, 4.4, null, '佛堂西側牆', 5, f5Y, 'clinical_mint', false);
+      addWall(5.85, -6.8, 0.3, 5.2, 4.4, null, '佛堂東側牆', 5, f5Y, 'clinical_mint', false);
+      addWall(-3.6, -9.4, 4.8, 0.3, 4.4, null, '佛堂北側西段牆', 5, f5Y, 'clinical_mint', true);
+      addWall(3.6, -9.4, 4.8, 0.3, 4.4, null, '佛堂北側東段牆', 5, f5Y, 'clinical_mint', true);
+
+      // 門楣上方牆體與「祈禱室」招牌（緊貼電動門上方）
+      const doorHeader = new THREE.Mesh(
+        new THREE.BoxGeometry(2.4, 2.0, 0.3),
+        ArchitecturalMaterials.getWallMaterial('clinical_mint', 1)
+      );
+      doorHeader.position.set(0, f5Y + 3.4, -9.4);
+      scene.add(doorHeader);
+      addHangingSign(0, f5Y + 3.15, -9.6, 3.2, 0.52, '祈禱室・佛堂', 'PRAYER & BUDDHIST HALL', '#b45309', '#fde047', Math.PI);
+
+      // 2) 雙開感應電動玻璃門（Z = -9.4）
+      const doorFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.7, roughness: 0.25 });
+      const sensorBox = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.16, 0.34), doorFrameMat);
+      sensorBox.position.set(0, f5Y + 2.42, -9.4);
+      const sensorEye = new THREE.Mesh(
+        new THREE.BoxGeometry(0.18, 0.05, 0.36),
+        new THREE.MeshBasicMaterial({ color: 0x22c55e })
+      );
+      sensorEye.position.set(0, f5Y + 2.42, -9.4);
+      scene.add(sensorBox, sensorEye);
+
+      const leftDoorLeaf = new THREE.Mesh(new THREE.BoxGeometry(1.18, 2.34, 0.06), frostedGlassMat);
+      leftDoorLeaf.position.set(-0.59, f5Y + 1.17, -9.4);
+      const rightDoorLeaf = new THREE.Mesh(new THREE.BoxGeometry(1.18, 2.34, 0.06), frostedGlassMat);
+      rightDoorLeaf.position.set(0.59, f5Y + 1.17, -9.4);
+      scene.add(leftDoorLeaf, rightDoorLeaf);
+      prayerAutoDoor = { leftLeaf: leftDoorLeaf, rightLeaf: rightDoorLeaf, openAmount: 0 };
+
+      // 3) 內部佛堂（木雕供桌、蓮花座金身佛像、香爐、蓮花燈與三座蒲團拜墊）
+      const altarWoodMat = new THREE.MeshStandardMaterial({ color: 0x5c2d16, roughness: 0.38 });
+      const goldMat = new THREE.MeshStandardMaterial({
+        color: 0xfbbf24,
+        emissive: 0xd97706,
+        emissiveIntensity: 0.35,
+        metalness: 0.85,
+        roughness: 0.2
+      });
+      const lotusMat = new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.45 });
+
+      const altarTable = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.05, 0.95), altarWoodMat);
+      altarTable.position.set(0, f5Y + 0.525, -5.0);
+      altarTable.castShadow = true;
+      scene.add(altarTable);
+      colliders.push({ minX: -1.65, maxX: 1.65, minZ: -5.5, maxZ: -4.5, floor: 5, label: '佛堂供桌' });
+
+      const lotusBase = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.58, 0.24, 20), lotusMat);
+      lotusBase.position.set(0, f5Y + 1.17, -4.95);
+      const buddhaBody = new THREE.Mesh(createSmoothCapsuleGeometry(0.28, 0.34, 12, 18), goldMat);
+      buddhaBody.position.set(0, f5Y + 1.56, -4.95);
+      const buddhaHead = new THREE.Mesh(new THREE.SphereGeometry(0.19, 20, 16), goldMat);
+      buddhaHead.position.set(0, f5Y + 1.98, -4.95);
+      const ushnisha = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 10), goldMat);
+      ushnisha.position.set(0, f5Y + 2.15, -4.95);
+      const haloRing = new THREE.Mesh(
+        new THREE.TorusGeometry(0.46, 0.035, 12, 32),
+        new THREE.MeshBasicMaterial({ color: 0xfef08a })
+      );
+      haloRing.position.set(0, f5Y + 1.85, -5.12);
+      scene.add(lotusBase, buddhaBody, buddhaHead, ushnisha, haloRing);
+
+      const censer = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.13, 0.22, 16), goldMat);
+      censer.position.set(0, f5Y + 1.16, -5.28);
+      scene.add(censer);
+
+      [-1.15, 1.15].forEach((lx) => {
+        const lampStem = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.08, 0.32, 12), goldMat);
+        lampStem.position.set(lx, f5Y + 1.21, -5.15);
+        const lampBulb = new THREE.Mesh(
+          new THREE.SphereGeometry(0.11, 14, 12),
+          new THREE.MeshBasicMaterial({ color: 0xfef08a })
+        );
+        lampBulb.position.set(lx, f5Y + 1.42, -5.15);
+        scene.add(lampStem, lampBulb);
+      });
+
+      const hallLight = new THREE.PointLight(0xfde68a, 0.9, 10, 1.5);
+      hallLight.position.set(0, f5Y + 3.2, -6.5);
+      scene.add(hallLight);
+
+      const cushionMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.78 });
+      const cushionTrimMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.5 });
+      [-1.1, 0, 1.1].forEach((cx) => {
+        const cushion = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.45, 0.12, 20), cushionMat);
+        cushion.position.set(cx, f5Y + 0.098, -6.65);
+        const trim = new THREE.Mesh(new THREE.TorusGeometry(0.43, 0.018, 8, 24), cushionTrimMat);
+        trim.rotation.x = Math.PI / 2;
+        trim.position.set(cx, f5Y + 0.14, -6.65);
+        scene.add(cushion, trim);
+        prayerCushionSpots.push(new THREE.Vector3(cx, f5Y + 0.038, -6.65));
+      });
 
       const kioskStand = new THREE.Mesh(
         new THREE.BoxGeometry(1.15, 1.85, 0.16),
@@ -3747,6 +3841,7 @@ window.location.href = `${floorItem.file}?${q.toString()}`;
       const moveLen = Math.hypot(moveX, moveZ);
 
       if (moveLen > 0.001) {
+        if (player.isKneeling) player.isKneeling = false;
         moveX /= moveLen;
         moveZ /= moveLen;
         const targetYaw = Math.atan2(moveX, moveZ);
@@ -4000,6 +4095,42 @@ window.location.href = `${floorItem.file}?${q.toString()}`;
         }
       });
 
+      // ------------------ D-0. 祈禱室／佛堂電動門感應與跪坐祈福 ------------------
+      if (prayerAutoDoor.leftLeaf && prayerAutoDoor.rightLeaf) {
+        const distToDoor = Math.hypot(player.pos.x - 0, player.pos.z - (-9.4));
+        const targetOpen = pFloor === 5 && distToDoor < 3.4 ? 1.05 : 0;
+        prayerAutoDoor.openAmount += (targetOpen - prayerAutoDoor.openAmount) * Math.min(1, dt * 7);
+        prayerAutoDoor.leftLeaf.position.x = -0.59 - prayerAutoDoor.openAmount;
+        prayerAutoDoor.rightLeaf.position.x = 0.59 + prayerAutoDoor.openAmount;
+      }
+
+      let nearCushion = null;
+      if (pFloor === 5) {
+        for (const spot of prayerCushionSpots) {
+          if (Math.hypot(player.pos.x - spot.x, player.pos.z - spot.z) < 1.25) {
+            nearCushion = spot;
+            break;
+          }
+        }
+      }
+
+      if (player.isKneeling) {
+        player.mesh.position.y = player.pos.y - 0.42;
+        player.leftHip.rotation.x = -1.45;
+        player.rightHip.rotation.x = -1.45;
+        player.leftShoulder.rotation.x = -0.75;
+        player.leftShoulder.rotation.z = -0.35;
+        player.leftElbow.rotation.x = -1.25;
+        player.rightShoulder.rotation.x = -0.75;
+        player.rightShoulder.rotation.z = 0.35;
+        player.rightElbow.rotation.x = -1.25;
+        player.headGroup.rotation.x = 0.18;
+      } else {
+        player.leftShoulder.rotation.z = 0;
+        player.rightShoulder.rotation.z = 0;
+        player.headGroup.rotation.x = 0;
+      }
+
       // ------------------ D. 接觸電梯門廳自動詢問樓層並連結 HTML ------------------
       let insideTransport = null;
       for (let i = 0; i < transportTriggers.length; i++) {
@@ -4038,6 +4169,19 @@ window.location.href = `${floorItem.file}?${q.toString()}`;
         talkPrompt.innerHTML = `按 <span class="px-2 py-0.5 mx-1 rounded bg-amber-400 text-slate-950 font-black">E</span> 與 <span class="text-teal-300">${closestNpc.name}</span> 對話`;
         talkPrompt.classList.remove('hidden');
         talkPrompt.onclick = () => openDialogue(closestNpc);
+      } else if (!activeTalkNpc && nearCushion) {
+        talkPrompt.innerHTML = player.isKneeling
+          ? `按 <span class="px-2 py-0.5 mx-1 rounded bg-amber-400 text-slate-950 font-black">E</span> 或移動方向鍵 <span class="text-teal-300">起身</span>`
+          : `按 <span class="px-2 py-0.5 mx-1 rounded bg-amber-400 text-slate-950 font-black">E</span> 於蒲團拜墊 <span class="text-amber-300">跪坐祈福</span>`;
+        talkPrompt.classList.remove('hidden');
+        talkPrompt.onclick = () => {
+          player.isKneeling = !player.isKneeling;
+          if (player.isKneeling) {
+            player.pos.set(nearCushion.x, nearCushion.y, nearCushion.z);
+            player.yaw = 0;
+            showToast('🙏 已於佛堂蒲團跪坐合十祈福（移動或再按 E 即可起身）');
+          }
+        };
       } else {
         talkPrompt.classList.add('hidden');
         talkPrompt.onclick = null;
@@ -4202,7 +4346,8 @@ window.location.href = `${floorItem.file}?${q.toString()}`;
         drawZoneRect(-26.5, -7.2, 31.0, 6.2, '#fbcfe8');
         drawZoneRect(31.5, -7.2, 41.0, 6.2, '#fbcfe8');
         drawZoneRect(0, -18.5, 13.5, 4.6, '#bae6fd');
-        drawZoneRect(0, -6.8, 12.0, 5.2, '#a7f3d0');
+        drawZoneRect(0, -6.8, 12.0, 5.2, '#fde68a');
+        drawZoneRect(0, -5.0, 3.2, 0.95, '#b45309');
         drawZoneRect(0, 34.5, 22.0, 14.0, '#bae6fd');
       } else if (pFloor === 3) {
         drawZoneRect(-21.5, -34.5, 38.0, 12.5, '#bae6fd');
