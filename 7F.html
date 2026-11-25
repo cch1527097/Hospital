@@ -2149,12 +2149,6 @@
         wallTextMesh.rotation.y = Math.PI;
         (activeBuildGroup || scene).add(wallTextMesh);
       })();
-
-        const wallTextTex = new THREE.CanvasTexture(wallSignCanvas);
-        const wallTextMesh = new THREE.Mesh(
-          new THREE.PlaneGeometry(5.6, 1.4),
-          new THREE.MeshBasicMaterial({ map: wallTextTex, transparent: true, depthWrite: false })
-        );
       
       // ================= 愛愛俱樂部 內部空間完整裝潢 (x: -7.0 ~ 13.5, z: 4.2 ~ 22.0) =================
       const clubGroup = activeBuildGroup || scene;
