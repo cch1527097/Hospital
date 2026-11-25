@@ -3147,13 +3147,12 @@ window.addEventListener('beforeunload', () => {
       buildLargeConferenceRoom(f8Y, wallWoodIvoryMat);
 
       const adminW = 18.0;
-      const adminStep = adminW / 5;
-      addWall(8.0, -34.0, adminW, 10.2, 4.4, wallWarmTeakMat, '北排辦公室與討論室', 8, f8Y);
-      addCorridorHandrail(-0.5, -28.82, 16.5, -28.82, f8Y);
-      for (let idx = 0; idx < 5; idx++) {
-        const rx = -1.0 + (idx + 0.5) * adminStep;
-        addWardDoorFacade(rx, -28.88, f8Y, true);
-      }
+const adminStep = adminW / 5;
+addWall(8.0, -34.0, adminW, 10.2, 4.4, wallWarmTeakMat, '北排辦公室與討論室', 8, f8Y);
+for (let idx = 0; idx < 5; idx++) {
+  const rx = -1.0 + (idx + 0.5) * adminStep;
+  addWardDoorFacade(rx, -28.88, f8Y, true);
+}
 
       buildRoundTableRoom(f8Y, wallWoodIvoryMat);
 
