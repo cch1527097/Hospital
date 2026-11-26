@@ -4529,45 +4529,6 @@ function normalizeRoleTitle(rawRole) {
 
       const coreStaffAndGuards = [
         {
-        name: '張哲維 醫學工程師',
-        role: '維生系統與呼吸器檢修組',
-        x: 44.1,
-        y: b1Y,
-        z: 34.0,
-        rotY: Math.PI / 2, // 面向東側工作檯（若想讓他面向西側門口可改為 -Math.PI / 2）
-        floor: 'B1',
-          badgeColor: '#60a5fa',
-          appearance: { coatColor: 0x1e40af, pantsColor: 0x1e293b, hasMask: true },
-          waypoints: [new THREE.Vector3(-37.6, b1Y, 40.5)],
-          speed: 0,
-          yaw: -Math.PI / 2,
-          dialogue: '目前正在進行加護病房呼吸器與生理監視器的電路板檢修與壓力校準，請勿隨意觸碰測試中的高壓電源與示波器探棒喔！',
-          options: [
-            {
-              label: '請問各病房壞掉的儀器都會送到這裡嗎？',
-              reply: '沒錯！包含輸液幫浦、電擊器、超音波探頭與手術室設備，全院醫療儀器都會先送來 B1 醫工室做故障排除與年度電性安全檢測。'
-            }
-          ]
-        },
-        {
-        name: '醫工設備技師', // 保留你原本的完整名字
-        role: '醫療儀器校準與零件管理',
-        x: 49.4,
-        y: b1Y,
-        z: 40.5,
-        rotY: Math.PI / 2,
-        floor: 'B1',
-          badgeColor: '#93c5fd',
-          appearance: { coatColor: 0x3b82f6, pantsColor: 0x334155, hasMask: true },
-          waypoints: [
-            new THREE.Vector3(-42.8, b1Y, 41.5),
-            new THREE.Vector3(-42.8, b1Y, 47.5)
-          ],
-          speed: 0.9,
-          dialogue: '這批輸液幫浦與電擊器剛更換完鋰電池模組，正在跑 24 小時連續燒機測試，確認數值穩定後就能送回臨床單位。',
-          options: []
-        },
-        {
           name: '劉家豪 主治醫師',
           role: '內視鏡中心・無痛胃鏡檢查室',
           avatar: '🩺',
