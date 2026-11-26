@@ -3228,8 +3228,7 @@ function normalizeRoleTitle(rawRole) {
         activeBuildGroup.add(mon);
       });
       colliders.push({ minX: -40.1, maxX: -38.6, minZ: 32.8, maxZ: 36.2, floor: 'B1', label: '核醫影像控制工作站' });
-
-      // === 維納斯醫學美容中心暨皮膚科門診（含感應電動門、美容儀器與診間）===
+      
       // 1. 外圍環狀牆體（北側 z = 7.95 中央 x = -24.5 預留寬 3.2 的電動門開口）
       addWall(-24.5, 17.05, 17.5, 0.4, 4.4, texAestheticPinkWall, '醫美中心南牆', 'B1', b1Y);
       addWall(-33.05, 12.5, 0.4, 9.5, 4.4, texAestheticPinkWall, '醫美中心西牆', 'B1', b1Y);
@@ -3389,42 +3388,113 @@ function normalizeRoleTitle(rawRole) {
       buildAestheticDeviceStation(-30.5, 10.6, 0xec4899, '皮秒雷射美容儀與治療床');
       buildAestheticDeviceStation(-30.5, 14.5, 0x38bdf8, '水飛梭／音波拉提美容儀');
 
-      // 5. 右側（東半部 x = -22.2 ~ -16.5）：皮膚科門診診間（皮膚 301診 & 302診）
+      // 5. 右側（東半部 x = -20.2 ~ -16.15）：完整封閉式皮膚科門診診間（皮膚 301診 & 302診）
+      const dermFrontX = -19.8; // 診間正面牆線（面朝西側走道）
+      const dermFrameMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.85, roughness: 0.22 });
+      const dermGlassMat = new THREE.MeshStandardMaterial({
+        color: 0xfce7f3,
+        transparent: true,
+        opacity: 0.55,
+        roughness: 0.14
+      });
+
+      // 診間之間的中央實體隔間牆（把 301 診與 302 診隔開，高度對齊外牆 4.4）
+      addWall(-17.95, 12.5, 3.8, 0.28, 4.4, texAestheticPinkWall, '皮膚科診間中央隔間', 'B1', b1Y);
+
       const dermRooms = [
-        { x: -19.2, z: 10.6, code: '皮膚 301診', dept: '醫學美容門診', doctor: '蘇妍希 醫師', queue: '0016' },
-        { x: -19.2, z: 14.4, code: '皮膚 302診', dept: '一般皮膚科', doctor: '陳柏宇 醫師', queue: '0024' }
+        { zCenter: 10.3, code: '皮膚 301診', dept: '醫學美容門診', doctor: '蘇妍希 醫師', queue: '0016' },
+        { zCenter: 14.7, code: '皮膚 302診', dept: '一般皮膚科', doctor: '陳柏宇 醫師', queue: '0024' }
       ];
 
       dermRooms.forEach((rm) => {
-        // 診間隔間牆與門框
-        addWall(rm.x + 1.4, rm.z, 3.2, 0.25, 3.6, texAestheticPinkWall, `${rm.code}隔間`, 'B1', b1Y);
+        const doorZ = rm.zCenter + 0.55;   // 診間門位置
+        const panelZ = rm.zCenter - 0.85;  // 實體牆面與叫號機位置
+
+        // (A) 門洞上方門楣牆（補滿高度 2.42 ~ 4.4，讓門完全嵌在牆內）
+        const doorLintel = new THREE.Mesh(
+          new THREE.BoxGeometry(0.28, 1.98, 1.38),
+          createScaledWallMaterial(texAestheticPinkWall, 1.38, 0.45)
+        );
+        doorLintel.position.set(dermFrontX, b1Y + 3.41, doorZ);
+        activeBuildGroup.add(doorLintel);
+
+        // (B) 門洞兩側立柱與門楣鋁框
+        const jambN = new THREE.Mesh(new THREE.BoxGeometry(0.32, 2.42, 0.08), dermFrameMat);
+        jambN.position.set(dermFrontX, b1Y + 1.21, doorZ - 0.65);
+        const jambS = new THREE.Mesh(new THREE.BoxGeometry(0.32, 2.42, 0.08), dermFrameMat);
+        jambS.position.set(dermFrontX, b1Y + 1.21, doorZ + 0.65);
+        const topFrame = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.09, 1.38), dermFrameMat);
+        topFrame.position.set(dermFrontX, b1Y + 2.42, doorZ);
+        activeBuildGroup.add(jambN, jambS, topFrame);
+
+        // (C) 嵌在門框內的診間門扇
         const doorTex = createClinicDoorTexture(rm.code, rm.dept, rm.doctor);
         const doorLeaf = new THREE.Mesh(
-          new THREE.BoxGeometry(0.12, 2.32, 1.18),
-          new THREE.MeshStandardMaterial({ map: doorTex, roughness: 0.4 })
+          new THREE.BoxGeometry(0.12, 2.36, 1.22),
+          new THREE.MeshStandardMaterial({ map: doorTex, roughness: 0.42 })
         );
-        doorLeaf.position.set(rm.x - 0.25, b1Y + 1.16, rm.z + 0.95);
+        doorLeaf.position.set(dermFrontX, b1Y + 1.18, doorZ);
         doorLeaf.rotation.y = -Math.PI / 2;
         activeBuildGroup.add(doorLeaf);
 
-        // 診間叫號螢幕
+        // (D) 門旁的玻璃側窗（上下帶粉紫實牆，高度齊平 4.4）
+        const sideWallLower = new THREE.Mesh(
+          new THREE.BoxGeometry(0.28, 1.05, 0.55),
+          createScaledWallMaterial(texAestheticPinkWall, 0.55, 0.25)
+        );
+        sideWallLower.position.set(dermFrontX, b1Y + 0.525, rm.zCenter - 0.35);
+        const sideGlass = new THREE.Mesh(new THREE.BoxGeometry(0.08, 1.37, 0.55), dermGlassMat);
+        sideGlass.position.set(dermFrontX, b1Y + 1.735, rm.zCenter - 0.35);
+        const sideWallUpper = new THREE.Mesh(
+          new THREE.BoxGeometry(0.28, 1.98, 0.55),
+          createScaledWallMaterial(texAestheticPinkWall, 0.55, 0.45)
+        );
+        sideWallUpper.position.set(dermFrontX, b1Y + 3.41, rm.zCenter - 0.35);
+        activeBuildGroup.add(sideWallLower, sideGlass, sideWallUpper);
+
+        // (E) 掛載叫號螢幕的實體前牆（高度 4.4 頂天立地，並附碰撞箱）
+        addWall(dermFrontX, panelZ - 0.35, 0.28, 1.45, 4.4, texAestheticPinkWall, `${rm.code}正面牆`, 'B1', b1Y);
+        colliders.push({
+          minX: dermFrontX - 0.2,
+          maxX: dermFrontX + 0.2,
+          minZ: rm.zCenter - 1.5,
+          maxZ: rm.zCenter + 1.3,
+          floor: 'B1',
+          label: `${rm.code}診間牆面`
+        });
+
+        // (F) 緊貼實體牆面的診間叫號機（不再懸空）
         const monTex = createQueueMonitorTexture(rm.queue, rm.code);
         const mon = new THREE.Mesh(
-          new THREE.BoxGeometry(0.09, 0.95, 0.55),
+          new THREE.BoxGeometry(0.1, 1.02, 0.58),
           new THREE.MeshStandardMaterial({
             map: monTex,
             emissive: new THREE.Color(0xffffff),
             emissiveMap: monTex,
-            emissiveIntensity: 0.35
+            emissiveIntensity: 0.35,
+            roughness: 0.3
           })
         );
-        mon.position.set(rm.x - 0.32, b1Y + 1.55, rm.z + 0.15);
+        mon.position.set(dermFrontX - 0.16, b1Y + 1.55, panelZ - 0.35);
         mon.rotation.y = -Math.PI / 2;
         activeBuildGroup.add(mon);
+
+        // (G) 診間內部看診桌與診療床（透過玻璃側窗可看見內部擺設）
+        const examDesk = new THREE.Mesh(
+          new THREE.BoxGeometry(0.75, 0.76, 1.45),
+          new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 })
+        );
+        examDesk.position.set(-17.8, b1Y + 0.38, rm.zCenter - 0.45);
+        const examBed = new THREE.Mesh(
+          new THREE.BoxGeometry(1.65, 0.58, 0.72),
+          new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.45 })
+        );
+        examBed.position.set(-17.4, b1Y + 0.29, rm.zCenter + 0.75);
+        activeBuildGroup.add(examDesk, examBed);
       });
 
       // 皮膚科診間外候診排椅
-      allWaitingSeats.push(...buildHospitalWaitingBench(-23.2, 14.5, Math.PI / 2, b1Y, 0x831843));
+      allWaitingSeats.push(...buildHospitalWaitingBench(-22.4, 14.5, Math.PI / 2, b1Y, 0x831843));
 
       buildClinicWallFacade(-22.5, 33.5, [
         { code: '神內 201診', dept: '神經內科', doctor: '黃柏翰 醫師', queueNum: '0064' },
