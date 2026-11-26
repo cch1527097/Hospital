@@ -3623,6 +3623,115 @@ registerCollider({
       addWall(27.5, 9.8, 11.5, 11.0, 4.4, wallBlueMat, '醫師值班室與出院準備服務', 3, f3Y);
       addHangingSign(-29.5, f3Y + 3.65, 8.4, 5.4, 0.72, '小兒科醫師辦公室', '醫師值班室・出院準備服務', '#065f46', '#6ee7b7');
 
+      // ======================== 新增：3F 減重中心門診（紅框標示東側立面 x = -23.9） ========================
+      // 1. 減重中心門診主橫幅招牌（面朝東側電梯廳走廊 +X）
+      const wmBannerTex = createSignTexture(
+        '減重中心門診',
+        'WEIGHT MANAGEMENT & METABOLIC CENTER',
+        '#0f766e',
+        '#fde047'
+      );
+      const wmBanner = new THREE.Mesh(
+        new THREE.BoxGeometry(0.10, 0.85, 6.2),
+        new THREE.MeshStandardMaterial({
+          map: wmBannerTex,
+          emissive: 0xffffff,
+          emissiveMap: wmBannerTex,
+          emissiveIntensity: 0.35,
+          roughness: 0.35
+        })
+      );
+      wmBanner.position.set(-23.85, f3Y + 3.45, 3.2);
+      addToFloorGroup(wmBanner, 3);
+
+      // 2. 減重 1診 & 減重 2診 門組（貼齊東側牆面 x = -23.88，面朝 +X）
+      const wmRooms = [
+        { z: 1.0, code: '減重 1診', num: '012', sub: '代謝與體重管理門診' },
+        { z: 5.4, code: '減重 2診', num: '008', sub: '減重營養與體雕諮詢' }
+      ];
+
+      wmRooms.forEach((rm) => {
+        addClinicDoorSet(-23.88, f3Y, rm.z, Math.PI / 2, rm.code);
+
+        // 診間旁 LED 數位叫號機
+        const qBox = new THREE.Mesh(
+          new THREE.BoxGeometry(0.08, 0.90, 0.66),
+          new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3, metalness: 0.4 })
+        );
+        qBox.position.set(-23.85, f3Y + 1.85, rm.z + 1.15);
+        addToFloorGroup(qBox, 3);
+
+        const qCanvas = document.createElement('canvas');
+        qCanvas.width = 256;
+        qCanvas.height = 340;
+        const qCtx = qCanvas.getContext('2d');
+        qCtx.fillStyle = '#090d16';
+        qCtx.fillRect(0, 0, 256, 340);
+        qCtx.fillStyle = '#0f766e';
+        qCtx.fillRect(0, 0, 256, 62);
+        qCtx.fillStyle = '#ffffff';
+        qCtx.font = 'bold 28px "Microsoft JhengHei", sans-serif';
+        qCtx.textAlign = 'center';
+        qCtx.textBaseline = 'middle';
+        qCtx.fillText(rm.code, 128, 32);
+
+        qCtx.fillStyle = '#94a3b8';
+        qCtx.font = 'bold 19px "Microsoft JhengHei", sans-serif';
+        qCtx.fillText('目前看診號碼', 128, 102);
+
+        qCtx.fillStyle = '#ff3b30';
+        qCtx.font = 'bold 96px monospace';
+        qCtx.fillText(rm.num, 128, 185);
+
+        qCtx.fillStyle = '#fde047';
+        qCtx.font = '18px "Microsoft JhengHei", sans-serif';
+        qCtx.fillText(rm.sub, 128, 285);
+
+        const qScreen = new THREE.Mesh(
+          new THREE.PlaneGeometry(0.58, 0.80),
+          new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(qCanvas) })
+        );
+        qScreen.rotation.y = Math.PI / 2;
+        qScreen.position.set(-23.805, f3Y + 1.85, rm.z + 1.15);
+        addToFloorGroup(qScreen, 3);
+      });
+
+      // 3. 減重中心門診前候診排椅（位於門前走廊 x = -21.2，面朝診間 -X）
+      const wmBenchGroup = new THREE.Group();
+      wmBenchGroup.position.set(-21.2, f3Y, 3.2);
+      wmBenchGroup.rotation.y = -Math.PI / 2;
+
+      const wmBenchMat = new THREE.MeshStandardMaterial({ color: 0x0f766e, roughness: 0.45, metalness: 0.3 });
+      const wmLegMat = ArchMaterials.stainlessSteel;
+      const wmBeam = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.08, 0.1), wmLegMat);
+      wmBeam.position.set(0, 0.36, 0);
+      wmBenchGroup.add(wmBeam);
+
+      [-1.1, 1.1].forEach((lx) => {
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.38, 0.52), wmLegMat);
+        leg.position.set(lx, 0.19, 0);
+        wmBenchGroup.add(leg);
+      });
+
+      [-0.85, 0, 0.85].forEach((sx) => {
+        const seat = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.07, 0.5), wmBenchMat);
+        seat.position.set(sx, 0.43, 0.03);
+        const back = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.48, 0.07), wmBenchMat);
+        back.position.set(sx, 0.7, -0.2);
+        back.rotation.x = -0.1;
+        wmBenchGroup.add(seat, back);
+      });
+
+      addToFloorGroup(wmBenchGroup, 3);
+      registerCollider({
+        minX: -21.52,
+        maxX: -20.88,
+        minZ: 1.85,
+        maxZ: 4.55,
+        floor: 3,
+        label: '減重中心候診排椅'
+      });
+
       build3FNursingDepartmentWing(f3Y, wallCreamMat, wallMintMat, ArchMaterials.wallLavender, glassMat);
       build3FRealistWardWing(f3Y, wallCreamMat, wallMintMat);
       build3FSoutheastEducationWing(f3Y, wallCreamMat, wallMintMat, wallPinkMat, wallBlueMat, glassMat, counterTopMat);
@@ -4468,6 +4577,50 @@ registerCollider({
 
       const staffList = [
         // ======================== 3F 實景雙人病房 (367 & 369 房：臥床患者 + 吊點滴護理師) ========================
+        {
+          id: 'weight_doc_f3',
+          name: '林宥廷 主治醫師',
+          title: '減重中心 主治醫師 ',
+          floorTag: '3F',
+          baseY: 9.2,
+          avatar: '⚖️',
+          roleType: 'doctor',
+          hasStethoscope: true,
+          hasGlasses: true,
+          shirtColor: 0xffffff,
+          pantsColor: 0x0f766e,
+          waypoints: [
+            new THREE.Vector3(-22.6, 9.2, 1.2),
+            new THREE.Vector3(-22.6, 9.2, 4.8)
+          ],
+          greeting: '歡迎來到 3F 減重中心門診（減重 1診／2診）！我是減重中心主治醫師林宥廷，我們整合內科代謝治療、營養處方與運動介入，幫您安全健康地找回理想體態。',
+          options: [
+            { label: '諮詢「醫學減重門診」評估與治療方案', reply: '林宥廷醫師：「我們會先透過 InBody 身體組成分析與抽血評估胰島素阻抗、甲狀腺功能，再量身搭配飲食調整或合法減重藥物輔助，避免復胖！」' },
+            { label: '進行體脂與基礎代謝健康檢測 (+100 HP)', reply: '林宥廷醫師：「您的肌肉量與代謝率表現很棒！已為您補充健康活力能量！」', action: 'heal' }
+          ]
+        },
+        {
+          id: 'weight_educator_f3',
+          name: '蘇郁涵 個案管理師',
+          title: '減重中心',
+          floorTag: '3F',
+          baseY: 9.2,
+          avatar: '📋',
+          roleType: 'nurse',
+          isFemale: true,
+          hasPonytail: true,
+          shirtColor: 0xffffff,
+          pantsColor: 0x14b8a6,
+          waypoints: [
+            new THREE.Vector3(-22.2, 9.2, 5.6),
+            new THREE.Vector3(-22.2, 9.2, 2.2)
+          ],
+          greeting: '您好！我是減重中心個管師蘇郁涵，協助初診貴賓建立體重管理日誌、測量腰臀圍與安排營養師一對一諮詢。',
+          options: [
+            { label: '領取「三階段健康減重手冊」與飲食原則', reply: '蘇郁涵個管師：「每天喝足『體重 × 35cc』的白開水、每餐先吃蛋白質與蔬菜，每週穩定減重 0.5～1 公斤最不易復胖喔！」' },
+            { label: '補充無糖高纖能量飲 (+100 HP)', reply: '體力與護甲已完全恢復！', action: 'heal' }
+          ]
+        },
         {
           id: 'ward367_patient_bed2',
           name: '林阿公',
