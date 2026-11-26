@@ -3494,29 +3494,37 @@ function normalizeRoleTitle(rawRole) {
       // 皮膚科診間外候診排椅
       allWaitingSeats.push(...buildHospitalWaitingBench(-22.4, 14.5, Math.PI / 2, b1Y, 0x831843));
 
-      buildClinicWallFacade(-22.5, 41.1, [
+      buildClinicWallFacade(-20.8, 41.1, [
+        { code: '神內 200診', dept: '神經內科特診', doctor: '陳冠廷 醫師', queueNum: '0038' },
         { code: '神內 201診', dept: '神經內科', doctor: '黃柏翰 醫師', queueNum: '0064' },
         { code: '神外 202診', dept: '神經外科', doctor: '林志豪 醫師', queueNum: '0041' },
         { code: '中醫 203診', dept: '中醫針灸', doctor: '張立德 醫師', queueNum: '0079' },
-        { code: '腦波 204室', dept: '腦波神經傳導', doctor: '吳佳穎 技師', queueNum: '0027' }
+        { code: '腦波 204室', dept: '腦波神經傳導', doctor: '吳佳穎 技師', queueNum: '0027' },
+        { code: '免疫 205診', dept: '過敏免疫風濕', doctor: '林佩珊 醫師', queueNum: '0053' },
+        { code: '復健 206診', dept: '神經復健門診', doctor: '周明哲 醫師', queueNum: '0034' }
       ], -1, b1Y);
 
-      const neuroFrameTop = new THREE.Mesh(new THREE.BoxGeometry(19.2, 0.22, 0.35), redHighlightMat);
-      neuroFrameTop.position.set(-22.5, b1Y + 4.25, 40.8);
+      const neuroFrameTop = new THREE.Mesh(new THREE.BoxGeometry(33.0, 0.22, 0.35), redHighlightMat);
+      neuroFrameTop.position.set(-20.8, b1Y + 4.25, 40.8);
       activeBuildGroup.add(neuroFrameTop);
-      addHangingSign(-22.5, b1Y + 3.65, 40.4, 10.2, 0.96, '神內科・中醫科・腦波室', 'NEUROLOGY・NEUROSURGERY・TCM・EEG & NCV LAB', '#1e3a8a', '#fde047', Math.PI);
+      addHangingSign(-20.8, b1Y + 3.65, 40.4, 15.8, 0.96, '神內科・神外科・中醫科・免疫復健・腦波室', 'NEUROLOGY・TCM・RHEUMATOLOGY・REHAB・EEG LAB', '#1e3a8a', '#fde047', Math.PI);
 
-      buildHospitalPillarWithTV(-14.5, 35.6, b1Y, true);
-      buildHospitalPillarWithTV(-30.5, 35.6, b1Y, false);
+      // 結構柱往兩側延伸同步配置
+      buildHospitalPillarWithTV(-10.5, 35.6, b1Y, true);
+      buildHospitalPillarWithTV(-20.8, 35.6, b1Y, false);
+      buildHospitalPillarWithTV(-31.5, 35.6, b1Y, true);
 
-      [-26.0, -19.5].forEach((bx) => {
+      // 候診排椅也一併向左右兩側延伸補齊
+      [-31.0, -24.5, -17.0, -10.5].forEach((bx) => {
         allWaitingSeats.push(...buildHospitalWaitingBench(bx, 36.8, Math.PI, b1Y));
         allWaitingSeats.push(...buildHospitalWaitingBench(bx, 35.2, 0, b1Y));
       });
-      allWaitingSeats.push(...buildHospitalWaitingBench(-26.0, 32.4, 0, b1Y));
-      allWaitingSeats.push(...buildHospitalWaitingBench(-19.5, 32.4, 0, b1Y));
+      [-31.0, -24.5, -17.0, -10.5].forEach((bx) => {
+        allWaitingSeats.push(...buildHospitalWaitingBench(bx, 32.4, 0, b1Y));
+      });
 
-      buildNeuroDiagnosticUnit(-32.5, 29.1, b1Y);
+      // 腦波與神經傳導檢查儀移至診間對側走廊旁，避免與西側延伸的 200 診重疊
+      buildNeuroDiagnosticUnit(-34.8, 26.5, b1Y);
 
       // G. 南中翼：耳鼻喉科（含招牌下方雙診間門面、鋁框玻璃側窗與叫號機）
       addWall(-4.5, 18.5, 13.5, 11.5, 4.4, texAestheticPinkWall, '耳鼻喉科', 'B1', b1Y);
@@ -4640,8 +4648,8 @@ function normalizeRoleTitle(rawRole) {
           badgeColor: '#38bdf8',
           appearance: { coatColor: 0xffffff, pantsColor: 0x1e293b, isDoctor: true, hasMask: true },
           waypoints: [
-  new THREE.Vector3(-25.5, b1Y, 39.4),
-  new THREE.Vector3(-19.5, b1Y, 39.4)
+  new THREE.Vector3(-33.5, b1Y, 39.4),
+  new THREE.Vector3(-8.5, b1Y, 39.4)
 ],
           speed: 1.05,
           dialogue: '今天神內 201 診、神外 202 診與中醫 203 診都大爆滿！頭暈、偏頭痛與手腳麻木的患者很多，我們已經加開腦波室 (EEG) 與神經傳導檢查時段！',
@@ -4778,9 +4786,12 @@ function normalizeRoleTitle(rawRole) {
         { pos: [-29.5, -13.2], yaw: 0, wheelchair: true, text: '今天帶阿公來看胸腔科，還好 B1 走廊很寬敞，推輪椅很順暢。' },
         { pos: [-17.5, -13.2], yaw: -Math.PI / 2, text: '剛從藥庫那邊拿完慢箋領藥單，人潮真的從早滿到現在！' },
 
-        { pos: [-26.8, 39.8], yaw: 0, text: '201 診神經內科門口排了十幾個人，大家都是來看頭暈跟頭痛的。' },
+        { pos: [-33.8, 39.8], yaw: 0, text: '神內 200 診加開特診，今天看診的人真的大爆滿！' },
+{ pos: [-26.8, 39.8], yaw: 0, text: '201 診神經內科門口排了十幾個人，大家都是來看頭暈跟頭痛的。' },
 { pos: [-22.2, 39.8], yaw: 0, text: '我預約了中醫 203 診針灸，前面還有 8 位病患在等。' },
 { pos: [-18.2, 39.8], yaw: 0, wheelchair: true, text: '腦波室 204 室叫到我的號碼了，準備進去檢查！' },
+{ pos: [-12.5, 39.8], yaw: 0, text: '我掛了過敏免疫風濕 205 診，剛抽完血回來等看報告。' },
+{ pos: [-7.8, 39.8], yaw: 0, text: '206 診神經復健門診就在病歷室旁邊，動線很方便！' },
 { pos: [-29.2, 30.4], yaw: Math.PI / 2, text: '神內候診大廳的排椅都坐滿了，我先站在柱子旁邊看叫號電視。' },
 
         { pos: [2.2, -18.5], yaw: Math.PI, text: '「素食食堂」的招牌湯麵看起來好好吃，牆上寫著『好吃 好好吃 好好吃飯』真親切！' },
@@ -5969,7 +5980,7 @@ function normalizeRoleTitle(rawRole) {
       drawZoneRect(-43.5, 11.5, 14.5, 9.5, '#bbf7d0');
       drawZoneRect(-44.5, 31.5, 13.5, 16.5, '#bfdbfe');
       drawZoneRect(-24.5, 12.5, 17.5, 9.5, '#fbcfe8');
-      drawZoneRect(-22.5, 42.1, 19.5, 4.5, '#fecdd3', '#e11d48');
+      drawZoneRect(-20.8, 42.1, 33.2, 4.5, '#fecdd3', '#e11d48');
       drawZoneRect(-40.5, 44.5, 12.0, 14.0, '#93c5fd');
       drawZoneRect(-4.5, 18.5, 13.5, 11.5, '#fbcfe8');
       drawZoneRect(14.5, 20.5, 12.5, 12.5, '#bae6fd');
