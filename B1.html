@@ -6451,104 +6451,110 @@ document.getElementById('btn-toggle-help')?.addEventListener('click', () => {
     }
 
     function init() {
-      const canvas = document.getElementById('game-canvas');
-      renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-      renderer.outputEncoding = THREE.sRGBEncoding;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.08;
-
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x0b131e);
-      scene.fog = new THREE.FogExp2(0x1e293b, 0.0052);
-      scene.add(floorGroups.B1);
-
-      camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.15, 220);
-
-      setupZonalLightingSystem();
-      buildHospitalB1Interior();
-      createMoveTargetMarker();
-      spawnAllNpcs();
-      applyLightingPreset('day', true);
-      setupUIAndInputs();
-
+      // 【修改 1】優先檢查門禁登入，未通過直接移除載入遮罩並顯示門禁警告
       if (!verifyAuthSession()) {
         const loader = document.getElementById('loading-overlay');
         if (loader) loader.remove();
         return;
       }
 
-      createPlayableCharacter();
-      applyLocalPlayerIdentity();
-      initMultiplayerPeerJS();
-
-      const chatInput = document.getElementById('mp-chat-input');
-const chatSendBtn = document.getElementById('mp-chat-send');
-const sendChat = () => {
-  if (!chatInput) return;
-  const text = chatInput.value.trim();
-  if (!text) return;
-  chatInput.value = '';
-  appendChatMessage(currentUser.name, currentUser.role, text, currentUser.badgeColor);
-  broadcastPacket({
-    type: 'chat',
-    id: myPeerId,
-    name: currentUser.name,
-    role: currentUser.role,
-    badgeColor: currentUser.badgeColor,
-    text
-  });
-};
-if (chatSendBtn) chatSendBtn.addEventListener('click', sendChat);
-if (chatInput) {
-  chatInput.addEventListener('keydown', (e) => {
-    e.stopPropagation();
-    if (e.key === 'Enter') sendChat();
-  });
-}
-
-window.addEventListener('beforeunload', () => {
-  if (peer && myPeerId) {
-    broadcastPacket({ type: 'leave', id: myPeerId });
-    peer.destroy();
-  }
-});
-
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+      // 【修改 2】加上 try...catch，若有執行期錯誤會直接顯示在畫面上，不會無限轉圈
+      try {
+        const canvas = document.getElementById('game-canvas');
+        renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setSize(window.innerWidth, window.innerHeight);
-      });
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.08;
 
-      setTimeout(() => {
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0b131e);
+        scene.fog = new THREE.FogExp2(0x1e293b, 0.0052);
+        scene.add(floorGroups.B1);
+
+        camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.15, 220);
+
+        setupZonalLightingSystem();
+        buildHospitalB1Interior();
+        createMoveTargetMarker();
+        spawnAllNpcs();
+        applyLightingPreset('day', true);
+        setupUIAndInputs();
+
+        createPlayableCharacter();
+        applyLocalPlayerIdentity();
+        initMultiplayerPeerJS();
+
+        const chatInput = document.getElementById('mp-chat-input');
+        const chatSendBtn = document.getElementById('mp-chat-send');
+        const sendChat = () => {
+          if (!chatInput) return;
+          const text = chatInput.value.trim();
+          if (!text) return;
+          chatInput.value = '';
+          appendChatMessage(currentUser.name, currentUser.role, text, currentUser.badgeColor);
+          broadcastPacket({
+            type: 'chat',
+            id: myPeerId,
+            name: currentUser.name,
+            role: currentUser.role,
+            badgeColor: currentUser.badgeColor,
+            text
+          });
+        };
+        if (chatSendBtn) chatSendBtn.addEventListener('click', sendChat);
+        if (chatInput) {
+          chatInput.addEventListener('keydown', (e) => {
+            e.stopPropagation();
+            if (e.key === 'Enter') sendChat();
+          });
+        }
+
+        window.addEventListener('beforeunload', () => {
+          if (peer && myPeerId) {
+            broadcastPacket({ type: 'leave', id: myPeerId });
+            peer.destroy();
+          }
+        });
+
+        window.addEventListener('resize', () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        setTimeout(() => {
+          const loader = document.getElementById('loading-overlay');
+          if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 500);
+          }
+        }, 450);
+
+        animate();
+      } catch (err) {
+        console.error('B1 初始化失敗:', err);
         const loader = document.getElementById('loading-overlay');
         if (loader) {
-          loader.style.opacity = '0';
-          setTimeout(() => loader.remove(), 500);
+          loader.innerHTML = `
+            <div class="text-rose-400 font-black text-xl mb-2">⚠️ 3D 場景載入失敗</div>
+            <div class="text-xs text-slate-200 bg-slate-900/90 border border-rose-500/40 p-3 rounded-xl max-w-md text-left font-mono break-all">
+              ${err.message || err}
+            </div>
+          `;
         }
-      }, 450);
-
-      animate();
+      }
     }
 
-    function animate() {
-      requestAnimationFrame(animate);
-      const dt = Math.min(0.05, clock.getDelta());
-      updateSimulation(dt);
-      syncMyPosition();
-      updateRemotePlayers(dt);
-      renderer.render(scene, camera);
-      renderMinimap();
-    }
-
+    // 【修改 3】不等外部字型與 PeerJS 慢速 CDN，DOM 備妥即啟動
     if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
   </script>
 </body>
 </html>
