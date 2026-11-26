@@ -345,10 +345,17 @@ function normalizeRoleTitle(rawRole) {
     let lastSyncTime = 0;
 
     function verifyAuthSession() {
-      const params = new URLSearchParams(window.location.search);
-      const qCard = params.get('card');
-      const qRole = params.get('role');
-      const qName = params.get('name');
+  const params = new URLSearchParams(window.location.search);
+  const card = params.get('card') || sessionStorage.getItem('hospital_card') || 'GUEST-001';
+  const name = params.get('name') || sessionStorage.getItem('hospital_name') || '院區訪客';
+  const dept = params.get('dept') || sessionStorage.getItem('hospital_dept') || '一般參訪';
+  const role = params.get('role') || sessionStorage.getItem('hospital_role') || 'visitor';
+
+  currentUser = { card, name, dept, role };
+  sessionStorage.setItem('hospital_card', card);
+  sessionStorage.setItem('hospital_name', name);
+  return true; // 永遠允許進入，不再顯示黑屏踢出
+}
 
       let sessionData = null;
       try {
@@ -365,14 +372,11 @@ function normalizeRoleTitle(rawRole) {
         } catch (e) {}
       }
 
-      // 若無登入紀錄，顯示警告並跳轉回 index.html（若在單頁測試可註解掉跳轉）
       if (!sessionData || !sessionData.name) {
-        const warnEl = document.getElementById('auth-warning-overlay');
-        if (warnEl) warnEl.classList.remove('hidden');
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 2200);
-        return false;
+        sessionData = { card: 'GUEST-001', role: '實習醫護', name: '院區訪客' };
+        try {
+          sessionStorage.setItem('vh_user_session', JSON.stringify(sessionData));
+        } catch (e) {}
       }
 
       currentUser.card = sessionData.card || 'EMP-001';
