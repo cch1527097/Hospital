@@ -4011,49 +4011,45 @@ function normalizeRoleTitle(rawRole) {
       addCorridorHandrail(34.15, 7.2, 34.15, 17.8, b1Y);
       addHangingSign(33.8, b1Y + 3.55, 12.5, 5.8, 0.85, 'B卸貨區', 'PARKING & LOADING DOCK', '#475569', '#fbbf24', -Math.PI / 2);
 
+      // 1. 醫工室五面外牆（門開在東側 X = -24.7，門洞 Z = 37.7 ~ 40.6）
       addWall(-30.5, 34.7, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室北牆', 'B1', b1Y);
       addWall(-30.5, 43.6, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室南牆', 'B1', b1Y);
       addWall(-36.3, 39.15, 0.4, 9.3, 4.4, texMedBlueGrayWall, '醫工室西牆', 'B1', b1Y);
       addWall(-24.7, 36.1, 0.4, 3.2, 4.4, texMedBlueGrayWall, '醫工室東側北牆', 'B1', b1Y);
       addWall(-24.7, 42.2, 0.4, 3.2, 4.4, texMedBlueGrayWall, '醫工室東側南牆', 'B1', b1Y);
 
-      // 電動門上方門楣牆
+      // 電動門上方門楣牆 (對齊 X = -24.7, Z = 39.15)
       const bmeLintel = new THREE.Mesh(
         new THREE.BoxGeometry(0.42, 1.9, 3.2),
         createScaledWallMaterial(texMedBlueGrayWall, 3.2, 0.45)
       );
-      bmeLintel.position.set(-34.7, b1Y + 3.45, 44.5);
+      bmeLintel.position.set(-24.7, b1Y + 3.45, 39.15);
       activeBuildGroup.add(bmeLintel);
 
-      // 東側走道扶手（分段避開中央電動門開口 z = 42.9 ~ 46.1）與壁燈
-      addCorridorHandrail(-34.4, 38.0, -34.4, 42.7, b1Y);
-      addCorridorHandrail(-34.4, 46.3, -34.4, 51.0, b1Y);
-      buildWallSconce(-34.4, b1Y + 2.25, 40.5, Math.PI / 2, 0x93c5fd);
-      buildWallSconce(-34.4, b1Y + 2.25, 48.5, Math.PI / 2, 0x93c5fd);
+      // 東側走道扶手（避開中央電動門開口 Z = 37.55 ~ 40.75）與壁燈
+      addCorridorHandrail(-24.4, 34.7, -24.4, 37.4, b1Y);
+      addCorridorHandrail(-24.4, 40.9, -24.4, 43.6, b1Y);
+      buildWallSconce(-24.4, b1Y + 2.25, 36.0, Math.PI / 2, 0x93c5fd);
+      buildWallSconce(-24.4, b1Y + 2.25, 42.3, Math.PI / 2, 0x93c5fd);
 
-      // 縮小後的招牌（由原本 7.6 x 0.9 縮小為 4.4 x 0.68，置於電動門正上方）
-      addHangingSign(-34.46, b1Y + 3.45, 44.5, 4.4, 0.68, '醫工室', 'BIOMEDICAL ENGINEERING', '#1e40af', '#93c5fd', Math.PI / 2);
+      // 招牌置於電動門正上方
+      addHangingSign(-24.46, b1Y + 3.45, 39.15, 4.4, 0.68, '醫工室', 'BIOMEDICAL ENGINEERING', '#1e40af', '#93c5fd', Math.PI / 2);
 
-      // 2. 招牌底下的雙開玻璃感應電動門（南北向滑動）
+      // 2. 招牌底下的雙開玻璃感應電動門（X = -24.7, 中心 Z = 39.15）
       const bmeFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.82, roughness: 0.22 });
-      const bmeGlassMat = new THREE.MeshStandardMaterial({
-        color: 0x93c5fd,
-        transparent: true,
-        opacity: 0.44,
-        roughness: 0.1
-      });
+      const bmeGlassMat = new THREE.MeshStandardMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.44, roughness: 0.1 });
 
       const bmePostN = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), bmeFrameMat);
-      bmePostN.position.set(-34.7, b1Y + 1.25, 42.95);
+      bmePostN.position.set(-24.7, b1Y + 1.25, 37.6);
       const bmePostS = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), bmeFrameMat);
-      bmePostS.position.set(-34.7, b1Y + 1.25, 46.05);
+      bmePostS.position.set(-24.7, b1Y + 1.25, 40.7);
       const bmeHeader = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.16, 3.2), bmeFrameMat);
-      bmeHeader.position.set(-34.7, b1Y + 2.5, 44.5);
+      bmeHeader.position.set(-24.7, b1Y + 2.5, 39.15);
       const bmeSensor = new THREE.Mesh(
         new THREE.BoxGeometry(0.14, 0.08, 0.32),
         new THREE.MeshStandardMaterial({ color: 0x090d16, emissive: 0x3b82f6, emissiveIntensity: 0.85 })
       );
-      bmeSensor.position.set(-34.45, b1Y + 2.48, 44.5);
+      bmeSensor.position.set(-24.45, b1Y + 2.48, 39.15);
       activeBuildGroup.add(bmePostN, bmePostS, bmeHeader, bmeSensor);
 
       const createBmeDoorLeaf = () => {
@@ -4073,26 +4069,26 @@ function normalizeRoleTitle(rawRole) {
       };
 
       const bmeLeftLeaf = createBmeDoorLeaf();
-      bmeLeftLeaf.position.set(-34.7, b1Y + 1.21, 43.75);
+      bmeLeftLeaf.position.set(-24.7, b1Y + 1.21, 38.4);
       const bmeRightLeaf = createBmeDoorLeaf();
-      bmeRightLeaf.position.set(-34.7, b1Y + 1.21, 45.25);
+      bmeRightLeaf.position.set(-24.7, b1Y + 1.21, 39.9);
       activeBuildGroup.add(bmeLeftLeaf, bmeRightLeaf);
 
-      const bmeLeftCol = { minX: -34.9, maxX: -34.5, minZ: 43.0, maxZ: 44.5, floor: 'B1', label: '醫工室電動門' };
-      const bmeRightCol = { minX: -34.9, maxX: -34.5, minZ: 44.5, maxZ: 46.0, floor: 'B1', label: '醫工室電動門' };
+      const bmeLeftCol = { minX: -24.9, maxX: -24.5, minZ: 37.65, maxZ: 39.15, floor: 'B1', label: '醫工室電動門' };
+      const bmeRightCol = { minX: -24.9, maxX: -24.5, minZ: 39.15, maxZ: 40.65, floor: 'B1', label: '醫工室電動門' };
       colliders.push(bmeLeftCol, bmeRightCol);
 
       slidingDoors.push({
-        sensorPos: new THREE.Vector3(-34.5, b1Y, 44.5),
+        sensorPos: new THREE.Vector3(-24.5, b1Y, 39.15),
         leftLeaf: bmeLeftLeaf,
         rightLeaf: bmeRightLeaf,
-        leftClosedZ: 43.75,
-        rightClosedZ: 45.25,
+        leftClosedZ: 38.4,
+        rightClosedZ: 39.9,
         openOffset: 1.38,
         openProgress: 0,
         leftCollider: bmeLeftCol,
         rightCollider: bmeRightCol,
-        centerZ: 44.5
+        centerZ: 39.15
       });
 
       // 3. 醫工室內部照明、維修工作檯與各種檢修中醫療儀器
