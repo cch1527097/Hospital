@@ -3763,24 +3763,29 @@ function normalizeRoleTitle(rawRole) {
       pillow.position.set(0, 0.84, -0.75);
       endoBedGroup.add(bedBase, bedMattress, pillow);
 
-      // 側躺接受胃鏡檢查的患者角色模型（穩穩側躺在床墊正中央，頭枕在白色枕頭上並朝向黑色胃鏡導管）
+      // 側躺接受胃鏡檢查的患者（雙層容器精準置中，保證 100% 側躺在床墊正中央）
       const gastroPatientRig = createRoundedCharacterRig({
         coatColor: 0xbae6fd,   // 淡藍色檢查服
         pantsColor: 0x64748b,
         hairColor: 0x1e1b18,
         skinColor: 0xf1c29b
       });
-      gastroPatientRig.group.rotation.order = 'XZY';
-      gastroPatientRig.group.rotation.x = -Math.PI / 2; // 頭朝北 (-Z 枕頭)、腳朝南 (+Z 床尾)
-      gastroPatientRig.group.rotation.z = -Math.PI / 2; // 側翻 90 度（左側臥，臉部朝向右側黑色胃鏡塔）
-      gastroPatientRig.group.position.set(0, 0.96, 0.85); // 精準置於床墊正中央（頭剛好枕在 z = -0.75 枕頭上）
+      // 1. 內層：先把角色腰部中心移到原點，並讓身體側翻 90 度（臉朝向黑色胃鏡塔）
+      gastroPatientRig.group.position.set(0, -0.85, 0);
+      gastroPatientRig.group.rotation.y = Math.PI / 2;
 
-      // 雙膝微彎與雙手自然放胸前的側臥姿勢
+      // 雙膝微彎、雙手放胸前的側臥姿勢
       gastroPatientRig.leftHip.rotation.x = -0.45;
       gastroPatientRig.rightHip.rotation.x = -0.65;
       gastroPatientRig.leftShoulder.rotation.x = -0.45;
       gastroPatientRig.rightShoulder.rotation.x = -0.65;
-      endoBedGroup.add(gastroPatientRig.group);
+
+      // 2. 外層：直接放平並精準放在床墊正中央 (x=0, y=0.96, z=0.05)
+      const patientBedPivot = new THREE.Group();
+      patientBedPivot.add(gastroPatientRig.group);
+      patientBedPivot.rotation.x = -Math.PI / 2; // 頭朝北 (-Z 枕頭)、腳朝南 (+Z 床尾)
+      patientBedPivot.position.set(0, 0.96, 0.05);
+      endoBedGroup.add(patientBedPivot);
 
       // 內視鏡主機影像塔與胃部即時彩色螢幕（位於床頭右側）
       const scopeTower = new THREE.Mesh(new THREE.BoxGeometry(0.62, 1.38, 0.58), towerMat);
