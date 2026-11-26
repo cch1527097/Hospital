@@ -5988,23 +5988,24 @@ function normalizeRoleTitle(rawRole) {
           }
         }
 
-        const targetProg = triggerOpen ? 1 : 0;
-        d.openProgress += (targetProg - d.openProgress) * Math.min(1, dt * 7.5);
+        const targetProgress = triggerOpen ? 1 : 0;
+        d.openProgress += (targetProgress - d.openProgress) * Math.min(1, dt * 6.5);
         const offset = d.openProgress * d.openOffset;
 
         if (d.axis === 'x') {
-          // 東西向滑動門（門診辦公室、核子醫學部、醫美中心、內視鏡中心）
           d.leftLeaf.position.x = d.leftClosedPos - offset;
           d.rightLeaf.position.x = d.rightClosedPos + offset;
-          d.leftCollider.maxX = d.centerCoord - offset;
-          d.rightCollider.minX = d.centerCoord + offset;
+          if (d.leftCollider && d.rightCollider) {
+            d.leftCollider.maxX = d.centerCoord - offset;
+            d.rightCollider.minX = d.centerCoord + offset;
+          }
         } else {
-          // 南北向滑動門（資材處/藥庫、供應室、高壓氧艙、病歷室、醫工室）
-          const centerZ = d.centerZ ?? (d.leftClosedZ + d.rightClosedZ) * 0.5;
           d.leftLeaf.position.z = d.leftClosedZ - offset;
           d.rightLeaf.position.z = d.rightClosedZ + offset;
-          d.leftCollider.maxZ = centerZ - offset;
-          d.rightCollider.minZ = centerZ + offset;
+          if (d.leftCollider && d.rightCollider) {
+            d.leftCollider.maxZ = d.centerZ - offset;
+            d.rightCollider.minZ = d.centerZ + offset;
+          }
         }
       }
 
