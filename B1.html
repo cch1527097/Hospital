@@ -3229,11 +3229,202 @@ function normalizeRoleTitle(rawRole) {
       });
       colliders.push({ minX: -40.1, maxX: -38.6, minZ: 32.8, maxZ: 36.2, floor: 'B1', label: '核醫影像控制工作站' });
 
-      addWall(-24.5, 12.5, 17.5, 9.5, 4.4, texAestheticPinkWall, '維納斯醫學美容中心', 'B1', b1Y);
-      addCorridorHandrail(-32.8, 7.65, -16.2, 7.65, b1Y, 0xb45309);
+      // === 維納斯醫學美容中心暨皮膚科門診（含感應電動門、美容儀器與診間）===
+      // 1. 外圍環狀牆體（北側 z = 7.95 中央 x = -24.5 預留寬 3.2 的電動門開口）
+      addWall(-24.5, 17.05, 17.5, 0.4, 4.4, texAestheticPinkWall, '醫美中心南牆', 'B1', b1Y);
+      addWall(-33.05, 12.5, 0.4, 9.5, 4.4, texAestheticPinkWall, '醫美中心西牆', 'B1', b1Y);
+      addWall(-15.95, 12.5, 0.4, 9.5, 4.4, texAestheticPinkWall, '醫美中心東牆', 'B1', b1Y);
+      addWall(-29.675, 7.95, 7.15, 0.4, 4.4, texAestheticPinkWall, '醫美中心北側西牆', 'B1', b1Y);
+      addWall(-19.325, 7.95, 7.15, 0.4, 4.4, texAestheticPinkWall, '醫美中心北側東牆', 'B1', b1Y);
+
+      // 電動門上方門楣牆
+      const aesLintel = new THREE.Mesh(
+        new THREE.BoxGeometry(3.2, 1.9, 0.42),
+        createScaledWallMaterial(texAestheticPinkWall, 3.2, 0.45)
+      );
+      aesLintel.position.set(-24.5, b1Y + 3.45, 7.95);
+      activeBuildGroup.add(aesLintel);
+
+      // 北側走道扶手（避開中央電動門開口 -26.1 ~ -22.9）、壁燈與招牌
+      addCorridorHandrail(-32.8, 7.65, -26.3, 7.65, b1Y, 0xb45309);
+      addCorridorHandrail(-22.7, 7.65, -16.2, 7.65, b1Y, 0xb45309);
       buildWallSconce(-29.5, b1Y + 2.25, 7.65, 0, 0xfbcfe8);
       buildWallSconce(-19.5, b1Y + 2.25, 7.65, 0, 0xfbcfe8);
-      addHangingSign(-24.5, b1Y + 3.65, 7.5, 8.2, 0.9, '醫學美容中心', 'Medical Aesthetic Center', '#be185d', '#f9a8d4', Math.PI);
+      addHangingSign(-24.5, b1Y + 3.65, 7.65, 8.2, 0.9, '醫學美容中心', 'Medical Aesthetic', '#be185d', '#f9a8d4', Math.PI);
+
+      // 2. 招牌底下的雙開玻璃感應電動門（東西向滑動）
+      const aesFrameMat = new THREE.MeshStandardMaterial({ color: 0xb45309, metalness: 0.82, roughness: 0.22 });
+      const aesGlassMat = new THREE.MeshStandardMaterial({
+        color: 0xfbcfe8,
+        transparent: true,
+        opacity: 0.44,
+        roughness: 0.1
+      });
+
+      const aesPostW = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.5, 0.46), aesFrameMat);
+      aesPostW.position.set(-26.05, b1Y + 1.25, 7.95);
+      const aesPostE = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.5, 0.46), aesFrameMat);
+      aesPostE.position.set(-22.95, b1Y + 1.25, 7.95);
+      const aesHeader = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.16, 0.5), aesFrameMat);
+      aesHeader.position.set(-24.5, b1Y + 2.5, 7.95);
+      const aesSensor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.32, 0.08, 0.14),
+        new THREE.MeshStandardMaterial({ color: 0x090d16, emissive: 0xf472b6, emissiveIntensity: 0.85 })
+      );
+      aesSensor.position.set(-24.5, b1Y + 2.48, 7.7);
+      activeBuildGroup.add(aesPostW, aesPostE, aesHeader, aesSensor);
+
+      const createAesDoorLeaf = () => {
+        const leaf = new THREE.Group();
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2.42, 0.06), aesGlassMat);
+        const topRail = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 0.09), aesFrameMat);
+        topRail.position.y = 1.16;
+        const botRail = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.14, 0.09), aesFrameMat);
+        botRail.position.y = -1.14;
+        const pinkStripe = new THREE.Mesh(
+          new THREE.BoxGeometry(1.48, 0.12, 0.075),
+          new THREE.MeshStandardMaterial({ color: 0xbe185d, emissive: 0xdb2777, emissiveIntensity: 0.45 })
+        );
+        pinkStripe.position.y = 0.05;
+        leaf.add(pane, topRail, botRail, pinkStripe);
+        return leaf;
+      };
+
+      const aesLeftLeaf = createAesDoorLeaf();
+      aesLeftLeaf.position.set(-25.25, b1Y + 1.21, 7.95);
+      const aesRightLeaf = createAesDoorLeaf();
+      aesRightLeaf.position.set(-23.75, b1Y + 1.21, 7.95);
+      activeBuildGroup.add(aesLeftLeaf, aesRightLeaf);
+
+      const aesLeftCol = { minX: -26.0, maxX: -24.5, minZ: 7.75, maxZ: 8.15, floor: 'B1', label: '醫美中心電動門' };
+      const aesRightCol = { minX: -24.5, maxX: -23.0, minZ: 7.75, maxZ: 8.15, floor: 'B1', label: '醫美中心電動門' };
+      colliders.push(aesLeftCol, aesRightCol);
+
+      slidingDoors.push({
+        axis: 'x',
+        sensorPos: new THREE.Vector3(-24.5, b1Y, 7.75),
+        leftLeaf: aesLeftLeaf,
+        rightLeaf: aesRightLeaf,
+        leftClosedPos: -25.25,
+        rightClosedPos: -23.75,
+        openOffset: 1.38,
+        openProgress: 0,
+        leftCollider: aesLeftCol,
+        rightCollider: aesRightCol,
+        centerCoord: -24.5
+      });
+
+      // 3. 室內暖粉照明與迎賓諮詢櫃檯
+      const aesLight1 = new THREE.PointLight(0xfce7f3, 1.2, 20, 1.4);
+      aesLight1.position.set(-28.5, b1Y + 3.8, 12.5);
+      const aesLight2 = new THREE.PointLight(0xfff1f2, 1.15, 20, 1.4);
+      aesLight2.position.set(-20.5, b1Y + 3.8, 12.5);
+      activeBuildGroup.add(aesLight1, aesLight2);
+
+      const aesCounter = new THREE.Mesh(
+        new THREE.BoxGeometry(2.6, 1.05, 0.75),
+        new THREE.MeshStandardMaterial({ color: 0xfdf2f8, roughness: 0.25 })
+      );
+      aesCounter.position.set(-24.5, b1Y + 0.525, 10.6);
+      const aesCounterTrim = new THREE.Mesh(
+        new THREE.BoxGeometry(2.64, 0.14, 0.79),
+        new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.85, roughness: 0.2 })
+      );
+      aesCounterTrim.position.set(-24.5, b1Y + 1.05, 10.6);
+      activeBuildGroup.add(aesCounter, aesCounterTrim);
+      colliders.push({ minX: -25.85, maxX: -23.15, minZ: 10.2, maxZ: 11.0, floor: 'B1', label: '醫美迎賓諮詢櫃檯' });
+
+      // 4. 左側（西半部 x = -31.5 ~ -27.2）：美容儀器區（皮秒雷射儀、水飛梭與美容躺椅）
+      const buildAestheticDeviceStation = (dx, dz, deviceColorHex, labelText) => {
+        const st = new THREE.Group();
+        const whiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.2 });
+        const accentMat = new THREE.MeshStandardMaterial({ color: deviceColorHex, roughness: 0.35 });
+        const leatherMat = new THREE.MeshStandardMaterial({ color: 0xf9a8d4, roughness: 0.45 });
+        const screenMat = new THREE.MeshStandardMaterial({
+          color: 0x0f172a,
+          emissive: new THREE.Color(deviceColorHex),
+          emissiveIntensity: 0.85
+        });
+
+        // 美容診療躺椅
+        const bedBase = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.45, 1.2), whiteMat);
+        bedBase.position.set(0, 0.225, 0);
+        const mattress = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.14, 1.95), leatherMat);
+        mattress.position.set(0, 0.52, 0);
+        const headrest = new THREE.Mesh(new THREE.BoxGeometry(0.74, 0.14, 0.48), leatherMat);
+        headrest.position.set(0, 0.62, -0.82);
+        headrest.rotation.x = 0.28;
+
+        // 醫學美容雷射／水飛梭主機塔與關節懸臂
+        const tower = new THREE.Mesh(new THREE.BoxGeometry(0.54, 1.18, 0.52), whiteMat);
+        tower.position.set(0.88, 0.59, -0.35);
+        const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.22, 0.54), accentMat);
+        stripe.position.set(0.88, 0.88, -0.35);
+        const panel = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.32, 0.06), screenMat);
+        panel.position.set(0.88, 1.32, -0.25);
+        panel.rotation.x = -0.35;
+
+        const armV = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.04, 0.75, 10), whiteMat);
+        armV.position.set(0.88, 1.52, -0.45);
+        const armH = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.85, 10), whiteMat);
+        armH.rotation.z = Math.PI * 0.42;
+        armH.position.set(0.48, 1.78, -0.45);
+        const laserHead = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.04, 0.22, 12), accentMat);
+        laserHead.position.set(0.12, 1.62, -0.45);
+
+        st.add(bedBase, mattress, headrest, tower, stripe, panel, armV, armH, laserHead);
+        st.position.set(dx, b1Y, dz);
+        activeBuildGroup.add(st);
+
+        colliders.push({
+          minX: dx - 0.5,
+          maxX: dx + 1.25,
+          minZ: dz - 1.05,
+          maxZ: dz + 1.05,
+          floor: 'B1',
+          label: labelText
+        });
+      };
+
+      buildAestheticDeviceStation(-30.5, 10.6, 0xec4899, '皮秒雷射美容儀與治療床');
+      buildAestheticDeviceStation(-30.5, 14.5, 0x38bdf8, '水飛梭／音波拉提美容儀');
+
+      // 5. 右側（東半部 x = -22.2 ~ -16.5）：皮膚科門診診間（皮膚 301診 & 302診）
+      const dermRooms = [
+        { x: -19.2, z: 10.6, code: '皮膚 301診', dept: '醫學美容門診', doctor: '蘇妍希 醫師', queue: '0016' },
+        { x: -19.2, z: 14.4, code: '皮膚 302診', dept: '一般皮膚科', doctor: '陳柏宇 醫師', queue: '0024' }
+      ];
+
+      dermRooms.forEach((rm) => {
+        // 診間隔間牆與門框
+        addWall(rm.x + 1.4, rm.z, 3.2, 0.25, 3.6, texAestheticPinkWall, `${rm.code}隔間`, 'B1', b1Y);
+        const doorTex = createClinicDoorTexture(rm.code, rm.dept, rm.doctor);
+        const doorLeaf = new THREE.Mesh(
+          new THREE.BoxGeometry(0.12, 2.32, 1.18),
+          new THREE.MeshStandardMaterial({ map: doorTex, roughness: 0.4 })
+        );
+        doorLeaf.position.set(rm.x - 0.25, b1Y + 1.16, rm.z + 0.95);
+        doorLeaf.rotation.y = -Math.PI / 2;
+        activeBuildGroup.add(doorLeaf);
+
+        // 診間叫號螢幕
+        const monTex = createQueueMonitorTexture(rm.queue, rm.code);
+        const mon = new THREE.Mesh(
+          new THREE.BoxGeometry(0.09, 0.95, 0.55),
+          new THREE.MeshStandardMaterial({
+            map: monTex,
+            emissive: new THREE.Color(0xffffff),
+            emissiveMap: monTex,
+            emissiveIntensity: 0.35
+          })
+        );
+        mon.position.set(rm.x - 0.32, b1Y + 1.55, rm.z + 0.15);
+        mon.rotation.y = -Math.PI / 2;
+        activeBuildGroup.add(mon);
+      });
+
+      // 皮膚科診間外候診排椅
+      allWaitingSeats.push(...buildHospitalWaitingBench(-23.2, 14.5, Math.PI / 2, b1Y, 0x831843));
 
       buildClinicWallFacade(-22.5, 33.5, [
         { code: '神內 201診', dept: '神經內科', doctor: '黃柏翰 醫師', queueNum: '0064' },
@@ -3598,6 +3789,41 @@ function normalizeRoleTitle(rawRole) {
       const b1Y = FLOOR_Y.B1;
 
       const coreStaffAndGuards = [
+        {
+          name: '蘇妍希 主治醫師',
+          role: '皮膚科暨醫美主治醫師',
+          avatar: '✨',
+          type: 'staff',
+          floor: 'B1',
+          badgeColor: '#f472b6',
+          appearance: { coatColor: 0xffffff, pantsColor: 0x831843, isDoctor: true, hasMask: true },
+          waypoints: [
+            new THREE.Vector3(-25.5, b1Y, 12.6),
+            new THREE.Vector3(-21.2, b1Y, 12.6)
+          ],
+          speed: 0.95,
+          dialogue: '歡迎來到醫學美容中心暨皮膚科門診！左側配置皮秒雷射與水飛梭美容儀器，右側為皮膚 301、302 診間，提供雷射光療與健保皮膚診療服務。',
+          options: [
+            {
+              label: '請問皮秒雷射與水飛梭需要預約嗎？',
+              reply: '可先至門口迎賓櫃檯進行膚質檢測與醫師諮詢，療程結束後可直接前往隔壁高壓氧艙中心加強術後修復喔！'
+            }
+          ]
+        },
+        {
+          name: '林語柔 護理諮詢師',
+          role: '醫美雷射室・術前評估與衛教',
+          avatar: '💆‍♀️',
+          type: 'staff',
+          floor: 'B1',
+          badgeColor: '#f9a8d4',
+          appearance: { coatColor: 0xf472b6, pantsColor: 0xbe185d, isNurse: true, hasMask: true },
+          waypoints: [new THREE.Vector3(-28.2, b1Y, 12.5)],
+          speed: 0,
+          yaw: Math.PI / 2,
+          dialogue: '您好！皮秒雷射與音波拉提儀器已完成無菌消毒與能量校準，請躺上美容診療床即可開始療程。',
+          options: []
+        },
         {
           name: '林俊傑 胸腔科主治醫師',
           role: 'B1 胸腔科 101診・今日候診大爆滿',
