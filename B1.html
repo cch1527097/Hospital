@@ -2100,6 +2100,25 @@ function normalizeRoleTitle(rawRole) {
         isWoodBand: true
       });
 
+      const texWoodAccentWall = texFoodWalnutMarbleWall;
+      function addSolidBox(cx, cy, cz, w, h, d, mat, label = '物體', floor = 'B1') {
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+        mesh.position.set(cx, cy, cz);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        (activeBuildGroup || scene).add(mesh);
+
+        colliders.push({
+          minX: cx - w / 2,
+          maxX: cx + w / 2,
+          minZ: cz - d / 2,
+          maxZ: cz + d / 2,
+          floor,
+          label
+        });
+        return mesh;
+      }
+
       const redHighlightMat = new THREE.MeshStandardMaterial({
         color: 0xdc2626,
         emissive: 0xdc2626,
@@ -6448,6 +6467,16 @@ document.getElementById('btn-toggle-help')?.addEventListener('click', () => {
           openTransportModal('中央手扶梯 / 電梯');
         }
       }, { passive: false });
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05);
+      updateSimulation(dt);
+      updateRemotePlayers(dt);
+      syncMyPosition(false);
+      renderMinimap();
+      renderer.render(scene, camera);
     }
 
     function init() {
