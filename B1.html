@@ -1910,25 +1910,25 @@ function normalizeRoleTitle(rawRole) {
         stallData.accentHex || '#b45309'
       );
       const backWall = new THREE.Mesh(
-        new THREE.BoxGeometry(width, 3.6, 0.25),
-        new THREE.MeshStandardMaterial({ map: backTex, roughness: 0.42 })
-      );
-      backWall.position.set(0, 1.8, -depth / 2 + 0.15);
+  new THREE.BoxGeometry(width, 4.48, 0.25),
+  new THREE.MeshStandardMaterial({ map: backTex, roughness: 0.42 })
+);
+backWall.position.set(0, 2.24, -depth / 2 + 0.15);
       g.add(backWall);
 
       const backCove = new THREE.Mesh(new THREE.BoxGeometry(width - 0.3, 0.08, 0.24), warmLedMat);
       backCove.position.set(0, 3.35, -depth / 2 + 0.34);
       g.add(backCove);
 
-      const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.24, 3.6, depth), marbleMat);
-      leftWall.position.set(-width / 2 + 0.12, 1.8, 0);
-      const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.24, 3.6, depth), marbleMat);
-      rightWall.position.set(width / 2 - 0.12, 1.8, 0);
+      const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.24, 4.48, depth), marbleMat);
+leftWall.position.set(-width / 2 + 0.12, 2.24, 0);
+const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.24, 4.48, depth), marbleMat);
+rightWall.position.set(width / 2 - 0.12, 2.24, 0);
       g.add(leftWall, rightWall);
 
       for (let s = 0; s < 4; s++) {
-        const slat = new THREE.Mesh(new THREE.BoxGeometry(0.065, 3.45, 0.12), slatMat);
-        slat.position.set(-width / 2 - 0.06, 1.72, frontZ - 0.1 - s * 0.16);
+        const slat = new THREE.Mesh(new THREE.BoxGeometry(0.065, 4.46, 0.12), slatMat);
+slat.position.set(-width / 2 - 0.06, 2.23, frontZ - 0.1 - s * 0.16);
         g.add(slat);
       }
 
@@ -1961,10 +1961,10 @@ function normalizeRoleTitle(rawRole) {
       g.add(dividerL, dividerR);
 
       const headerBeam = new THREE.Mesh(
-        new THREE.BoxGeometry(width, 0.88, 0.44),
-        new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35, metalness: 0.5 })
-      );
-      headerBeam.position.set(0, 3.18, frontZ - 0.15);
+  new THREE.BoxGeometry(width, 1.2, 0.44),
+  new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35, metalness: 0.5 })
+);
+headerBeam.position.set(0, 3.88, frontZ - 0.15);
       g.add(headerBeam);
 
       const underCounterLight = new THREE.Mesh(new THREE.BoxGeometry(width - 0.35, 0.04, 0.16), warmLedMat);
@@ -1981,7 +1981,7 @@ function normalizeRoleTitle(rawRole) {
           emissiveIntensity: 0.42
         })
       );
-      signFace.position.set(0, 3.18, frontZ + 0.08);
+      signFace.position.set(0, 3.88, frontZ + 0.08);
       g.add(signFace);
 
       g.position.set(x, baseY, z);
@@ -2999,6 +2999,9 @@ function normalizeRoleTitle(rawRole) {
         buildRealFoodCourtStall(st.x, -21.2, st.w, st, marbleMat, b1Y);
       });
 
+      addWall(11.4, -17.5, 22.0, 0.35, 4.48, texFoodWalnutMarbleWall, '美食街紅框新增牆壁', 'B1', b1Y);
+minimapFurnitures.push({ x: 11.4, z: -17.5, w: 22.0, d: 0.35, color: '#78716c' });
+      
       addHangingSign(11.5, b1Y + 3.85, -16.8, 9.2, 0.85, '地下美食街', 'FOOD COURT・吧檯用餐區', '#7c2d12', '#fde047');
 
       // === 員工餐廳（往左延伸至 X=22.15 補齊縫隙 + 招牌下方開大門口 + 內部 Buffet 與用餐區）===
