@@ -3660,9 +3660,184 @@ function normalizeRoleTitle(rawRole) {
       allWaitingSeats.push(...buildHospitalWaitingBench(9.5, 12.6, Math.PI, b1Y));
       allWaitingSeats.push(...buildHospitalWaitingBench(19.5, 12.6, Math.PI, b1Y));
 
-      // H. 南東翼
-      addWall(26.5, 20.5, 7.5, 12.5, 4.4, texCleanTealWall, '內視鏡中心', 'B1', b1Y);
-      addHangingSign(26.5, b1Y + 3.65, 13.8, 7.2, 0.9, '內視鏡中心', 'GASTROSCOPY・COLONOSCOPY・ENDOSCOPY SUITE', '#065f46', '#6ee7b7', Math.PI);
+      // === 內視鏡中心（縮小招牌、北側感應電動門、室內胃鏡檢查室）===
+      // 1. 外圍環狀牆體（X: 22.75 ~ 30.25，寬 7.5；Z: 14.25 ~ 26.75，深 12.5；北側 z = 14.45 中央 x = 26.5 預留寬 3.2 的電動門開口）
+      addWall(26.5, 26.55, 7.5, 0.4, 4.4, texCleanTealWall, '內視鏡中心南牆', 'B1', b1Y);
+      addWall(22.95, 20.5, 0.4, 12.5, 4.4, texCleanTealWall, '內視鏡中心西牆', 'B1', b1Y);
+      addWall(30.05, 20.5, 0.4, 12.5, 4.4, texCleanTealWall, '內視鏡中心東牆', 'B1', b1Y);
+      addWall(23.825, 14.45, 2.15, 0.4, 4.4, texCleanTealWall, '內視鏡中心北側西牆', 'B1', b1Y);
+      addWall(29.175, 14.45, 2.15, 0.4, 4.4, texCleanTealWall, '內視鏡中心北側東牆', 'B1', b1Y);
+
+      // 電動門上方門楣牆
+      const endoLintel = new THREE.Mesh(
+        new THREE.BoxGeometry(3.2, 1.9, 0.42),
+        createScaledWallMaterial(texCleanTealWall, 3.2, 0.45)
+      );
+      endoLintel.position.set(26.5, b1Y + 3.45, 14.45);
+      activeBuildGroup.add(endoLintel);
+
+      // 縮小後的招牌（由原本 7.2 x 0.9 縮小為 4.2 x 0.65，置於電動門正上方）
+      addHangingSign(26.5, b1Y + 3.35, 14.21, 4.2, 0.65, '內視鏡中心', 'ENDOSCOPY SUITE', '#065f46', '#6ee7b7', Math.PI);
+
+      // 2. 招牌底下的雙開玻璃感應電動門（東西向滑動 axis: 'x'）
+      const endoFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.25 });
+      const endoGlassMat = new THREE.MeshStandardMaterial({
+        color: 0xa7f3d0,
+        transparent: true,
+        opacity: 0.44,
+        roughness: 0.1
+      });
+
+      const endoPostW = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.5, 0.46), endoFrameMat);
+      endoPostW.position.set(24.95, b1Y + 1.25, 14.45);
+      const endoPostE = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.5, 0.46), endoFrameMat);
+      endoPostE.position.set(28.05, b1Y + 1.25, 14.45);
+      const endoHeader = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.16, 0.5), endoFrameMat);
+      endoHeader.position.set(26.5, b1Y + 2.5, 14.45);
+      const endoSensor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.32, 0.08, 0.14),
+        new THREE.MeshStandardMaterial({ color: 0x090d16, emissive: 0x10b981, emissiveIntensity: 0.85 })
+      );
+      endoSensor.position.set(26.5, b1Y + 2.48, 14.2);
+      activeBuildGroup.add(endoPostW, endoPostE, endoHeader, endoSensor);
+
+      const createEndoDoorLeaf = () => {
+        const leaf = new THREE.Group();
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2.42, 0.06), endoGlassMat);
+        const topRail = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 0.09), endoFrameMat);
+        topRail.position.y = 1.16;
+        const botRail = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.14, 0.09), endoFrameMat);
+        botRail.position.y = -1.14;
+        const greenStripe = new THREE.Mesh(
+          new THREE.BoxGeometry(1.48, 0.12, 0.075),
+          new THREE.MeshStandardMaterial({ color: 0x065f46, emissive: 0x059669, emissiveIntensity: 0.45 })
+        );
+        greenStripe.position.y = 0.05;
+        leaf.add(pane, topRail, botRail, greenStripe);
+        return leaf;
+      };
+
+      const endoLeftLeaf = createEndoDoorLeaf();
+      endoLeftLeaf.position.set(25.75, b1Y + 1.21, 14.45);
+      const endoRightLeaf = createEndoDoorLeaf();
+      endoRightLeaf.position.set(27.25, b1Y + 1.21, 14.45);
+      activeBuildGroup.add(endoLeftLeaf, endoRightLeaf);
+
+      const endoLeftCol = { minX: 25.0, maxX: 26.5, minZ: 14.25, maxZ: 14.65, floor: 'B1', label: '內視鏡中心電動門' };
+      const endoRightCol = { minX: 26.5, maxX: 28.0, minZ: 14.25, maxZ: 14.65, floor: 'B1', label: '內視鏡中心電動門' };
+      colliders.push(endoLeftCol, endoRightCol);
+
+      slidingDoors.push({
+        axis: 'x',
+        sensorPos: new THREE.Vector3(26.5, b1Y, 14.25),
+        leftLeaf: endoLeftLeaf,
+        rightLeaf: endoRightLeaf,
+        leftClosedPos: 25.75,
+        rightClosedPos: 27.25,
+        openOffset: 1.38,
+        openProgress: 0,
+        leftCollider: endoLeftCol,
+        rightCollider: endoRightCol,
+        centerCoord: 26.5
+      });
+
+      // 3. 室內照明、胃鏡檢查床、內視鏡影像塔與胃鏡軟管
+      const endoLight = new THREE.PointLight(0xe0f7fa, 1.25, 20, 1.4);
+      endoLight.position.set(26.5, b1Y + 3.8, 20.5);
+      activeBuildGroup.add(endoLight);
+
+      const endoBedGroup = new THREE.Group();
+      const bedFrameMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3, metalness: 0.3 });
+      const bedPadMat = new THREE.MeshStandardMaterial({ color: 0x0d9488, roughness: 0.45 });
+      const towerMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35, metalness: 0.5 });
+
+      // 胃鏡檢查床與枕頭
+      const bedBase = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.68, 1.85), bedFrameMat);
+      bedBase.position.set(0, 0.34, 0);
+      const bedMattress = new THREE.Mesh(new THREE.BoxGeometry(0.84, 0.14, 2.05), bedPadMat);
+      bedMattress.position.set(0, 0.74, 0);
+      const pillow = new THREE.Mesh(
+        new THREE.BoxGeometry(0.46, 0.12, 0.32),
+        new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 })
+      );
+      pillow.position.set(0, 0.84, -0.75);
+      endoBedGroup.add(bedBase, bedMattress, pillow);
+
+      // 側躺接受胃鏡檢查的患者角色模型（側臥於檢查床上，頭朝北、面向醫師側）
+      const gastroPatientRig = createRoundedCharacterRig({
+        coatColor: 0xbae6fd,   // 淡藍色檢查服
+        pantsColor: 0x64748b,
+        hairColor: 0x1e1b18,
+        skinColor: 0xf1c29b
+      });
+      gastroPatientRig.group.rotation.z = -Math.PI / 2; // 左側臥姿（標準胃鏡檢查姿勢）
+      gastroPatientRig.group.rotation.x = Math.PI / 2;
+      gastroPatientRig.group.position.set(-0.82, 0.96, -0.82);
+      gastroPatientRig.leftHip.rotation.x = -0.55;
+      gastroPatientRig.rightHip.rotation.x = -0.65;
+      endoBedGroup.add(gastroPatientRig.group);
+
+      // 內視鏡主機影像塔與胃部即時彩色螢幕（位於床頭右側）
+      const scopeTower = new THREE.Mesh(new THREE.BoxGeometry(0.62, 1.38, 0.58), towerMat);
+      scopeTower.position.set(1.15, 0.69, -0.65);
+
+      const scopeCanvas = document.createElement('canvas');
+      scopeCanvas.width = 256;
+      scopeCanvas.height = 192;
+      const sctx = scopeCanvas.getContext('2d');
+      sctx.fillStyle = '#090d16';
+      sctx.fillRect(0, 0, 256, 192);
+      // 模擬胃鏡內視鏡圓形胃黏膜畫面
+      const gGrad = sctx.createRadialGradient(128, 96, 12, 128, 96, 76);
+      gGrad.addColorStop(0, '#fecdd3');
+      gGrad.addColorStop(0.55, '#fb7185');
+      gGrad.addColorStop(1, '#9f1239');
+      sctx.fillStyle = gGrad;
+      sctx.beginPath();
+      sctx.arc(128, 96, 74, 0, Math.PI * 2);
+      sctx.fill();
+      sctx.fillStyle = '#34d399';
+      sctx.font = 'bold 14px monospace';
+      sctx.fillText('GASTROSCOPY LIVE', 12, 20);
+      const scopeTex = new THREE.CanvasTexture(scopeCanvas);
+      scopeTex.encoding = THREE.sRGBEncoding;
+      scopeTex.needsUpdate = true;
+
+      const scopeMonitor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.58, 0.44, 0.06),
+        new THREE.MeshStandardMaterial({
+          map: scopeTex,
+          emissive: new THREE.Color(0xffffff),
+          emissiveMap: scopeTex,
+          emissiveIntensity: 0.75
+        })
+      );
+      scopeMonitor.position.set(1.15, 1.65, -0.65);
+      scopeMonitor.rotation.y = -0.35;
+
+      // 黑色胃鏡導管（從影像塔延伸至患者口部咬嘴位置）
+      const scopeTubeCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0.95, 1.15, -0.65),
+        new THREE.Vector3(0.45, 1.25, -0.78),
+        new THREE.Vector3(0.05, 1.02, -0.78)
+      ]);
+      const scopeTube = new THREE.Mesh(
+        new THREE.TubeGeometry(scopeTubeCurve, 16, 0.016, 8, false),
+        new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.2 })
+      );
+
+      endoBedGroup.add(scopeTower, scopeMonitor, scopeTube);
+      endoBedGroup.position.set(26.1, b1Y, 20.8);
+      activeBuildGroup.add(endoBedGroup);
+
+      colliders.push({
+        minX: 25.4,
+        maxX: 27.7,
+        minZ: 19.6,
+        maxZ: 22.0,
+        floor: 'B1',
+        label: '胃鏡檢查床與內視鏡影像塔'
+      });
 
       addWall(42.5, 12.5, 16.5, 11.5, 4.4, texIvoryWoodWall, '卸貨區', 'B1', b1Y);
       addCorridorHandrail(34.15, 7.2, 34.15, 17.8, b1Y);
@@ -3980,6 +4155,39 @@ function normalizeRoleTitle(rawRole) {
       const b1Y = FLOOR_Y.B1;
 
       const coreStaffAndGuards = [
+        {
+          name: '劉家豪 主治醫師',
+          role: '內視鏡中心・無痛胃鏡檢查室',
+          avatar: '🩺',
+          type: 'staff',
+          floor: 'B1',
+          badgeColor: '#34d399',
+          appearance: { coatColor: 0xffffff, pantsColor: 0x065f46, isDoctor: true, hasMask: true },
+          waypoints: [new THREE.Vector3(25.15, b1Y, 20.1)],
+          speed: 0,
+          yaw: Math.PI / 2,
+          dialogue: '正在為患者進行上消化道胃鏡檢查，請保持室內安靜。若您預約了無痛胃鏡或大腸鏡，請先確認已完成清腸與禁食 8 小時喔！',
+          options: [
+            {
+              label: '請問胃鏡檢查大概需要多久？',
+              reply: '一般胃鏡檢查約 5 至 10 分鐘即可完成；若選擇舒眠無痛胃鏡，檢查後需在恢復室休息約 30 分鐘待麻藥消退。'
+            }
+          ]
+        },
+        {
+          name: '林佳蓉 護理師',
+          role: '內視鏡中心・術前衛教與恢復照護',
+          avatar: '👩‍⚕️',
+          type: 'staff',
+          floor: 'B1',
+          badgeColor: '#6ee7b7',
+          appearance: { coatColor: 0x10b981, pantsColor: 0x064e3b, isNurse: true, hasMask: true },
+          waypoints: [new THREE.Vector3(27.5, b1Y, 21.3)],
+          speed: 0,
+          yaw: -Math.PI / 2,
+          dialogue: '您好！請先在報到處領取咽喉局部麻醉噴劑與消泡劑，輪到您的號碼時我會協助引導進入檢查室。',
+          options: []
+        },
         {
           name: '蘇妍希 主治醫師',
           role: '皮膚科暨醫美主治醫師',
