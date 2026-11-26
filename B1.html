@@ -4011,31 +4011,31 @@ function normalizeRoleTitle(rawRole) {
       addCorridorHandrail(34.15, 7.2, 34.15, 17.8, b1Y);
       addHangingSign(33.8, b1Y + 3.55, 12.5, 5.8, 0.85, 'B卸貨區', 'PARKING & LOADING DOCK', '#475569', '#fbbf24', -Math.PI / 2);
 
-      // 1. 醫工室五面外牆（位於病歷室電動門正對面，門開在西側 X = 27.7，門洞 Z = 35.95 ~ 39.05）
-      addWall(33.5, 33.05, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室北牆', 'B1', b1Y);
-      addWall(33.5, 41.95, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室南牆', 'B1', b1Y);
-      addWall(39.3, 37.5, 0.4, 9.3, 4.4, texMedBlueGrayWall, '醫工室東牆', 'B1', b1Y);
-      addWall(27.7, 34.45, 0.4, 3.2, 4.4, texMedBlueGrayWall, '醫工室西側北牆', 'B1', b1Y);
-      addWall(27.7, 40.55, 0.4, 3.2, 4.4, texMedBlueGrayWall, '醫工室西側南牆', 'B1', b1Y);
+      // 1. 醫工室五面外牆（東牆緊貼 B1 東側外牆 X = 53.1，南牆緊貼 B1 南側外牆 Z = 44.1，門開在西側 X = 41.3，門洞中心 Z = 37.5 正對病歷室電動門）
+      addWall(47.2, 31.1, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室北牆', 'B1', b1Y);
+      addWall(47.2, 43.9, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室南牆', 'B1', b1Y);
+      addWall(53.0, 37.5, 0.4, 13.2, 4.4, texMedBlueGrayWall, '醫工室東牆', 'B1', b1Y);
+      addWall(41.3, 33.4, 0.4, 5.0, 4.4, texMedBlueGrayWall, '醫工室西側北牆', 'B1', b1Y);
+      addWall(41.3, 41.6, 0.4, 5.0, 4.4, texMedBlueGrayWall, '醫工室西側南牆', 'B1', b1Y);
 
-      // 電動門上方門楣牆（對齊 X = 27.7, Z = 37.5）
+      // 電動門上方門楣牆（對齊 X = 41.3, Z = 37.5）
       const bmeLintel = new THREE.Mesh(
         new THREE.BoxGeometry(0.42, 1.9, 3.2),
         createScaledWallMaterial(texMedBlueGrayWall, 3.2, 0.45)
       );
-      bmeLintel.position.set(27.7, b1Y + 3.45, 37.5);
+      bmeLintel.position.set(41.3, b1Y + 3.45, 37.5);
       activeBuildGroup.add(bmeLintel);
 
       // 西側走道扶手（避開中央電動門開口 Z = 35.9 ~ 39.1）與壁燈
-      addCorridorHandrail(27.4, 33.05, 27.4, 35.75, b1Y);
-      addCorridorHandrail(27.4, 39.25, 27.4, 41.95, b1Y);
-      buildWallSconce(27.4, b1Y + 2.25, 34.35, -Math.PI / 2, 0x93c5fd);
-      buildWallSconce(27.4, b1Y + 2.25, 40.65, -Math.PI / 2, 0x93c5fd);
+      addCorridorHandrail(41.0, 31.1, 41.0, 35.75, b1Y);
+      addCorridorHandrail(41.0, 39.25, 41.0, 43.9, b1Y);
+      buildWallSconce(41.0, b1Y + 2.25, 33.4, -Math.PI / 2, 0x93c5fd);
+      buildWallSconce(41.0, b1Y + 2.25, 41.6, -Math.PI / 2, 0x93c5fd);
 
       // 招牌置於電動門正上方（朝向西側 -X 病歷室電動門）
-      addHangingSign(27.46, b1Y + 3.45, 37.5, 4.4, 0.68, '醫工室', 'BIOMEDICAL ENGINEERING', '#1e40af', '#93c5fd', -Math.PI / 2);
+      addHangingSign(41.06, b1Y + 3.45, 37.5, 4.4, 0.68, '醫工室', 'BIOMEDICAL ENGINEERING', '#1e40af', '#93c5fd', -Math.PI / 2);
 
-      // 2. 招牌底下的雙開玻璃感應電動門（X = 27.7, 中心 Z = 37.5）
+      // 2. 招牌底下的雙開玻璃感應電動門（X = 41.3, 中心 Z = 37.5）
       const bmeFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.82, roughness: 0.22 });
       const bmeGlassMat = new THREE.MeshStandardMaterial({
         color: 0x93c5fd,
@@ -4045,16 +4045,16 @@ function normalizeRoleTitle(rawRole) {
       });
 
       const bmePostN = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), bmeFrameMat);
-      bmePostN.position.set(27.7, b1Y + 1.25, 35.95);
+      bmePostN.position.set(41.3, b1Y + 1.25, 35.95);
       const bmePostS = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), bmeFrameMat);
-      bmePostS.position.set(27.7, b1Y + 1.25, 39.05);
+      bmePostS.position.set(41.3, b1Y + 1.25, 39.05);
       const bmeHeader = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.16, 3.2), bmeFrameMat);
-      bmeHeader.position.set(27.7, b1Y + 2.5, 37.5);
+      bmeHeader.position.set(41.3, b1Y + 2.5, 37.5);
       const bmeSensor = new THREE.Mesh(
         new THREE.BoxGeometry(0.14, 0.08, 0.32),
         new THREE.MeshStandardMaterial({ color: 0x090d16, emissive: 0x3b82f6, emissiveIntensity: 0.85 })
       );
-      bmeSensor.position.set(27.45, b1Y + 2.48, 37.5);
+      bmeSensor.position.set(41.05, b1Y + 2.48, 37.5);
       activeBuildGroup.add(bmePostN, bmePostS, bmeHeader, bmeSensor);
 
       const createBmeDoorLeaf = () => {
@@ -4074,17 +4074,17 @@ function normalizeRoleTitle(rawRole) {
       };
 
       const bmeLeftLeaf = createBmeDoorLeaf();
-      bmeLeftLeaf.position.set(27.7, b1Y + 1.21, 36.75);
+      bmeLeftLeaf.position.set(41.3, b1Y + 1.21, 36.75);
       const bmeRightLeaf = createBmeDoorLeaf();
-      bmeRightLeaf.position.set(27.7, b1Y + 1.21, 38.25);
+      bmeRightLeaf.position.set(41.3, b1Y + 1.21, 38.25);
       activeBuildGroup.add(bmeLeftLeaf, bmeRightLeaf);
 
-      const bmeLeftCol = { minX: 27.5, maxX: 27.9, minZ: 36.0, maxZ: 37.5, floor: 'B1', label: '醫工室電動門' };
-      const bmeRightCol = { minX: 27.5, maxX: 27.9, minZ: 37.5, maxZ: 39.0, floor: 'B1', label: '醫工室電動門' };
+      const bmeLeftCol = { minX: 41.1, maxX: 41.5, minZ: 36.0, maxZ: 37.5, floor: 'B1', label: '醫工室電動門' };
+      const bmeRightCol = { minX: 41.1, maxX: 41.5, minZ: 37.5, maxZ: 39.0, floor: 'B1', label: '醫工室電動門' };
       colliders.push(bmeLeftCol, bmeRightCol);
 
       slidingDoors.push({
-        sensorPos: new THREE.Vector3(27.5, b1Y, 37.5),
+        sensorPos: new THREE.Vector3(41.1, b1Y, 37.5),
         leftLeaf: bmeLeftLeaf,
         rightLeaf: bmeRightLeaf,
         leftClosedZ: 36.75,
@@ -4096,11 +4096,11 @@ function normalizeRoleTitle(rawRole) {
         centerZ: 37.5
       });
 
-      // 3. 醫工室內部照明、維修工作檯與各種檢修中醫療儀器（全部放進 X: 28.2 ~ 38.8, Z: 33.5 ~ 41.5 室內）
+      // 3. 醫工室內部照明、維修工作檯與各種檢修中醫療儀器（全部放進 X: 41.8 ~ 52.5, Z: 31.6 ~ 43.4 室內）
       const bmeLight1 = new THREE.PointLight(0xf0f9ff, 1.25, 22, 1.4);
-      bmeLight1.position.set(31.5, b1Y + 3.8, 35.5);
+      bmeLight1.position.set(45.0, b1Y + 3.8, 35.0);
       const bmeLight2 = new THREE.PointLight(0xe0f2fe, 1.2, 22, 1.4);
-      bmeLight2.position.set(35.5, b1Y + 3.8, 39.5);
+      bmeLight2.position.set(49.5, b1Y + 3.8, 40.0);
       activeBuildGroup.add(bmeLight1, bmeLight2);
 
       const benchMetalMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.75, roughness: 0.3 });
@@ -4203,27 +4203,26 @@ function normalizeRoleTitle(rawRole) {
         });
       };
 
-      // 三座維修工作檯（全部放進醫工室內部並面向西側門口）
-      buildRepairWorkbench(31.5, 34.9, 'ventilator', '呼吸器與麻醉機檢修檯');
-      buildRepairWorkbench(36.8, 35.1, 'pump', '輸液幫浦與電擊器校準檯');
-      buildRepairWorkbench(36.8, 39.7, 'ventilator', '生理監視器與超音波探頭維修檯');
+      // 三座維修工作檯（全部放進貼齊外牆後的醫工室內部）
+      buildRepairWorkbench(45.2, 34.0, 'ventilator', '呼吸器與麻醉機檢修檯');
+      buildRepairWorkbench(50.5, 34.5, 'pump', '輸液幫浦與電擊器校準檯');
+      buildRepairWorkbench(50.5, 40.5, 'ventilator', '生理監視器與超音波探頭維修檯');
 
-      // 南側牆邊備品架（貼齊醫工室南牆 Z = 41.35）
+      // 南側牆邊備品架（貼齊醫工室南牆 Z = 43.35）
       const spareShelf = new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.2, 0.65), benchMetalMat);
-      spareShelf.position.set(32.2, b1Y + 1.1, 41.35);
+      spareShelf.position.set(45.8, b1Y + 1.1, 43.35);
       const spareBox1 = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.45, 0.52), cautionMat);
-      spareBox1.position.set(33.1, b1Y + 1.45, 41.35);
+      spareBox1.position.set(46.7, b1Y + 1.45, 43.35);
       const spareBox2 = new THREE.Mesh(
         new THREE.BoxGeometry(0.85, 0.5, 0.52),
         new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.4 })
       );
-      spareBox2.position.set(31.4, b1Y + 0.85, 41.35);
+      spareBox2.position.set(45.0, b1Y + 0.85, 43.35);
       activeBuildGroup.add(spareShelf, spareBox1, spareBox2);
-      colliders.push({ minX: 30.3, maxX: 34.1, minZ: 40.95, maxZ: 41.75, floor: 'B1', label: '醫工備品與待修儀器架' });
+      colliders.push({ minX: 43.9, maxX: 47.7, minZ: 42.95, maxZ: 43.75, floor: 'B1', label: '醫工備品與待修儀器架' });
 
       activeBuildGroup = null;
     }
-
     function createRoundedCharacterRig(opts = {}) {
       const group = new THREE.Group();
       const skinMat = new THREE.MeshStandardMaterial({ color: opts.skinColor || 0xf1c29b, roughness: 0.55 });
