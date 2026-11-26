@@ -4365,6 +4365,135 @@ colliders.push({ minX: 44.7, maxX: 45.7, minZ: 10.0, maxZ: 12.2, floor: 'B1', la
   colliders.push({ minX: 48.9, maxX: 50.1, minZ: cz - 0.45, maxZ: cz + 0.45, floor: 'B1', label: '血液腫瘤科化療躺椅' });
 });
 
+      // === 放射腫瘤科（位於血液腫瘤科正隔壁北側 Z: -8.7 ~ 4.5，大小 12.0 x 13.2）===
+      addWall(47.2, -8.5, 12.0, 0.4, 4.4, texMedBlueGrayWall, '放射腫瘤科北牆', 'B1', b1Y);
+      addWall(47.2, 4.3, 12.0, 0.4, 4.4, texMedBlueGrayWall, '放射腫瘤科南牆', 'B1', b1Y);
+      addWall(53.0, -2.1, 0.4, 13.2, 4.4, texMedBlueGrayWall, '放射腫瘤科東牆', 'B1', b1Y);
+      addWall(41.3, -6.2, 0.4, 5.0, 4.4, texMedBlueGrayWall, '放射腫瘤科西側北牆', 'B1', b1Y);
+      addWall(41.3, 2.0, 0.4, 5.0, 4.4, texMedBlueGrayWall, '放射腫瘤科西側南牆', 'B1', b1Y);
+
+      const radOncolLintel = new THREE.Mesh(
+        new THREE.BoxGeometry(0.42, 1.9, 3.2),
+        createScaledWallMaterial(texMedBlueGrayWall, 3.2, 0.45)
+      );
+      radOncolLintel.position.set(41.3, b1Y + 3.45, -2.1);
+      activeBuildGroup.add(radOncolLintel);
+
+      addHangingSign(41.06, b1Y + 3.45, -2.1, 5.4, 0.68, '放射腫瘤科', 'Radiation Oncology', '#1e3a8a', '#38bdf8', -Math.PI / 2);
+
+      // 西側雙開感應電動門（X = 41.3, 中心 Z = -2.1）
+      const radFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.82, roughness: 0.22 });
+      const radGlassMat = new THREE.MeshStandardMaterial({
+        color: 0xbae6fd,
+        transparent: true,
+        opacity: 0.44,
+        roughness: 0.1
+      });
+
+      const radPostN = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), radFrameMat);
+      radPostN.position.set(41.3, b1Y + 1.25, -3.65);
+      const radPostS = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), radFrameMat);
+      radPostS.position.set(41.3, b1Y + 1.25, -0.55);
+      const radHeader = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.16, 3.2), radFrameMat);
+      radHeader.position.set(41.3, b1Y + 2.5, -2.1);
+      activeBuildGroup.add(radPostN, radPostS, radHeader);
+
+      const createRadDoorLeaf = () => {
+        const leaf = new THREE.Group();
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.42, 1.5), radGlassMat);
+        const topRail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.1, 1.5), radFrameMat);
+        topRail.position.y = 1.16;
+        const botRail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.14, 1.5), radFrameMat);
+        botRail.position.y = -1.14;
+        const stripe = new THREE.Mesh(
+          new THREE.BoxGeometry(0.075, 0.12, 1.48),
+          new THREE.MeshStandardMaterial({ color: 0x1d4ed8, emissive: 0x0284c7, emissiveIntensity: 0.45 })
+        );
+        stripe.position.y = 0.05;
+        leaf.add(pane, topRail, botRail, stripe);
+        return leaf;
+      };
+
+      const radLeftLeaf = createRadDoorLeaf();
+      radLeftLeaf.position.set(41.3, b1Y + 1.21, -2.85);
+      const radRightLeaf = createRadDoorLeaf();
+      radRightLeaf.position.set(41.3, b1Y + 1.21, -1.35);
+      activeBuildGroup.add(radLeftLeaf, radRightLeaf);
+
+      const radLeftCol = { minX: 41.1, maxX: 41.5, minZ: -3.6, maxZ: -2.1, floor: 'B1', label: '放射腫瘤科電動門' };
+      const radRightCol = { minX: 41.1, maxX: 41.5, minZ: -2.1, maxZ: -0.6, floor: 'B1', label: '放射腫瘤科電動門' };
+      colliders.push(radLeftCol, radRightCol);
+
+      slidingDoors.push({
+        sensorPos: new THREE.Vector3(41.1, b1Y, -2.1),
+        leftLeaf: radLeftLeaf,
+        rightLeaf: radRightLeaf,
+        leftClosedZ: -2.85,
+        rightClosedZ: -1.35,
+        openOffset: 1.38,
+        openProgress: 0,
+        leftCollider: radLeftCol,
+        rightCollider: radRightCol,
+        centerZ: -2.1
+      });
+
+      // 室內照明與直線加速器放射治療儀器（LINAC）
+      const radLight = new THREE.PointLight(0xe0f2fe, 1.25, 22, 1.4);
+      radLight.position.set(47.2, b1Y + 3.8, -2.1);
+      activeBuildGroup.add(radLight);
+
+      const linacGroup = new THREE.Group();
+      const linacWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.25 });
+      const linacAccentMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.35 });
+      const linacDarkMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.6 });
+      const laserBeamMat = new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0xdc2626, emissiveIntensity: 1.1 });
+
+      // 放射治療機架本體與治療射束頭
+      const linacBase = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.55, 1.2), linacDarkMat);
+      linacBase.position.set(0, 0.275, 0.6);
+      const linacGantry = new THREE.Mesh(new THREE.TorusGeometry(1.22, 0.36, 18, 36), linacWhiteMat);
+      linacGantry.position.set(0, 1.55, 0.6);
+      const linacRingBand = new THREE.Mesh(new THREE.TorusGeometry(1.22, 0.37, 12, 36), linacAccentMat);
+      linacRingBand.scale.set(1, 1, 0.32);
+      linacRingBand.position.set(0, 1.55, 0.42);
+      const treatmentHead = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.34, 0.42), linacDarkMat);
+      treatmentHead.position.set(0, 2.02, 0.6);
+
+      // 延伸治療床與定位雷射線
+      const couchPedestal = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.82, 1.9), linacWhiteMat);
+      couchPedestal.position.set(0, 0.41, -1.55);
+      const couchTop = new THREE.Mesh(
+        new THREE.BoxGeometry(0.64, 0.12, 3.2),
+        new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.4 })
+      );
+      couchTop.position.set(0, 0.88, -0.85);
+      const laserLine = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 1.1, 8), laserBeamMat);
+      laserLine.position.set(0, 1.45, 0.6);
+
+      linacGroup.add(linacBase, linacGantry, linacRingBand, treatmentHead, couchPedestal, couchTop, laserLine);
+      linacGroup.position.set(48.2, b1Y, -1.8);
+      activeBuildGroup.add(linacGroup);
+
+      colliders.push({
+        minX: 46.8,
+        maxX: 49.6,
+        minZ: -2.6,
+        maxZ: 1.3,
+        floor: 'B1',
+        label: '直線加速器放射治療儀 (LINAC)'
+      });
+
+      // 治療室旁控制檯與防護螢幕
+      const radCtrlDesk = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.82, 2.4), linacWhiteMat);
+      radCtrlDesk.position.set(44.2, b1Y + 0.41, -4.5);
+      const radCtrlMon = new THREE.Mesh(
+        new THREE.BoxGeometry(0.08, 0.42, 0.64),
+        new THREE.MeshStandardMaterial({ color: 0x090d16, emissive: 0x38bdf8, emissiveIntensity: 0.85 })
+      );
+      radCtrlMon.position.set(44.2, b1Y + 1.05, -4.5);
+      activeBuildGroup.add(radCtrlDesk, radCtrlMon);
+      colliders.push({ minX: 43.6, maxX: 44.8, minZ: -5.7, maxZ: -3.3, floor: 'B1', label: '放射治療劑量控制檯' });
+
       // 1. 醫工室五面外牆（東牆緊貼 B1 東側外牆 X = 53.1，南牆緊貼 B1 南側外牆 Z = 44.1，門開在西側 X = 41.3，門洞中心 Z = 37.5 正對病歷室電動門）
       addWall(47.2, 31.1, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室北牆', 'B1', b1Y);
       addWall(47.2, 43.9, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室南牆', 'B1', b1Y);
