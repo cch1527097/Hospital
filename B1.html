@@ -4167,9 +4167,105 @@ headerBeam.position.set(0, 3.88, frontZ - 0.15);
         label: '胃鏡檢查床與內視鏡影像塔'
       });
 
-      addWall(42.5, 12.5, 16.5, 11.5, 4.4, texIvoryWoodWall, '卸貨區', 'B1', b1Y);
-      addCorridorHandrail(34.15, 7.2, 34.15, 17.8, b1Y);
-      addHangingSign(33.8, b1Y + 3.55, 12.5, 5.8, 0.85, 'B卸貨區', 'PARKING & LOADING DOCK', '#475569', '#fbbf24', -Math.PI / 2);
+      // === 同位素病房（與醫工室同大小 12.0 x 13.2，緊鄰隔壁 Z: 17.7 ~ 30.9）===
+addWall(47.2, 17.9, 12.0, 0.4, 4.4, texCleanTealWall, '同位素病房北牆', 'B1', b1Y);
+addWall(47.2, 30.7, 12.0, 0.4, 4.4, texCleanTealWall, '同位素病房南牆', 'B1', b1Y);
+addWall(53.0, 24.3, 0.4, 13.2, 4.4, texCleanTealWall, '同位素病房東牆', 'B1', b1Y);
+addWall(41.3, 20.2, 0.4, 5.0, 4.4, texCleanTealWall, '同位素病房西側北牆', 'B1', b1Y);
+addWall(41.3, 28.4, 0.4, 5.0, 4.4, texCleanTealWall, '同位素病房西側南牆', 'B1', b1Y);
+
+const isoLintel = new THREE.Mesh(
+  new THREE.BoxGeometry(0.42, 1.9, 3.2),
+  createScaledWallMaterial(texCleanTealWall, 3.2, 0.45)
+);
+isoLintel.position.set(41.3, b1Y + 3.45, 24.3);
+activeBuildGroup.add(isoLintel);
+
+// 西側走廊扶手、壁燈與招牌（朝向西側 -X 走道）
+addCorridorHandrail(41.0, 17.9, 41.0, 22.55, b1Y);
+addCorridorHandrail(41.0, 26.05, 41.0, 30.7, b1Y);
+buildWallSconce(41.0, b1Y + 2.25, 20.2, -Math.PI / 2, 0x99f6e4);
+buildWallSconce(41.0, b1Y + 2.25, 28.4, -Math.PI / 2, 0x99f6e4);
+addHangingSign(41.06, b1Y + 3.45, 24.3, 4.8, 0.68, '同位素病房', 'ISOTOPE THERAPY WARD', '#0f766e', '#fde047', -Math.PI / 2);
+
+// 西側雙開感應電動門（X = 41.3, 中心 Z = 24.3）
+const isoFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.82, roughness: 0.22 });
+const isoGlassMat = new THREE.MeshStandardMaterial({
+  color: 0x99f6e4,
+  transparent: true,
+  opacity: 0.44,
+  roughness: 0.1
+});
+
+const isoPostN = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), isoFrameMat);
+isoPostN.position.set(41.3, b1Y + 1.25, 22.75);
+const isoPostS = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), isoFrameMat);
+isoPostS.position.set(41.3, b1Y + 1.25, 25.85);
+const isoHeader = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.16, 3.2), isoFrameMat);
+isoHeader.position.set(41.3, b1Y + 2.5, 24.3);
+activeBuildGroup.add(isoPostN, isoPostS, isoHeader);
+
+const createIsoDoorLeaf = () => {
+  const leaf = new THREE.Group();
+  const pane = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.42, 1.5), isoGlassMat);
+  const topRail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.1, 1.5), isoFrameMat);
+  topRail.position.y = 1.16;
+  const botRail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.14, 1.5), isoFrameMat);
+  botRail.position.y = -1.14;
+  const stripe = new THREE.Mesh(
+    new THREE.BoxGeometry(0.075, 0.12, 1.48),
+    new THREE.MeshStandardMaterial({ color: 0x0f766e, emissive: 0x0d9488, emissiveIntensity: 0.45 })
+  );
+  stripe.position.y = 0.05;
+  leaf.add(pane, topRail, botRail, stripe);
+  return leaf;
+};
+
+const isoLeftLeaf = createIsoDoorLeaf();
+isoLeftLeaf.position.set(41.3, b1Y + 1.21, 23.55);
+const isoRightLeaf = createIsoDoorLeaf();
+isoRightLeaf.position.set(41.3, b1Y + 1.21, 25.05);
+activeBuildGroup.add(isoLeftLeaf, isoRightLeaf);
+
+const isoLeftCol = { minX: 41.1, maxX: 41.5, minZ: 22.8, maxZ: 24.3, floor: 'B1', label: '同位素病房電動門' };
+const isoRightCol = { minX: 41.1, maxX: 41.5, minZ: 24.3, maxZ: 25.8, floor: 'B1', label: '同位素病房電動門' };
+colliders.push(isoLeftCol, isoRightCol);
+
+slidingDoors.push({
+  sensorPos: new THREE.Vector3(41.1, b1Y, 24.3),
+  leftLeaf: isoLeftLeaf,
+  rightLeaf: isoRightLeaf,
+  leftClosedZ: 23.55,
+  rightClosedZ: 25.05,
+  openOffset: 1.38,
+  openProgress: 0,
+  leftCollider: isoLeftCol,
+  rightCollider: isoRightCol,
+  centerZ: 24.3
+});
+
+// 病房內部照明、病床與防護屏風
+const isoLight = new THREE.PointLight(0xe0f7fa, 1.2, 22, 1.4);
+isoLight.position.set(47.2, b1Y + 3.8, 24.3);
+activeBuildGroup.add(isoLight);
+
+const isoBedFrame = new THREE.Mesh(
+  new THREE.BoxGeometry(1.15, 0.55, 2.15),
+  new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35 })
+);
+isoBedFrame.position.set(48.8, b1Y + 0.275, 22.2);
+const isoBedBlanket = new THREE.Mesh(
+  new THREE.BoxGeometry(1.05, 0.14, 1.75),
+  new THREE.MeshStandardMaterial({ color: 0x0d9488, roughness: 0.5 })
+);
+isoBedBlanket.position.set(48.8, b1Y + 0.6, 22.35);
+const isoShield = new THREE.Mesh(
+  new THREE.BoxGeometry(0.1, 1.65, 1.4),
+  new THREE.MeshStandardMaterial({ color: 0xfef08a, transparent: true, opacity: 0.45, roughness: 0.15 })
+);
+isoShield.position.set(46.8, b1Y + 0.825, 22.2);
+activeBuildGroup.add(isoBedFrame, isoBedBlanket, isoShield);
+colliders.push({ minX: 48.1, maxX: 49.5, minZ: 21.0, maxZ: 23.4, floor: 'B1', label: '同位素病房病床' });
 
       // 1. 醫工室五面外牆（東牆緊貼 B1 東側外牆 X = 53.1，南牆緊貼 B1 南側外牆 Z = 44.1，門開在西側 X = 41.3，門洞中心 Z = 37.5 正對病歷室電動門）
       addWall(47.2, 31.1, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室北牆', 'B1', b1Y);
