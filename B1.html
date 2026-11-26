@@ -3410,7 +3410,7 @@ function normalizeRoleTitle(rawRole) {
         const doorZ = rm.zCenter + 0.55;   // 診間門位置
         const panelZ = rm.zCenter - 0.85;  // 實體牆面與叫號機位置
 
-        // (A) 門洞上方門楣牆（補滿高度 2.42 ~ 4.4，讓門完全嵌在牆內）
+        // (A) 門洞上方門楣牆
         const doorLintel = new THREE.Mesh(
           new THREE.BoxGeometry(0.28, 1.98, 1.38),
           createScaledWallMaterial(texAestheticPinkWall, 1.38, 0.45)
@@ -3427,17 +3427,16 @@ function normalizeRoleTitle(rawRole) {
         topFrame.position.set(dermFrontX, b1Y + 2.42, doorZ);
         activeBuildGroup.add(jambN, jambS, topFrame);
 
-        // (C) 嵌在門框內的診間門扇
+        // (C) 嵌在門框內的診間門扇（不加 rotation.y，正面自然朝向西側走道）
         const doorTex = createClinicDoorTexture(rm.code, rm.dept, rm.doctor);
         const doorLeaf = new THREE.Mesh(
           new THREE.BoxGeometry(0.12, 2.36, 1.22),
           new THREE.MeshStandardMaterial({ map: doorTex, roughness: 0.42 })
         );
         doorLeaf.position.set(dermFrontX, b1Y + 1.18, doorZ);
-        doorLeaf.rotation.y = -Math.PI / 2;
         activeBuildGroup.add(doorLeaf);
 
-        // (D) 門旁的玻璃側窗（上下帶粉紫實牆，高度齊平 4.4）
+        // (D) 門旁的玻璃側窗
         const sideWallLower = new THREE.Mesh(
           new THREE.BoxGeometry(0.28, 1.05, 0.55),
           createScaledWallMaterial(texAestheticPinkWall, 0.55, 0.25)
@@ -3452,7 +3451,7 @@ function normalizeRoleTitle(rawRole) {
         sideWallUpper.position.set(dermFrontX, b1Y + 3.41, rm.zCenter - 0.35);
         activeBuildGroup.add(sideWallLower, sideGlass, sideWallUpper);
 
-        // (E) 掛載叫號螢幕的實體前牆（高度 4.4 頂天立地，並附碰撞箱）
+        // (E) 掛載叫號螢幕的實體前牆
         addWall(dermFrontX, panelZ - 0.35, 0.28, 1.45, 4.4, texAestheticPinkWall, `${rm.code}正面牆`, 'B1', b1Y);
         colliders.push({
           minX: dermFrontX - 0.2,
@@ -3463,7 +3462,7 @@ function normalizeRoleTitle(rawRole) {
           label: `${rm.code}診間牆面`
         });
 
-        // (F) 緊貼實體牆面的診間叫號機（不再懸空）
+        // (F) 緊貼實體牆面的診間叫號機（不加 rotation.y，螢幕正面自然朝向西側走道）
         const monTex = createQueueMonitorTexture(rm.queue, rm.code);
         const mon = new THREE.Mesh(
           new THREE.BoxGeometry(0.1, 1.02, 0.58),
@@ -3476,10 +3475,9 @@ function normalizeRoleTitle(rawRole) {
           })
         );
         mon.position.set(dermFrontX - 0.16, b1Y + 1.55, panelZ - 0.35);
-        mon.rotation.y = -Math.PI / 2;
         activeBuildGroup.add(mon);
 
-        // (G) 診間內部看診桌與診療床（透過玻璃側窗可看見內部擺設）
+        // (G) 診間內部看診桌與診療床
         const examDesk = new THREE.Mesh(
           new THREE.BoxGeometry(0.75, 0.76, 1.45),
           new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 })
