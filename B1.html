@@ -5961,8 +5961,8 @@ function normalizeRoleTitle(rawRole) {
         st.mesh.position.x = -st.spanX / 2 + st.t * st.spanX;
         st.mesh.position.y = st.baseY + 0.16 + st.t * st.riseY;
       }
-      
-      // ✅ 修正後的程式碼
+
+      // 多組雙開感應電動門自動開關邏輯（支援南北向 Z 與東西向 X）
       for (let i = 0; i < slidingDoors.length; i++) {
         const d = slidingDoors[i];
         let triggerOpen = player.pos.distanceTo(d.sensorPos) < 3.6;
@@ -5996,12 +5996,16 @@ function normalizeRoleTitle(rawRole) {
         }
       }
 
+      // 揮擊刀光特效更新與回收
       for (let i = slashEffects.length - 1; i >= 0; i--) {
         const s = slashEffects[i];
         s.life -= dt;
         s.mesh.material.opacity = Math.max(0, (s.life / s.maxLife) * 0.85);
+        s.mesh.scale.setScalar(1 + (1 - s.life / s.maxLife) * 0.15);
         if (s.life <= 0) {
           scene.remove(s.mesh);
+          s.mesh.geometry.dispose();
+          s.mesh.material.dispose();
           slashEffects.splice(i, 1);
         }
       }
