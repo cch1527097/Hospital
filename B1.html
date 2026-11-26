@@ -3587,9 +3587,167 @@ function normalizeRoleTitle(rawRole) {
       allWaitingSeats.push(...buildHospitalWaitingBench(-9.8, 11.2, Math.PI, b1Y));
       allWaitingSeats.push(...buildHospitalWaitingBench(0.8, 11.2, Math.PI, b1Y));
 
-      addWall(5.5, 37.5, 18.5, 11.5, 4.4, texIvoryWoodWall, '病歷室 (Medical Records Room)', 'B1', b1Y);
+      // === 病歷室 (Medical Records Room)：招牌移至東側牆面、下方設感應電動門與大量病歷檔案貨架 ===
+      // 1. 外圍環狀牆體（X: -3.75 ~ 14.75，寬 18.5；Z: 31.75 ~ 43.25，深 11.5；東側牆 x = 14.55 中央 z = 37.5 預留寬 3.2 電動門開口）
+      addWall(5.5, 31.95, 18.5, 0.4, 4.4, texIvoryWoodWall, '病歷室北牆', 'B1', b1Y);
+      addWall(5.5, 43.05, 18.5, 0.4, 4.4, texIvoryWoodWall, '病歷室南牆', 'B1', b1Y);
+      addWall(-3.55, 37.5, 0.4, 11.5, 4.4, texIvoryWoodWall, '病歷室西牆', 'B1', b1Y);
+      addWall(14.55, 33.825, 0.4, 4.15, 4.4, texIvoryWoodWall, '病歷室東側北牆', 'B1', b1Y);
+      addWall(14.55, 41.175, 0.4, 4.15, 4.4, texIvoryWoodWall, '病歷室東側南牆', 'B1', b1Y);
+
+      // 電動門上方門楣牆
+      const mrLintel = new THREE.Mesh(
+        new THREE.BoxGeometry(0.42, 1.9, 3.2),
+        createScaledWallMaterial(texIvoryWoodWall, 3.2, 0.45)
+      );
+      mrLintel.position.set(14.55, b1Y + 3.45, 37.5);
+      activeBuildGroup.add(mrLintel);
+
+      // 北側走道扶手與東側壁燈
       addCorridorHandrail(-3.2, 31.65, 14.2, 31.65, b1Y);
-      addHangingSign(5.5, b1Y + 3.55, 31.5, 6.4, 0.85, '病歷室', 'MEDICAL RECORDS ARCHIVES', '#334155', '#38bdf8', Math.PI);
+      buildWallSconce(14.85, b1Y + 2.25, 33.8, Math.PI / 2, 0xbae6fd);
+      buildWallSconce(14.85, b1Y + 2.25, 41.2, Math.PI / 2, 0xbae6fd);
+
+      // 招牌移至東側牆面正中央 (x = 14.79, z = 37.5)，朝向東側 (+X) 走道
+      addHangingSign(14.79, b1Y + 3.55, 37.5, 6.4, 0.85, '病歷室', 'MEDICAL RECORDS ARCHIVES', '#334155', '#38bdf8', Math.PI / 2);
+
+      // 2. 招牌底下的雙開玻璃感應電動門（南北向滑動）
+      const mrFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.25 });
+      const mrGlassMat = new THREE.MeshStandardMaterial({
+        color: 0xbae6fd,
+        transparent: true,
+        opacity: 0.44,
+        roughness: 0.1
+      });
+
+      const mrPostN = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), mrFrameMat);
+      mrPostN.position.set(14.55, b1Y + 1.25, 35.95);
+      const mrPostS = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), mrFrameMat);
+      mrPostS.position.set(14.55, b1Y + 1.25, 39.05);
+      const mrHeader = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.16, 3.2), mrFrameMat);
+      mrHeader.position.set(14.55, b1Y + 2.5, 37.5);
+      const mrSensor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.14, 0.08, 0.32),
+        new THREE.MeshStandardMaterial({ color: 0x090d16, emissive: 0x38bdf8, emissiveIntensity: 0.85 })
+      );
+      mrSensor.position.set(14.8, b1Y + 2.48, 37.5);
+      activeBuildGroup.add(mrPostN, mrPostS, mrHeader, mrSensor);
+
+      const createMrDoorLeaf = () => {
+        const leaf = new THREE.Group();
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.42, 1.5), mrGlassMat);
+        const topRail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.1, 1.5), mrFrameMat);
+        topRail.position.y = 1.16;
+        const botRail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.14, 1.5), mrFrameMat);
+        botRail.position.y = -1.14;
+        const stripe = new THREE.Mesh(
+          new THREE.BoxGeometry(0.075, 0.12, 1.48),
+          new THREE.MeshStandardMaterial({ color: 0x0284c7, emissive: 0x0369a1, emissiveIntensity: 0.4 })
+        );
+        stripe.position.y = 0.05;
+        leaf.add(pane, topRail, botRail, stripe);
+        return leaf;
+      };
+
+      const mrLeftLeaf = createMrDoorLeaf();
+      mrLeftLeaf.position.set(14.55, b1Y + 1.21, 36.75);
+      const mrRightLeaf = createMrDoorLeaf();
+      mrRightLeaf.position.set(14.55, b1Y + 1.21, 38.25);
+      activeBuildGroup.add(mrLeftLeaf, mrRightLeaf);
+
+      const mrLeftCol = { minX: 14.35, maxX: 14.75, minZ: 36.0, maxZ: 37.5, floor: 'B1', label: '病歷室電動門' };
+      const mrRightCol = { minX: 14.35, maxX: 14.75, minZ: 37.5, maxZ: 39.0, floor: 'B1', label: '病歷室電動門' };
+      colliders.push(mrLeftCol, mrRightCol);
+
+      slidingDoors.push({
+        sensorPos: new THREE.Vector3(14.75, b1Y, 37.5),
+        leftLeaf: mrLeftLeaf,
+        rightLeaf: mrRightLeaf,
+        leftClosedZ: 36.75,
+        rightClosedZ: 38.25,
+        openOffset: 1.38,
+        openProgress: 0,
+        leftCollider: mrLeftCol,
+        rightCollider: mrRightCol,
+        centerZ: 37.5
+      });
+
+      // 3. 病歷室內部照明與密集病歷檔案貨架
+      const mrLight1 = new THREE.PointLight(0xf8fafc, 1.2, 22, 1.4);
+      mrLight1.position.set(2.0, b1Y + 3.8, 37.5);
+      const mrLight2 = new THREE.PointLight(0xe0f2fe, 1.15, 22, 1.4);
+      mrLight2.position.set(9.5, b1Y + 3.8, 37.5);
+      activeBuildGroup.add(mrLight1, mrLight2);
+
+      const mrRackMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.7, roughness: 0.35 });
+      const folderMats = [
+        new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.65 }), // 米黃牛皮紙病歷夾
+        new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.55 }), // 藍色科別病歷夾
+        new THREE.MeshStandardMaterial({ color: 0xfb7185, roughness: 0.55 }), // 粉紅住院病歷夾
+        new THREE.MeshStandardMaterial({ color: 0x34d399, roughness: 0.55 }), // 綠色健檢病歷夾
+        new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.55 })  // 琥珀黃急診病歷夾
+      ];
+
+      // 建立四排大型病歷檔案鐵架（沿東西向排列，中間留出走道讓玩家可走入查閱）
+      const rackRowsZ = [33.3, 35.8, 39.2, 41.7];
+      rackRowsZ.forEach((rz, rowIdx) => {
+        for (let rx = -1.0; rx <= 9.5; rx += 3.5) {
+          const rack = new THREE.Group();
+          // 四角鐵架立柱
+          [-1.55, 1.55].forEach((px) => {
+            [-0.42, 0.42].forEach((pz) => {
+              const post = new THREE.Mesh(new THREE.BoxGeometry(0.06, 3.0, 0.06), mrRackMat);
+              post.position.set(px, 1.5, pz);
+              rack.add(post);
+            });
+          });
+
+          // 五層層板與直立排列的彩色病歷夾／檔案盒
+          [0.2, 0.85, 1.5, 2.15, 2.8].forEach((sy, levelIdx) => {
+            const shelf = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.04, 0.92), mrRackMat);
+            shelf.position.set(0, sy, 0);
+            rack.add(shelf);
+
+            if (sy < 2.75) {
+              // 每層擺滿直立病歷夾（偶爾留一點空隙增加真實感）
+              for (let fx = -1.42; fx <= 1.42; fx += 0.14) {
+                const seed = Math.abs(Math.round(rx * 10 + fx * 20 + levelIdx * 7 + rowIdx * 3));
+                if (seed % 11 === 0) continue; // 模擬已調閱借出的病歷空位
+                const fMat = folderMats[seed % folderMats.length];
+                const folder = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.46, 0.76), fMat);
+                folder.position.set(fx, sy + 0.25, 0);
+                rack.add(folder);
+              }
+            }
+          });
+
+          rack.position.set(rx, b1Y, rz);
+          activeBuildGroup.add(rack);
+
+          colliders.push({
+            minX: rx - 1.65,
+            maxX: rx + 1.65,
+            minZ: rz - 0.5,
+            maxZ: rz + 0.5,
+            floor: 'B1',
+            label: '病歷檔案貨架'
+          });
+        }
+      });
+
+      // 進門右側（x = 12.6, z = 34.2）設置病歷調閱登記櫃檯與電腦螢幕
+      const mrDesk = new THREE.Mesh(
+        new THREE.BoxGeometry(0.85, 0.78, 2.2),
+        new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35 })
+      );
+      mrDesk.position.set(12.6, b1Y + 0.39, 34.2);
+      const mrMonitor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.08, 0.42, 0.64),
+        new THREE.MeshStandardMaterial({ color: 0x090d16, emissive: 0x38bdf8, emissiveIntensity: 0.85 })
+      );
+      mrMonitor.position.set(12.6, b1Y + 1.05, 34.2);
+      activeBuildGroup.add(mrDesk, mrMonitor);
+      colliders.push({ minX: 12.1, maxX: 13.1, minZ: 33.0, maxZ: 35.4, floor: 'B1', label: '病歷調閱服務台' });
 
       // === 消化器中心與超音波室（含招牌下方雙診間門面、鋁框玻璃側窗與叫號機）===
       addWall(14.5, 20.5, 12.5, 12.5, 4.4, texMedBlueGrayWall, '消化器中心與超音波室', 'B1', b1Y);
