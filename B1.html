@@ -4011,13 +4011,11 @@ function normalizeRoleTitle(rawRole) {
       addCorridorHandrail(34.15, 7.2, 34.15, 17.8, b1Y);
       addHangingSign(33.8, b1Y + 3.55, 12.5, 5.8, 0.85, 'B卸貨區', 'PARKING & LOADING DOCK', '#475569', '#fbbf24', -Math.PI / 2);
 
-      // === 醫工室 (Biomedical Engineering)：縮小招牌、東側感應電動門、室內醫療儀器檢修工作站 ===
-      // 1. 外圍環狀牆體（X: -46.5 ~ -34.5，寬 12.0；Z: 37.5 ~ 51.5，深 14.0；東側牆 x = -34.7 中央 z = 44.5 預留寬 3.2 電動門開口）
-      addWall(-40.5, 37.7, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室北牆', 'B1', b1Y);
-      addWall(-40.5, 51.3, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室南牆', 'B1', b1Y);
-      addWall(-46.3, 44.5, 0.4, 14.0, 4.4, texMedBlueGrayWall, '醫工室西牆', 'B1', b1Y);
-      addWall(-34.7, 40.2, 0.4, 5.4, 4.4, texMedBlueGrayWall, '醫工室東側北牆', 'B1', b1Y);
-      addWall(-34.7, 48.8, 0.4, 5.4, 4.4, texMedBlueGrayWall, '醫工室東側南牆', 'B1', b1Y);
+      addWall(-30.5, 34.7, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室北牆', 'B1', b1Y);
+addWall(-30.5, 43.6, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室南牆', 'B1', b1Y);
+addWall(-36.3, 39.15, 0.4, 9.3, 4.4, texMedBlueGrayWall, '醫工室西牆', 'B1', b1Y);
+addWall(-24.7, 36.1, 0.4, 3.2, 4.4, texMedBlueGrayWall, '醫工室東側北牆', 'B1', b1Y);
+addWall(-24.7, 42.2, 0.4, 3.2, 4.4, texMedBlueGrayWall, '醫工室東側南牆', 'B1', b1Y);
 
       // 電動門上方門楣牆
       const bmeLintel = new THREE.Mesh(
@@ -6016,6 +6014,7 @@ function normalizeRoleTitle(rawRole) {
       drawZoneRect(-44.5, 31.5, 13.5, 16.5, '#bfdbfe');
       drawZoneRect(-24.5, 12.5, 17.5, 9.5, '#fbcfe8');
       drawZoneRect(-22.5, 34.5, 19.5, 4.5, '#fecdd3', '#e11d48');
+      drawZoneRect(-40.5, 44.5, 12.0, 14.0, '#93c5fd');
       drawZoneRect(-4.5, 18.5, 13.5, 11.5, '#fbcfe8');
       drawZoneRect(14.5, 20.5, 12.5, 12.5, '#bae6fd');
       drawZoneRect(26.5, 20.5, 7.5, 12.5, '#a7f3d0');
