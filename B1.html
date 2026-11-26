@@ -3591,12 +3591,74 @@ function normalizeRoleTitle(rawRole) {
       addCorridorHandrail(-3.2, 31.65, 14.2, 31.65, b1Y);
       addHangingSign(5.5, b1Y + 3.55, 31.5, 6.4, 0.85, '病歷室', 'MEDICAL RECORDS ARCHIVES', '#334155', '#38bdf8', Math.PI);
 
+      // === 消化器中心與超音波室（含招牌下方雙診間門面、鋁框玻璃側窗與叫號機）===
       addWall(14.5, 20.5, 12.5, 12.5, 4.4, texMedBlueGrayWall, '消化器中心與超音波室', 'B1', b1Y);
-      addCorridorHandrail(8.6, 14.15, 20.4, 14.15, b1Y);
+      // 扶手分段避開兩扇診間門洞（10.85 ~ 12.15 與 16.05 ~ 17.35）
+      addCorridorHandrail(8.6, 14.15, 10.7, 14.15, b1Y);
+      addCorridorHandrail(12.3, 14.15, 15.9, 14.15, b1Y);
+      addCorridorHandrail(17.5, 14.15, 20.4, 14.15, b1Y);
       buildWallSconce(14.5, b1Y + 2.25, 14.15, 0, 0xbae6fd);
       addHangingSign(14.5, b1Y + 3.65, 13.8, 7.4, 0.9, '消化器中心', 'DIGESTIVE / GI CENTER & ULTRASOUND', '#0369a1', '#7dd3fc', Math.PI);
-      allWaitingSeats.push(...buildHospitalWaitingBench(12.5, 12.2, Math.PI, b1Y));
-      allWaitingSeats.push(...buildHospitalWaitingBench(16.5, 12.2, Math.PI, b1Y));
+
+      // 招牌底下的兩間消化器中心診間門與叫號機（緊貼北側牆面 z = 14.24，面朝北 -Z 走道）
+      const giFrontZ = 14.24;
+      const giFrameMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.85, roughness: 0.22 });
+      const giGlassMat = new THREE.MeshStandardMaterial({
+        color: 0xbae6fd,
+        transparent: true,
+        opacity: 0.55,
+        roughness: 0.14
+      });
+
+      const giClinics = [
+        { doorX: 11.5, monX: 13.05, code: '腸胃 501診', dept: '肝膽腸胃內科', doctor: '鄭宇軒 醫師', queue: '0043' },
+        { doorX: 16.7, monX: 18.25, code: '超音波 502室', dept: '腹部超音波室', doctor: '消化檢查組', queue: '0028' }
+      ];
+
+      giClinics.forEach((rm) => {
+        // 鋁合金門框（左右立柱 + 上橫樑）
+        const jambW = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.42, 0.14), giFrameMat);
+        jambW.position.set(rm.doorX - 0.65, b1Y + 1.21, giFrontZ - 0.04);
+        const jambE = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.42, 0.14), giFrameMat);
+        jambE.position.set(rm.doorX + 0.65, b1Y + 1.21, giFrontZ - 0.04);
+        const header = new THREE.Mesh(new THREE.BoxGeometry(1.38, 0.09, 0.14), giFrameMat);
+        header.position.set(rm.doorX, b1Y + 2.42, giFrontZ - 0.04);
+        activeBuildGroup.add(jambW, jambE, header);
+
+        // 診間門扇（不加 Y 軸旋轉，BoxGeometry 前後面自動正向顯示門牌）
+        const doorTex = createClinicDoorTexture(rm.code, rm.dept, rm.doctor);
+        const doorLeaf = new THREE.Mesh(
+          new THREE.BoxGeometry(1.22, 2.36, 0.1),
+          new THREE.MeshStandardMaterial({ map: doorTex, roughness: 0.42 })
+        );
+        doorLeaf.position.set(rm.doorX, b1Y + 1.18, giFrontZ - 0.03);
+        activeBuildGroup.add(doorLeaf);
+
+        // 門旁藍色玻璃裝飾側窗框
+        const sideGlass = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.35, 0.08), giGlassMat);
+        sideGlass.position.set(rm.doorX + 0.93, b1Y + 1.72, giFrontZ - 0.02);
+        activeBuildGroup.add(sideGlass);
+
+        // 緊貼牆面的診間叫號機
+        const monTex = createQueueMonitorTexture(rm.queue, rm.code);
+        const mon = new THREE.Mesh(
+          new THREE.BoxGeometry(0.58, 1.02, 0.1),
+          new THREE.MeshStandardMaterial({
+            map: monTex,
+            emissive: new THREE.Color(0xffffff),
+            emissiveMap: monTex,
+            emissiveIntensity: 0.35,
+            roughness: 0.3
+          })
+        );
+        mon.position.set(rm.monX, b1Y + 1.55, giFrontZ - 0.05);
+        activeBuildGroup.add(mon);
+      });
+
+      // 候診排椅移至中央牆段與兩側，不遮擋診間門口動線
+      allWaitingSeats.push(...buildHospitalWaitingBench(14.5, 12.6, Math.PI, b1Y));
+      allWaitingSeats.push(...buildHospitalWaitingBench(9.5, 12.6, Math.PI, b1Y));
+      allWaitingSeats.push(...buildHospitalWaitingBench(19.5, 12.6, Math.PI, b1Y));
 
       // H. 南東翼
       addWall(26.5, 20.5, 7.5, 12.5, 4.4, texCleanTealWall, '內視鏡中心', 'B1', b1Y);
