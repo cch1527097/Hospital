@@ -4578,6 +4578,28 @@ registerCollider({
       const staffList = [
         // ======================== 3F 實景雙人病房 (367 & 369 房：臥床患者 + 吊點滴護理師) ========================
         {
+          id: 'pediatric_doc_f3',
+          name: '陳柏宇',
+          title: '小兒科 主治醫師 (醫師辦公室)',
+          floorTag: '3F',
+          baseY: 9.2,
+          avatar: '🩺',
+          roleType: 'doctor',
+          hasStethoscope: true,
+          hasGlasses: true,
+          shirtColor: 0xffffff,
+          pantsColor: 0x0284c7,
+          waypoints: [
+            new THREE.Vector3(25.6, 9.2, 7.6),
+            new THREE.Vector3(29.4, 9.2, 11.2)
+          ],
+          greeting: '歡迎來到 3F 小兒科醫師辦公室！這裡備有 4 台臨床資訊電腦工作站，方便醫師團隊處理住院醫囑、新生兒會診與出院準備。',
+          options: [
+            { label: '詢問小兒科照護與出院準備流程', reply: '陳柏宇醫師：「我們會透過電腦系統同步追蹤寶寶的生長指標與疫苗時程，出院前也會與護理師共同完成衛教指導。」' },
+            { label: '醫師健康諮詢與體力補給 (+100 HP)', reply: '體力與護甲已完全恢復！', action: 'heal' }
+          ]
+        },
+        {
           id: 'weight_doc_f3',
           name: '林宥廷 主治醫師',
           title: '減重中心 主治醫師 ',
