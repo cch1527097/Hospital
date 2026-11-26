@@ -1697,16 +1697,46 @@
       addTransportSensorZone('f6_nw_elev', 6, f6Y, -40.2, -34.5, 2.3, '電梯', '電梯梯廳', 0x38bdf8);
 
       const neRooms = ['616', '615', '613', '612', '611'];
-      addWall(47.8, -19.5, 10.5, 21.0, 4.4, null, '住院病房 (616~611)', 6, f6Y, 'ward');
+      // 1. 延伸東翼牆面至 Z = -5.65，完美補齊與 610 負壓隔離病房之間的空缺
+      addWall(47.8, -17.825, 10.5, 24.35, 4.4, null, '住院病房 (616~611)', 6, f6Y, 'ward');
+
+      const neDoorFrameMat = new THREE.MeshStandardMaterial({ color: 0x5c3a21, roughness: 0.45 });
+      const neDoorWoodMat = new THREE.MeshStandardMaterial({ color: 0xb07d4f, roughness: 0.48 });
+      const neDoorGlassMat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.65, roughness: 0.15 });
+      const neDoorHandleMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.2 });
+
       neRooms.forEach((rm, idx) => {
-        const rz = -27.5 + idx * 4.0;
+        // 2. 調整間距（4.85m），讓 611 病房招牌往右移至新補齊的牆面位置（Z = -8.1）
+        const rz = -27.5 + idx * 4.85;
         const plaqueTex = createSignTexture(`${rm} 病房`, 'NE WING', '#0f4c5c', '#2dd4bf');
         const plaque = new THREE.Mesh(
           new THREE.BoxGeometry(0.1, 0.42, 1.35),
           new THREE.MeshStandardMaterial({ map: plaqueTex, emissive: 0xffffff, emissiveMap: plaqueTex, emissiveIntensity: 0.35 })
         );
-        plaque.position.set(42.5, f6Y + 2.55, rz);
+        plaque.position.set(42.5, f6Y + 2.75, rz);
         activeBuildGroup.add(plaque);
+
+        // 3. 在每一間病房（616、615、613、612、611）招牌正下方補齊病房門
+        const doorGroup = new THREE.Group();
+
+        const jambNorth = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.32, 0.12), neDoorFrameMat);
+        jambNorth.position.set(0, 1.16, -0.68);
+        const jambSouth = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.32, 0.12), neDoorFrameMat);
+        jambSouth.position.set(0, 1.16, 0.68);
+        const header = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 1.48), neDoorFrameMat);
+        header.position.set(0, 2.32, 0);
+
+        const doorLeaf = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.24, 1.24), neDoorWoodMat);
+        doorLeaf.position.set(-0.02, 1.12, 0);
+        const doorWin = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.85, 0.24), neDoorGlassMat);
+        doorWin.position.set(-0.02, 1.45, -0.25);
+
+        const handle = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.04, 0.16), neDoorHandleMat);
+        handle.position.set(-0.06, 1.05, 0.42);
+
+        doorGroup.add(jambNorth, jambSouth, header, doorLeaf, doorWin, handle);
+        doorGroup.position.set(42.52, f6Y, rz);
+        activeBuildGroup.add(doorGroup);
       });
       addWall(47.8, -38.5, 10.5, 14.0, 4.4, null, '洗衣間・電梯安全梯', 6, f6Y, 'clinical_mint');
       addHangingSign(42.0, f6Y + 3.55, -34.5, 5.2, 0.82, '電梯廳・緊急出口', 'NE ELEVATOR & STAIR', '#065f46', '#6ee7b7', -Math.PI / 2);
