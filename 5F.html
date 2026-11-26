@@ -2239,8 +2239,8 @@ let myPeerId5F = '';
       addHangingSign(-21.5, f5Y + 3.65, -28.6, 7.6, 0.88, '一般病房 (553 ～ 562)', '558・560', '#0f4c5c', '#2dd4bf');
       addHangingSign(18.5, f5Y + 3.65, -28.6, 7.8, 0.88, '一般病房 (525・520・519)', '520', '#be185d', '#f9a8d4');
 
-      // 2. 西翼病房區 (552 ~ 538) & 西側電梯廳接觸感應區
-      addWall(-47.5, -24.5, 10.5, 22.0, 4.4, null, '一般病房 (552~538)', 5, f5Y, 'ward');
+      // 2. 西翼病房區 (552 ~ 538) & 西側電梯廳接觸感應區（已延伸補齊南北缺口）
+      addWall(-47.5, -23.9, 10.5, 28.0, 4.4, null, '一般病房 (552~538)', 5, f5Y, 'ward');
       addHangingSign(-41.8, f5Y + 3.55, -24.5, 5.4, 0.82, '552 ～ 538 病房區・西側電梯廳', '接觸電梯門自動選擇 B1 ~ 8F', '#0369a1', '#7dd3fc', Math.PI / 2);
       addTransportTriggerZone({
         type: 'elevator',
@@ -2273,7 +2273,7 @@ let myPeerId5F = '';
       addHangingSign(-25.5, f5Y + 3.6, -10.6, 6.4, 0.85, '一般病房 (536 ~ 528)', 'INPATIENT WARDS (528-536)', '#0f766e', '#5eead4', Math.PI);
 
       // 3. 東翼病房區 & 東側電梯廳接觸感應區
-      addWall(47.5, -24.5, 10.5, 22.0, 4.4, null, '東側病房', 5, f5Y, 'ward');
+      addWall(47.5, -23.9, 10.5, 28.0, 4.4, null, '東側病房', 5, f5Y, 'ward');
       addHangingSign(41.8, f5Y + 3.55, -24.5, 5.4, 0.82, '東側病房區・東側電梯廳', '接觸電梯門自動選擇 B1 ~ 8F', '#0369a1', '#7dd3fc', -Math.PI / 2);
       addTransportTriggerZone({
         type: 'elevator',
