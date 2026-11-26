@@ -4211,23 +4211,21 @@ function normalizeRoleTitle(rawRole) {
         });
       };
 
-      // 擺放三座維修工作檯（呼吸器檢修區、生理監視器校準區、輸液幫浦拆機檯）
-      buildRepairWorkbench(-38.5, 40.5, 'ventilator', '呼吸器與麻醉機檢修檯');
-      buildRepairWorkbench(-43.8, 41.2, 'pump', '輸液幫浦與電擊器校準檯');
-      buildRepairWorkbench(-43.8, 47.8, 'ventilator', '生理監視器與超音波探頭維修檯');
+      buildRepairWorkbench(-28.5, 36.6, 'ventilator', '呼吸器與麻醉機檢修檯');
+      buildRepairWorkbench(-33.8, 36.8, 'pump', '輸液幫浦與電擊器校準檯');
+      buildRepairWorkbench(-33.8, 41.4, 'ventilator', '生理監視器與超音波探頭維修檯');
 
-      // 南側牆邊擺放待修醫療儀器推車與備品零件鐵架
       const spareShelf = new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.2, 0.65), benchMetalMat);
-      spareShelf.position.set(-39.2, b1Y + 1.1, 50.4);
+      spareShelf.position.set(-29.2, b1Y + 1.1, 43.0);
       const spareBox1 = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.45, 0.52), cautionMat);
-      spareBox1.position.set(-40.1, b1Y + 1.45, 50.4);
+      spareBox1.position.set(-30.1, b1Y + 1.45, 43.0);
       const spareBox2 = new THREE.Mesh(
         new THREE.BoxGeometry(0.85, 0.5, 0.52),
         new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.4 })
       );
-      spareBox2.position.set(-38.4, b1Y + 0.85, 50.4);
+      spareBox2.position.set(-28.4, b1Y + 0.85, 43.0);
       activeBuildGroup.add(spareShelf, spareBox1, spareBox2);
-      colliders.push({ minX: -41.1, maxX: -37.3, minZ: 50.0, maxZ: 50.8, floor: 'B1', label: '醫工備品與待修儀器架' });
+      colliders.push({ minX: -31.1, maxX: -27.3, minZ: 42.6, maxZ: 43.4, floor: 'B1', label: '醫工備品與待修儀器架' });
 
       activeBuildGroup = null;
     }
