@@ -4494,6 +4494,127 @@ colliders.push({ minX: 44.7, maxX: 45.7, minZ: 10.0, maxZ: 12.2, floor: 'B1', la
       activeBuildGroup.add(radCtrlDesk, radCtrlMon);
       colliders.push({ minX: 43.6, maxX: 44.8, minZ: -5.7, maxZ: -3.3, floor: 'B1', label: '放射治療劑量控制檯' });
 
+      // === 血液腫瘤科與放射腫瘤科聯合門診（單一合併空間 Z: -19.3 ~ -8.9，北界不超過員工餐廳 Z = -19.5）===
+      addWall(47.2, -19.1, 12.0, 0.4, 4.4, texMedBlueGrayWall, '腫瘤聯合門診北牆', 'B1', b1Y);
+      addWall(47.2, -8.9, 12.0, 0.4, 4.4, texMedBlueGrayWall, '腫瘤聯合門診南牆', 'B1', b1Y);
+      addWall(53.0, -14.0, 0.4, 10.6, 4.4, texMedBlueGrayWall, '腫瘤聯合門診東牆', 'B1', b1Y);
+
+      // 西側牆段（中心 z = -14.0 留出寬 3.2 的單一雙開電動門開口）
+      addWall(41.3, -17.45, 0.4, 3.3, 4.4, texMedBlueGrayWall, '腫瘤聯合門診西側北牆', 'B1', b1Y);
+      addWall(41.3, -10.55, 0.4, 3.3, 4.4, texMedBlueGrayWall, '腫瘤聯合門診西側南牆', 'B1', b1Y);
+
+      const mergedClinicDoorFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.82, roughness: 0.22 });
+      const mergedClinicDoorGlassMat = new THREE.MeshStandardMaterial({
+        color: 0xbae6fd,
+        transparent: true,
+        opacity: 0.44,
+        roughness: 0.1
+      });
+      const mergedDeskMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35 });
+      const mergedScreenMat = new THREE.MeshStandardMaterial({
+        color: 0x090d16,
+        emissive: 0x38bdf8,
+        emissiveIntensity: 0.85
+      });
+
+      const mergedLintel = new THREE.Mesh(
+        new THREE.BoxGeometry(0.42, 1.9, 3.2),
+        createScaledWallMaterial(texMedBlueGrayWall, 3.2, 0.45)
+      );
+      mergedLintel.position.set(41.3, b1Y + 3.45, -14.0);
+      activeBuildGroup.add(mergedLintel);
+
+      addHangingSign(
+        41.06,
+        b1Y + 3.45,
+        -14.0,
+        5.8,
+        0.64,
+        '血液腫瘤科・放射腫瘤科門診',
+        'HEMATOLOGY & RADIATION ONCOLOGY CLINIC',
+        '#1e3a8a',
+        '#fde047',
+        -Math.PI / 2
+      );
+
+      const mPostN = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), mergedClinicDoorFrameMat);
+      mPostN.position.set(41.3, b1Y + 1.25, -15.55);
+      const mPostS = new THREE.Mesh(new THREE.BoxGeometry(0.46, 2.5, 0.1), mergedClinicDoorFrameMat);
+      mPostS.position.set(41.3, b1Y + 1.25, -12.45);
+      const mHeader = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.16, 3.2), mergedClinicDoorFrameMat);
+      mHeader.position.set(41.3, b1Y + 2.5, -14.0);
+      activeBuildGroup.add(mPostN, mPostS, mHeader);
+
+      const makeMergedLeaf = (stripeHex) => {
+        const leaf = new THREE.Group();
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.42, 1.5), mergedClinicDoorGlassMat);
+        const topRail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.1, 1.5), mergedClinicDoorFrameMat);
+        topRail.position.y = 1.16;
+        const botRail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.14, 1.5), mergedClinicDoorFrameMat);
+        botRail.position.y = -1.14;
+        const stripe = new THREE.Mesh(
+          new THREE.BoxGeometry(0.075, 0.12, 1.48),
+          new THREE.MeshStandardMaterial({ color: stripeHex, emissive: stripeHex, emissiveIntensity: 0.42 })
+        );
+        stripe.position.y = 0.05;
+        leaf.add(pane, topRail, botRail, stripe);
+        return leaf;
+      };
+
+      const mLeftLeaf = makeMergedLeaf(0xd97706);
+      mLeftLeaf.position.set(41.3, b1Y + 1.21, -14.75);
+      const mRightLeaf = makeMergedLeaf(0x0284c7);
+      mRightLeaf.position.set(41.3, b1Y + 1.21, -13.25);
+      activeBuildGroup.add(mLeftLeaf, mRightLeaf);
+
+      const mLeftCol = { minX: 41.1, maxX: 41.5, minZ: -15.5, maxZ: -14.0, floor: 'B1', label: '腫瘤聯合門診電動門' };
+      const mRightCol = { minX: 41.1, maxX: 41.5, minZ: -14.0, maxZ: -12.5, floor: 'B1', label: '腫瘤聯合門診電動門' };
+      colliders.push(mLeftCol, mRightCol);
+
+      slidingDoors.push({
+        sensorPos: new THREE.Vector3(41.1, b1Y, -14.0),
+        leftLeaf: mLeftLeaf,
+        rightLeaf: mRightLeaf,
+        leftClosedZ: -14.75,
+        rightClosedZ: -13.25,
+        openOffset: 1.38,
+        openProgress: 0,
+        leftCollider: mLeftCol,
+        rightCollider: mRightCol,
+        centerZ: -14.0
+      });
+
+      const mergedLight = new THREE.PointLight(0xe0f2fe, 1.2, 22, 1.4);
+      mergedLight.position.set(47.2, b1Y + 3.8, -14.0);
+      activeBuildGroup.add(mergedLight);
+
+      // 同一空間內並排設置：北側「血液腫瘤科」診療區、南側「放射腫瘤科」診療區
+      const hemeDesk = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.78, 2.1), mergedDeskMat);
+      hemeDesk.position.set(45.5, b1Y + 0.39, -16.6);
+      const hemeMon = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.42, 0.66), mergedScreenMat);
+      hemeMon.position.set(45.5, b1Y + 1.05, -16.9);
+      const hemeChair = new THREE.Mesh(
+        new THREE.BoxGeometry(1.15, 0.62, 1.45),
+        new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.45 })
+      );
+      hemeChair.position.set(49.8, b1Y + 0.31, -16.6);
+      activeBuildGroup.add(hemeDesk, hemeMon, hemeChair);
+      colliders.push({ minX: 45.0, maxX: 46.0, minZ: -17.7, maxZ: -15.5, floor: 'B1', label: '血液腫瘤科看診桌' });
+      colliders.push({ minX: 49.2, maxX: 50.4, minZ: -17.3, maxZ: -15.9, floor: 'B1', label: '血液腫瘤科診療椅' });
+
+      const radDesk = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.78, 2.1), mergedDeskMat);
+      radDesk.position.set(45.5, b1Y + 0.39, -11.4);
+      const radMon = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.42, 0.66), mergedScreenMat);
+      radMon.position.set(45.5, b1Y + 1.05, -11.7);
+      const radBed = new THREE.Mesh(
+        new THREE.BoxGeometry(1.15, 0.62, 1.45),
+        new THREE.MeshStandardMaterial({ color: 0x0d9488, roughness: 0.45 })
+      );
+      radBed.position.set(49.8, b1Y + 0.31, -11.4);
+      activeBuildGroup.add(radDesk, radMon, radBed);
+      colliders.push({ minX: 45.0, maxX: 46.0, minZ: -12.5, maxZ: -10.3, floor: 'B1', label: '放射腫瘤科看診桌' });
+      colliders.push({ minX: 49.2, maxX: 50.4, minZ: -12.1, maxZ: -10.7, floor: 'B1', label: '放射腫瘤科診療床' });
+
       // 1. 醫工室五面外牆（東牆緊貼 B1 東側外牆 X = 53.1，南牆緊貼 B1 南側外牆 Z = 44.1，門開在西側 X = 41.3，門洞中心 Z = 37.5 正對病歷室電動門）
       addWall(47.2, 31.1, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室北牆', 'B1', b1Y);
       addWall(47.2, 43.9, 12.0, 0.4, 4.4, texMedBlueGrayWall, '醫工室南牆', 'B1', b1Y);
