@@ -1623,6 +1623,90 @@ let myPeerId5F = '';
       });
     }
 
+    /**
+     * 建構 3D 醫院標準摺疊輪椅 (Hospital Wheelchair)
+     */
+    function buildHospitalWheelchair(x, z, baseY, rotY = Math.PI) {
+      const g = new THREE.Group();
+      const steelMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.2 });
+      const seatMat = new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.65 });
+      const tireMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.75 });
+      const padMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 });
+
+      // 皮革座墊與椅背
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.06, 0.44), seatMat);
+      seat.position.set(0, 0.50, 0.02);
+      seat.castShadow = true;
+
+      const backrest = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.44, 0.05), seatMat);
+      backrest.position.set(0, 0.76, -0.20);
+      backrest.rotation.x = -0.10;
+      backrest.castShadow = true;
+      g.add(seat, backrest);
+
+      // 左右不鏽鋼骨架、手推握把、扶手與腳踏板
+      [-0.25, 0.25].forEach((sx) => {
+        // 椅背直立管與向後彎曲推把
+        const backPost = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.62, 10), steelMat);
+        backPost.position.set(sx, 0.68, -0.21);
+        const pushHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.14, 10), padMat);
+        pushHandle.rotation.x = Math.PI / 2;
+        pushHandle.position.set(sx, 0.98, -0.27);
+
+        // 扶手支架與黑色軟墊扶手
+        const armFront = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.24, 10), steelMat);
+        armFront.position.set(sx, 0.61, 0.18);
+        const armPad = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.035, 0.36), padMat);
+        armPad.position.set(sx, 0.73, 0.02);
+
+        // 前小萬向輪與支架
+        const frontFork = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.36, 10), steelMat);
+        frontFork.position.set(sx, 0.28, 0.22);
+        const frontWheel = new THREE.Mesh(new THREE.TorusGeometry(0.09, 0.02, 10, 20), tireMat);
+        frontWheel.rotation.y = Math.PI / 2;
+        frontWheel.position.set(sx, 0.11, 0.22);
+
+        // 後大驅動輪與手推圈
+        const rearWheel = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.024, 12, 28), tireMat);
+        rearWheel.rotation.y = Math.PI / 2;
+        rearWheel.position.set(sx + (sx > 0 ? 0.04 : -0.04), 0.30, -0.10);
+
+        const handRim = new THREE.Mesh(new THREE.TorusGeometry(0.23, 0.010, 8, 24), steelMat);
+        handRim.rotation.y = Math.PI / 2;
+        handRim.position.set(sx + (sx > 0 ? 0.065 : -0.065), 0.30, -0.10);
+
+        // 輪軸十字輻條
+        [0, Math.PI / 2].forEach((ang) => {
+          const spoke = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.54, 6), steelMat);
+          spoke.rotation.x = ang;
+          spoke.position.set(sx + (sx > 0 ? 0.04 : -0.04), 0.30, -0.10);
+          g.add(spoke);
+        });
+
+        // 腳踏板支架與折疊踏板
+        const footStem = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.36, 8), steelMat);
+        footStem.rotation.x = -0.35;
+        footStem.position.set(sx * 0.85, 0.32, 0.28);
+        const footPlate = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.02, 0.16), padMat);
+        footPlate.position.set(sx * 0.72, 0.15, 0.36);
+
+        g.add(backPost, pushHandle, armFront, armPad, frontFork, frontWheel, rearWheel, handRim, footStem, footPlate);
+      });
+
+      g.position.set(x, baseY, z);
+      g.rotation.y = rotY;
+      scene.add(g);
+
+      colliders.push({
+        minX: x - 0.34,
+        maxX: x + 0.34,
+        minZ: z - 0.38,
+        maxZ: z + 0.38,
+        floor: getFloorNumber(baseY),
+        label: '醫院公用輪椅'
+      });
+    }
+
     // --------------------------------------------------------------------------
     // 5. 3D 醫療大型儀器建構器 (1F / 2F / 3F)
     // --------------------------------------------------------------------------
@@ -2387,6 +2471,86 @@ let myPeerId5F = '';
       addWall(-8.5, -18.5, 2.8, 1.15, 1.08, counterWoodMat, '西側護理站櫃檯', 5, f5Y);
       addWall(8.5, -18.5, 2.8, 1.15, 1.08, counterWoodMat, '東側護理站櫃檯', 5, f5Y);
       addHangingSign(0, f5Y + 3.35, -21.0, 4.2, 0.56, '輪椅停放區', 'WHEELCHAIR BAY', '#1d4ed8', '#93c5fd', Math.PI);
+
+      const buildHospitalWheelchair = (x, z, baseY, rotY = Math.PI) => {
+        const g = new THREE.Group();
+        const steelMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.2 });
+        const seatMat = new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.65 });
+        const tireMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.75 });
+        const padMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 });
+
+        const seat = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.06, 0.44), seatMat);
+        seat.position.set(0, 0.50, 0.02);
+        seat.castShadow = true;
+
+        const backrest = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.44, 0.05), seatMat);
+        backrest.position.set(0, 0.76, -0.20);
+        backrest.rotation.x = -0.10;
+        backrest.castShadow = true;
+        g.add(seat, backrest);
+
+        [-0.25, 0.25].forEach((sx) => {
+          const backPost = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.62, 10), steelMat);
+          backPost.position.set(sx, 0.68, -0.21);
+          const pushHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.14, 10), padMat);
+          pushHandle.rotation.x = Math.PI / 2;
+          pushHandle.position.set(sx, 0.98, -0.27);
+
+          const armFront = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.24, 10), steelMat);
+          armFront.position.set(sx, 0.61, 0.18);
+          const armPad = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.035, 0.36), padMat);
+          armPad.position.set(sx, 0.73, 0.02);
+
+          const frontFork = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.36, 10), steelMat);
+          frontFork.position.set(sx, 0.28, 0.22);
+          const frontWheel = new THREE.Mesh(new THREE.TorusGeometry(0.09, 0.02, 10, 20), tireMat);
+          frontWheel.rotation.y = Math.PI / 2;
+          frontWheel.position.set(sx, 0.11, 0.22);
+
+          const rearWheel = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.024, 12, 28), tireMat);
+          rearWheel.rotation.y = Math.PI / 2;
+          rearWheel.position.set(sx + (sx > 0 ? 0.04 : -0.04), 0.30, -0.10);
+
+          const handRim = new THREE.Mesh(new THREE.TorusGeometry(0.23, 0.010, 8, 24), steelMat);
+          handRim.rotation.y = Math.PI / 2;
+          handRim.position.set(sx + (sx > 0 ? 0.065 : -0.065), 0.30, -0.10);
+
+          [0, Math.PI / 2].forEach((ang) => {
+            const spoke = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.54, 6), steelMat);
+            spoke.rotation.x = ang;
+            spoke.position.set(sx + (sx > 0 ? 0.04 : -0.04), 0.30, -0.10);
+            g.add(spoke);
+          });
+
+          const footStem = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.36, 8), steelMat);
+          footStem.rotation.x = -0.35;
+          footStem.position.set(sx * 0.85, 0.32, 0.28);
+          const footPlate = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.02, 0.16), padMat);
+          footPlate.position.set(sx * 0.72, 0.15, 0.36);
+
+          g.add(backPost, pushHandle, armFront, armPad, frontFork, frontWheel, rearWheel, handRim, footStem, footPlate);
+        });
+
+        g.position.set(x, baseY, z);
+        g.rotation.y = rotY;
+        scene.add(g);
+
+        colliders.push({
+          minX: x - 0.34,
+          maxX: x + 0.34,
+          minZ: z - 0.38,
+          maxZ: z + 0.38,
+          floor: getFloorNumber(baseY),
+          label: '醫院公用輪椅'
+        });
+      };
+
+      [-1.35, -0.45, 0.45, 1.35].forEach((wx) => {
+        buildHospitalWheelchair(wx, -21.25, f5Y, Math.PI);
+      });
+
+      // 祈禱室／佛堂可走入式空間（中心 x=0, z=-6.8，寬 12.0，深 5.2）
+      addFloorSlab5F(0, -6.8, 12.2, 5.4, 0.038, true);
 
       // 祈禱室／佛堂可走入式空間（中心 x=0, z=-6.8，寬 12.0，深 5.2）
       addFloorSlab5F(0, -6.8, 12.2, 5.4, 0.038, true);
