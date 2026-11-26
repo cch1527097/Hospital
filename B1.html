@@ -521,8 +521,13 @@ function normalizeRoleTitle(rawRole) {
     }
 
     function initMultiplayerPeerJS() {
+      // 修正 <script defer> 尚未載入完成就誤判離線的問題
       if (typeof Peer === 'undefined') {
-        setMpStatusUI(false, 'PeerJS 載入失敗（離線模式）');
+        if (document.readyState !== 'complete') {
+          window.addEventListener('load', initMultiplayerPeerJS, { once: true });
+        } else {
+          setMpStatusUI(false, 'PeerJS 載入失敗（離線模式）');
+        }
         return;
       }
 
@@ -539,6 +544,38 @@ function normalizeRoleTitle(rawRole) {
         peer.on('connection', (conn) => {
           clientConns.set(conn.peer, conn);
           bindConnectionEvents(conn);
+
+          // 新玩家連線建立後，Host 主動把「自己」與「所有已在線玩家」座標推播給新玩家
+          conn.on('open', () => {
+            conn.send({
+              type: 'sync',
+              id: myPeerId,
+              name: currentUser.name,
+              role: currentUser.role,
+              colorHex: currentUser.colorHex,
+              x: Number(player.pos.x.toFixed(3)),
+              y: Number(player.pos.y.toFixed(3)),
+              z: Number(player.pos.z.toFixed(3)),
+              rotY: Number(player.yaw.toFixed(3))
+            });
+
+            remotePlayers.forEach((rp, existingPeerId) => {
+              if (existingPeerId !== conn.peer) {
+                const theme = ROLE_COLOR_MAP[rp.role] || { hex: 0x2dd4bf };
+                conn.send({
+                  type: 'sync',
+                  id: existingPeerId,
+                  name: rp.name,
+                  role: rp.role,
+                  colorHex: theme.hex,
+                  x: Number(rp.targetPos.x.toFixed(3)),
+                  y: Number(rp.targetPos.y.toFixed(3)),
+                  z: Number(rp.targetPos.z.toFixed(3)),
+                  rotY: Number(rp.targetYaw.toFixed(3))
+                });
+              }
+            });
+          });
         });
       });
 
@@ -557,7 +594,7 @@ function normalizeRoleTitle(rawRole) {
             hostConn.on('open', () => {
               setMpStatusUI(true, '已連線至 B1 多人頻道');
               updateOnlineCountUI();
-              syncMyPosition(true);
+              syncMyPosition(true); // 連上後立即廣播自己的初始位置
             });
 
             bindConnectionEvents(hostConn);
@@ -5937,6 +5974,31 @@ function normalizeRoleTitle(rawRole) {
             }
           }
         }
+        const targetOpen = triggerOpen ? 1 : 0;
+        d.openProgress += (targetOpen - d.openProgress) * Math.min(1, dt * 6.5);
+
+        const shift = d.openProgress * d.openOffset;
+
+        if (d.axis === 'x') {
+          const midX = d.centerCoord !== undefined
+            ? d.centerCoord
+            : (d.leftClosedPos + d.rightClosedPos) * 0.5;
+          d.leftLeaf.position.x = d.leftClosedPos - shift;
+          d.rightLeaf.position.x = d.rightClosedPos + shift;
+          // 門開啟超過 65% 時，將碰撞框完全移出門洞避免角色半徑擦撞空氣牆
+          d.leftCollider.maxX = d.openProgress > 0.65 ? (midX - d.openOffset - 0.5) : (midX - shift);
+          d.rightCollider.minX = d.openProgress > 0.65 ? (midX + d.openOffset + 0.5) : (midX + shift);
+        } else {
+          const lClosed = d.leftClosedZ !== undefined ? d.leftClosedZ : d.leftClosedPos;
+          const rClosed = d.rightClosedZ !== undefined ? d.rightClosedZ : d.rightClosedPos;
+          // 直接以左右門片關閉位置的幾何中點計算，避免漏填 centerZ 導致空氣牆偏移
+          const midZ = (lClosed + rClosed) * 0.5;
+          d.leftLeaf.position.z = lClosed - shift;
+          d.rightLeaf.position.z = rClosed + shift;
+          d.leftCollider.maxZ = d.openProgress > 0.65 ? (midZ - d.openOffset - 0.5) : (midZ - shift);
+          d.rightCollider.minZ = d.openProgress > 0.65 ? (midZ + d.openOffset + 0.5) : (midZ + shift);
+        }
+      }
         const targetOpen = triggerOpen ? 1 : 0;
         d.openProgress += (targetOpen - d.openProgress) * Math.min(1, dt * 6.5);
 
