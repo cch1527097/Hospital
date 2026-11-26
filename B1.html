@@ -345,17 +345,10 @@ function normalizeRoleTitle(rawRole) {
     let lastSyncTime = 0;
 
     function verifyAuthSession() {
-  const params = new URLSearchParams(window.location.search);
-  const card = params.get('card') || sessionStorage.getItem('hospital_card') || 'GUEST-001';
-  const name = params.get('name') || sessionStorage.getItem('hospital_name') || '院區訪客';
-  const dept = params.get('dept') || sessionStorage.getItem('hospital_dept') || '一般參訪';
-  const role = params.get('role') || sessionStorage.getItem('hospital_role') || 'visitor';
-
-  currentUser = { card, name, dept, role };
-  sessionStorage.setItem('hospital_card', card);
-  sessionStorage.setItem('hospital_name', name);
-  return true; // 永遠允許進入，不再顯示黑屏踢出
-}
+      const params = new URLSearchParams(window.location.search);
+      const qCard = params.get('card');
+      const qName = params.get('name');
+      const qRole = params.get('role');
 
       let sessionData = null;
       try {
@@ -365,26 +358,26 @@ function normalizeRoleTitle(rawRole) {
         console.warn('讀取登入工作階段失敗:', e);
       }
 
-      if (qCard && qName) {
-        sessionData = { card: qCard, role: qRole || '護理師', name: qName };
-        try {
-          sessionStorage.setItem('vh_user_session', JSON.stringify(sessionData));
-        } catch (e) {}
-      }
+      const card = qCard || (sessionData && sessionData.card) || sessionStorage.getItem('hospital_card') || 'GUEST-001';
+      const name = qName || (sessionData && sessionData.name) || sessionStorage.getItem('hospital_name') || '院區訪客';
+      const rawRole = qRole || (sessionData && sessionData.role) || sessionStorage.getItem('hospital_role') || '護理師';
 
-      if (!sessionData || !sessionData.name) {
-        sessionData = { card: 'GUEST-001', role: '實習醫護', name: '院區訪客' };
-        try {
-          sessionStorage.setItem('vh_user_session', JSON.stringify(sessionData));
-        } catch (e) {}
-      }
-
-      currentUser.card = sessionData.card || 'EMP-001';
-      currentUser.name = sessionData.name;
-      currentUser.role = normalizeRoleTitle(sessionData.role);
+      currentUser.card = card;
+      currentUser.name = name;
+      currentUser.role = normalizeRoleTitle(rawRole);
       const theme = ROLE_COLOR_MAP[currentUser.role] || { hex: 0x2dd4bf, badge: '#2dd4bf' };
       currentUser.colorHex = theme.hex;
       currentUser.badgeColor = theme.badge;
+
+      try {
+        sessionStorage.setItem('hospital_card', card);
+        sessionStorage.setItem('hospital_name', name);
+        sessionStorage.setItem('vh_user_session', JSON.stringify({
+          card: currentUser.card,
+          name: currentUser.name,
+          role: currentUser.role
+        }));
+      } catch (e) {}
 
       const badgeEl = document.getElementById('mp-user-badge');
       if (badgeEl) {
@@ -6001,26 +5994,6 @@ function normalizeRoleTitle(rawRole) {
           d.rightLeaf.position.z = rClosed + shift;
           d.leftCollider.maxZ = d.openProgress > 0.65 ? (midZ - d.openOffset - 0.5) : (midZ - shift);
           d.rightCollider.minZ = d.openProgress > 0.65 ? (midZ + d.openOffset + 0.5) : (midZ + shift);
-        }
-      }
-        const targetOpen = triggerOpen ? 1 : 0;
-        d.openProgress += (targetOpen - d.openProgress) * Math.min(1, dt * 6.5);
-
-        const shift = d.openProgress * d.openOffset;
-
-        if (d.axis === 'x') {
-          d.leftLeaf.position.x = d.leftClosedPos - shift;
-          d.rightLeaf.position.x = d.rightClosedPos + shift;
-          d.leftCollider.maxX = d.centerCoord - shift;
-          d.rightCollider.minX = d.centerCoord + shift;
-        } else {
-          const lClosed = d.leftClosedZ !== undefined ? d.leftClosedZ : d.leftClosedPos;
-          const rClosed = d.rightClosedZ !== undefined ? d.rightClosedZ : d.rightClosedPos;
-          const midZ = d.centerZ !== undefined ? d.centerZ : (d.centerCoord !== undefined ? d.centerCoord : -39.5);
-          d.leftLeaf.position.z = lClosed - shift;
-          d.rightLeaf.position.z = rClosed + shift;
-          d.leftCollider.maxZ = midZ - shift;
-          d.rightCollider.minZ = midZ + shift;
         }
       }
       
