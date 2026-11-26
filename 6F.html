@@ -218,13 +218,6 @@
       <span class="text-slate-500">★</span>
     </div>
 
-    <!-- 目前所在空間徽章 -->
-    <div class="mt-1.5 px-3 py-1 rounded-xl hud-glass border-l-4 border-pink-500 text-right shadow-lg">
-      <div class="text-[10px] text-slate-400 font-medium">現在位置 You Are Here</div>
-      <div id="current-zone-label" class="text-xs sm:text-sm font-black text-white">6F 620 病房 / 東側護理站 B</div>
-    </div>
-  </div>
-
   <!-- 浮動傷害數字與 NPC 血條覆蓋層 -->
   <div id="floating-fx-layer" class="fixed inset-0 z-10 pointer-events-none overflow-hidden"></div>
 
@@ -1654,15 +1647,6 @@
           buildHospitalBedWithIV(rx + 1.05, northMidZ - 0.5, f6Y, 0, idx % 2 === 0, `${rm} 病房病床`);
         }
       });
-
-      const herePadTex = createSignTexture('6F 現在位置 YOU ARE HERE', '620 病房・東側護理站', '#9d174d', '#f9a8d4');
-      const herePad = new THREE.Mesh(
-        new THREE.PlaneGeometry(3.8, 1.1),
-        new THREE.MeshStandardMaterial({ map: herePadTex, roughness: 0.4 })
-      );
-      herePad.rotation.x = -Math.PI / 2;
-      herePad.position.set(24.5, f6Y + 0.015, -18.2);
-      activeBuildGroup.add(herePad);
 
       addHangingSign(24.5, f6Y + 3.65, -23.2, 6.8, 0.88, '住院病房 (617 ~ 627 病房)', 'INPATIENT WARDS', '#0f4c5c', '#2dd4bf');
       addHangingSign(-22.5, f6Y + 3.65, -23.2, 6.8, 0.88, '住院病房 (653 ~ 663 病房)', 'INPATIENT WARDS', '#0f4c5c', '#2dd4bf');
@@ -3476,6 +3460,9 @@ addFireHydrantCabinet(8.81, 13.5, -Math.PI / 2, f6Y);
     }
 
     function updateCurrentZoneHUD() {
+      const el = document.getElementById('current-zone-label'); // ← 加上這行
+      if (!el) return;
+      
       const x = player.pos.x;
       const z = player.pos.z;
       let label = '6F 住院病房走廊 (木質地板區)';
