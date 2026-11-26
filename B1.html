@@ -4220,6 +4220,10 @@ function normalizeRoleTitle(rawRole) {
       spareBox2.position.set(-28.4, b1Y + 0.85, 43.0);
       activeBuildGroup.add(spareShelf, spareBox1, spareBox2);
       colliders.push({ minX: -31.1, maxX: -27.3, minZ: 42.6, maxZ: 43.4, floor: 'B1', label: '醫工備品與待修儀器架' });
+
+      activeBuildGroup = null;
+    }
+
     function createRoundedCharacterRig(opts = {}) {
       const group = new THREE.Group();
       const skinMat = new THREE.MeshStandardMaterial({ color: opts.skinColor || 0xf1c29b, roughness: 0.55 });
