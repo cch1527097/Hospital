@@ -3619,9 +3619,42 @@ registerCollider({
       addHangingSign(21.5, f3Y + 3.65, -27.5, 7.2, 0.88, '總務課收發處・社工辦公室', '績效組・醫療委員會', '#1d4ed8', '#93c5fd');
       addHangingSign(23.5, f3Y + 3.65, -15.5, 7.2, 0.88, '總務處勞安課・品管中心', '社工辦公室・志工室', '#0f766e', '#5eead4');
 
-      addWall(-29.5, 3.2, 11.2, 9.2, 4.4, wallMintMat, '小兒科醫師辦公室', 3, f3Y);
-      addWall(27.5, 9.8, 11.5, 11.0, 4.4, wallBlueMat, '醫師值班室與出院準備服務', 3, f3Y);
-      addHangingSign(-29.5, f3Y + 3.65, 8.4, 5.4, 0.72, '小兒科醫師辦公室', '醫師值班室・出院準備服務', '#065f46', '#6ee7b7');
+      // 左側保留給「減重中心門診」使用的主體量體（原本小兒科位置）
+      addWall(-29.5, 3.2, 11.2, 9.2, 4.4, wallMintMat, '減重中心門診主體', 3, f3Y);
+
+      // 👉 右側箭頭指定處 (x = 27.5, z = 9.8)：改造為可走入的「小兒科醫師辦公室（內設 4 台電腦）」
+      addWall(27.5, 4.3, 11.5, 0.36, 4.4, wallBlueMat, '小兒科醫師辦公室北牆', 3, f3Y);
+      addWall(21.75, 9.8, 0.36, 11.0, 4.4, wallBlueMat, '小兒科醫師辦公室西牆', 3, f3Y);
+      addWall(33.25, 9.8, 0.36, 11.0, 4.4, wallBlueMat, '小兒科醫師辦公室東牆', 3, f3Y);
+
+      // 南側牆面中央留出 2.3m 寬大門入口 (x = 27.5) 讓玩家可以自由走進去
+      addWall(24.05, 15.3, 4.6, 0.36, 4.4, wallBlueMat, '小兒科醫師辦公室南牆西段', 3, f3Y);
+      addWall(30.95, 15.3, 4.6, 0.36, 4.4, wallBlueMat, '小兒科醫師辦公室南牆東段', 3, f3Y);
+      const pedHeader = new THREE.Mesh(new THREE.BoxGeometry(2.3, 1.95, 0.36), wallCreamMat);
+      pedHeader.position.set(27.5, f3Y + 3.42, 15.3);
+      const pedDoorOpen = new THREE.Mesh(new THREE.BoxGeometry(1.45, 2.3, 0.08), ArchMaterials.salmonDoor);
+      pedDoorOpen.position.set(26.45, f3Y + 1.16, 14.55);
+      pedDoorOpen.rotation.y = Math.PI * 0.48;
+      addToFloorGroup(pedHeader, 3);
+      addToFloorGroup(pedDoorOpen, 3);
+
+      // 懸掛招牌移至右側新位置上方
+      addHangingSign(27.5, f3Y + 3.65, 15.5, 6.2, 0.82, '小兒科醫師辦公室', 'PEDIATRIC PHYSICIANS OFFICE・醫師值班室・出院準備服務', '#065f46', '#6ee7b7');
+
+      // 辦公室內部配置 4 台電腦工作站（左右兩排對坐配置，留出中央走道）
+      const pedComputerDesks = [
+        { x: 24.4, z: 7.4, rotY: Math.PI / 2,  title: '小兒科門診與住院醫囑系統', sub: '新生兒黃疸與生長曲線評估' },
+        { x: 24.4, z: 11.4, rotY: Math.PI / 2, title: '兒童過敏氣喘與疫苗追蹤網', sub: '兒童預防接種與衛教紀錄' },
+        { x: 30.6, z: 7.4, rotY: -Math.PI / 2, title: '醫師值班排班與會診系統', sub: '小兒急重症與 NICU 交班總覽' },
+        { x: 30.6, z: 11.4, rotY: -Math.PI / 2, title: '出院準備與長照轉銜平台', sub: '跨團隊出院照護計畫整合' }
+      ];
+      pedComputerDesks.forEach((desk) => {
+        addComputerWorkstation(desk.x, f3Y, desk.z, {
+          rotY: desk.rotY,
+          screenTitle: desk.title,
+          screenSub: desk.sub
+        });
+      });
 
       // ======================== 新增：3F 減重中心門診（紅框標示東側立面 x = -23.9） ========================
       // 1. 減重中心門診主橫幅招牌（面朝東側電梯廳走廊 +X）
@@ -6175,6 +6208,7 @@ registerCollider({
         else if (x > 39.0 && z >= 35.0) zone = '3F 心血管衛教室（血壓量測與心臟模型諮詢）';
         else if (x >= 15.5 && z > 28.2 && z < 35.0) zone = '3F 東南醫療衛教木質走廊（候診休憩沙發區）';
         else if (z > 9.0 && z < 23.0 && Math.abs(x) < 13.0) zone = '3F 小兒科醫師辦公室 / 出院準備服務';
+        else if (x >= 21.75 && x <= 33.25 && z >= 4.3 && z <= 15.3) zone = '3F 小兒科醫師辦公室（4台電腦工作站・醫師值班室）';
         else if (z < -12.0 && x < -4.0) zone = '3F 睡眠中心 / 產房壁畫走廊 / 婦產科 VIP 病房';
         else if (z < -12.0 && x >= -4.0) zone = '3F 總務處勞安課 / 品管中心 / 行政處 / 社工辦公室';
         else zone = '3F 三樓木質地板醫療走廊';
