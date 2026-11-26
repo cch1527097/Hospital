@@ -1652,11 +1652,15 @@
       addHangingSign(-22.5, f6Y + 3.65, -23.2, 6.8, 0.88, '住院病房 (653 ~ 663 病房)', 'INPATIENT WARDS', '#0f4c5c', '#2dd4bf');
 
       const nwRooms = ['652', '651', '650', '639', '638'];
-      // 1. 延伸牆面至 Z = -5.65（中心 -17.825，長度 24.35），完美補齊與 637 病房之間的空缺
+      // 補齊與 637 病房之間的空缺
       addWall(-47.8, -17.825, 10.5, 24.35, 4.4, null, '住院病房 (652~638)', 6, f6Y, 'ward');
 
+      const doorFrameMat = new THREE.MeshStandardMaterial({ color: 0x5c3a21, roughness: 0.45 });
+      const doorWoodMat = new THREE.MeshStandardMaterial({ color: 0xb07d4f, roughness: 0.48 });
+      const doorGlassMat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.65, roughness: 0.15 });
+      const doorHandleMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.2 });
+
       nwRooms.forEach((rm, idx) => {
-        // 2. 調整間距（4.85m），讓最後一間「638 病房」往左移至補齊後的牆面位置（Z = -8.1）
         const rz = -27.5 + idx * 4.85;
         const plaqueTex = createSignTexture(`${rm} 病房`, 'NW WING', '#0f4c5c', '#2dd4bf');
         const plaque = new THREE.Mesh(
@@ -1666,36 +1670,27 @@
         plaque.position.set(-42.5, f6Y + 2.75, rz);
         activeBuildGroup.add(plaque);
 
-        // 3. 在 638 病房招牌正下方新增木質門框、毛玻璃窗木門與門把
-        if (rm === '638') {
-          const doorGroup = new THREE.Group();
-          const frameMat = new THREE.MeshStandardMaterial({ color: 0x5c3a21, roughness: 0.45 });
-          const doorWoodMat = new THREE.MeshStandardMaterial({ color: 0xb07d4f, roughness: 0.48 });
-          const doorGlassMat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.65, roughness: 0.15 });
-          const handleMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.2 });
+        // 為每一間病房（652、651、650、639、638）招牌正下方補齊病房門
+        const doorGroup = new THREE.Group();
 
-          // 左右門框與上橫樑
-          const jambNorth = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.32, 0.12), frameMat);
-          jambNorth.position.set(0, 1.16, -0.68);
-          const jambSouth = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.32, 0.12), frameMat);
-          jambSouth.position.set(0, 1.16, 0.68);
-          const header = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 1.48), frameMat);
-          header.position.set(0, 2.32, 0);
+        const jambNorth = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.32, 0.12), doorFrameMat);
+        jambNorth.position.set(0, 1.16, -0.68);
+        const jambSouth = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.32, 0.12), doorFrameMat);
+        jambSouth.position.set(0, 1.16, 0.68);
+        const header = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 1.48), doorFrameMat);
+        header.position.set(0, 2.32, 0);
 
-          // 病房門扇與觀察窗
-          const doorLeaf = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.24, 1.24), doorWoodMat);
-          doorLeaf.position.set(0.02, 1.12, 0);
-          const doorWin = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.85, 0.24), doorGlassMat);
-          doorWin.position.set(0.02, 1.45, -0.25);
+        const doorLeaf = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.24, 1.24), doorWoodMat);
+        doorLeaf.position.set(0.02, 1.12, 0);
+        const doorWin = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.85, 0.24), doorGlassMat);
+        doorWin.position.set(0.02, 1.45, -0.25);
 
-          // 不鏽鋼門把
-          const handle = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.04, 0.16), handleMat);
-          handle.position.set(0.06, 1.05, 0.42);
+        const handle = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.04, 0.16), doorHandleMat);
+        handle.position.set(0.06, 1.05, 0.42);
 
-          doorGroup.add(jambNorth, jambSouth, header, doorLeaf, doorWin, handle);
-          doorGroup.position.set(-42.52, f6Y, rz);
-          activeBuildGroup.add(doorGroup);
-        }
+        doorGroup.add(jambNorth, jambSouth, header, doorLeaf, doorWin, handle);
+        doorGroup.position.set(-42.52, f6Y, rz);
+        activeBuildGroup.add(doorGroup);
       });
       addWall(-47.8, -38.5, 10.5, 14.0, 4.4, null, '電梯安全梯', 6, f6Y, 'clinical_mint');
       addHangingSign(-42.0, f6Y + 3.55, -34.5, 5.2, 0.82, '電梯梯廳', 'NW ELEVATOR & STAIR', '#065f46', '#6ee7b7', Math.PI / 2);
