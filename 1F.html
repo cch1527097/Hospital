@@ -783,33 +783,42 @@ function updateRemotePlayers1F(dt) {
       return geomCache.get(key);
     }
 
-    // 可愛圓潤膠囊積木公仔共用幾何快取池
     const capsuleGeoCache = {
-      head: new THREE.SphereGeometry(0.215, 20, 16),
-      hairCap: new THREE.SphereGeometry(0.222, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.53),
-      nurseCap: new THREE.CylinderGeometry(0.085, 0.095, 0.045, 14),
-      nurseCapTop: new THREE.SphereGeometry(0.085, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.5),
-      visorBand: new THREE.CylinderGeometry(0.224, 0.224, 0.068, 20, 1, true, -Math.PI * 0.34, Math.PI * 0.68),
-      visorRim: new THREE.CylinderGeometry(0.226, 0.226, 0.012, 20, 1, true, -Math.PI * 0.35, Math.PI * 0.70),
-      torsoCyl: new THREE.CylinderGeometry(0.205, 0.205, 0.44, 18),
-      torsoCap: new THREE.SphereGeometry(0.205, 18, 12),
-      pelvisCyl: new THREE.CylinderGeometry(0.195, 0.195, 0.10, 16),
-      pelvisCap: new THREE.SphereGeometry(0.195, 16, 10),
-      shoulderBall: new THREE.SphereGeometry(0.086, 14, 12),
-      upperArmCyl: new THREE.CylinderGeometry(0.072, 0.068, 0.21, 12),
-      elbowBall: new THREE.SphereGeometry(0.068, 12, 10),
-      foreArmCyl: new THREE.CylinderGeometry(0.066, 0.062, 0.20, 12),
-      cuffRing: new THREE.TorusGeometry(0.064, 0.012, 8, 14),
-      handBall: new THREE.SphereGeometry(0.064, 12, 10),
-      thighCyl: new THREE.CylinderGeometry(0.086, 0.080, 0.27, 12),
-      kneeBall: new THREE.SphereGeometry(0.080, 12, 10),
-      shinCyl: new THREE.CylinderGeometry(0.078, 0.072, 0.27, 12),
-      shoeBody: new THREE.BoxGeometry(0.135, 0.085, 0.18),
-      shoeToe: new THREE.SphereGeometry(0.068, 12, 10),
-      shoeHeel: new THREE.SphereGeometry(0.068, 12, 10),
-      combatAuraBall: new THREE.SphereGeometry(0.115, 10, 8),
-      footAuraBall: new THREE.SphereGeometry(0.145, 10, 8)
-    };
+  // 寫實頭部比例（縮小頭圍，拉長身形比例）
+  head: new THREE.SphereGeometry(0.115, 24, 20),
+  hairCap: new THREE.SphereGeometry(0.122, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.58),
+  nurseCap: new THREE.CylinderGeometry(0.065, 0.075, 0.04, 14),
+  nurseCapTop: new THREE.SphereGeometry(0.065, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.5),
+  visorBand: new THREE.CylinderGeometry(0.124, 0.124, 0.05, 20, 1, true, -Math.PI * 0.34, Math.PI * 0.68),
+  visorRim: new THREE.CylinderGeometry(0.126, 0.126, 0.01, 20, 1, true, -Math.PI * 0.35, Math.PI * 0.70),
+
+  // 修長軀幹與骨盆（上寬下窄、自然肩線）
+  torsoCyl: new THREE.CylinderGeometry(0.175, 0.155, 0.52, 20),
+  torsoCap: new THREE.SphereGeometry(0.175, 20, 12),
+  pelvisCyl: new THREE.CylinderGeometry(0.155, 0.148, 0.14, 18),
+  pelvisCap: new THREE.SphereGeometry(0.148, 18, 10),
+
+  // 寫實手臂（上臂＋前臂＋手掌）
+  shoulderBall: new THREE.SphereGeometry(0.062, 14, 12),
+  upperArmCyl: new THREE.CylinderGeometry(0.054, 0.046, 0.27, 14),
+  elbowBall: new THREE.SphereGeometry(0.046, 12, 10),
+  foreArmCyl: new THREE.CylinderGeometry(0.045, 0.036, 0.26, 14),
+  cuffRing: new THREE.TorusGeometry(0.040, 0.008, 8, 14),
+  handBall: new THREE.SphereGeometry(0.042, 12, 10),
+
+  // 修長雙腿（大腿＋小腿總長約 0.84m，符合寫實比例）
+  thighCyl: new THREE.CylinderGeometry(0.076, 0.062, 0.42, 14),
+  kneeBall: new THREE.SphereGeometry(0.062, 12, 10),
+  shinCyl: new THREE.CylinderGeometry(0.060, 0.046, 0.42, 14),
+
+  // 運動鞋
+  shoeBody: new THREE.BoxGeometry(0.095, 0.065, 0.16),
+  shoeToe: new THREE.SphereGeometry(0.048, 12, 10),
+  shoeHeel: new THREE.SphereGeometry(0.048, 12, 10),
+
+  combatAuraBall: new THREE.SphereGeometry(0.09, 10, 8),
+  footAuraBall: new THREE.SphereGeometry(0.11, 10, 8)
+};
 
     // 牆面與大型傢俱 AABB 碰撞箱
     const colliders = [];
