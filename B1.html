@@ -2660,9 +2660,6 @@ function normalizeRoleTitle(rawRole) {
       allWaitingSeats.push(...buildHospitalWaitingBench(-28.0, -14.8, Math.PI, b1Y));
       allWaitingSeats.push(...buildHospitalWaitingBench(-21.5, -14.8, Math.PI, b1Y));
 
-      addWall(-13.8, -21.5, 4.2, 6.5, 4.4, texIvoryWoodWall, '佐綺軒精品醫療生活館', 'B1', b1Y);
-      addHangingSign(-13.8, b1Y + 3.45, -17.8, 3.8, 0.75, '佐綺軒', 'MEDICAL BOUTIQUE', '#b45309', '#fde047');
-
       // C. 免疫/中醫科門診候診區
       allWaitingSeats.push(...buildHospitalWaitingBench(-15.5, -8.8, 0, b1Y));
       allWaitingSeats.push(...buildHospitalWaitingBench(-11.5, -8.8, 0, b1Y));
@@ -2948,10 +2945,116 @@ function normalizeRoleTitle(rawRole) {
 
       addHangingSign(11.5, b1Y + 3.85, -16.8, 9.2, 0.85, '地下美食街', 'FOOD COURT・吧檯用餐區', '#7c2d12', '#fde047');
 
-      addWall(31.5, -31.5, 15.5, 24.0, 4.4, texFoodWalnutMarbleWall, '員工餐廳 (Staff Cafeteria)', 'B1', b1Y);
-      buildWallSconce(26.5, b1Y + 2.25, -19.4, 0, 0xfde68a);
-      buildWallSconce(36.5, b1Y + 2.25, -19.4, 0, 0xfde68a);
-      addHangingSign(31.5, b1Y + 3.65, -19.2, 7.2, 0.92, '員工餐廳', 'STAFF CAFETERIA', '#991b1b', '#fde047');
+      // === 員工餐廳（往左延伸至 X=22.15 補齊縫隙 + 招牌下方開大門口 + 內部 Buffet 與用餐區）===
+      // 1. 西牆（往左延伸貼齊美食街「爺爺漢堡」東側，消除縫隙）
+      addWall(22.15, -31.5, 0.4, 24.0, 4.4, texWoodAccentWall, '員工餐廳西牆', 'B1', b1Y);
+      // 2. 東牆與北牆（貼齊 B1 外牆）
+      addWall(39.25, -31.5, 0.4, 24.0, 4.4, texWoodAccentWall, '員工餐廳東牆', 'B1', b1Y);
+      addWall(30.7, -43.5, 17.5, 0.4, 4.4, texWoodAccentWall, '員工餐廳北牆', 'B1', b1Y);
+
+      // 3. 前牆（Z = -19.5，總寬 X: 22.15 ~ 39.25，中間 X: 28.0 ~ 35.0 留出 7.0 單位大門口）
+      addWall(25.075, -19.5, 5.85, 0.4, 4.4, texWoodAccentWall, '員工餐廳前牆左段', 'B1', b1Y);
+      addWall(37.125, -19.5, 4.25, 0.4, 4.4, texWoodAccentWall, '員工餐廳前牆右段', 'B1', b1Y);
+      // 大門口上方門楣牆（高度 3.25 ~ 4.4，保留完整立面結構）
+      const cafeLintel = new THREE.Mesh(new THREE.BoxGeometry(7.0, 1.15, 0.4), texWoodAccentWall);
+      cafeLintel.position.set(31.5, b1Y + 3.825, -19.5);
+      activeBuildGroup.add(cafeLintel);
+
+      // 大門口兩側金屬門框飾條
+      const doorFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35, metalness: 0.6 });
+      [28.0, 35.0].forEach((fx) => {
+        const jamb = new THREE.Mesh(new THREE.BoxGeometry(0.16, 3.25, 0.46), doorFrameMat);
+        jamb.position.set(fx, b1Y + 1.625, -19.5);
+        activeBuildGroup.add(jamb);
+      });
+      const headerBar = new THREE.Mesh(new THREE.BoxGeometry(7.16, 0.14, 0.46), doorFrameMat);
+      headerBar.position.set(31.5, b1Y + 3.25, -19.5);
+      activeBuildGroup.add(headerBar);
+
+      // 4. 員工餐廳看板（置中於大門口正上方）
+      addHangingSign(31.5, b1Y + 3.82, -19.15, 6.6, 0.88, '員工餐廳', 'STAFF CAFETERIA・BUFFET', '#b91c1c', '#fef08a', 0);
+
+      // 5. 內部 Buffet 自助餐取餐吧台（位於大門口內側 Z = -25.2）
+      const buffetCounterMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.15 });
+      const stainlessMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.2, metalness: 0.85 });
+      const sneezeGlassMat = new THREE.MeshPhysicalMaterial({ color: 0xe0f2fe, transparent: true, opacity: 0.35, roughness: 0.1 });
+
+      // 主取餐中島台（含碰撞箱）
+      addSolidBox(31.5, b1Y + 0.45, -25.2, 7.6, 0.9, 1.5, buffetCounterMat, '員工餐廳自助餐檯', 'B1', b1Y);
+      const buffetTopSteel = new THREE.Mesh(new THREE.BoxGeometry(7.7, 0.06, 1.6), stainlessMat);
+      buffetTopSteel.position.set(31.5, b1Y + 0.92, -25.2);
+      activeBuildGroup.add(buffetTopSteel);
+
+      // 防飛沫透明玻璃罩與頂部保溫燈架
+      [28.2, 31.5, 34.8].forEach((px) => {
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.55, 8), stainlessMat);
+        post.position.set(px, b1Y + 1.2, -25.2);
+        activeBuildGroup.add(post);
+      });
+      const sneezeGuard = new THREE.Mesh(new THREE.BoxGeometry(7.4, 0.45, 0.04), sneezeGlassMat);
+      sneezeGuard.position.set(31.5, b1Y + 1.28, -24.75);
+      sneezeGuard.rotation.x = -0.35;
+      activeBuildGroup.add(sneezeGuard);
+      const heatLampHood = new THREE.Mesh(new THREE.BoxGeometry(7.4, 0.08, 0.45), stainlessMat);
+      heatLampHood.position.set(31.5, b1Y + 1.48, -25.2);
+      activeBuildGroup.add(heatLampHood);
+
+      // 自助餐多道菜色餐盤（主菜、時蔬、咖哩/湯鍋、水果沙拉）
+      const dishColors = [0x16a34a, 0xea580c, 0xfacc15, 0xdc2626, 0x22c55e, 0xd97706, 0xf43f5e, 0x84cc16];
+      dishColors.forEach((col, idx) => {
+        const dx = 28.35 + idx * 0.9;
+        const pan = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.08, 0.95), stainlessMat);
+        pan.position.set(dx, b1Y + 0.96, -25.2);
+        activeBuildGroup.add(pan);
+        const food = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.06, 0.85), new THREE.MeshStandardMaterial({ color: col, roughness: 0.55 }));
+        food.position.set(dx, b1Y + 1.0, -25.2);
+        activeBuildGroup.add(food);
+      });
+
+      // 6. 內部靠牆飲料湯品吧 & 餐盤回收台（西牆側 X = 23.0）
+      addSolidBox(23.0, b1Y + 0.45, -24.0, 1.1, 0.9, 4.5, buffetCounterMat, '自助飲料湯品檯', 'B1', b1Y);
+      [-25.2, -23.8].forEach((dz) => {
+        const soupPot = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.36, 16), stainlessMat);
+        soupPot.position.set(23.0, b1Y + 1.08, dz);
+        activeBuildGroup.add(soupPot);
+      });
+      const drinkDispenser = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.65, 0.8), new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.5 }));
+      drinkDispenser.position.set(23.0, b1Y + 1.22, -22.5);
+      activeBuildGroup.add(drinkDispenser);
+
+      // 7. 員工餐廳內部用餐區（後方 Z = -31.5 與 Z = -37.5 兩排共 6 組四人餐桌椅）
+      const cafeTableMat = new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.4 });
+      const cafeChairMat = new THREE.MeshStandardMaterial({ color: 0x0f766e, roughness: 0.5 });
+      [-31.5, -37.5].forEach((tz) => {
+        [25.6, 31.5, 36.4].forEach((tx) => {
+          // 餐桌（含碰撞箱）
+          addSolidBox(tx, b1Y + 0.38, tz, 2.2, 0.76, 1.1, cafeTableMat, '員工餐廳餐桌', 'B1', b1Y);
+          // 桌兩側共 4 張座椅
+          [-0.65, 0.65].forEach((cxOff) => {
+            [-0.85, 0.85].forEach((czOff) => {
+              const chairSeat = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.06, 0.42), cafeChairMat);
+              chairSeat.position.set(tx + cxOff, b1Y + 0.44, tz + czOff);
+              activeBuildGroup.add(chairSeat);
+              const chairLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.44, 8), stainlessMat);
+              chairLeg.position.set(tx + cxOff, b1Y + 0.22, tz + czOff);
+              activeBuildGroup.add(chairLeg);
+              const chairBack = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.42, 0.05), cafeChairMat);
+              chairBack.position.set(tx + cxOff, b1Y + 0.65, tz + czOff + (czOff > 0 ? 0.19 : -0.19));
+              activeBuildGroup.add(chairBack);
+            });
+          });
+        });
+      });
+
+      // 8. 員工餐廳內部吸頂燈光條（讓室內明亮清晰）
+      const cafeLightMat = new THREE.MeshBasicMaterial({ color: 0xfffbeb });
+      [-25.5, -33.5].forEach((lz) => {
+        [26.5, 34.5].forEach((lx) => {
+          const panel = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.06, 0.8), cafeLightMat);
+          panel.position.set(lx, b1Y + 4.35, lz);
+          activeBuildGroup.add(panel);
+        });
+      });
 
       allDiningSeats.push(...buildDiningTableSet(6.5, -10.8, b1Y));
       allDiningSeats.push(...buildDiningTableSet(12.2, -10.8, b1Y));
@@ -5973,7 +6076,7 @@ function normalizeRoleTitle(rawRole) {
       drawZoneRect(-41.5, -27.5, 13, 13, '#bae6fd');
       drawZoneRect(-24.5, -24.5, 19, 4.5, '#fecdd3', '#e11d48');
       drawZoneRect(11.5, -36.5, 22, 16.5, '#e2e8f0');
-      drawZoneRect(31.5, -31.5, 15.5, 24, '#fca5a5');
+      drawZoneRect(30.7, -31.5, 17.2, 24, '#fca5a5');
       drawZoneRect(-43.5, 11.5, 14.5, 9.5, '#bbf7d0');
       drawZoneRect(-44.5, 33.7, 13.5, 20.8, '#bfdbfe');
       drawZoneRect(-24.5, 12.5, 17.5, 9.5, '#fbcfe8');
