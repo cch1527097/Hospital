@@ -2523,16 +2523,22 @@ function updateRemotePlayers2F(dt) {
     }
 
     function buildCardiovascularCenter2F(f2Y, wallPinkMat, wallCreamMat) {
+      // 西側隔間牆（與中央走道分隔）
       addWall(1.8, 36.25, 0.5, 16.5, 4.4, wallPinkMat, '心血管中心西牆', 2, f2Y);
 
-      addWall(8.7, 41.2, 13.4, 0.45, 4.4, wallCreamMat, '心血管診間後方隔間牆', 2, f2Y);
+      // ▼▼▼ 診間後方隔間牆往東延伸至 X = 18.0（中心點 9.9，總寬度 16.2），直接密合牙科部西牆補齊空缺 ▼▼▼
+      addWall(9.9, 41.2, 16.2, 0.45, 4.4, wallCreamMat, '心血管診間後方隔間牆', 2, f2Y);
 
-      addHangingSign(8.7, f2Y + 3.65, 27.6, 6.4, 0.88, '心血管中心', 'CARDIOVASCULAR CENTER', '#be123c', '#fda4af');
+      // 上方主招牌（同步微調置中於 X = 9.9）
+      addHangingSign(9.9, f2Y + 3.65, 27.6, 6.8, 0.88, '心血管中心', 'CARDIOVASCULAR CENTER', '#be123c', '#fda4af');
 
-      addClinicDoorSet(4.8, f2Y, 41.0, 0, '215 心臟內科');
-      addClinicDoorSet(8.7, f2Y, 41.0, 0, '216 心臟外科');
-      addClinicDoorSet(12.6, f2Y, 41.0, 0, '218 心超室');
+      // ▼▼▼ 均勻排列四扇診間門（在延伸出來的空缺處 X = 15.6 新增第 4 扇門） ▼▼▼
+      addClinicDoorSet(4.2,  f2Y, 41.0, 0, '215 心臟內科');
+      addClinicDoorSet(8.0,  f2Y, 41.0, 0, '216 心臟外科');
+      addClinicDoorSet(11.8, f2Y, 41.0, 0, '218 心超室');
+      addClinicDoorSet(15.6, f2Y, 41.0, 0, '219 運動心電圖');
 
+      // 兩排藍色候診長椅
       const benchMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.48 });
       [32.0, 36.0].forEach((bz) => {
         const bench = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.44, 0.72), benchMat);
@@ -2543,6 +2549,7 @@ function updateRemotePlayers2F(dt) {
         colliders.push({ minX: 4.3, maxX: 8.7, minZ: bz - 0.45, maxZ: bz + 0.45, floor: 2, label: '心血管中心候診長椅' });
       });
 
+      // 心超螢幕
       const echoScreen = new THREE.Mesh(
         new THREE.BoxGeometry(0.55, 0.42, 0.08),
         new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x38bdf8, emissiveIntensity: 0.75 })
@@ -5150,7 +5157,7 @@ function updateRemotePlayers2F(dt) {
         drawZone(-43.5, 34, 16, 19, '#e0f2fe', '嬰兒室');
         drawZone(-25.5, 34.5, 12.5, 17, '#fce7f3', '產房');
         drawZone(-15.35, 33.5, 7.7, 17.5, '#fbcfe8', '婦產病房/護理站');
-        drawZone(8.7, 36.25, 13.8, 16.5, '#fce7f3', '心血管中心');
+        drawZone(9.9, 36.25, 16.2, 16.5, '#fce7f3', '心血管中心');
         drawZone(35.5, 36.25, 35, 16.5, '#f3e8ff', '牙科部');
         drawZone(-24.7, 15.5, 19.4, 11.8, '#e2e8f0', '挑空');
         drawZone(24.7, 15.5, 19.4, 11.8, '#e2e8f0', '挑空');
