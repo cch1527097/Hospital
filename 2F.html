@@ -2549,8 +2549,11 @@ function updateRemotePlayers2F(dt) {
     addWall(-9.075, 28.0, 4.85, 0.45, 4.4, wallBlueMat, '生殖醫學中心北側左牆', 2, f2Y);
     // 右牆 (X: -3.05 ~ 1.8，寬 4.85m)
     addWall(-0.625, 28.0, 4.85, 0.45, 4.4, wallBlueMat, '生殖醫學中心北側右牆', 2, f2Y);
-    // 門上方過樑 (寬 3.6m)
-    addWall(cx, 28.0, 3.6, 0.45, 1.8, wallBlueMat, '生殖醫學中心門上方牆', 2, f2Y + 2.6, false);
+
+      // 門上方過樑 (僅視覺模型，不產生地面碰撞箱)
+const reproHeader = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.8, 0.45), wallBlueMat);
+reproHeader.position.set(cx, f2Y + 2.6 + 0.9, 28.0);
+scene.add(reproHeader);
 
       // 主招牌 (Z = 27.55)
       addHangingSign(cx, f2Y + 3.55, 27.55, 4.4, 0.68, '生殖醫學中心', 'REPRODUCTIVE MEDICINE CENTER', '#0284c7', '#bae6fd');
