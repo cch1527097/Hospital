@@ -6215,7 +6215,6 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
     function createPlayer() {
       const role = getInheritedRole();
 
-      // 對應 1F_2.html 膠囊公仔的制服樣式
       let uniformStyle = 'casual';
       if (role.outfitStyle === 'lab_coat') uniformStyle = 'doctor';
       else if (role.id === 'nurse') uniformStyle = 'nurse';
@@ -6237,55 +6236,30 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
         combatGlow: true
       });
 
-      const ROLE_STYLES = {
-  educator:    { label: '衛教師', coat: 0xf59e0b, pants: 0x1e293b },
-  it_engineer: { label: '資訊工程師', coat: 0xd9381e, pants: 0x162b3d },
-  doctor:      { label: '主治醫師', coat: 0xf8fafc, pants: 0x1e293b },
-  nurse:       { label: '護理師', coat: 0x14b8a6, pants: 0x1e3a5f },
-  patient:     { label: '門診訪客', coat: 0xf1f5f9, pants: 0x111827 },
-  pharmacist:  { label: '藥師', coat: 0xf1f5f9, pants: 0x1e293b },
-  emt:         { label: '救護技術員', coat: 0xb91c1c, pants: 0x0f172a },
-  med_tech:    { label: '醫事檢驗師', coat: 0xe2e8f0, pants: 0x1e293b },
-  security:    { label: '園區警衛', coat: 0x0f172a, pants: 0x090d16 }
-};
+      rig.root.position.copy(player.pos);
 
-const myStyle = ROLE_STYLES[authRole] || ROLE_STYLES.nurse;
-const playerRig = createArticulatedCharacterMesh({
-  skinColor: 0xf4c29f,
-  shirtColor: myStyle.coat,
-  pantsColor: myStyle.pants,
-  shoeColor: 0xf8fafc,
-  hairColor: 0x1e293b,
-  roleType: authRole === 'doctor' ? 'doctor' : (authRole === 'nurse' ? 'nurse' : 'civilian')
-});
-playerRig.root.position.copy(player.pos);
-scene.add(playerRig.root);
+      player.mesh = rig.root;
+      player.bodyRoot = rig.bodyRoot;
+      player.leftShoulder = rig.leftShoulder;
+      player.rightShoulder = rig.rightShoulder;
+      player.leftElbow = rig.leftElbow;
+      player.rightElbow = rig.rightElbow;
+      player.leftHip = rig.leftHip;
+      player.rightHip = rig.rightHip;
+      player.leftKnee = rig.leftKnee;
+      player.rightKnee = rig.rightKnee;
+      player.leftFistAura = rig.leftFistAura;
+      player.rightFistAura = rig.rightFistAura;
+      player.rightFootAura = rig.rightFootAura;
 
-// 綁定骨骼參考以驅動走路、跑步與揮拳動畫
-player.mesh = playerRig.root;
-player.bodyRoot = playerRig.bodyRoot;
-player.leftShoulder = playerRig.leftShoulder;
-player.rightShoulder = playerRig.rightShoulder;
-player.leftElbow = playerRig.leftElbow;
-player.rightElbow = playerRig.rightElbow;
-player.leftHip = playerRig.leftHip;
-player.rightHip = playerRig.rightHip;
-player.leftKnee = playerRig.leftKnee;
-player.rightKnee = playerRig.rightKnee;
-player.leftFistAura = playerRig.leftFistAura;
-player.rightFistAura = playerRig.rightFistAura;
-player.rightFootAura = playerRig.rightFootAura;
-
-      // 同步角色生命值與護甲至右上角 HUD 狀態條
       player.hp = role.health;
       player.maxHp = role.health;
       player.armor = role.armor;
       updateHealthArmorBarsUI();
 
-     // 在「健保卡已連線」徽章顯示目前帶入的角色名稱
       const comboBadge = document.getElementById('hud-combo-badge');
       if (comboBadge) {
-        comboBadge.textContent = `${role.icon} ${role.name}`;
+        comboBadge.textContent = `${role.icon} ${authName} (${role.name})`;
       }
     }
 
@@ -8423,45 +8397,56 @@ function checkTransportAndExitTriggers() {
         mctx.strokeRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
       };
 
-      drawRoom(-53.5, -47.5, -18, -36.5, '#fde68a');
-      drawRoom(18, -47.5, 53.5, -36.5, '#fbcfe8');
-      drawRoom(-34.5, -32.8, -12.5, -13.5, '#bae6fd');
-      drawRoom(7.2, -32.8, 37.2, -13.5, '#fda4af');
-      drawRoom(37.2, -32.8, 53.5, 2.2, '#fecdd3');
-      drawRoom(-34, -10.8, -15, -6.5, '#bae6fd');
-      drawRoom(12, -10.8, 29, -6.5, '#bae6fd');
-      drawRoom(-11.2, 0.8, 11.2, 4.0, '#f9a8d4');
-      drawRoom(-12.2, 6.6, 9.2, 8.0, '#fbcfe8');
-      drawRoom(-29, 11.3, -16, 18.7, '#e2e8f0');
-      drawRoom(16, 11.3, 29, 18.7, '#e2e8f0');
-      drawRoom(-53.0, 20.2, -36.2, 34.8, '#c7d2fe');
-      drawRoom(-53.0, 34.8, -36.2, 44.0, '#fdba74');
-      drawRoom(-33.5, 21.8, -18.2, 37.2, '#fbcfe8');
-      drawRoom(-18.0, 26.8, -14.2, 34.2, '#fed7aa');
-      drawRoom(-6.0, 20.6, 6.0, 38.4, '#fef3c7');
-      drawRoom(14.2, 26.8, 18.0, 34.2, '#bbf7d0');
-      drawRoom(18.2, 21.8, 33.5, 37.2, '#fbcfe8');
-      drawRoom(35.2, 20.0, 53.5, 43.0, '#bae6fd');
+      // 補完 drawMinimap() 平面圖房間區塊
+      drawRoom(-53.5, -47.5, -18.0, -36.5, '#fde68a'); // 工務/監控
+      drawRoom(18.0, -47.5, 53.5, -36.5, '#fbcfe8');   // 1F 洗腎室
+      drawRoom(-34.5, -32.8, -12.5, -13.5, '#bae6fd'); // 放射科 MRI/CT
+      drawRoom(7.2, -32.8, 37.2, -13.5, '#fbcfe8');    // 急診室
+      drawRoom(37.2, -32.8, 53.5, 2.2, '#fed7aa');     // 急診檢傷與休息區
+      drawRoom(-33.5, -10.8, -15.5, -6.0, '#bae6fd');  // 檢驗科
+      drawRoom(12.0, -10.8, 29.0, -6.0, '#bbf7d0');    // 藥劑科
+      drawRoom(-11.2, 0.8, 11.2, 4.0, '#38bdf8');      // 北側電梯
+      drawRoom(-12.2, 6.6, 9.2, 8.0, '#f472b6');       // 批價掛號處
+      drawRoom(-29.0, 11.3, -16.0, 18.7, '#e2e8f0');   // 西採光中庭
+      drawRoom(16.0, 11.3, 29.0, 18.7, '#e2e8f0');     // 東採光中庭
+      drawRoom(-53.1, 20.2, -36.2, 34.8, '#c7d2fe');   // 藝文廳
+      drawRoom(-53.1, 34.8, -36.2, 44.5, '#fdba74');   // 向日葵超商
+      drawRoom(-33.5, 21.8, -18.2, 37.2, '#fbcfe8');   // 西側門診
+      drawRoom(-18.0, 26.8, -14.2, 34.2, '#fed7aa');   // 美美食品
+      drawRoom(14.2, 26.8, 18.0, 34.2, '#bbf7d0');     // STARFUCKS
+      drawRoom(18.2, 21.8, 33.5, 37.2, '#fbcfe8');     // 東側門診
+      drawRoom(35.2, 20.0, 53.5, 44.5, '#bae6fd');     // 國際會議廳
 
+      // 繪製 NPC 小圓點
       for (let i = 0; i < npcs.length; i++) {
         const npc = npcs[i];
         if (npc.state === 'ko') continue;
         const p = toMap(npc.pos.x, npc.pos.z);
-        mctx.fillStyle = npc.isGuard ? '#2563eb' : (npc.isDoingCPR || npc.isMedicalAttending) ? '#e11d48' : '#10b981';
+        mctx.fillStyle = (npc.isErBrawler || npc.isOpdYeller) ? '#ef4444' : (npc.isGuard ? '#0284c7' : '#10b981');
         mctx.beginPath();
         mctx.arc(p.x, p.y, 2.8, 0, Math.PI * 2);
         mctx.fill();
       }
 
+      // 繪製遠端連線玩家
+      remotePlayers1F.forEach((rp) => {
+        const p = toMap(rp.group.position.x, rp.group.position.z);
+        mctx.fillStyle = '#38bdf8';
+        mctx.beginPath();
+        mctx.arc(p.x, p.y, 3.6, 0, Math.PI * 2);
+        mctx.fill();
+      });
+
+      // 繪製玩家自身方向箭頭
       mctx.save();
       mctx.translate(cx, cy);
       mctx.rotate(-player.yaw + Math.PI);
       mctx.fillStyle = '#e11d48';
       mctx.beginPath();
-      mctx.moveTo(0, -7);
-      mctx.lineTo(5.2, 6);
-      mctx.lineTo(0, 3);
-      mctx.lineTo(-5.2, 6);
+      mctx.moveTo(0, -6.5);
+      mctx.lineTo(4.5, 5);
+      mctx.lineTo(0, 2.5);
+      mctx.lineTo(-4.5, 5);
       mctx.closePath();
       mctx.fill();
       mctx.restore();
@@ -8469,15 +8454,16 @@ function checkTransportAndExitTriggers() {
       mctx.restore();
     }
 
+    // --------------------------------------------------------------------------
+    // 16. 燈光切換、輸入控制與主渲染迴圈
+    // --------------------------------------------------------------------------
     function cycleLightingMode() {
       currentLightingIdx = (currentLightingIdx + 1) % LIGHTING_MODES.length;
       const mode = LIGHTING_MODES[currentLightingIdx];
-
       renderer.toneMappingExposure = mode.exposure;
       scene.background.setHex(mode.bg);
       scene.fog.color.setHex(mode.fogColor);
       scene.fog.density = mode.fogDensity;
-
       if (hemiLightRef) {
         hemiLightRef.color.setHex(mode.hemiSky);
         hemiLightRef.groundColor.setHex(mode.hemiGround);
@@ -8487,93 +8473,51 @@ function checkTransportAndExitTriggers() {
         dirLightRef.color.setHex(mode.dirColor);
         dirLightRef.intensity = mode.dirInt;
       }
-      if (lotusPointLight) {
-        lotusPointLight.intensity = mode.lotusInt;
-      }
-      lotusPetalMats.forEach((m) => {
-        m.emissiveIntensity = mode.lotusEmissive;
-      });
-      louverSconceMats.forEach((m) => {
-        m.emissiveIntensity = mode.sconceEmissive;
-      });
-
-      document.getElementById('lighting-mode-text').textContent = mode.label;
+      if (lotusPointLight) lotusPointLight.intensity = mode.lotusInt;
+      lotusPetalMats.forEach((m) => (m.emissiveIntensity = mode.lotusEmissive));
+      louverSconceMats.forEach((m) => (m.emissiveIntensity = mode.sconceEmissive));
       spawnFloatingText(player.pos, mode.label, 'text-amber-300');
     }
 
-    // --------------------------------------------------------------------------
-    // 16. 事件綁定與靈活滑鼠控制
-    // --------------------------------------------------------------------------
-    function setupInputsAndUI() {
+    function setupControls() {
       const canvas = document.getElementById('game-canvas');
 
       window.addEventListener('keydown', (e) => {
+        if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
         keys[e.code] = true;
-
-        if (e.code === 'Escape') {
-          if (activeTalkNpc) closeDialogue();
-          else if (activeFloorModal) closeFloorModal(true);
-          return;
-        }
 
         if (e.code === 'KeyE') {
           if (activeTalkNpc) {
             closeDialogue();
-          } else if (activeFloorModal) {
-            closeFloorModal(true);
           } else if (nearestNpc) {
             openDialogue(nearestNpc);
           } else if (nearGrandPiano) {
-            SoundFX.playPianoNote(pianoNoteIndex);
-            const notes = ['♪ Do', '♫ Re', '♩ Mi', '♬ Sol', '♪ La', '♫ Do↑', '♩ Re↑', '♬ Mi↑'];
-            spawnFloatingText(new THREE.Vector3(0, 0.2, 31.8), notes[pianoNoteIndex % notes.length], 'text-amber-300');
-            pianoNoteIndex++;
+            SoundFX.playPianoNote(pianoNoteIndex++);
+            spawnFloatingText(new THREE.Vector3(0, 0.5, 31.8), '🎵 鋼琴和弦迴盪中...', 'text-teal-300');
           }
+        } else if (e.code === 'Escape') {
+          if (activeTalkNpc) closeDialogue();
+          if (activeFloorModal) closeFloorModal(true);
+        } else if (e.code === 'KeyJ') {
+          triggerMeleeCombo(false);
+        } else if (e.code === 'KeyK') {
+          triggerMeleeCombo(true);
+        } else if (e.code === 'KeyL') {
+          cycleLightingMode();
+        } else if (e.code === 'KeyC') {
+          clearWantedAndHeal();
+        } else if (e.code === 'KeyV') {
+          camState.firstPerson = !camState.firstPerson;
+          spawnFloatingText(player.pos, camState.firstPerson ? '👁️ 切換第一人稱視角' : '🎥 切換第三人稱視角', 'text-sky-300');
         }
-        if (e.code === 'KeyJ') triggerMeleeCombo(false);
-        if (e.code === 'KeyK') triggerMeleeCombo(true);
-        if (e.code === 'KeyV') toggleFirstPerson();
-        if (e.code === 'KeyM') togglePointerLockMode();
-        if (e.code === 'KeyL') cycleLightingMode();
-        if (e.code === 'KeyC') clearWantedAndHeal();
       });
 
       window.addEventListener('keyup', (e) => {
         keys[e.code] = false;
       });
 
-      function togglePointerLockMode() {
-        if (document.pointerLockElement === canvas) {
-          document.exitPointerLock();
-        } else if (!activeTalkNpc && !activeFloorModal && !isRedirecting) {
-          canvas.requestPointerLock?.();
-        }
-      }
-
-      function toggleFirstPerson() {
-        camState.firstPerson = !camState.firstPerson;
-        spawnFloatingText(
-          player.pos,
-          camState.firstPerson ? '👁️ 第一人稱視角' : '🎥 第三人稱視角',
-          'text-sky-300'
-        );
-      }
-
-      // PointerLock 狀態變更監聽
-      document.addEventListener('pointerlockchange', () => {
-        const locked = document.pointerLockElement === canvas;
-        camState.pointerLocked = locked;
-        const reticle = document.getElementById('pointer-lock-reticle');
-        if (reticle) {
-          reticle.classList.toggle('hidden', !locked);
-        }
-      });
-
-      // 滑鼠拖曳旋轉視角與左鍵近戰攻擊
       canvas.addEventListener('mousedown', (e) => {
-        SoundFX.ensureContext();
-        if (activeTalkNpc || activeFloorModal || isRedirecting) return;
-
+        if (activeTalkNpc || activeFloorModal) return;
         camState.isDragging = true;
         camState.dragButton = e.button;
         camState.lastX = e.clientX;
@@ -8582,130 +8526,55 @@ function checkTransportAndExitTriggers() {
       });
 
       window.addEventListener('mousemove', (e) => {
-        if (camState.pointerLocked) {
-          camState.targetYaw -= e.movementX * 0.0028;
-          camState.targetPitch = THREE.MathUtils.clamp(
-            camState.targetPitch + e.movementY * 0.0024,
-            -0.35,
-            0.95
-          );
-          return;
-        }
-
         if (!camState.isDragging) return;
         const dx = e.clientX - camState.lastX;
         const dy = e.clientY - camState.lastY;
-        if (Math.hypot(dx, dy) > 4) {
-          camState.movedDuringDrag = true;
-        }
+        if (Math.hypot(dx, dy) > 4) camState.movedDuringDrag = true;
         camState.lastX = e.clientX;
         camState.lastY = e.clientY;
 
         camState.targetYaw -= dx * 0.0055;
-        camState.targetPitch = THREE.MathUtils.clamp(
-          camState.targetPitch + dy * 0.0045,
-          -0.35,
-          0.95
-        );
+        camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * 0.0045, -0.35, 1.05);
       });
 
       window.addEventListener('mouseup', (e) => {
-        if (camState.isDragging && e.button === 0 && !camState.movedDuringDrag) {
+        if (camState.isDragging && !camState.movedDuringDrag && e.button === 0) {
           triggerMeleeCombo(false);
         }
         camState.isDragging = false;
-        camState.dragButton = -1;
       });
 
-      // 滑鼠滾輪縮放視距
       canvas.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        if (camState.firstPerson) return;
-        camState.targetDistance = THREE.MathUtils.clamp(
-          camState.targetDistance + e.deltaY * 0.004,
-          2.6,
-          11.5
-        );
-      }, { passive: false });
+        camState.targetDistance = THREE.MathUtils.clamp(camState.targetDistance + e.deltaY * 0.004, 2.4, 12.0);
+      }, { passive: true });
 
-      // 互動提示膠囊點擊
-      const talkPromptBtn = document.getElementById('npc-talk-prompt');
-      if (talkPromptBtn) {
-        talkPromptBtn.addEventListener('click', () => {
-          if (nearestNpc) openDialogue(nearestNpc);
-          else if (nearGrandPiano) {
-            SoundFX.playPianoNote(pianoNoteIndex++);
-          }
-        });
-      }
+      // 按鈕與 Modal 綁定
+      document.getElementById('btn-action-attack').onclick = () => triggerMeleeCombo(false);
+      document.getElementById('btn-action-heavy').onclick = () => triggerMeleeCombo(true);
+      document.getElementById('dlg-close-btn').onclick = closeDialogue;
+      document.getElementById('floor-modal-close').onclick = () => closeFloorModal(true);
 
-      // 對話視窗關閉按鈕
-      const dlgCloseBtn = document.getElementById('dlg-close-btn');
-      if (dlgCloseBtn) {
-        dlgCloseBtn.addEventListener('click', closeDialogue);
-      }
-
-      // 樓層選擇視窗按鈕綁定
-      const floorCloseBtn = document.getElementById('floor-modal-close');
-      if (floorCloseBtn) {
-        floorCloseBtn.addEventListener('click', () => closeFloorModal(true));
-      }
       document.querySelectorAll('.floor-choice-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
-          const targetFloor = btn.getAttribute('data-floor');
-          if (targetFloor === '1F') {
-            closeFloorModal(true);
-          } else {
-            selectFloorAndRedirect(targetFloor);
-          }
+          const floor = btn.getAttribute('data-floor');
+          if (floor === '1F') closeFloorModal(true);
+          else selectFloorAndRedirect(floor);
         });
       });
 
-      // 右下角動作按鈕與行動裝置虛擬搖桿
-      const btnAttack = document.getElementById('btn-action-attack');
-      const btnHeavy = document.getElementById('btn-action-heavy');
-      if (btnAttack) btnAttack.addEventListener('click', () => triggerMeleeCombo(false));
-      if (btnHeavy) btnHeavy.addEventListener('click', () => triggerMeleeCombo(true));
-
-      const btnSprint = document.getElementById('btn-touch-sprint');
-      if (btnSprint) {
-        btnSprint.addEventListener('click', () => {
-          touchSprintActive = !touchSprintActive;
-          btnSprint.classList.toggle('bg-sky-500/40', touchSprintActive);
-        });
-      }
-
-      const btnTalk = document.getElementById('btn-touch-talk');
-      if (btnTalk) {
-        btnTalk.addEventListener('click', () => {
-          if (nearestNpc) openDialogue(nearestNpc);
-          else if (nearGrandPiano) SoundFX.playPianoNote(pianoNoteIndex++);
-        });
-      }
-
-      const btnJump = document.getElementById('btn-touch-jump');
-      if (btnJump) {
-        btnJump.addEventListener('pointerdown', () => {
-          if (player.onGround && !activeTalkNpc && !activeFloorModal) {
-            player.vel.y = 6.6;
-            player.onGround = false;
-          }
-        });
-      }
-
-      document.querySelectorAll('.touch-pad').forEach((pad) => {
-        const keyCode = pad.getAttribute('data-key');
-        pad.addEventListener('pointerdown', (e) => {
-          e.preventDefault();
-          keys[keyCode] = true;
-        });
-        const release = () => { keys[keyCode] = false; };
-        pad.addEventListener('pointerup', release);
-        pad.addEventListener('pointerleave', release);
-        pad.addEventListener('pointercancel', release);
+      // 行動裝置虛擬按鍵
+      document.querySelectorAll('.touch-pad').forEach((btn) => {
+        const code = btn.getAttribute('data-key');
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[code] = true; });
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[code] = false; });
       });
+      document.getElementById('btn-touch-sprint').onclick = () => { touchSprintActive = !touchSprintActive; };
+      document.getElementById('btn-touch-jump').onclick = () => { keys['Space'] = true; setTimeout(() => (keys['Space'] = false), 120); };
+      document.getElementById('btn-touch-talk').onclick = () => {
+        if (nearestNpc) openDialogue(nearestNpc);
+        else if (nearGrandPiano) SoundFX.playPianoNote(pianoNoteIndex++);
+      };
 
-      // 視窗大小自適應
       window.addEventListener('resize', () => {
         cachedHalfW = window.innerWidth * 0.5;
         cachedHalfH = window.innerHeight * 0.5;
@@ -8715,93 +8584,53 @@ function checkTransportAndExitTriggers() {
       });
     }
 
-    // --------------------------------------------------------------------------
-    // 17. 主場景初始化與 60FPS 動畫迴圈
-    // --------------------------------------------------------------------------
     function init() {
       const canvas = document.getElementById('game-canvas');
-      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-      renderer.outputEncoding = THREE.sRGBEncoding;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = LIGHTING_MODES[0].exposure;
-
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(LIGHTING_MODES[0].bg);
-      scene.fog = new THREE.FogExp2(LIGHTING_MODES[0].fogColor, LIGHTING_MODES[0].fogDensity);
+      scene.background = new THREE.Color(0xe6dfd3);
+      scene.fog = new THREE.FogExp2(0xe6dfd3, 0.0034);
 
       camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.15, 160);
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.08;
 
-      // 全域光源配置
-      hemiLightRef = new THREE.HemisphereLight(
-        LIGHTING_MODES[0].hemiSky,
-        LIGHTING_MODES[0].hemiGround,
-        LIGHTING_MODES[0].hemiInt
-      );
-      hemiLightRef.position.set(0, 20, 0);
+      hemiLightRef = new THREE.HemisphereLight(0xfff8eb, 0xd6c7b2, 0.92);
       scene.add(hemiLightRef);
 
-      dirLightRef = new THREE.DirectionalLight(LIGHTING_MODES[0].dirColor, LIGHTING_MODES[0].dirInt);
-      dirLightRef.position.set(18, 32, 24);
+      dirLightRef = new THREE.DirectionalLight(0xffe8c2, 0.72);
+      dirLightRef.position.set(18, 36, 24);
       dirLightRef.castShadow = true;
-      dirLightRef.shadow.mapSize.width = 2048;
-      dirLightRef.shadow.mapSize.height = 2048;
-      dirLightRef.shadow.camera.near = 2;
-      dirLightRef.shadow.camera.far = 110;
-      const d = 55;
-      dirLightRef.shadow.camera.left = -d;
-      dirLightRef.shadow.camera.right = d;
-      dirLightRef.shadow.camera.top = d;
-      dirLightRef.shadow.camera.bottom = -d;
+      dirLightRef.shadow.mapSize.set(1024, 1024);
       scene.add(dirLightRef);
 
-      // 建構建築、角色與多人連線
       buildHospital1FInterior();
       createPlayer();
       createHospitalStaffAndPatients();
 
-      const initialEntry = resolveInitialEntryPoint();
-      applyEntrySpawnPoint(initialEntry, false);
+      const entryCfg = resolveInitialEntryPoint();
+      applyEntrySpawnPoint(entryCfg, false);
 
-      setupInputsAndUI();
+      setupControls();
       initMultiplayer1F();
 
-      // 淡出載入遮罩並顯示入場歡迎浮字
-      const loadingOverlay = document.getElementById('loading-overlay');
-      setTimeout(() => {
-        if (loadingOverlay) {
-          loadingOverlay.style.opacity = '0';
-          setTimeout(() => {
-            loadingOverlay.classList.add('hidden');
-            spawnFloatingText(
-              player.pos,
-              initialEntry.notice,
-              initialEntry.type === 'er' ? 'text-rose-300 text-lg sm:text-xl' : 'text-amber-300 text-lg sm:text-xl'
-            );
-          }, 450);
-        }
-      }, 300);
+      const loading = document.getElementById('loading-overlay');
+      if (loading) {
+        loading.style.opacity = '0';
+        setTimeout(() => loading.remove(), 500);
+      }
 
       animate();
     }
 
     function animate() {
       requestAnimationFrame(animate);
-      const dt = Math.min(clock.getDelta(), 0.05);
+      const dt = Math.min(0.05, clock.getDelta());
       frameCounter++;
-
-      // 更新遊戲內時鐘顯示
-      gameClockMinutes += dt * 0.5;
-      if (frameCounter % 30 === 0) {
-        const totalMins = Math.floor(gameClockMinutes) % (24 * 60);
-        const hh = String(Math.floor(totalMins / 60)).padStart(2, '0');
-        const mm = String(totalMins % 60).padStart(2, '0');
-        const clockEl = document.getElementById('hud-clock');
-        if (clockEl) clockEl.textContent = `${hh}:${mm}`;
-      }
 
       updatePlayer(dt);
       updateNPCs(dt);
@@ -8810,9 +8639,13 @@ function checkTransportAndExitTriggers() {
       updateCamera(dt);
       updateNpcLabelsProjection();
 
-      if (frameCounter % 3 === 0) {
-        drawMinimap();
-      }
+      if (frameCounter % 2 === 0) drawMinimap();
+
+      // 更新右上角時鐘
+      gameClockMinutes += dt * 0.5;
+      const hh = String(Math.floor((gameClockMinutes / 60) % 24)).padStart(2, '0');
+      const mm = String(Math.floor(gameClockMinutes % 60)).padStart(2, '0');
+      document.getElementById('hud-clock').textContent = `${hh}:${mm}`;
 
       renderer.render(scene, camera);
     }
