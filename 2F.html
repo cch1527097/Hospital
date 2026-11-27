@@ -771,6 +771,8 @@ function updateRemotePlayers2F(dt) {
     let dialysisAutoDoorR = null;
     let cardioAutoDoorL = null;
     let cardioAutoDoorR = null;
+    let dentalAutoDoorL = null;
+    let dentalAutoDoorR = null;
 
     // 3D 感應光圈參考（電梯 & 橫向手扶梯）
     const transportPads = [];
@@ -2647,24 +2649,149 @@ function updateRemotePlayers2F(dt) {
     }
 
     function buildDentalDepartment2F(f2Y, wallPinkMat, wallCreamMat, glassMat, counterTopMat) {
-      // 西側隔間牆往內退縮（Z 範圍：28.0 ~ 44.5，與心血管中心齊平）
+      // 西側隔間牆
       addWall(18.0, 36.25, 0.5, 16.5, 4.4, wallPinkMat, '牙科部西牆', 2, f2Y);
 
-      // 主招牌往內移至 Z = 27.6
-      addHangingSign(35.5, f2Y + 3.65, 27.6, 8.2, 0.88, '牙科部', 'DENTISTRY', '#9d174d', '#f9a8d4');
+      // 上方主招牌（置於電動門正前方 Z = 27.55）
+      addHangingSign(35.5, f2Y + 3.65, 27.55, 8.2, 0.88, '牙科部', 'DENTISTRY', '#9d174d', '#f9a8d4');
 
-      // 牙科掛號報到櫃檯往內移至 Z = 30.0
-      addWall(22.0, 30.0, 5.4, 1.05, 1.08, ArchMaterials.woodWainscot, '牙科掛號報到櫃檯', 2, f2Y, false);
+      // ▼▼▼ 1. 招牌下方補上整排隔間牆壁（左右兩段實牆＋門上方過樑，中央 X=35.5 留出 3.4m 電動門開口） ▼▼▼
+      // 左段牆 (X: 18.0 ~ 33.8，中心 25.9，寬度 15.8m)
+      addWall(25.9, 28.0, 15.8, 0.45, 4.4, wallPinkMat, '牙科部北側左牆', 2, f2Y);
+      // 右段牆 (X: 37.2 ~ 53.5，中心 45.35，寬度 16.3m)
+      addWall(45.35, 28.0, 16.3, 0.45, 4.4, wallPinkMat, '牙科部北側右牆', 2, f2Y);
+      // 電動門上方牆 (X: 35.5，寬度 3.4m，高度 1.8m，位於 y=2.6 至天花板 y=4.4)
+      addWall(35.5, 28.0, 3.4, 0.45, 1.8, wallPinkMat, '牙科部電動門上方牆', 2, f2Y + 2.6, false);
+
+      // ▼▼▼ 2. 牆壁上掛置兩幅高解析「牙科廣告燈箱看板」（面向走廊北側 -Z） ▼▼▼
+      const addDentalPoster = (px, pz, title, subtitle, tagline, accentHex) => {
+        const c = document.createElement('canvas');
+        c.width = 1024;
+        c.height = 512;
+        const ctx = c.getContext('2d');
+
+        // 漸層背景
+        const grad = ctx.createLinearGradient(0, 0, 1024, 512);
+        grad.addColorStop(0, '#fdf2f8');
+        grad.addColorStop(0.55, '#fce7f3');
+        grad.addColorStop(1, '#fbcfe8');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 512);
+
+        // 左側主題色裝飾條與牙齒圖示圓徽
+        ctx.fillStyle = accentHex;
+        ctx.fillRect(0, 0, 28, 512);
+        ctx.beginPath();
+        ctx.arc(175, 256, 115, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = accentHex;
+        ctx.stroke();
+
+        // 繪製牙齒圖示
+        ctx.font = '120px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🦷', 175, 262);
+
+        // 廣告文字
+        ctx.textAlign = 'left';
+        ctx.fillStyle = accentHex;
+        ctx.font = 'bold 54px "Noto Sans TC", sans-serif';
+        ctx.fillText(title, 330, 155);
+
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 34px "Noto Sans TC", sans-serif';
+        ctx.fillText(subtitle, 330, 235);
+
+        // 底部服務標籤膠囊
+        ctx.fillStyle = accentHex;
+        ctx.beginPath();
+        ctx.roundRect(330, 305, 620, 76, 38);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 30px "Noto Sans TC", sans-serif';
+        ctx.fillText(tagline, 365, 345);
+
+        const tex = new THREE.CanvasTexture(c);
+        const frame = new THREE.Mesh(
+          new THREE.BoxGeometry(4.4, 2.2, 0.1),
+          new THREE.MeshStandardMaterial({ color: 0xf472b6, metalness: 0.4, roughness: 0.3 })
+        );
+        const board = new THREE.Mesh(
+          new THREE.PlaneGeometry(4.2, 2.0),
+          new THREE.MeshBasicMaterial({ map: tex })
+        );
+        board.rotation.y = Math.PI; // 朝向走廊北側 (-Z)
+        board.position.z = -0.055;
+        frame.add(board);
+        frame.position.set(px, f2Y + 2.35, pz);
+        scene.add(frame);
+      };
+
+      // 左牆廣告看板（X = 25.9）與右牆廣告看板（X = 45.2）
+      addDentalPoster(
+        25.9, 27.74,
+        '數位微創人工植牙中心',
+        '3D 電腦斷層精準導航・無痛舒眠治療',
+        '✨ 預約諮詢：請至 2F 牙科部報到櫃檯',
+        '#be185d'
+      );
+      addDentalPoster(
+        45.2, 27.74,
+        '隱形矯正・全瓷美學貼片',
+        '量身打造自信笑容・定期洗牙健保給付',
+        '💖 專業齒顎矯正與口腔外科專科團隊',
+        '#9d174d'
+      );
+
+      // ▼▼▼ 3. 招牌正下方中央 (X = 35.5, Z = 28.0) 開設雙開透明玻璃電動門 ▼▼▼
+      const dentalDoorFrameMat = new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.3, metalness: 0.4 });
+      const dentalDoorGlassMat = new THREE.MeshPhysicalMaterial({
+        color: 0xfce7f3,
+        transparent: true,
+        opacity: 0.25,
+        roughness: 0.08,
+        depthWrite: false
+      });
+
+      const createDentalDoorLeaf = (w, h) => {
+        const leaf = new THREE.Group();
+        const t = 0.085;
+        const d = 0.10;
+        const topB = new THREE.Mesh(new THREE.BoxGeometry(w, t, d), dentalDoorFrameMat);
+        topB.position.y = h / 2 - t / 2;
+        const botB = new THREE.Mesh(new THREE.BoxGeometry(w, t * 1.4, d), dentalDoorFrameMat);
+        botB.position.y = -h / 2 + (t * 1.4) / 2;
+        const leftB = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), dentalDoorFrameMat);
+        leftB.position.x = -w / 2 + t / 2;
+        const rightB = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), dentalDoorFrameMat);
+        rightB.position.x = w / 2 - t / 2;
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(w - t * 2, h - t * 2.4, 0.025), dentalDoorGlassMat);
+        leaf.add(topB, botB, leftB, rightB, pane);
+        return leaf;
+      };
+
+      dentalAutoDoorL = createDentalDoorLeaf(1.7, 2.6);
+      dentalAutoDoorL.position.set(34.65, f2Y + 1.3, 28.0);
+      dentalAutoDoorR = createDentalDoorLeaf(1.7, 2.6);
+      dentalAutoDoorR.position.set(36.35, f2Y + 1.3, 28.0);
+      scene.add(dentalAutoDoorL, dentalAutoDoorR);
+      // ▲▲▲ 牆壁、牙科廣告與電動門建立完成 ▲▲▲
+
+      // 牙科掛號報到櫃檯（微調至 Z = 30.8，讓電動門進來後動線更寬敞）
+      addWall(22.0, 30.8, 5.4, 1.05, 1.08, ArchMaterials.woodWainscot, '牙科掛號報到櫃檯', 2, f2Y, false);
       const dentalTop = new THREE.Mesh(new THREE.BoxGeometry(5.6, 0.12, 1.2), counterTopMat);
-      dentalTop.position.set(22.0, f2Y + 1.12, 30.0);
+      dentalTop.position.set(22.0, f2Y + 1.12, 30.8);
       const dentalShield = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.82, 0.06), glassMat);
-      dentalShield.position.set(22.0, f2Y + 1.56, 30.45);
+      dentalShield.position.set(22.0, f2Y + 1.56, 31.25);
       scene.add(dentalTop, dentalShield);
-      addHangingSign(22.0, f2Y + 2.95, 30.0, 4.2, 0.58, '牙科部', 'DENTISTRY', '#be185d', '#fbcfe8');
+      addHangingSign(22.0, f2Y + 2.95, 30.8, 4.2, 0.58, '牙科部', 'DENTISTRY', '#be185d', '#fbcfe8');
 
-      // 牙科候診等待沙發往內移至 Z = 34.8 與 38.2
+      // 牙科候診等待沙發
       const waitSeatMat = new THREE.MeshStandardMaterial({ color: 0xa855f7, roughness: 0.45 });
-      [34.8, 38.2].forEach((wz) => {
+      [35.2, 38.6].forEach((wz) => {
         const sofaRow = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.44, 0.78), waitSeatMat);
         sofaRow.position.set(22.2, f2Y + 0.22, wz);
         const sofaBack = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.48, 0.14), waitSeatMat);
@@ -2673,14 +2800,14 @@ function updateRemotePlayers2F(dt) {
         colliders.push({ minX: 19.8, maxX: 24.6, minZ: wz - 0.45, maxZ: wz + 0.45, floor: 2, label: '牙科候診等待椅' });
       });
 
-      // 三排牙科診療椅往內移至 Z = 32.2、36.6、41.0
+      // 三排牙科診療椅
       [30.5, 39.2, 47.8].forEach((dx) => {
-        [32.2, 36.6, 41.0].forEach((dz) => {
+        [32.4, 36.7, 41.0].forEach((dz) => {
           buildDentalChairUnit(dx, dz, f2Y);
         });
       });
 
-      // 東側外牆邊器械消毒櫃同步往內移至 Z = 33.0 與 39.5
+      // 東側外牆邊器械消毒櫃
       [33.0, 39.5].forEach((cz) => {
         const cab = new THREE.Mesh(new THREE.BoxGeometry(0.65, 1.85, 2.4), ArchMaterials.woodCabinet);
         cab.position.set(52.7, f2Y + 0.925, cz);
@@ -4862,6 +4989,14 @@ function updateRemotePlayers2F(dt) {
         const openCardio = (nearPlayer || nearNpc) ? 1.55 : 0.0;
         cardioAutoDoorL.position.x = THREE.MathUtils.lerp(cardioAutoDoorL.position.x, 9.05 - openCardio, dt * 12);
         cardioAutoDoorR.position.x = THREE.MathUtils.lerp(cardioAutoDoorR.position.x, 10.75 + openCardio, dt * 12);
+      }
+
+      if (dentalAutoDoorL && dentalAutoDoorR) {
+        const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - 35.5, player.pos.z - 28.0) < 4.6);
+        const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - 35.5, n.pos.z - 28.0) < 4.2);
+        const openDental = (nearPlayer || nearNpc) ? 1.55 : 0.0;
+        dentalAutoDoorL.position.x = THREE.MathUtils.lerp(dentalAutoDoorL.position.x, 34.65 - openDental, dt * 12);
+        dentalAutoDoorR.position.x = THREE.MathUtils.lerp(dentalAutoDoorR.position.x, 36.35 + openDental, dt * 12);
       }
 
       if (nurseryAutoDoorL && nurseryAutoDoorR) {
