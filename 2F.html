@@ -2989,7 +2989,11 @@ scene.add(reproHeader);
         addGalleryArtwork(-53.02, baseY + 2.15, -12.0, Math.PI / 2, fIdx + 1);
         addGalleryArtwork(53.02, baseY + 2.15, 2.0, -Math.PI / 2, fIdx + 2);
         addGalleryArtwork(53.02, baseY + 2.15, -12.0, -Math.PI / 2, fIdx + 3);
-        addGalleryArtwork(-18.0, baseY + 2.15, 44.02, Math.PI, fIdx + 1);
+        if (baseY > 0) {
+          addGalleryArtwork(-11.78, baseY + 2.15, 35.5, -Math.PI / 2, fIdx + 1);
+        } else {
+          addGalleryArtwork(-18.0, baseY + 2.15, 44.02, Math.PI, fIdx + 1);
+        }
         addGalleryArtwork(baseY > 0 ? 35.5 : 18.0, baseY + 2.15, 44.02, Math.PI, fIdx + 2);
       });
 
