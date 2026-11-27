@@ -2208,24 +2208,24 @@ function updateRemotePlayers2F(dt) {
       const whiteUpperMat = ArchMaterials.wallCream;
       const pinkDoorMat = new THREE.MeshStandardMaterial({ color: 0xe297a8, roughness: 0.42 });
 
-      // A. 嬰兒室 Nursery
-      addWall(-51.6, 24.5, 2.2, 0.45, 4.4, stripedWallMat, '嬰兒室西側門框牆', 2, f2Y);
-      addWall(-35.5, 34.0, 0.45, 19.0, 4.4, stripedWallMat, '嬰兒室與產房隔間牆', 2, f2Y);
-      addWall(-44.15, 24.5, 12.7, 1.18, 1.18, stripedWallMat, '嬰兒室觀察窗下牆', 2, f2Y);
+      // A. 嬰兒室 Nursery (已往內移至 Z = 26.5，與隔壁產房前牆完全對齊)
+      addWall(-51.6, 26.5, 2.2, 0.45, 4.4, stripedWallMat, '嬰兒室西側門框牆', 2, f2Y);
+      addWall(-35.5, 35.0, 0.45, 17.0, 4.4, stripedWallMat, '嬰兒室與產房隔間牆', 2, f2Y);
+      addWall(-44.15, 26.5, 12.7, 1.18, 1.18, stripedWallMat, '嬰兒室觀察窗下牆', 2, f2Y);
 
       const nurseryHeader = new THREE.Mesh(new THREE.BoxGeometry(15.0, 1.82, 0.48), whiteUpperMat);
-      nurseryHeader.position.set(-43.0, f2Y + 3.49, 24.5);
+      nurseryHeader.position.set(-43.0, f2Y + 3.49, 26.5);
       scene.add(nurseryHeader);
 
       const centerMullion = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.72, 0.46), stripedWallMat);
-      centerMullion.position.set(-44.15, f2Y + 1.98, 24.5);
+      centerMullion.position.set(-44.15, f2Y + 1.98, 26.5);
       scene.add(centerMullion);
 
       const nurseryDoorMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.25, metalness: 0.4 });
       nurseryAutoDoorL = new THREE.Mesh(new THREE.BoxGeometry(1.12, 2.58, 0.14), nurseryDoorMat);
-      nurseryAutoDoorL.position.set(-37.26, f2Y + 1.29, 24.5);
+      nurseryAutoDoorL.position.set(-37.26, f2Y + 1.29, 26.5);
       nurseryAutoDoorR = new THREE.Mesh(new THREE.BoxGeometry(1.12, 2.58, 0.14), nurseryDoorMat);
-      nurseryAutoDoorR.position.set(-36.14, f2Y + 1.29, 24.5);
+      nurseryAutoDoorR.position.set(-36.14, f2Y + 1.29, 26.5);
 
       const nurseryWinL = new THREE.Mesh(new THREE.BoxGeometry(0.45, 1.15, 0.17), glassMat);
       nurseryWinL.position.set(0.18, 0.32, 0);
@@ -2305,7 +2305,7 @@ function updateRemotePlayers2F(dt) {
         stickerPlane.position.z = -0.06;
 
         winGroup.add(topBar, botBar, leftBar, rightBar, glassPane, stickerPlane);
-        winGroup.position.set(cfg.x, f2Y + 1.98, 24.48);
+        winGroup.position.set(cfg.x, f2Y + 1.98, 26.48);
         winGroup.rotation.x = 0.10;
         scene.add(winGroup);
       });
@@ -2315,17 +2315,17 @@ function updateRemotePlayers2F(dt) {
         new THREE.BoxGeometry(0.95, 0.32, 0.12),
         new THREE.MeshStandardMaterial({ map: exitTex, emissive: 0xffffff, emissiveMap: exitTex, emissiveIntensity: 0.65 })
       );
-      exitSign.position.set(-46.8, f2Y + 0.85, 24.22);
+      exitSign.position.set(-46.8, f2Y + 0.85, 26.22);
       scene.add(exitSign);
 
       const badgeReader = new THREE.Mesh(
         new THREE.BoxGeometry(0.24, 0.34, 0.08),
         new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.3 })
       );
-      badgeReader.position.set(-50.5, f2Y + 1.45, 24.22);
+      badgeReader.position.set(-50.5, f2Y + 1.45, 26.22);
       scene.add(badgeReader);
 
-      addHangingSign(-43.5, f2Y + 3.65, 22.8, 6.2, 0.88, '嬰兒室・新生兒照護中心', 'BABY ROOM & NURSERY', '#0369a1', '#7dd3fc');
+      addHangingSign(-43.5, f2Y + 3.65, 24.8, 6.2, 0.88, '嬰兒室・新生兒照護中心', 'BABY ROOM & NURSERY', '#0369a1', '#7dd3fc');
 
       const clearIncubatorGlassMat = new THREE.MeshStandardMaterial({
         color: 0xf0f9ff,
@@ -2335,7 +2335,7 @@ function updateRemotePlayers2F(dt) {
         metalness: 0.12
       });
       [-48.5, -44.5, -40.5, -37.2].forEach((bx, bIdx) => {
-        const czInc = 28.2 + (bIdx % 2) * 3.5;
+        const czInc = 30.2 + (bIdx % 2) * 3.5;
         const crib = new THREE.Mesh(
           new THREE.BoxGeometry(0.95, 0.82, 0.65),
           new THREE.MeshStandardMaterial({ color: 0xfce7f3, roughness: 0.28 })
@@ -3945,7 +3945,7 @@ scene.add(reproHeader);
           baseY: 4.6,
           badgeColor: '#38bdf8',
           appearance: { coatColor: 0x93c5fd, isBaby: true },
-          waypoints: [new THREE.Vector3(-48.5, 4.6, 28.2)],
+          waypoints: [new THREE.Vector3(-48.5, 4.6, 30.2))],
           speed: 0,
           yaw: 0,
           dialogue: '咿呀～咿呀～（陳小寶正裹著水藍色柔軟包巾，在恆溫保溫箱裡安穩熟睡中！）',
@@ -3960,7 +3960,7 @@ scene.add(reproHeader);
           baseY: 4.6,
           badgeColor: '#f472b6',
           appearance: { coatColor: 0xf9a8d4, isBaby: true },
-          waypoints: [new THREE.Vector3(-44.5, 4.6, 31.7)],
+          waypoints: [new THREE.Vector3(-44.5, 4.6, 33.7)],
           speed: 0,
           yaw: 0,
           dialogue: '哇啊～（林小妹剛喝完母乳，正舒服地伸展小手手，護理師在旁邊細心拍嗝照護中！）',
@@ -3975,7 +3975,7 @@ scene.add(reproHeader);
           baseY: 4.6,
           badgeColor: '#fbbf24',
           appearance: { coatColor: 0xfde68a, isBaby: true },
-          waypoints: [new THREE.Vector3(-40.5, 4.6, 28.2)],
+          waypoints: [new THREE.Vector3(-40.5, 4.6, 30.2)],
           speed: 0,
           yaw: 0,
           dialogue: '呼嚕嚕～（張小弟在保溫箱內穩定休息，各項生命徵象與體溫監測皆正常！）',
@@ -3990,7 +3990,7 @@ scene.add(reproHeader);
           baseY: 4.6,
           badgeColor: '#f43f5e',
           appearance: { coatColor: 0xfda4af, isBaby: true },
-          waypoints: [new THREE.Vector3(-37.2, 4.6, 31.7)],
+          waypoints: [new THREE.Vector3(-37.2, 4.6, 33.7)],
           speed: 0,
           yaw: 0,
           dialogue: '咿呀～（黃小妞正等待護理師推著嬰兒車送往病房與媽媽進行親子同室哺育！）',
@@ -4006,7 +4006,7 @@ scene.add(reproHeader);
           badgeColor: '#f472b6',
           appearance: { coatColor: 0xf472b6, pantsColor: 0xffffff, isNurse: true },
           waypoints: [
-            new THREE.Vector3(-48.5, 4.6, 26.8),
+            new THREE.Vector3(-48.5, 4.6, 28.8),
             new THREE.Vector3(-44.5, 4.6, 30.2),
             new THREE.Vector3(-48.5, 4.6, 30.2)
           ],
@@ -4025,7 +4025,7 @@ scene.add(reproHeader);
           appearance: { coatColor: 0x38bdf8, pantsColor: 0xffffff, isNurse: true },
           waypoints: [
             new THREE.Vector3(-40.5, 4.6, 26.8),
-            new THREE.Vector3(-37.2, 4.6, 30.2),
+            new THREE.Vector3(-37.2, 4.6, 32.2),
             new THREE.Vector3(-37.2, 4.6, 26.8)
           ],
           speed: 1.0,
@@ -4042,8 +4042,8 @@ scene.add(reproHeader);
           badgeColor: '#2dd4bf',
           appearance: { coatColor: 0xfce7f3, pantsColor: 0xf472b6, isNurse: true },
           waypoints: [
-            new THREE.Vector3(-46.2, 4.6, 29.8),
-            new THREE.Vector3(-38.8, 4.6, 29.8)
+            new THREE.Vector3(-46.2, 4.6, 31.8),
+            new THREE.Vector3(-38.8, 4.6, 31.8)
           ],
           speed: 0.9,
           dialogue: '嬰兒室全區維持恆溫恆濕與正壓無菌空調，每次接觸不同寶寶前後我們都會嚴格執行手部消毒！',
@@ -5202,8 +5202,8 @@ scene.add(reproHeader);
       }
 
       if (nurseryAutoDoorL && nurseryAutoDoorR) {
-        const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - (-36.7), player.pos.z - 24.5) < 4.4);
-        const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - (-36.7), n.pos.z - 24.5) < 4.0);
+        const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - (-36.7), player.pos.z - 26.5) < 4.4);
+        const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - (-36.7), n.pos.z - 26.5) < 4.0);
         const openNursery = (nearPlayer || nearNpc) ? 0.96 : 0.0;
         nurseryAutoDoorL.position.x = THREE.MathUtils.lerp(nurseryAutoDoorL.position.x, -37.26 - openNursery, dt * 12);
         nurseryAutoDoorR.position.x = THREE.MathUtils.lerp(nurseryAutoDoorR.position.x, -36.14 + openNursery, dt * 12);
@@ -5596,7 +5596,7 @@ scene.add(reproHeader);
         drawZone(-24.5, -19.8, 18, 12.6, '#dbeafe', '內外科ICU');
         drawZone(-9.5, -19.8, 10, 12.6, '#ffe4e6', '心導管室');
         drawZone(19, -19.8, 29, 12.6, '#d1fae5', '開刀房');
-        drawZone(-43.5, 34, 16, 19, '#e0f2fe', '嬰兒室');
+        drawZone(-43.5, 35, 16, 17, '#e0f2fe', '嬰兒室');
         drawZone(-25.5, 34.5, 12.5, 17, '#fce7f3', '產房');
         drawZone(-15.35, 33.5, 7.7, 17.5, '#fbcfe8', '婦產病房/護理站');
         drawZone(-4.85, 36.25, 13.3, 16.5, '#dbeafe', '生殖醫學');
