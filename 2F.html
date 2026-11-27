@@ -867,7 +867,7 @@ function updateRemotePlayers2F(dt) {
       f2_renal:         { label: '2F 東北側・洗腎室 / CAPD 中心 (李文清 / 許麗美醫師)', pos: new THREE.Vector3(34.5, 4.6, -31.5), yaw: Math.PI },
       f2_or:            { label: '2F 開刀房 (OR-1 ~ OR-9・自動感應電動門)', pos: new THREE.Vector3(18.5, 4.6, -11.5), yaw: Math.PI },
       f2_icu:           { label: '2F 內外科ICU / 心導管室 (自動感應電動門)', pos: new THREE.Vector3(-23.5, 4.6, -11.5), yaw: Math.PI },
-      f2_cardio:        { label: '2F 心血管中心 (215/216 門診・心超室)', pos: new THREE.Vector3(8.5, 4.6, 23.8), yaw: Math.PI },
+      f2_cardio:        { label: '2F 心血管中心 (215/216 門診・心超室)', pos: new THREE.Vector3(8.5, 4.6, 29.2), yaw: Math.PI },
       f2_dental:        { label: '2F 東南側・牙科部 (掛號櫃檯・候診等待區)', pos: new THREE.Vector3(24.5, 4.6, 23.2), yaw: Math.PI },
       entrance:         { label: '1F 入口門廳 (主大廳)', pos: new THREE.Vector3(0, 0, 38.5), yaw: Math.PI },
       registration:     { label: '1F 中央大廳・批價掛號櫃檯', pos: new THREE.Vector3(0, 0, 10.5), yaw: Math.PI },
@@ -2533,18 +2533,19 @@ function updateRemotePlayers2F(dt) {
     }
 
     function buildCardiovascularCenter2F(f2Y, wallPinkMat, wallCreamMat) {
-      addWall(1.8, 32.0, 0.5, 19.5, 4.4, wallPinkMat, '心血管中心西牆', 2, f2Y);
-      addWall(15.6, 32.0, 0.5, 19.5, 4.4, wallPinkMat, '心血管中心東牆', 2, f2Y);
-      addWall(8.7, 36.5, 13.4, 0.45, 4.4, wallCreamMat, '心血管診間後方隔間牆', 2, f2Y);
+      addWall(1.8, 36.25, 0.5, 16.5, 4.4, wallPinkMat, '心血管中心西牆', 2, f2Y);
+      addWall(15.6, 36.25, 0.5, 16.5, 4.4, wallPinkMat, '心血管中心東牆', 2, f2Y);
 
-      addHangingSign(8.7, f2Y + 3.65, 22.2, 6.4, 0.88, '心血管中心', 'CARDIOVASCULAR CENTER', '#be123c', '#fda4af');
+      addWall(8.7, 41.2, 13.4, 0.45, 4.4, wallCreamMat, '心血管診間後方隔間牆', 2, f2Y);
 
-      addClinicDoorSet(4.8, f2Y, 36.3, 0, '215 心臟內科');
-      addClinicDoorSet(8.7, f2Y, 36.3, 0, '216 心臟外科');
-      addClinicDoorSet(12.6, f2Y, 36.3, 0, '218 心超室');
+      addHangingSign(8.7, f2Y + 3.65, 27.6, 6.4, 0.88, '心血管中心', 'CARDIOVASCULAR CENTER', '#be123c', '#fda4af');
+
+      addClinicDoorSet(4.8, f2Y, 41.0, 0, '215 心臟內科');
+      addClinicDoorSet(8.7, f2Y, 41.0, 0, '216 心臟外科');
+      addClinicDoorSet(12.6, f2Y, 41.0, 0, '218 心超室');
 
       const benchMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.48 });
-      [26.5, 30.8].forEach((bz) => {
+      [32.0, 36.0].forEach((bz) => {
         const bench = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.44, 0.72), benchMat);
         bench.position.set(6.5, f2Y + 0.22, bz);
         const back = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.46, 0.14), benchMat);
@@ -2557,7 +2558,7 @@ function updateRemotePlayers2F(dt) {
         new THREE.BoxGeometry(0.55, 0.42, 0.08),
         new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x38bdf8, emissiveIntensity: 0.75 })
       );
-      echoScreen.position.set(13.2, f2Y + 1.45, 39.5);
+      echoScreen.position.set(13.2, f2Y + 1.45, 43.2);
       scene.add(echoScreen);
     }
 
@@ -3837,7 +3838,7 @@ function updateRemotePlayers2F(dt) {
           baseY: 4.6,
           badgeColor: '#ef4444',
           appearance: { coatColor: 0xffffff, pantsColor: 0x1e293b, isDoctor: true },
-          waypoints: [new THREE.Vector3(4.8, 4.6, 35.0), new THREE.Vector3(8.7, 4.6, 35.0)],
+          waypoints: [new THREE.Vector3(4.8, 4.6, 39.7), new THREE.Vector3(8.7, 4.6, 39.7)],
           speed: 1.1,
           dialogue: '歡迎來到 2F 心血管中心門診！我們提供高血壓、冠心病、心律不整門診，並可現場安排心臟超音波與運動心電圖檢查。',
           options: []
@@ -3851,7 +3852,7 @@ function updateRemotePlayers2F(dt) {
           baseY: 4.6,
           badgeColor: '#f43f5e',
           appearance: { coatColor: 0xf472b6, pantsColor: 0xbe185d, isNurse: true },
-          waypoints: [new THREE.Vector3(12.2, 4.6, 34.8)],
+          waypoints: [new THREE.Vector3(12.2, 4.6, 39.5)],
           speed: 0,
           yaw: Math.PI,
           dialogue: '請先在心血管中心門診報到機插卡報到，量完血壓與身高體重後請在候診長椅稍候叫號！',
@@ -3866,7 +3867,7 @@ function updateRemotePlayers2F(dt) {
           baseY: 4.6,
           badgeColor: '#f59e0b',
           appearance: { coatColor: 0x0284c7, pantsColor: 0x1e293b },
-          waypoints: [new THREE.Vector3(5.2, 4.6, 27.6)],
+          waypoints: [new THREE.Vector3(5.2, 4.6, 33.1)],
           speed: 0,
           yaw: 0,
           dialogue: '我每個月都會定期回心血管中心找陳醫師追蹤血壓跟心電圖，這裡候診區很寬敞舒適！',
@@ -3881,7 +3882,7 @@ function updateRemotePlayers2F(dt) {
           baseY: 4.6,
           badgeColor: '#f59e0b',
           appearance: { coatColor: 0x0d9488, pantsColor: 0x334155 },
-          waypoints: [new THREE.Vector3(7.6, 4.6, 31.9)],
+          waypoints: [new THREE.Vector3(7.6, 4.6, 37.1)],
           speed: 0,
           yaw: 0,
           dialogue: '剛剛量好血壓，正在等 218 心臟超音波室叫號做檢查！',
@@ -5031,7 +5032,7 @@ function updateRemotePlayers2F(dt) {
         else if (z > 22.0 && x >= -35.5 && x < -19.2) zoneName = '2F 產房 (Delivery Room・LDR 樂得兒產房)';
         else if (z > 22.0 && x >= -19.2 && x < -9.2) zoneName = '2F 婦產科護理站 & 婦產科病房 (201~210)';
         else if (z > 27.5 && x >= -7.6 && x < -2.0) zoneName = '2F 生殖醫學中心 & 胎兒影像中心';
-        else if (z > 22.0 && x >= 1.8 && x < 15.6) zoneName = '2F 心血管中心 (215/216 門診・心超室)';
+        else if (z > 27.5 && x >= 1.8 && x < 15.6) zoneName = '2F 心血管中心 (215/216 門診・心超室)';
         else if (z > 22.0 && x >= 18.0) zoneName = '2F 東南側・牙科部 (掛號櫃檯・候診區・診療室)';
         else if (z >= 4.0 && z <= 10.5 && Math.abs(x) < 12.0) zoneName = '2F 中央電梯廳 (B1 ~ 8F)';
       } else {
@@ -5159,7 +5160,7 @@ function updateRemotePlayers2F(dt) {
         drawZone(-25.5, 34.5, 12.5, 17, '#fce7f3', '產房');
         drawZone(-14.2, 33.5, 10, 17.5, '#fbcfe8', '婦產病房/護理站');
         drawZone(-4.8, 36.25, 5.6, 16.5, '#dbeafe', '生殖/胎兒');
-        drawZone(8.7, 32, 13.8, 19.5, '#fce7f3', '心血管中心');
+        drawZone(8.7, 36.25, 13.8, 16.5, '#fce7f3', '心血管中心');
         drawZone(35.5, 32.5, 35, 21.5, '#f3e8ff', '牙科部');
         drawZone(-24.7, 15.5, 19.4, 11.8, '#e2e8f0', '挑空');
         drawZone(24.7, 15.5, 19.4, 11.8, '#e2e8f0', '挑空');
