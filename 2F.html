@@ -2180,15 +2180,15 @@ function updateRemotePlayers2F(dt) {
       // 5. 2F 南側西翼重構：嬰兒室 ＋ 產房 ＋ 婦產科病房 ＋ 護理站
       buildObgynMaternityComplex(f2Y, glassMat, darkFrameMat, counterTopMat);
 
-      // 6. 2F 中南側：泌尿科門診 & 心血管中心門診
-      addWall(-7.6, 31.0, 0.5, 16.5, 4.4, wallBlueMat, '泌尿科西牆', 2, f2Y);
-      addWall(-2.0, 31.0, 0.5, 16.5, 4.4, wallBlueMat, '泌尿科東牆', 2, f2Y);
-      addWall(-6.675, 22.75, 2.35, 0.5, 4.4, wallBlueMat, '泌尿科北側左牆', 2, f2Y);
-      addWall(-2.925, 22.75, 2.35, 0.5, 4.4, wallBlueMat, '泌尿科北側右牆', 2, f2Y);
-      addWall(-4.8,   22.75, 1.40, 0.5, 2.05, wallBlueMat, '泌尿科門上方牆', 2, f2Y + 2.35, false);
+      // 6. 2F 中南側：生殖醫學中心（整體往內退縮至 Z = 28.0，與南側外牆 Z = 44.5 密合）
+      addWall(-7.6, 36.25, 0.5, 16.5, 4.4, wallBlueMat, '泌尿科西牆', 2, f2Y);
+      addWall(-2.0, 36.25, 0.5, 16.5, 4.4, wallBlueMat, '泌尿科東牆', 2, f2Y);
+      addWall(-6.675, 28.0, 2.35, 0.5, 4.4, wallBlueMat, '泌尿科北側左牆', 2, f2Y);
+      addWall(-2.925, 28.0, 2.35, 0.5, 4.4, wallBlueMat, '泌尿科北側右牆', 2, f2Y);
+      addWall(-4.8,   28.0, 1.40, 0.5, 2.05, wallBlueMat, '泌尿科門上方牆', 2, f2Y + 2.35, false);
 
-      addHangingSign(-4.8, f2Y + 3.55, 22.3, 4.0, 0.82, '生殖醫學中心', 'Reproductive Medicine Center', '#0284c7');
-      addClinicDoorSet(-4.8, f2Y, 22.75, 0, '胎兒影像中心');
+      addHangingSign(-4.8, f2Y + 3.55, 27.55, 4.0, 0.82, '生殖醫學中心', 'Reproductive Medicine Center', '#0284c7');
+      addClinicDoorSet(-4.8, f2Y, 28.0, 0, '胎兒影像中心');
 
       buildCardiovascularCenter2F(f2Y, wallPinkMat, wallCreamMat);
 
@@ -5030,7 +5030,7 @@ function updateRemotePlayers2F(dt) {
         else if (z > 22.0 && x < -35.5) zoneName = '2F 嬰兒室 (透明玻璃觀察櫥窗・新生兒照護)';
         else if (z > 22.0 && x >= -35.5 && x < -19.2) zoneName = '2F 產房 (Delivery Room・LDR 樂得兒產房)';
         else if (z > 22.0 && x >= -19.2 && x < -9.2) zoneName = '2F 婦產科護理站 & 婦產科病房 (201~210)';
-        else if (z > 22.0 && x >= -7.6 && x < -2.0) zoneName = '2F 生殖醫學中心 & 胎兒影像中心';
+        else if (z > 27.5 && x >= -7.6 && x < -2.0) zoneName = '2F 生殖醫學中心 & 胎兒影像中心';
         else if (z > 22.0 && x >= 1.8 && x < 15.6) zoneName = '2F 心血管中心 (215/216 門診・心超室)';
         else if (z > 22.0 && x >= 18.0) zoneName = '2F 東南側・牙科部 (掛號櫃檯・候診區・診療室)';
         else if (z >= 4.0 && z <= 10.5 && Math.abs(x) < 12.0) zoneName = '2F 中央電梯廳 (B1 ~ 8F)';
@@ -5158,7 +5158,7 @@ function updateRemotePlayers2F(dt) {
         drawZone(-43.5, 34, 16, 19, '#e0f2fe', '嬰兒室');
         drawZone(-25.5, 34.5, 12.5, 17, '#fce7f3', '產房');
         drawZone(-14.2, 33.5, 10, 17.5, '#fbcfe8', '婦產病房/護理站');
-        drawZone(-4.8, 31, 5.6, 16.5, '#dbeafe', '生殖/胎兒');
+        drawZone(-4.8, 36.25, 5.6, 16.5, '#dbeafe', '生殖/胎兒');
         drawZone(8.7, 32, 13.8, 19.5, '#fce7f3', '心血管中心');
         drawZone(35.5, 32.5, 35, 21.5, '#f3e8ff', '牙科部');
         drawZone(-24.7, 15.5, 19.4, 11.8, '#e2e8f0', '挑空');
