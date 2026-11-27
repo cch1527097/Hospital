@@ -1473,16 +1473,6 @@ function updateRemotePlayers2F(dt) {
         });
       }
 
-      colliders.push({
-        minX: cx - w / 2 - pad,
-        maxX: cx + w / 2 + pad,
-        minZ: cz - d / 2 - pad,
-        maxZ: cz + d / 2 + pad,
-        floor: targetFloor,
-        label: labelStr
-      });
-    }
-
     function addGalleryArtwork(x, y, z, rotY = 0, themeIndex = 0) {
       const group = new THREE.Group();
       const canvas = document.createElement('canvas');
