@@ -1854,7 +1854,7 @@ function updateRemotePlayers2F(dt) {
         addZoneFloor(19.0, -19.8, 29.0, 12.2, new THREE.MeshStandardMaterial({ color: 0xcbe5dc, roughness: 0.35 }));
         addZoneFloor(-19.0, -19.8, 29.0, 12.2, new THREE.MeshStandardMaterial({ color: 0xd0e4f2, roughness: 0.35 }));
         addZoneFloor(38.0, -37.5, 25.0, 17.5, ArchMaterials.woodFloorWarm);
-        addZoneFloor(35.6, 32.5, 35.0, 23.0, ArchMaterials.woodFloorWarm);
+        addZoneFloor(35.6, 36.25, 35.0, 16.5, ArchMaterials.woodFloorWarm);
         addZoneFloor(-31.0, 31.5, 28.0, 20.0, new THREE.MeshStandardMaterial({ color: 0xf7e3eb, roughness: 0.42 }));
       }
     }
@@ -2563,21 +2563,24 @@ function updateRemotePlayers2F(dt) {
     }
 
     function buildDentalDepartment2F(f2Y, wallPinkMat, wallCreamMat, glassMat, counterTopMat) {
-      addWall(18.0, 32.5, 0.5, 21.5, 4.4, wallPinkMat, '牙科部西牆', 2, f2Y);
+      // 西側隔間牆往內退縮（Z 範圍：28.0 ~ 44.5，與心血管中心齊平）
+      addWall(18.0, 36.25, 0.5, 16.5, 4.4, wallPinkMat, '牙科部西牆', 2, f2Y);
 
-      // 主招牌置中於擴大後的牙科部上方 (X = 35.5)
-      addHangingSign(35.5, f2Y + 3.65, 21.8, 8.2, 0.88, '牙科部', 'DENTISTRY', '#9d174d', '#f9a8d4');
+      // 主招牌往內移至 Z = 27.6
+      addHangingSign(35.5, f2Y + 3.65, 27.6, 8.2, 0.88, '牙科部', 'DENTISTRY', '#9d174d', '#f9a8d4');
 
-      addWall(22.0, 24.5, 5.4, 1.05, 1.08, ArchMaterials.woodWainscot, '牙科掛號報到櫃檯', 2, f2Y, false);
+      // 牙科掛號報到櫃檯往內移至 Z = 30.0
+      addWall(22.0, 30.0, 5.4, 1.05, 1.08, ArchMaterials.woodWainscot, '牙科掛號報到櫃檯', 2, f2Y, false);
       const dentalTop = new THREE.Mesh(new THREE.BoxGeometry(5.6, 0.12, 1.2), counterTopMat);
-      dentalTop.position.set(22.0, f2Y + 1.12, 24.5);
+      dentalTop.position.set(22.0, f2Y + 1.12, 30.0);
       const dentalShield = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.82, 0.06), glassMat);
-      dentalShield.position.set(22.0, f2Y + 1.56, 24.95);
+      dentalShield.position.set(22.0, f2Y + 1.56, 30.45);
       scene.add(dentalTop, dentalShield);
-      addHangingSign(22.0, f2Y + 2.95, 24.5, 4.2, 0.58, '牙科部', 'DENTISTRY', '#be185d', '#fbcfe8');
+      addHangingSign(22.0, f2Y + 2.95, 30.0, 4.2, 0.58, '牙科部', 'DENTISTRY', '#be185d', '#fbcfe8');
 
+      // 牙科候診等待沙發往內移至 Z = 34.8 與 38.2
       const waitSeatMat = new THREE.MeshStandardMaterial({ color: 0xa855f7, roughness: 0.45 });
-      [29.2, 32.4].forEach((wz) => {
+      [34.8, 38.2].forEach((wz) => {
         const sofaRow = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.44, 0.78), waitSeatMat);
         sofaRow.position.set(22.2, f2Y + 0.22, wz);
         const sofaBack = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.48, 0.14), waitSeatMat);
@@ -2586,15 +2589,15 @@ function updateRemotePlayers2F(dt) {
         colliders.push({ minX: 19.8, maxX: 24.6, minZ: wz - 0.45, maxZ: wz + 0.45, floor: 2, label: '牙科候診等待椅' });
       });
 
-      // 向左(東側)擴增為三排共 9 座牙科診療椅，補齊空缺至 X = 47.8
+      // 三排牙科診療椅往內移至 Z = 32.2、36.6、41.0
       [30.5, 39.2, 47.8].forEach((dx) => {
-        [27.2, 32.2, 37.2].forEach((dz) => {
+        [32.2, 36.6, 41.0].forEach((dz) => {
           buildDentalChairUnit(dx, dz, f2Y);
         });
       });
 
-      // 東側外牆邊補齊牙科器械消毒櫃
-      [27.5, 34.5].forEach((cz) => {
+      // 東側外牆邊器械消毒櫃同步往內移至 Z = 33.0 與 39.5
+      [33.0, 39.5].forEach((cz) => {
         const cab = new THREE.Mesh(new THREE.BoxGeometry(0.65, 1.85, 2.4), ArchMaterials.woodCabinet);
         cab.position.set(52.7, f2Y + 0.925, cz);
         scene.add(cab);
@@ -2702,7 +2705,7 @@ function updateRemotePlayers2F(dt) {
       addCofferedCeilingBay(-19.0, y2F, -19.8, 28.0, 11.5, false);
       addCofferedCeilingBay(38.0, y2F, -37.5, 24.0, 16.5, true);
       addCofferedCeilingBay(-25.5, y2F, 31.5, 16.5, 18.0, true);
-      addCofferedCeilingBay(35.6, y2F, 32.5, 34.0, 22.0, true);
+      addCofferedCeilingBay(35.6, y2F, 36.25, 34.0, 16.0, true);
 
       const dummy = new THREE.Object3D();
       const lightGeom = new THREE.CylinderGeometry(0.16, 0.16, 0.03, 16);
@@ -3899,7 +3902,7 @@ function updateRemotePlayers2F(dt) {
           baseY: 4.6,
           badgeColor: '#ec4899',
           appearance: { coatColor: 0xfce7f3, pantsColor: 0x9d174d, isNurse: true },
-          waypoints: [new THREE.Vector3(22.0, 4.6, 23.4)],
+          waypoints: [new THREE.Vector3(22.0, 4.6, 28.9)],
           speed: 0,
           yaw: 0,
           dialogue: '您好！這裡是 2F 牙科部專屬掛號報到櫃檯，初診或預約洗牙、植牙、根管治療請在此過健保卡報到！',
@@ -3914,7 +3917,7 @@ function updateRemotePlayers2F(dt) {
           baseY: 4.6,
           badgeColor: '#a855f7',
           appearance: { coatColor: 0xffffff, pantsColor: 0x334155, isDoctor: true },
-          waypoints: [new THREE.Vector3(30.2, 4.6, 27.5), new THREE.Vector3(30.2, 4.6, 35.5)],
+          waypoints: [new THREE.Vector3(30.2, 4.6, 32.5), new THREE.Vector3(30.2, 4.6, 40.5)],
           speed: 1.15,
           dialogue: '歡迎來到 2F 牙科部！我們提供數位 3D 齒雕、微創人工植牙、牙周病治療與兒童牙科全人照護。',
           options: []
@@ -3928,7 +3931,7 @@ function updateRemotePlayers2F(dt) {
           baseY: 4.6,
           badgeColor: '#c084fc',
           appearance: { coatColor: 0xe9d5ff, pantsColor: 0x6b21a8, isNurse: true },
-          waypoints: [new THREE.Vector3(33.2, 4.6, 27.2), new THREE.Vector3(33.2, 4.6, 32.0)],
+          waypoints: [new THREE.Vector3(33.2, 4.6, 32.2), new THREE.Vector3(33.2, 4.6, 36.6)],
           speed: 1.05,
           dialogue: '每位病患看診前後我們都會為牙科診療椅進行高規格消毒並更換全新無菌手機與吸唾管！',
           options: []
@@ -3936,13 +3939,13 @@ function updateRemotePlayers2F(dt) {
         {
           name: '吳淑華 女士 (牙科等待區患者)',
           role: '2F 牙科候診等待區・預約洗牙病患',
-          avatar: '👩',
+          avatar: '👵',
           type: 'patient',
           floor: 2,
           baseY: 4.6,
           badgeColor: '#f59e0b',
           appearance: { coatColor: 0xa855f7, pantsColor: 0x1e293b },
-          waypoints: [new THREE.Vector3(21.2, 4.6, 30.2)],
+          waypoints: [new THREE.Vector3(21.2, 4.6, 35.8)],
           speed: 0,
           yaw: 0,
           dialogue: '我已經在牙科掛號櫃檯報到好了，正坐在等待區看叫號螢幕等 227 診間叫號！',
@@ -3957,7 +3960,7 @@ function updateRemotePlayers2F(dt) {
           baseY: 4.6,
           badgeColor: '#f59e0b',
           appearance: { coatColor: 0x0284c7, pantsColor: 0x0f172a },
-          waypoints: [new THREE.Vector3(23.5, 4.6, 33.4)],
+          waypoints: [new THREE.Vector3(23.5, 4.6, 39.2)],
           speed: 0,
           yaw: 0,
           dialogue: '葉醫師技術很好，今天回來做植牙定期檢查，等待區的紫羅蘭沙發椅坐起來很舒服。',
@@ -5161,7 +5164,7 @@ function updateRemotePlayers2F(dt) {
         drawZone(-14.2, 33.5, 10, 17.5, '#fbcfe8', '婦產病房/護理站');
         drawZone(-4.8, 36.25, 5.6, 16.5, '#dbeafe', '生殖/胎兒');
         drawZone(8.7, 36.25, 13.8, 16.5, '#fce7f3', '心血管中心');
-        drawZone(35.5, 32.5, 35, 21.5, '#f3e8ff', '牙科部');
+        drawZone(35.5, 36.25, 35, 16.5, '#f3e8ff', '牙科部');
         drawZone(-24.7, 15.5, 19.4, 11.8, '#e2e8f0', '挑空');
         drawZone(24.7, 15.5, 19.4, 11.8, '#e2e8f0', '挑空');
       } else {
