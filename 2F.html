@@ -773,6 +773,8 @@ function updateRemotePlayers2F(dt) {
     let cardioAutoDoorR = null;
     let dentalAutoDoorL = null;
     let dentalAutoDoorR = null;
+    let reproAutoDoorL = null;
+    let reproAutoDoorR = null;
 
     // 3D 感應光圈參考（電梯 & 橫向手扶梯）
     const transportPads = [];
@@ -2187,6 +2189,8 @@ function updateRemotePlayers2F(dt) {
 
       buildDentalDepartment2F(f2Y, wallPinkMat, wallCreamMat, glassMat, counterTopMat);
 
+      buildReproductiveCenter2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterTopMat);
+
       addWall(-4.85, 44.0, 13.8, 0.35, 4.4, wallPinkMat, '2F 中南側走廊粉紅底牆', 2, f2Y);
 
       [
@@ -2524,6 +2528,175 @@ function updateRemotePlayers2F(dt) {
       );
       ledTicker.position.set(-14.2, f2Y + 3.85, 31.5);
       scene.add(bookRack, ledTicker);
+    }
+
+    function buildReproductiveCenter2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterTopMat) {
+      // 中心點 X = -4.85 (介於婦產科病房 X = -11.5 與心血管中心 X = 1.8 之間，總寬 13.3m，深度 Z: 28.0 ~ 44.5)
+      const cx = -4.85;
+
+      // 1. 正面牆壁 (Z = 28.0，與左右兩翼齊平；中央留出寬 3.2m 電動門開口)
+      // 左牆 (X: -11.5 ~ -6.45，寬 5.05m)
+      addWall(-8.975, 28.0, 5.05, 0.45, 4.4, wallBlueMat, '生殖醫學中心北側左牆', 2, f2Y);
+      // 右牆 (X: -3.25 ~ 1.8，寬 5.05m)
+      addWall(-0.725, 28.0, 5.05, 0.45, 4.4, wallBlueMat, '生殖醫學中心北側右牆', 2, f2Y);
+      // 門上方過樑 (X: -4.85，寬 3.2m，高 1.8m)
+      addWall(cx, 28.0, 3.2, 0.45, 1.8, wallBlueMat, '生殖醫學中心門上方牆', 2, f2Y + 2.6, false);
+
+      // 主招牌 (Z = 27.55)
+      addHangingSign(cx, f2Y + 3.55, 27.55, 4.4, 0.68, '生殖醫學中心', 'REPRODUCTIVE MEDICINE CENTER', '#0284c7', '#bae6fd');
+
+      // 雙開透明玻璃自動感應電動門 (總寬 3.2m，單扇 1.6m × 2.6m)
+      const reproDoorFrameMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.3, metalness: 0.4 });
+      const reproDoorGlassMat = new THREE.MeshPhysicalMaterial({
+        color: 0xe0f2fe, transparent: true, opacity: 0.25, roughness: 0.08, depthWrite: false
+      });
+      const createReproDoorLeaf = (w, h) => {
+        const leaf = new THREE.Group();
+        const t = 0.08, d = 0.10;
+        const topB = new THREE.Mesh(new THREE.BoxGeometry(w, t, d), reproDoorFrameMat); topB.position.y = h / 2 - t / 2;
+        const botB = new THREE.Mesh(new THREE.BoxGeometry(w, t * 1.4, d), reproDoorFrameMat); botB.position.y = -h / 2 + (t * 1.4) / 2;
+        const leftB = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), reproDoorFrameMat); leftB.position.x = -w / 2 + t / 2;
+        const rightB = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), reproDoorFrameMat); rightB.position.x = w / 2 - t / 2;
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(w - t * 2, h - t * 2.4, 0.025), reproDoorGlassMat);
+        leaf.add(topB, botB, leftB, rightB, pane);
+        return leaf;
+      };
+      reproAutoDoorL = createReproDoorLeaf(1.6, 2.6);
+      reproAutoDoorL.position.set(cx - 0.8, f2Y + 1.3, 28.0);
+      reproAutoDoorR = createReproDoorLeaf(1.6, 2.6);
+      reproAutoDoorR.position.set(cx + 0.8, f2Y + 1.3, 28.0);
+      scene.add(reproAutoDoorL, reproAutoDoorR);
+
+      // 2. 內部中央半高玻璃隔間 (X = -4.85, Z: 33.5 ~ 44.0)，分隔左側「超音波室」與右側「胚胎研究室」
+      addWall(cx, 38.75, 0.25, 10.5, 1.15, wallBlueMat, '生殖中心內部分隔矮牆', 2, f2Y);
+      const midGlass = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.1, 10.3), glassMat);
+      midGlass.position.set(cx, f2Y + 2.2, 38.75);
+      scene.add(midGlass);
+      addHangingSign(-8.2, f2Y + 3.4, 34.0, 3.2, 0.48, '高層次超音波室', 'ULTRASOUND ROOM', '#0369a1', '#e0f2fe');
+      addHangingSign(-1.5, f2Y + 3.4, 34.0, 3.2, 0.48, '胚胎與基因研究室', 'EMBRYOLOGY LAB', '#0f766e', '#ccfbf1');
+
+      // ==================== 3. 左側：高層次超音波檢查區 (X: -11.2 ~ -5.0) ====================
+      const buildUltrasoundMachine = (ux, uz, rotY = 0) => {
+        const ug = new THREE.Group();
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
+        const trimMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.35 });
+        const screenMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x38bdf8, emissiveIntensity: 0.85 });
+
+        // 主機底座與滾輪台車
+        const base = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.85, 0.68), bodyMat);
+        base.position.y = 0.45;
+        const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.12, 0.70), trimMat);
+        stripe.position.y = 0.75;
+        // 操作鍵盤面板與軌跡球
+        const consolePanel = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.08, 0.55), bodyMat);
+        consolePanel.position.set(0, 0.92, 0.08);
+        consolePanel.rotation.x = 0.12;
+        // 支撐臂與高解析超音波顯示螢幕
+        const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.45, 10), trimMat);
+        arm.position.set(0, 1.15, -0.12);
+        const monitorFrame = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.46, 0.06), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+        monitorFrame.position.set(0, 1.42, -0.08);
+        const monitorScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.40), screenMat);
+        monitorScreen.position.set(0, 1.42, -0.048);
+        // 超音波探頭架與探頭
+        const probe = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.025, 0.18, 8), trimMat);
+        probe.position.set(0.36, 0.96, 0.12);
+
+        ug.add(base, stripe, consolePanel, arm, monitorFrame, monitorScreen, probe);
+        ug.position.set(ux, f2Y, uz);
+        ug.rotation.y = rotY;
+        scene.add(ug);
+        colliders.push({ minX: ux - 0.4, maxX: ux + 0.4, minZ: uz - 0.4, maxZ: uz + 0.4, floor: 2, label: '高層次超音波儀器' });
+      };
+
+      // 兩組超音波檢查床 ＋ 兩台彩色杜卜勒超音波儀
+      [36.5, 41.2].forEach((bz) => {
+        // 檢查床
+        const bedBase = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.52, 0.82), new THREE.MeshStandardMaterial({ color: 0xe2e8f0 }));
+        bedBase.position.set(-9.6, f2Y + 0.26, bz);
+        const mattress = new THREE.Mesh(new THREE.BoxGeometry(2.05, 0.14, 0.86), new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.4 }));
+        mattress.position.set(-9.6, f2Y + 0.58, bz);
+        const pillow = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.1, 0.52), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+        pillow.position.set(-10.35, f2Y + 0.68, bz);
+        scene.add(bedBase, mattress, pillow);
+        colliders.push({ minX: -10.7, maxX: -8.5, minZ: bz - 0.5, maxZ: bz + 0.5, floor: 2, label: '超音波診療床' });
+
+        // 床旁超音波儀器
+        buildUltrasoundMachine(-8.0, bz - 0.65, -Math.PI / 5);
+      });
+
+      // ==================== 4. 右側：胚胎實驗室與研究儀器區 (X: -4.6 ~ 1.5) ====================
+      const labMetalMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.55, roughness: 0.25 });
+      const labTealMat = new THREE.MeshStandardMaterial({ color: 0x0d9488, roughness: 0.35 });
+      const labDarkMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 });
+
+      // (A) 兩組研究實驗桌 ＋ 高倍率顯微操作儀 (Micromanipulator / Microscope)
+      [36.2, 40.8].forEach((lz) => {
+        // 實驗桌
+        const bench = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.85, 0.95), labMetalMat);
+        bench.position.set(-1.6, f2Y + 0.425, lz);
+        const top = new THREE.Mesh(new THREE.BoxGeometry(2.46, 0.06, 1.0), counterTopMat);
+        top.position.set(-1.6, f2Y + 0.88, lz);
+        scene.add(bench, top);
+        colliders.push({ minX: -2.9, maxX: -0.3, minZ: lz - 0.55, maxZ: lz + 0.55, floor: 2, label: '胚胎研究實驗桌' });
+
+        // 顯微鏡與螢幕組 (每張桌上放兩組研究儀器)
+        [-2.2, -1.0].forEach((mx) => {
+          const mg = new THREE.Group();
+          const mBase = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.08, 0.38), labDarkMat);
+          mBase.position.y = 0.04;
+          const mPillar = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.36, 0.12), labMetalMat);
+          mPillar.position.set(0, 0.22, -0.1);
+          const mStage = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.03, 0.24), labTealMat);
+          mStage.position.set(0, 0.2, 0.02);
+          const mLens = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.02, 0.14, 10), labDarkMat);
+          mLens.position.set(0, 0.32, 0.02);
+          const mEye = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.16, 8), labDarkMat);
+          mEye.position.set(0, 0.42, 0.08);
+          mEye.rotation.x = 0.55;
+          // 旁側研究數據螢幕
+          const pcScreen = new THREE.Mesh(
+            new THREE.BoxGeometry(0.38, 0.28, 0.03),
+            new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x14b8a6, emissiveIntensity: 0.7 })
+          );
+          pcScreen.position.set(0.34, 0.24, -0.05);
+          mg.add(mBase, mPillar, mStage, mLens, mEye, pcScreen);
+          mg.position.set(mx, f2Y + 0.91, lz);
+          scene.add(mg);
+        });
+      });
+
+      // (B) 東側靠牆：無菌層流操作台 (Laminar Flow Hood)、CO2 胚胎培養箱 與 液態氮冷凍桶
+      // 無菌操作台
+      const hoodBase = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.85, 2.2), labMetalMat);
+      hoodBase.position.set(0.95, f2Y + 0.425, 36.2);
+      const hoodTop = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.15, 2.2), labTealMat);
+      hoodTop.position.set(0.95, f2Y + 1.425, 36.2);
+      const hoodWindow = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.75, 1.95), glassMat);
+      hoodWindow.position.set(0.39, f2Y + 1.35, 36.2);
+      scene.add(hoodBase, hoodTop, hoodWindow);
+      colliders.push({ minX: 0.35, maxX: 1.55, minZ: 35.0, maxZ: 37.4, floor: 2, label: '無菌層流操作台' });
+
+      // CO2 胚胎培養箱 (雙層恆溫箱)
+      const incubator = new THREE.Mesh(new THREE.BoxGeometry(0.95, 1.85, 1.1), labMetalMat);
+      incubator.position.set(0.95, f2Y + 0.925, 39.2);
+      const incDoor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.04, 1.55, 0.9),
+        new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x0d9488, emissiveIntensity: 0.35 })
+      );
+      incDoor.position.set(0.46, f2Y + 0.95, 39.2);
+      scene.add(incubator, incDoor);
+      colliders.push({ minX: 0.4, maxX: 1.5, minZ: 38.6, maxZ: 39.8, floor: 2, label: 'CO2 胚胎培養箱' });
+
+      // 兩座不鏽鋼液態氮冷凍儲存桶 (Cryotank)
+      [41.2, 42.6].forEach((tz) => {
+        const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 1.15, 16), labMetalMat);
+        tank.position.set(0.95, f2Y + 0.575, tz);
+        const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.22, 0.22, 12), labTealMat);
+        cap.position.set(0.95, f2Y + 1.22, tz);
+        scene.add(tank, cap);
+        colliders.push({ minX: 0.55, maxX: 1.35, minZ: tz - 0.4, maxZ: tz + 0.4, floor: 2, label: '液態氮胚胎儲存桶' });
+      });
     }
 
     function buildCardiovascularCenter2F(f2Y, wallPinkMat, wallCreamMat) {
@@ -4173,6 +4346,36 @@ function updateRemotePlayers2F(dt) {
           options: []
         },
 
+        // ==================== 2F 生殖醫學中心 NPC ====================
+      {
+        name: '周雅婷 生殖醫學科主治醫師',
+        role: '2F 生殖醫學中心・高層次超音波室',
+        avatar: '👩‍⚕️',
+        type: 'staff',
+        floor: 2,
+        baseY: 4.6,
+        badgeColor: '#0284c7',
+        appearance: { coatColor: 0xffffff, pantsColor: 0x0369a1, isDoctor: true },
+        waypoints: [new THREE.Vector3(-7.6, 4.6, 36.2), new THREE.Vector3(-7.6, 4.6, 40.8)],
+        speed: 1.0,
+        dialogue: '歡迎來到生殖醫學中心！左側超音波室配備最新彩色杜卜勒高層次超音波儀，可精準追蹤卵泡發育與胎兒健康。',
+        options: []
+      },
+      {
+        name: '林柏翰 資深胚胎技術師',
+        role: '2F 生殖醫學中心・胚胎與基因研究室',
+        avatar: '🔬',
+        type: 'staff',
+        floor: 2,
+        baseY: 4.6,
+        badgeColor: '#0d9488',
+        appearance: { coatColor: 0xccfbf1, pantsColor: 0x115e59, isDoctor: true },
+        waypoints: [new THREE.Vector3(-2.6, 4.6, 36.2), new THREE.Vector3(-2.6, 4.6, 40.8)],
+        speed: 0.95,
+        dialogue: '右側無塵實驗室配備高倍率顯微操作儀、三氣式胚胎培養箱與液態氮冷凍儲存系統，全天候維持最佳培養環境！',
+        options: []
+      },
+
         // ==================== 1F 大廳代表 NPC ====================
         {
           name: '林佳穎 急診護理師',
@@ -5010,6 +5213,14 @@ function updateRemotePlayers2F(dt) {
         deliveryAutoDoorR.position.x = THREE.MathUtils.lerp(deliveryAutoDoorR.position.x, -24.64 + openDr, dt * 12);
       }
 
+      if (reproAutoDoorL && reproAutoDoorR) {
+        const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - (-4.85), player.pos.z - 28.0) < 4.6);
+        const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - (-4.85), n.pos.z - 28.0) < 4.2);
+        const openRepro = (nearPlayer || nearNpc) ? 1.65 : 0.0;
+        reproAutoDoorL.position.x = THREE.MathUtils.lerp(reproAutoDoorL.position.x, -5.65 - openRepro, dt * 12);
+        reproAutoDoorR.position.x = THREE.MathUtils.lerp(reproAutoDoorR.position.x, -4.05 + openRepro, dt * 12);
+      }
+
       if (dialysisAutoDoorL && dialysisAutoDoorR) {
         const inDoorZone = (objPos) =>
           Math.abs(objPos.y - 4.6) < 1.6 &&
@@ -5256,6 +5467,7 @@ function updateRemotePlayers2F(dt) {
         else if (z > 22.0 && x < -35.5) zoneName = '2F 嬰兒室 (透明玻璃觀察櫥窗・新生兒照護)';
         else if (z > 22.0 && x >= -35.5 && x < -19.2) zoneName = '2F 產房 (Delivery Room・LDR 樂得兒產房)';
         else if (z > 22.0 && x >= -19.2 && x < -11.5) zoneName = '2F 婦產科護理站 & 婦產科病房 (201~210)';
+        else if (z > 27.5 && x >= -11.5 && x < 1.8) zoneName = '2F 生殖醫學中心 (超音波室・胚胎研究室)';
         else if (z > 27.5 && x >= 1.8 && x < 15.6) zoneName = '2F 心血管中心 (215/216 門診・心超室)';
         else if (z > 22.0 && x >= 18.0) zoneName = '2F 東南側・牙科部 (掛號櫃檯・候診區・診療室)';
         else if (z >= 4.0 && z <= 10.5 && Math.abs(x) < 12.0) zoneName = '2F 中央電梯廳 (B1 ~ 8F)';
@@ -5383,6 +5595,7 @@ function updateRemotePlayers2F(dt) {
         drawZone(-43.5, 34, 16, 19, '#e0f2fe', '嬰兒室');
         drawZone(-25.5, 34.5, 12.5, 17, '#fce7f3', '產房');
         drawZone(-15.35, 33.5, 7.7, 17.5, '#fbcfe8', '婦產病房/護理站');
+        drawZone(-4.85, 36.25, 13.3, 16.5, '#dbeafe', '生殖醫學');
         drawZone(9.9, 36.25, 16.2, 16.5, '#fce7f3', '心血管中心');
         drawZone(35.5, 36.25, 35, 16.5, '#f3e8ff', '牙科部');
         drawZone(-24.7, 15.5, 19.4, 11.8, '#e2e8f0', '挑空');
