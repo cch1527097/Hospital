@@ -1854,7 +1854,7 @@ function updateRemotePlayers2F(dt) {
         addZoneFloor(19.0, -19.8, 29.0, 12.2, new THREE.MeshStandardMaterial({ color: 0xcbe5dc, roughness: 0.35 }));
         addZoneFloor(-19.0, -19.8, 29.0, 12.2, new THREE.MeshStandardMaterial({ color: 0xd0e4f2, roughness: 0.35 }));
         addZoneFloor(38.0, -37.5, 25.0, 17.5, ArchMaterials.woodFloorWarm);
-        addZoneFloor(27.5, 31.5, 17.5, 20.0, ArchMaterials.woodFloorWarm);
+        addZoneFloor(35.6, 32.5, 35.0, 23.0, ArchMaterials.woodFloorWarm);
         addZoneFloor(-31.0, 31.5, 28.0, 20.0, new THREE.MeshStandardMaterial({ color: 0xf7e3eb, roughness: 0.42 }));
       }
     }
@@ -2564,7 +2564,8 @@ function updateRemotePlayers2F(dt) {
     function buildDentalDepartment2F(f2Y, wallPinkMat, wallCreamMat, glassMat, counterTopMat) {
       addWall(18.0, 32.5, 0.5, 21.5, 4.4, wallPinkMat, '牙科部西牆', 2, f2Y);
 
-      addHangingSign(27.5, f2Y + 3.65, 21.8, 6.8, 0.88, '牙科部', 'DENTISTRY', '#9d174d', '#f9a8d4');
+      // 主招牌置中於擴大後的牙科部上方 (X = 35.5)
+      addHangingSign(35.5, f2Y + 3.65, 21.8, 8.2, 0.88, '牙科部', 'DENTISTRY', '#9d174d', '#f9a8d4');
 
       addWall(22.0, 24.5, 5.4, 1.05, 1.08, ArchMaterials.woodWainscot, '牙科掛號報到櫃檯', 2, f2Y, false);
       const dentalTop = new THREE.Mesh(new THREE.BoxGeometry(5.6, 0.12, 1.2), counterTopMat);
@@ -2584,8 +2585,19 @@ function updateRemotePlayers2F(dt) {
         colliders.push({ minX: 19.8, maxX: 24.6, minZ: wz - 0.45, maxZ: wz + 0.45, floor: 2, label: '牙科候診等待椅' });
       });
 
-      [27.2, 32.0, 36.8].forEach((dz) => {
-        buildDentalChairUnit(31.8, dz, f2Y);
+      // 向左(東側)擴增為三排共 9 座牙科診療椅，補齊空缺至 X = 47.8
+      [30.5, 39.2, 47.8].forEach((dx) => {
+        [27.2, 32.2, 37.2].forEach((dz) => {
+          buildDentalChairUnit(dx, dz, f2Y);
+        });
+      });
+
+      // 東側外牆邊補齊牙科器械消毒櫃
+      [27.5, 34.5].forEach((cz) => {
+        const cab = new THREE.Mesh(new THREE.BoxGeometry(0.65, 1.85, 2.4), ArchMaterials.woodCabinet);
+        cab.position.set(52.7, f2Y + 0.925, cz);
+        scene.add(cab);
+        colliders.push({ minX: 52.3, maxX: 53.1, minZ: cz - 1.2, maxZ: cz + 1.2, floor: 2, label: '牙科器械消毒櫃' });
       });
     }
 
@@ -2596,7 +2608,7 @@ function updateRemotePlayers2F(dt) {
         addGalleryArtwork(53.02, baseY + 2.15, 2.0, -Math.PI / 2, fIdx + 2);
         addGalleryArtwork(53.02, baseY + 2.15, -12.0, -Math.PI / 2, fIdx + 3);
         addGalleryArtwork(-18.0, baseY + 2.15, 44.02, Math.PI, fIdx + 1);
-        addGalleryArtwork(baseY > 0 ? 28.5 : 18.0, baseY + 2.15, 44.02, Math.PI, fIdx + 2);
+        addGalleryArtwork(baseY > 0 ? 35.5 : 18.0, baseY + 2.15, 44.02, Math.PI, fIdx + 2);
       });
 
       const pillarCoords = [
@@ -2689,7 +2701,7 @@ function updateRemotePlayers2F(dt) {
       addCofferedCeilingBay(-19.0, y2F, -19.8, 28.0, 11.5, false);
       addCofferedCeilingBay(38.0, y2F, -37.5, 24.0, 16.5, true);
       addCofferedCeilingBay(-25.5, y2F, 31.5, 16.5, 18.0, true);
-      addCofferedCeilingBay(27.5, y2F, 31.5, 16.5, 18.0, true);
+      addCofferedCeilingBay(35.6, y2F, 32.5, 34.0, 22.0, true);
 
       const dummy = new THREE.Object3D();
       const lightGeom = new THREE.CylinderGeometry(0.16, 0.16, 0.03, 16);
@@ -5148,7 +5160,7 @@ function updateRemotePlayers2F(dt) {
         drawZone(-14.2, 33.5, 10, 17.5, '#fbcfe8', '婦產病房/護理站');
         drawZone(-4.8, 31, 5.6, 16.5, '#dbeafe', '生殖/胎兒');
         drawZone(8.7, 32, 13.8, 19.5, '#fce7f3', '心血管中心');
-        drawZone(27.5, 32.5, 19, 21.5, '#f3e8ff', '牙科部');
+        drawZone(35.5, 32.5, 35, 21.5, '#f3e8ff', '牙科部');
         drawZone(-24.7, 15.5, 19.4, 11.8, '#e2e8f0', '挑空');
         drawZone(24.7, 15.5, 19.4, 11.8, '#e2e8f0', '挑空');
       } else {
