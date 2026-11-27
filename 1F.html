@@ -544,8 +544,8 @@ function updateOnlineList1F() {
   const total = remotePlayers1F.size + 1;
   if (countEl) countEl.textContent = `${total} 人在線`;
   if (listEl) {
-    const myRoleObj = ROLE_STYLES_1F[authRole];
-const myRoleLabel = myRoleObj ? myRoleObj.label : '同仁';
+    const myRoleObj = (typeof ROLES !== 'undefined') ? ROLES.find(r => r.id === authRole) : null;
+    const myRoleLabel = myRoleObj ? myRoleObj.label : '同仁';
 
     let html = `<div class="text-teal-300 font-bold">● ${authName} (${myRoleLabel} - 我)</div>`;
 
@@ -782,296 +782,34 @@ function updateRemotePlayers1F(dt) {
       }
       return geomCache.get(key);
     }
-    
-  // 1. 圓弧平滑膠囊幾何體生成器
-    const capsuleGeomCache = new Map();
-    function createSmoothCapsuleGeometry(radius, cylinderHeight, radialSegs = 16, capSegs = 8) {
-      const key = `${radius.toFixed(4)}_${cylinderHeight.toFixed(4)}_${radialSegs}_${capSegs}`;
-      if (capsuleGeomCache.has(key)) return capsuleGeomCache.get(key);
 
-      const halfH = Math.max(0.001, cylinderHeight * 0.5);
-      const pts = [];
-      for (let i = 0; i <= capSegs; i++) {
-        const theta = -Math.PI * 0.5 + (i / capSegs) * (Math.PI * 0.5);
-        pts.push(new THREE.Vector2(Math.cos(theta) * radius, -halfH + Math.sin(theta) * radius));
-      }
-      for (let i = 0; i <= capSegs; i++) {
-        const theta = (i / capSegs) * (Math.PI * 0.5);
-        pts.push(new THREE.Vector2(Math.cos(theta) * radius, halfH + Math.sin(theta) * radius));
-      }
-      const geom = new THREE.LatheGeometry(pts, radialSegs);
-      geom.computeVertexNormals();
-      capsuleGeomCache.set(key, geom);
-      return geom;
-    }
-
-    // 供遠端多人連線角色使用的快取池
+    // 可愛圓潤膠囊積木公仔共用幾何快取池
     const capsuleGeoCache = {
-      head: getCachedSphereGeom(0.215, 20, 16),
-      hairCap: new THREE.SphereGeometry(0.224, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.56),
-      pelvisCyl: getCachedCylinderGeom(0.175, 0.165, 0.12, 16),
-      pelvisCap: getCachedSphereGeom(0.165, 16, 10),
-      torsoCyl: getCachedCylinderGeom(0.195, 0.185, 0.44, 18),
-      torsoCap: getCachedSphereGeom(0.195, 16, 10),
-      shoulderBall: getCachedSphereGeom(0.068, 12, 10),
-      upperArmCyl: createSmoothCapsuleGeometry(0.056, 0.16, 12, 6),
-      elbowBall: getCachedSphereGeom(0.052, 10, 8),
-      foreArmCyl: createSmoothCapsuleGeometry(0.048, 0.15, 12, 6),
-      cuffRing: new THREE.TorusGeometry(0.05, 0.01, 8, 14),
-      handBall: getCachedSphereGeom(0.054, 12, 10),
-      thighCyl: createSmoothCapsuleGeometry(0.074, 0.22, 12, 6),
-      kneeBall: getCachedSphereGeom(0.066, 10, 8),
-      shinCyl: createSmoothCapsuleGeometry(0.062, 0.22, 12, 6),
-      shoeBody: getCachedBoxGeom(0.135, 0.075, 0.18),
-      shoeToe: getCachedSphereGeom(0.068, 12, 10),
-      shoeHeel: getCachedSphereGeom(0.065, 12, 10),
-      nurseCap: getCachedBoxGeom(0.18, 0.05, 0.09),
-      nurseCapTop: getCachedBoxGeom(0.15, 0.03, 0.07),
-      visorBand: new THREE.CylinderGeometry(0.226, 0.226, 0.055, 18, 1, true, -0.65, 1.3),
-      visorRim: new THREE.CylinderGeometry(0.23, 0.23, 0.012, 18, 1, true, -0.68, 1.36),
-      combatAuraBall: getCachedSphereGeom(0.14, 10, 8),
-      footAuraBall: getCachedSphereGeom(0.17, 10, 8)
+      head: new THREE.SphereGeometry(0.215, 20, 16),
+      hairCap: new THREE.SphereGeometry(0.222, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.53),
+      nurseCap: new THREE.CylinderGeometry(0.085, 0.095, 0.045, 14),
+      nurseCapTop: new THREE.SphereGeometry(0.085, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.5),
+      visorBand: new THREE.CylinderGeometry(0.224, 0.224, 0.068, 20, 1, true, -Math.PI * 0.34, Math.PI * 0.68),
+      visorRim: new THREE.CylinderGeometry(0.226, 0.226, 0.012, 20, 1, true, -Math.PI * 0.35, Math.PI * 0.70),
+      torsoCyl: new THREE.CylinderGeometry(0.205, 0.205, 0.44, 18),
+      torsoCap: new THREE.SphereGeometry(0.205, 18, 12),
+      pelvisCyl: new THREE.CylinderGeometry(0.195, 0.195, 0.10, 16),
+      pelvisCap: new THREE.SphereGeometry(0.195, 16, 10),
+      shoulderBall: new THREE.SphereGeometry(0.086, 14, 12),
+      upperArmCyl: new THREE.CylinderGeometry(0.072, 0.068, 0.21, 12),
+      elbowBall: new THREE.SphereGeometry(0.068, 12, 10),
+      foreArmCyl: new THREE.CylinderGeometry(0.066, 0.062, 0.20, 12),
+      cuffRing: new THREE.TorusGeometry(0.064, 0.012, 8, 14),
+      handBall: new THREE.SphereGeometry(0.064, 12, 10),
+      thighCyl: new THREE.CylinderGeometry(0.086, 0.080, 0.27, 12),
+      kneeBall: new THREE.SphereGeometry(0.080, 12, 10),
+      shinCyl: new THREE.CylinderGeometry(0.078, 0.072, 0.27, 12),
+      shoeBody: new THREE.BoxGeometry(0.135, 0.085, 0.18),
+      shoeToe: new THREE.SphereGeometry(0.068, 12, 10),
+      shoeHeel: new THREE.SphereGeometry(0.068, 12, 10),
+      combatAuraBall: new THREE.SphereGeometry(0.115, 10, 8),
+      footAuraBall: new THREE.SphereGeometry(0.145, 10, 8)
     };
-
-    // 2. 地面接觸軟陰影
-    const groundShadowGeom = new THREE.CircleGeometry(0.42, 16);
-    groundShadowGeom.rotateX(-Math.PI / 2);
-    const groundShadowMat = new THREE.MeshBasicMaterial({
-      color: 0x0f172a,
-      transparent: true,
-      opacity: 0.28,
-      depthWrite: false
-    });
-
-    // 3. 與 3F.html 完全一致的關節人偶建構器
-    function createArticulatedCharacterMesh(opts = {}) {
-      const {
-        skinColor = 0xf5c6a5,
-        shirtColor = 0xffffff,
-        pantsColor = 0x1e293b,
-        shoeColor = 0xf8fafc,
-        hairColor = 0x1e293b,
-        roleType = 'civilian',
-        hasStethoscope = false,
-        hasGlasses = false,
-        hasPonytail = false,
-        isFemale = false
-      } = opts;
-
-      const root = new THREE.Group();
-      const dropShadow = new THREE.Mesh(groundShadowGeom, groundShadowMat);
-      dropShadow.position.y = 0.014;
-      root.add(dropShadow);
-
-      const skinMat = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.48, metalness: 0.04 });
-      const shirtMat = new THREE.MeshStandardMaterial({ color: shirtColor, roughness: 0.45, metalness: 0.05 });
-      const pantsMat = new THREE.MeshStandardMaterial({ color: pantsColor, roughness: 0.55, metalness: 0.05 });
-      const shoeMat = new THREE.MeshStandardMaterial({ color: shoeColor, roughness: 0.35, metalness: 0.15 });
-      const hairMat = new THREE.MeshStandardMaterial({ color: hairColor, roughness: 0.65 });
-      const eyeMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 });
-
-      const bodyRoot = new THREE.Group();
-      bodyRoot.position.y = 0.90;
-      root.add(bodyRoot);
-
-      const pelvis = new THREE.Mesh(createSmoothCapsuleGeometry(0.165, 0.08, 16, 8), pantsMat);
-      pelvis.scale.set(1.16, 0.85, 0.86);
-      pelvis.position.y = 0.02;
-      bodyRoot.add(pelvis);
-
-      const chest = new THREE.Mesh(
-        createSmoothCapsuleGeometry(isFemale ? 0.175 : 0.195, 0.28, 16, 8),
-        shirtMat
-      );
-      chest.scale.set(1.18, 1.0, 0.82);
-      chest.position.y = 0.26;
-      bodyRoot.add(chest);
-
-      const neck = new THREE.Mesh(createSmoothCapsuleGeometry(0.068, 0.06, 12, 6), skinMat);
-      neck.position.y = 0.48;
-      bodyRoot.add(neck);
-
-      const headGroup = new THREE.Group();
-      headGroup.position.y = 0.64;
-      bodyRoot.add(headGroup);
-
-      const head = new THREE.Mesh(new THREE.SphereGeometry(0.152, 18, 16), skinMat);
-      head.scale.set(0.95, 1.08, 0.98);
-      headGroup.add(head);
-
-      const hairCap = new THREE.Mesh(
-        new THREE.SphereGeometry(0.158, 18, 14, 0, Math.PI * 2, 0, Math.PI * 0.58),
-        hairMat
-      );
-      hairCap.position.set(0, 0.015, -0.01);
-      headGroup.add(hairCap);
-
-      if (hasPonytail || isFemale) {
-        const bun = new THREE.Mesh(new THREE.SphereGeometry(0.072, 12, 10), hairMat);
-        bun.position.set(0, 0.04, -0.155);
-        headGroup.add(bun);
-      }
-
-      if (roleType === 'nurse' || roleType === 'head_nurse') {
-        const capGroup = new THREE.Group();
-        capGroup.position.set(0, 0.158, -0.01);
-        capGroup.rotation.x = -0.12;
-
-        const capBody = new THREE.Mesh(
-          createSmoothCapsuleGeometry(0.036, 0.115, 12, 6),
-          new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25 })
-        );
-        capBody.rotation.z = Math.PI / 2;
-        capBody.scale.set(1.0, 1.0, 0.52);
-
-        const capStripe = new THREE.Mesh(
-          new THREE.BoxGeometry(0.12, 0.012, 0.042),
-          new THREE.MeshBasicMaterial({ color: roleType === 'head_nurse' ? 0x7c3aed : 0x0d9488 })
-        );
-        capStripe.position.set(0, 0.012, 0);
-
-        capGroup.add(capBody, capStripe);
-        headGroup.add(capGroup);
-      }
-
-      [-0.052, 0.052].forEach((ex) => {
-        const eye = new THREE.Mesh(new THREE.SphereGeometry(0.017, 10, 8), eyeMat);
-        eye.position.set(ex, 0.01, 0.142);
-        headGroup.add(eye);
-      });
-
-      const nose = new THREE.Mesh(new THREE.SphereGeometry(0.016, 8, 6), skinMat);
-      nose.position.set(0, -0.015, 0.152);
-      headGroup.add(nose);
-
-      if (hasGlasses) {
-        const frameMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7, roughness: 0.25 });
-        [-0.052, 0.052].forEach((gx) => {
-          const rim = new THREE.Mesh(new THREE.TorusGeometry(0.033, 0.005, 8, 16), frameMat);
-          rim.position.set(gx, 0.012, 0.148);
-          headGroup.add(rim);
-        });
-        const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.036, 0.005, 0.005), frameMat);
-        bridge.position.set(0, 0.014, 0.15);
-        headGroup.add(bridge);
-      }
-
-      if (roleType === 'doctor' || roleType === 'nurse' || roleType === 'head_nurse' || roleType === 'clerk') {
-        const coatMat = new THREE.MeshStandardMaterial({
-          color: roleType === 'clerk' ? 0xfce7f3 : roleType === 'head_nurse' ? 0xf3e8ff : 0xffffff,
-          roughness: 0.35
-        });
-        const coatSkirt = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.195, 0.22, 0.34, 18, 1, true),
-          coatMat
-        );
-        coatSkirt.material.side = THREE.DoubleSide;
-        coatSkirt.position.y = -0.02;
-        bodyRoot.add(coatSkirt);
-
-        const badge = new THREE.Mesh(
-          new THREE.BoxGeometry(0.065, 0.045, 0.014),
-          new THREE.MeshStandardMaterial({
-            color: roleType === 'doctor' ? 0x0284c7 : roleType === 'head_nurse' ? 0x7c3aed : 0x10b981,
-            emissive: 0x0f766e,
-            emissiveIntensity: 0.3
-          })
-        );
-        badge.position.set(-0.085, 0.33, 0.165);
-        bodyRoot.add(badge);
-      }
-
-      if (hasStethoscope) {
-        const stethCurve = new THREE.TorusGeometry(0.125, 0.011, 8, 16, Math.PI * 1.15);
-        const steth = new THREE.Mesh(
-          stethCurve,
-          new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3, metalness: 0.4 })
-        );
-        steth.rotation.x = Math.PI * 0.42;
-        steth.rotation.z = -Math.PI * 0.08;
-        steth.position.set(0, 0.37, 0.06);
-        bodyRoot.add(steth);
-      }
-
-      // 4. 四肢關節（左/右手臂、左/右雙腿）
-      function createArm(isLeft) {
-        const side = isLeft ? -1 : 1;
-        const shoulderPivot = new THREE.Group();
-        shoulderPivot.position.set(side * (isFemale ? 0.235 : 0.255), 0.39, 0);
-        bodyRoot.add(shoulderPivot);
-
-        const upperArm = new THREE.Mesh(createSmoothCapsuleGeometry(0.046, 0.17, 12, 6), shirtMat);
-        upperArm.position.y = -0.105;
-        shoulderPivot.add(upperArm);
-
-        const elbowPivot = new THREE.Group();
-        elbowPivot.position.y = -0.21;
-        shoulderPivot.add(elbowPivot);
-
-        const foreArm = new THREE.Mesh(createSmoothCapsuleGeometry(0.041, 0.16, 12, 6), skinMat);
-        foreArm.position.y = -0.095;
-        elbowPivot.add(foreArm);
-
-        const hand = new THREE.Mesh(new THREE.SphereGeometry(0.044, 10, 8), skinMat);
-        hand.position.y = -0.195;
-        elbowPivot.add(hand);
-
-        return { shoulderPivot, elbowPivot };
-      }
-
-      function createLeg(isLeft) {
-        const side = isLeft ? -1 : 1;
-        const hipPivot = new THREE.Group();
-        hipPivot.position.set(side * 0.095, -0.02, 0);
-        bodyRoot.add(hipPivot);
-
-        const thigh = new THREE.Mesh(createSmoothCapsuleGeometry(0.066, 0.28, 12, 6), pantsMat);
-        thigh.position.y = -0.17;
-        hipPivot.add(thigh);
-
-        const kneePivot = new THREE.Group();
-        kneePivot.position.y = -0.35;
-        hipPivot.add(kneePivot);
-
-        const shin = new THREE.Mesh(createSmoothCapsuleGeometry(0.056, 0.28, 12, 6), pantsMat);
-        shin.position.y = -0.165;
-        kneePivot.add(shin);
-
-        const shoe = new THREE.Mesh(createSmoothCapsuleGeometry(0.054, 0.11, 12, 6), shoeMat);
-        shoe.rotation.x = Math.PI / 2;
-        shoe.scale.set(1.12, 1.0, 0.78);
-        shoe.position.set(0, -0.34, 0.045);
-        kneePivot.add(shoe);
-
-        return { hipPivot, kneePivot };
-      }
-
-      const leftArm = createArm(true);
-      const rightArm = createArm(false);
-      const leftLeg = createLeg(true);
-      const rightLeg = createLeg(false);
-
-      root.traverse((obj) => {
-        if (obj.isMesh && obj !== dropShadow) {
-          obj.castShadow = true;
-          obj.receiveShadow = true;
-        }
-      });
-
-      return {
-        root,
-        bodyRoot,
-        headGroup,
-        leftArmPivot: leftArm.shoulderPivot,
-        rightArmPivot: rightArm.shoulderPivot,
-        leftElbowPivot: leftArm.elbowPivot,
-        rightElbowPivot: rightArm.elbowPivot,
-        leftLegPivot: leftLeg.hipPivot,
-        rightLegPivot: rightLeg.hipPivot,
-        leftKneePivot: leftLeg.kneePivot,
-        rightKneePivot: rightLeg.kneePivot
-      };
-    }
 
     // 牆面與大型傢俱 AABB 碰撞箱
     const colliders = [];
@@ -6124,6 +5862,7 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
     function createPlayer() {
       const role = getInheritedRole();
 
+      // 對應 1F_2.html 膠囊公仔的制服樣式
       let uniformStyle = 'casual';
       if (role.outfitStyle === 'lab_coat') uniformStyle = 'doctor';
       else if (role.id === 'nurse') uniformStyle = 'nurse';
@@ -6145,8 +5884,6 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
         combatGlow: true
       });
 
-      rig.root.position.copy(player.pos);
-
       player.mesh = rig.root;
       player.bodyRoot = rig.bodyRoot;
       player.leftShoulder = rig.leftShoulder;
@@ -6157,18 +5894,21 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
       player.rightHip = rig.rightHip;
       player.leftKnee = rig.leftKnee;
       player.rightKnee = rig.rightKnee;
-      player.leftFistAura = rig.leftFistAura;
       player.rightFistAura = rig.rightFistAura;
+      player.leftFistAura = rig.leftFistAura;
       player.rightFootAura = rig.rightFootAura;
+      player.mesh.position.copy(player.pos);
 
+      // 同步角色生命值與護甲至右上角 HUD 狀態條
       player.hp = role.health;
       player.maxHp = role.health;
       player.armor = role.armor;
       updateHealthArmorBarsUI();
 
+     // 在「健保卡已連線」徽章顯示目前帶入的角色名稱
       const comboBadge = document.getElementById('hud-combo-badge');
       if (comboBadge) {
-        comboBadge.textContent = `${role.icon} ${authName} (${role.name})`;
+        comboBadge.textContent = `${role.icon} ${role.name}`;
       }
     }
 
@@ -7718,38 +7458,39 @@ function checkTransportAndExitTriggers() {
       player.bodyRoot.rotation.x = THREE.MathUtils.lerp(player.bodyRoot.rotation.x, isMoving && player.isSprinting ? 0.12 : 0, 10 * dt);
 
       if (isMoving) {
-        const freq = player.isSprinting ? 14.5 : 9.8;
-        const amp = player.isSprinting ? 0.85 : 0.62;
+        const freq = player.isSprinting ? 14.5 : 9.5;
+        const amp = player.isSprinting ? 0.88 : 0.56;
         player.walkCycle += dt * freq;
-        const swing = Math.sin(player.walkCycle) * amp;
+        const s = Math.sin(player.walkCycle);
         const c = Math.cos(player.walkCycle);
 
-        player.leftHip.rotation.x = swing;
-        player.rightHip.rotation.x = -swing;
+        player.leftHip.rotation.x = s * amp;
+        player.rightHip.rotation.x = -s * amp;
+        player.leftKnee.rotation.x = Math.max(0, -c) * (amp * 0.95);
+        player.rightKnee.rotation.x = Math.max(0, c) * (amp * 0.95);
 
-        player.leftKnee.rotation.x = Math.max(0, -swing) * 0.85 + Math.max(0, c) * 0.25;
-        player.rightKnee.rotation.x = Math.max(0, swing) * 0.85 + Math.max(0, -c) * 0.25;
+        player.leftShoulder.rotation.x = -s * (amp * 0.85);
+        player.rightShoulder.rotation.x = s * (amp * 0.85);
+        player.leftShoulder.rotation.z = 0.08;
+        player.rightShoulder.rotation.z = -0.08;
+        player.leftElbow.rotation.x = -0.35 - Math.max(0, s) * 0.45;
+        player.rightElbow.rotation.x = -0.35 - Math.max(0, -s) * 0.45;
 
-        player.leftShoulder.rotation.x = -swing * 0.75;
-        player.rightShoulder.rotation.x = swing * 0.75;
-        player.leftShoulder.rotation.z = 0.06;
-        player.rightShoulder.rotation.z = -0.06;
-        player.leftElbow.rotation.x = -0.35 - Math.max(0, swing) * 0.25;
-        player.rightElbow.rotation.x = -0.35 - Math.max(0, -swing) * 0.25;
-
-        player.bodyRoot.position.y = 0.90 + Math.abs(c) * 0.035;
+        player.bodyRoot.position.y = Math.abs(c) * 0.055;
       } else {
-        player.leftHip.rotation.x *= 0.8;
-        player.rightHip.rotation.x *= 0.8;
-        player.leftKnee.rotation.x *= 0.8;
-        player.rightKnee.rotation.x *= 0.8;
-        player.leftShoulder.rotation.x *= 0.8;
-        player.rightShoulder.rotation.x *= 0.8;
-        player.leftShoulder.rotation.z *= 0.8;
-        player.rightShoulder.rotation.z *= 0.8;
-        player.leftElbow.rotation.x *= 0.8;
-        player.rightElbow.rotation.x *= 0.8;
-        player.bodyRoot.position.y = 0.90 + Math.sin(clock.elapsedTime * 2.5) * 0.012;
+        const b = Math.sin(player.breathCycle);
+        player.bodyRoot.position.y = b * 0.014;
+        player.leftHip.rotation.x = THREE.MathUtils.lerp(player.leftHip.rotation.x, 0, 10 * dt);
+        player.rightHip.rotation.x = THREE.MathUtils.lerp(player.rightHip.rotation.x, 0, 10 * dt);
+        player.leftKnee.rotation.x = THREE.MathUtils.lerp(player.leftKnee.rotation.x, 0, 10 * dt);
+        player.rightKnee.rotation.x = THREE.MathUtils.lerp(player.rightKnee.rotation.x, 0, 10 * dt);
+
+        player.leftShoulder.rotation.x = THREE.MathUtils.lerp(player.leftShoulder.rotation.x, 0, 10 * dt);
+        player.rightShoulder.rotation.x = THREE.MathUtils.lerp(player.rightShoulder.rotation.x, 0, 10 * dt);
+        player.leftShoulder.rotation.z = 0.06 + b * 0.02;
+        player.rightShoulder.rotation.z = -0.06 - b * 0.02;
+        player.leftElbow.rotation.x = -0.14;
+        player.rightElbow.rotation.x = -0.14;
       }
     }
 
@@ -8063,226 +7804,711 @@ function checkTransportAndExitTriggers() {
           npc.rightShoulder.rotation.x = s * 0.45;
           npc.bodyRoot.position.y = Math.abs(Math.cos(npc.walkPhase)) * 0.04;
         } else {
-          npc.leftHip.rotation.x = THREE.MathUtils.lerp(npc.leftHip.rotation.x, 0, dt * 8);
-            npc.rightHip.rotation.x = THREE.MathUtils.lerp(npc.rightHip.rotation.x, 0, dt * 8);
-            npc.leftKnee.rotation.x = THREE.MathUtils.lerp(npc.leftKnee.rotation.x, 0, dt * 8);
-            npc.rightKnee.rotation.x = THREE.MathUtils.lerp(npc.rightKnee.rotation.x, 0, dt * 8);
-            npc.leftArm.rotation.x = THREE.MathUtils.lerp(npc.leftArm.rotation.x, 0, dt * 8);
-            npc.rightArm.rotation.x = THREE.MathUtils.lerp(npc.rightArm.rotation.x, 0, dt * 8);
+          npc.leftHip.rotation.x = THREE.MathUtils.lerp(npc.leftHip.rotation.x, 0, 8 * dt);
+          npc.rightHip.rotation.x = THREE.MathUtils.lerp(npc.rightHip.rotation.x, 0, 8 * dt);
+          npc.leftShoulder.rotation.x = THREE.MathUtils.lerp(npc.leftShoulder.rotation.x, 0, 8 * dt);
+          npc.rightShoulder.rotation.x = THREE.MathUtils.lerp(npc.rightShoulder.rotation.x, 0, 8 * dt);
+          npc.bodyRoot.position.y = 0;
         }
-    });
-}
+      }
 
-// ==========================================
-// 攝影機更新與互動觸發
-// ==========================================
-function updateCamera() {
-    const targetX = player.x;
-    const targetY = player.y + 1.5;
-    const targetZ = player.z;
+      nearestNpc = closest;
+      const promptEl = document.getElementById('npc-talk-prompt');
+      if (nearestNpc && !activeTalkNpc && !activeFloorModal) {
+        promptEl.innerHTML = `按 <span class="px-2 py-0.5 mx-1 rounded-md bg-emerald-400 text-slate-950 font-black">E</span> 與 <span id="prompt-npc-name" class="text-amber-300">${nearestNpc.name} (${nearestNpc.role})</span> 交談`;
+        promptEl.classList.remove('hidden');
+      } else if (nearGrandPiano && !activeTalkNpc && !activeFloorModal) {
+        promptEl.innerHTML = `按 <span class="px-2 py-0.5 mx-1 rounded-md bg-emerald-400 text-slate-950 font-black">E</span> 彈奏大廳三角演奏鋼琴`;
+        promptEl.classList.remove('hidden');
+      } else {
+        promptEl.classList.add('hidden');
+      }
+    }
 
-    const camDist = 4.2;
-    const camX = targetX + Math.sin(camYaw) * Math.cos(camPitch) * camDist;
-    const camY = Math.max(0.8, targetY + Math.sin(camPitch) * camDist);
-    const camZ = targetZ + Math.cos(camYaw) * Math.cos(camPitch) * camDist;
-
-    camera.position.lerp(new THREE.Vector3(camX, camY, camZ), 0.25);
-    camera.lookAt(targetX, targetY, targetZ);
-}
-
-function checkInteractions() {
-    let promptText = '';
-    currentInteractable = null;
-
-    // 1. 檢查手扶梯與電梯傳送門
-    for (const p of portals) {
-        const dist = Math.hypot(player.x - p.x, player.z - p.z);
-        if (dist < 2.2) {
-            promptText = `按 [E] 搭乘${p.name}`;
-            currentInteractable = { type: 'portal', data: p };
-            break;
+    const _projVec = new THREE.Vector3();
+    function updateNpcLabelsProjection() {
+      const camPos = camera.position;
+      for (let i = 0; i < npcs.length; i++) {
+        const npc = npcs[i];
+        const el = npc.labelEl;
+        if (!showNpcLabels || npc.state === 'ko') {
+          if (npc.lastLabelVisible) {
+            el.style.display = 'none';
+            npc.lastLabelVisible = false;
+          }
+          continue;
         }
-    }
 
-    // 2. 檢查三角鋼琴
-    if (!currentInteractable) {
-        const distPiano = Math.hypot(player.x - 14.5, player.z - 22.0);
-        if (distPiano < 2.8) {
-            promptText = pianoPlaying ? '按 [E] 停止演奏鋼琴' : '按 [E] 彈奏三角鋼琴';
-            currentInteractable = { type: 'piano' };
+        const dx = npc.pos.x - camPos.x;
+        const dy = npc.pos.y - camPos.y;
+        const dz = npc.pos.z - camPos.z;
+        const distSq = dx * dx + dy * dy + dz * dz;
+
+        if (distSq > 484) {
+          if (npc.lastLabelVisible) {
+            el.style.display = 'none';
+            npc.lastLabelVisible = false;
+          }
+          continue;
         }
-    }
 
-    // 3. 檢查附近 NPC
-    if (!currentInteractable) {
-        let minDist = 2.8;
-        for (const npc of npcs) {
-            if (npc.defeated) continue;
-            const d = Math.hypot(player.x - npc.mesh.position.x, player.z - npc.mesh.position.z);
-            if (d < minDist) {
-                minDist = d;
-                promptText = `按 [E] 與 ${npc.name} 對話`;
-                currentInteractable = { type: 'npc', data: npc };
-            }
+        _projVec.set(npc.pos.x, npc.pos.y + (npc.isSupinePatient ? 0.92 : 1.92), npc.pos.z);
+        _projVec.project(camera);
+
+        if (_projVec.z > 1) {
+          if (npc.lastLabelVisible) {
+            el.style.display = 'none';
+            npc.lastLabelVisible = false;
+          }
+          continue;
         }
+
+        if (!npc.lastLabelVisible) {
+          el.style.display = 'block';
+          npc.lastLabelVisible = true;
+        }
+
+        const sx = Math.round((_projVec.x + 1) * cachedHalfW);
+        const sy = Math.round((-_projVec.y + 1) * cachedHalfH);
+        if (sx !== npc.lastLabelX || sy !== npc.lastLabelY) {
+          el.style.transform = `translate3d(${sx}px, ${sy}px, 0) translate(-50%, -100%)`;
+          npc.lastLabelX = sx;
+          npc.lastLabelY = sy;
+        }
+      }
     }
 
-    const promptEl = document.getElementById('interact-prompt');
-    if (promptText) {
-        promptEl.innerText = promptText;
-        promptEl.style.display = 'block';
-    } else {
-        promptEl.style.display = 'none';
-    }
-}
+    function updateVisualEffects(dt) {
+      for (let i = slashEffects.length - 1; i >= 0; i--) {
+        const fx = slashEffects[i];
+        fx.life -= dt;
+        const ratio = Math.max(0, fx.life / fx.maxLife);
+        fx.mesh.material.opacity = ratio;
+        fx.mesh.scale.setScalar(1 + (1 - ratio) * 0.45);
+        if (fx.life <= 0) {
+          scene.remove(fx.mesh);
+          fx.mesh.geometry.dispose();
+          fx.mesh.material.dispose();
+          slashEffects.splice(i, 1);
+        }
+      }
 
-function triggerInteraction() {
-    if (!currentInteractable) return;
+      for (let i = impactParticles.length - 1; i >= 0; i--) {
+        const pt = impactParticles[i];
+        pt.life -= dt;
+        pt.vel.y -= 15 * dt;
+        pt.mesh.position.addScaledVector(pt.vel, dt);
+        pt.mesh.scale.setScalar(Math.max(0.01, pt.life / 0.36));
+        if (pt.life <= 0) {
+          scene.remove(pt.mesh);
+          pt.mesh.visible = false;
+          particlePool.push(pt.mesh);
+          impactParticles.splice(i, 1);
+        }
+      }
 
-    if (currentInteractable.type === 'portal') {
-        openFloorModal();
-    } else if (currentInteractable.type === 'piano') {
-        togglePiano();
-    } else if (currentInteractable.type === 'npc') {
-        const npc = currentInteractable.data;
-        const msg = npc.dialogues[Math.floor(Math.random() * npc.dialogues.length)];
-        showToast(`${npc.name}：「${msg}」`);
-    }
-}
+      if (lotusChandelierGroup) {
+        lotusChandelierGroup.rotation.y += dt * 0.14;
+      }
 
-// ==========================================
-// 小地圖繪製 (Minimap)
-// ==========================================
-const minimapCanvas = document.getElementById('minimap-canvas');
-const minimapCtx = minimapCanvas ? minimapCanvas.getContext('2d') : null;
+      // MRI 檢查床與患者同步前後掃描移動
+      if (mriSlidingTableMesh) {
+        const mriOffset = Math.sin(clock.elapsedTime * 0.7) * 0.75;
+        mriSlidingTableMesh.position.z = -23.8 + mriOffset;
+        if (mriPatientNpcRef) {
+          mriPatientNpcRef.pos.z = -23.0 + mriOffset;
+        }
+      }
 
-function updateMinimap() {
-    if (!minimapCtx) return;
-    const w = minimapCanvas.width;
-    const h = minimapCanvas.height;
-    const cx = w / 2;
-    const cy = h / 2;
-    const scale = 2.4;
+      if (ctSlidingTableMesh) {
+        ctSlidingTableMesh.position.z = -23.7 + Math.cos(clock.elapsedTime * 0.9) * 0.65;
+      }
+      if (erMonitorScreenMat) {
+        erMonitorScreenMat.emissiveIntensity = 0.48 + Math.sin(clock.elapsedTime * 9.5) * 0.18;
+      }
 
-    minimapCtx.clearRect(0, 0, w, h);
-    minimapCtx.fillStyle = '#0f172a';
-    minimapCtx.fillRect(0, 0, w, h);
-
-    minimapCtx.save();
-    minimapCtx.translate(cx, cy);
-    minimapCtx.rotate(-camYaw);
-
-    // 繪製牆體/障礙物
-    minimapCtx.fillStyle = '#475569';
-    for (const c of colliders) {
-        const rx = (c.minX - player.x) * scale;
-        const rz = (c.minZ - player.z) * scale;
-        const rw = (c.maxX - c.minX) * scale;
-        const rh = (c.maxZ - c.minZ) * scale;
-        minimapCtx.fillRect(rx, rz, rw, rh);
+      updateAutoSlidingDoors(dt);
+      updateEscalator(dt);
     }
 
-    // 繪製 NPC 點位
-    for (const npc of npcs) {
-        if (npc.defeated) continue;
-        const nx = (npc.mesh.position.x - player.x) * scale;
-        const nz = (npc.mesh.position.z - player.z) * scale;
-        minimapCtx.fillStyle = npc.isHostile ? '#ef4444' : '#38bdf8';
-        minimapCtx.beginPath();
-        minimapCtx.arc(nx, nz, 2.5, 0, Math.PI * 2);
-        minimapCtx.fill();
+    function updateCamera(dt) {
+      camState.yaw = THREE.MathUtils.lerp(camState.yaw, camState.targetYaw, 18 * dt);
+      camState.pitch = THREE.MathUtils.lerp(camState.pitch, camState.targetPitch, 18 * dt);
+      camState.distance = THREE.MathUtils.lerp(camState.distance, camState.targetDistance, 14 * dt);
+
+      const shakeOffset = new THREE.Vector3();
+      if (camShake > 0.001) {
+        shakeOffset.set(
+          (Math.random() - 0.5) * camShake,
+          (Math.random() - 0.5) * camShake,
+          (Math.random() - 0.5) * camShake
+        );
+        camShake *= Math.pow(0.03, dt);
+      }
+
+      const headTarget = new THREE.Vector3(player.pos.x, player.pos.y + 1.56, player.pos.z);
+      camState.targetPos.lerp(headTarget, 22 * dt);
+
+      if (camState.firstPerson) {
+        player.mesh.visible = false;
+        const eyePos = new THREE.Vector3(player.pos.x, player.pos.y + 1.62, player.pos.z).add(shakeOffset);
+        camera.position.copy(eyePos);
+        const lookDir = new THREE.Vector3(
+          -Math.sin(camState.yaw) * Math.cos(camState.pitch),
+          -Math.sin(camState.pitch),
+          -Math.cos(camState.yaw) * Math.cos(camState.pitch)
+        );
+        camera.lookAt(eyePos.clone().add(lookDir));
+      } else {
+        player.mesh.visible = true;
+        const offsetX = Math.sin(camState.yaw) * Math.cos(camState.pitch) * camState.distance;
+        const offsetY = Math.sin(camState.pitch) * camState.distance + 0.52;
+        const offsetZ = Math.cos(camState.yaw) * Math.cos(camState.pitch) * camState.distance;
+
+        const desiredCamPos = new THREE.Vector3(
+          camState.targetPos.x + offsetX,
+          Math.max(0.65, camState.targetPos.y + offsetY),
+          camState.targetPos.z + offsetZ
+        );
+
+        desiredCamPos.x = Math.max(-52.2, Math.min(52.2, desiredCamPos.x));
+        desiredCamPos.z = Math.max(-46.2, Math.min(43.8, desiredCamPos.z));
+
+        camera.position.copy(desiredCamPos).add(shakeOffset);
+        camera.lookAt(camState.targetPos);
+      }
     }
 
-    minimapCtx.restore();
+    function updateCurrentZoneHUD() {
+      const x = player.pos.x;
+      const z = player.pos.z;
+      let label = '中央挑空鋼琴大廳';
 
-    // 中心玩家箭頭
-    minimapCtx.fillStyle = '#facc15';
-    minimapCtx.beginPath();
-    minimapCtx.moveTo(cx, cy - 6);
-    minimapCtx.lineTo(cx - 4, cy + 5);
-    minimapCtx.lineTo(cx + 4, cy + 5);
-    minimapCtx.closePath();
-    minimapCtx.fill();
-}
+      if (z > 38.5) label = '南側入口大門廳 (走出大門連結 1index.html)';
+      else if (x > 37.2 && z >= -32.8 && z <= 2.2) label = '急診批價掛號 / 檢傷休息區';
+      else if (x >= 7.2 && x <= 37.2 && z >= -32.8 && z <= -13.5) label = '急診室 (CPR 急救區 / 留觀區)';
+      else if (x >= -34.5 && x <= -12.5 && z >= -32.8 && z <= -13.5) label = '放射科 (3.0T MRI / CT 檢查)';
+      else if (z >= -2.2 && z <= 1.2 && Math.abs(x) <= 11.5) label = '北側電梯大廳 (往 B1 / 2F~8F)';
+      else if (z >= 4.2 && z <= 10.5 && Math.abs(x) <= 13.5) label = '中央大廳・批價掛號處 / 品牌形象牆';
+      else if (x >= -5.5 && x <= 0.5 && z >= 12.2 && z <= 17.8) label = '中央橫向平行手扶梯大廳 (接觸可選樓層)';
+      else if (x < -14.2 && x > -18.2 && z >= 26.8 && z <= 34.2) label = '大廳左側・美美食品 M-MEI 門市';
+      else if (x > 14.2 && x < 18.2 && z >= 26.8 && z <= 34.2) label = '大廳右側・STARFUCKS';
+      else if (x < -36.2 && z >= 34.8) label = '西南側・向日葵超商';
+      else if (x < -36.2 && z >= 20.2 && z < 34.8) label = '西側・藝文廳 (向日葵醫院人文畫展)';
+      else if (Math.abs(x) <= 14.0 && z >= 20.5 && z <= 38.5) label = '挑空鋼琴大廳 (蓮花主燈 / 演奏鋼琴)';
+      else if (x < -15.5 && z >= 11 && z <= 19) label = '西側雙挑空採光中庭';
+      else if (x > 15.5 && z >= 11 && z <= 19) label = '東側雙挑空採光中庭';
+      else if (x < -18 && z > 19) label = '西側門診區 (十五診～二十七診)';
+      else if (x > 18 && x < 34.5 && z > 19) label = '東側門診區 (腸胃內科・一診～十二診)';
+      else if (x >= 35.0 && z > 19) label = '東南側・國際會議廳 / 員工餐廳';
+      else if (x < -11 && z >= -12.5 && z <= -1.5) label = '檢驗科 (抽血服務櫃檯)';
+      else if (x > 11 && z >= -12.5 && z <= -1.5) label = '藥劑科 (1~4號領藥窗口)';
+      else if (z < -33.0 && x < 0) label = '西北側・工務室 / 消防監控室';
+      else if (z < -33.0 && x >= 0) label = '東北側・1F 洗腎室';
 
-// ==========================================
-// 鍵盤與滑鼠控制監聽
-// ==========================================
-window.addEventListener('keydown', (e) => {
-    if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
-    const k = e.key.toLowerCase();
-    keys[k] = true;
-    if (e.code === 'Space') keys[' '] = true;
-    if (k === 'e') triggerInteraction();
-});
-
-window.addEventListener('keyup', (e) => {
-    const k = e.key.toLowerCase();
-    keys[k] = false;
-    if (e.code === 'Space') keys[' '] = false;
-});
-
-let isDragging = false;
-let prevMouseX = 0;
-let prevMouseY = 0;
-
-window.addEventListener('mousedown', (e) => {
-    if (e.target.closest('#ui-layer') || e.target.closest('#login-screen') || e.target.closest('#floor-modal')) return;
-    if (e.button === 0) {
-        isDragging = true;
-        prevMouseX = e.clientX;
-        prevMouseY = e.clientY;
-    } else if (e.button === 2) {
-        performAttack();
+      document.getElementById('current-zone-label').textContent = label;
     }
+
+    // --------------------------------------------------------------------------
+    // 15. 左下角 1F 平面圖雷達小地圖
+    // --------------------------------------------------------------------------
+    const minimapCanvas = document.getElementById('minimap-canvas');
+    const mctx = minimapCanvas.getContext('2d');
+
+    function drawMinimap() {
+      const w = minimapCanvas.width;
+      const h = minimapCanvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const scale = 1.92;
+
+      mctx.clearRect(0, 0, w, h);
+
+      mctx.save();
+      mctx.beginPath();
+      mctx.arc(cx, cy, cx - 2, 0, Math.PI * 2);
+      mctx.clip();
+
+      mctx.fillStyle = '#fefce8';
+      mctx.fillRect(0, 0, w, h);
+
+      const toMap = (wx, wz) => ({
+        x: cx + (wx - player.pos.x) * scale,
+        y: cy + (wz - player.pos.z) * scale
+      });
+
+      const drawRoom = (x1, z1, x2, z2, fill) => {
+        const p1 = toMap(x1, z1);
+        const p2 = toMap(x2, z2);
+        mctx.fillStyle = fill;
+        mctx.fillRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+        mctx.strokeStyle = '#15803d';
+        mctx.lineWidth = 1.1;
+        mctx.strokeRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+      };
+
+      drawRoom(-53.5, -47.5, -18, -36.5, '#fde68a');
+      drawRoom(18, -47.5, 53.5, -36.5, '#fbcfe8');
+      drawRoom(-34.5, -32.8, -12.5, -13.5, '#bae6fd');
+      drawRoom(7.2, -32.8, 37.2, -13.5, '#fda4af');
+      drawRoom(37.2, -32.8, 53.5, 2.2, '#fecdd3');
+      drawRoom(-34, -10.8, -15, -6.5, '#bae6fd');
+      drawRoom(12, -10.8, 29, -6.5, '#bae6fd');
+      drawRoom(-11.2, 0.8, 11.2, 4.0, '#f9a8d4');
+      drawRoom(-12.2, 6.6, 9.2, 8.0, '#fbcfe8');
+      drawRoom(-29, 11.3, -16, 18.7, '#e2e8f0');
+      drawRoom(16, 11.3, 29, 18.7, '#e2e8f0');
+      drawRoom(-53.0, 20.2, -36.2, 34.8, '#c7d2fe');
+      drawRoom(-53.0, 34.8, -36.2, 44.0, '#fdba74');
+      drawRoom(-33.5, 21.8, -18.2, 37.2, '#fbcfe8');
+      drawRoom(-18.0, 26.8, -14.2, 34.2, '#fed7aa');
+      drawRoom(-6.0, 20.6, 6.0, 38.4, '#fef3c7');
+      drawRoom(14.2, 26.8, 18.0, 34.2, '#bbf7d0');
+      drawRoom(18.2, 21.8, 33.5, 37.2, '#fbcfe8');
+      drawRoom(35.2, 20.0, 53.5, 43.0, '#bae6fd');
+
+      for (let i = 0; i < npcs.length; i++) {
+        const npc = npcs[i];
+        if (npc.state === 'ko') continue;
+        const p = toMap(npc.pos.x, npc.pos.z);
+        mctx.fillStyle = npc.isGuard ? '#2563eb' : (npc.isDoingCPR || npc.isMedicalAttending) ? '#e11d48' : '#10b981';
+        mctx.beginPath();
+        mctx.arc(p.x, p.y, 2.8, 0, Math.PI * 2);
+        mctx.fill();
+      }
+
+      mctx.save();
+      mctx.translate(cx, cy);
+      mctx.rotate(-player.yaw + Math.PI);
+      mctx.fillStyle = '#e11d48';
+      mctx.beginPath();
+      mctx.moveTo(0, -7);
+      mctx.lineTo(5.2, 6);
+      mctx.lineTo(0, 3);
+      mctx.lineTo(-5.2, 6);
+      mctx.closePath();
+      mctx.fill();
+      mctx.restore();
+
+      mctx.restore();
+    }
+
+    function cycleLightingMode() {
+      currentLightingIdx = (currentLightingIdx + 1) % LIGHTING_MODES.length;
+      const mode = LIGHTING_MODES[currentLightingIdx];
+
+      renderer.toneMappingExposure = mode.exposure;
+      scene.background.setHex(mode.bg);
+      scene.fog.color.setHex(mode.fogColor);
+      scene.fog.density = mode.fogDensity;
+
+      if (hemiLightRef) {
+        hemiLightRef.color.setHex(mode.hemiSky);
+        hemiLightRef.groundColor.setHex(mode.hemiGround);
+        hemiLightRef.intensity = mode.hemiInt;
+      }
+      if (dirLightRef) {
+        dirLightRef.color.setHex(mode.dirColor);
+        dirLightRef.intensity = mode.dirInt;
+      }
+      if (lotusPointLight) {
+        lotusPointLight.intensity = mode.lotusInt;
+      }
+      lotusPetalMats.forEach((m) => {
+        m.emissiveIntensity = mode.lotusEmissive;
+      });
+      louverSconceMats.forEach((m) => {
+        m.emissiveIntensity = mode.sconceEmissive;
+      });
+
+      document.getElementById('lighting-mode-text').textContent = mode.label;
+      spawnFloatingText(player.pos, mode.label, 'text-amber-300');
+    }
+
+    // --------------------------------------------------------------------------
+    // 16. 事件綁定與靈活滑鼠控制
+    // --------------------------------------------------------------------------
+    function setupInputsAndUI() {
+      const canvas = document.getElementById('game-canvas');
+
+      window.addEventListener('keydown', (e) => {
+        keys[e.code] = true;
+
+        if (e.code === 'Escape') {
+          if (activeTalkNpc) closeDialogue();
+          else if (activeFloorModal) closeFloorModal(true);
+          return;
+        }
+
+        if (e.code === 'KeyE') {
+          if (activeTalkNpc) {
+            closeDialogue();
+          } else if (activeFloorModal) {
+            closeFloorModal(true);
+          } else if (nearestNpc) {
+            openDialogue(nearestNpc);
+          } else if (nearGrandPiano) {
+            SoundFX.playPianoNote(pianoNoteIndex);
+            const notes = ['♪ Do', '♫ Re', '♩ Mi', '♬ Sol', '♪ La', '♫ Do↑', '♩ Re↑', '♬ Mi↑'];
+            spawnFloatingText(new THREE.Vector3(0, 0.2, 31.8), notes[pianoNoteIndex % notes.length], 'text-amber-300');
+            pianoNoteIndex++;
+          }
+        }
+        if (e.code === 'KeyJ') triggerMeleeCombo(false);
+        if (e.code === 'KeyK') triggerMeleeCombo(true);
+        if (e.code === 'KeyV') toggleFirstPerson();
+        if (e.code === 'KeyM') togglePointerLockMode();
+        if (e.code === 'KeyL') cycleLightingMode();
+        if (e.code === 'KeyC') clearWantedAndHeal();
+      });
+
+      window.addEventListener('keyup', (e) => {
+        keys[e.code] = false;
+      });
+
+      function togglePointerLockMode() {
+        if (document.pointerLockElement === canvas) {
+          document.exitPointerLock();
+        } else {
+          canvas.requestPointerLock?.();
+        }
+      }
+
+      document.addEventListener('pointerlockchange', () => {
+        const locked = document.pointerLockElement === canvas;
+        camState.pointerLocked = locked;
+        const btn = document.getElementById('btn-toggle-mouselock');
+        const reticle = document.getElementById('pointer-lock-reticle');
+        if (locked) {
+          btn.textContent = '🔓 退出自由視角 (ESC)';
+          btn.classList.add('ring-2', 'ring-teal-300');
+          reticle.classList.remove('hidden');
+        } else {
+          btn.textContent = '🖱️ 自由視角 (M)';
+          btn.classList.remove('ring-2', 'ring-teal-300');
+          reticle.classList.add('hidden');
+        }
+      });
+
+      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+      canvas.addEventListener('mousedown', (e) => {
+        if (activeTalkNpc || activeFloorModal || isRedirecting) return;
+
+        if (camState.pointerLocked) {
+          if (e.button === 0) triggerMeleeCombo(false);
+          else if (e.button === 2) triggerMeleeCombo(true);
+          return;
+        }
+
+        if (e.button === 0 || e.button === 2) {
+          camState.isDragging = true;
+          camState.dragButton = e.button;
+          camState.lastX = e.clientX;
+          camState.lastY = e.clientY;
+          camState.movedDuringDrag = false;
+        }
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (activeTalkNpc || activeFloorModal || isRedirecting) return;
+
+        if (camState.pointerLocked) {
+          camState.targetYaw -= e.movementX * 0.0042;
+          camState.targetPitch = Math.max(-0.42, Math.min(0.88, camState.targetPitch + e.movementY * 0.0036));
+          return;
+        }
+
+        if (!camState.isDragging) return;
+        const dx = e.clientX - camState.lastX;
+        const dy = e.clientY - camState.lastY;
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+          camState.movedDuringDrag = true;
+        }
+        camState.lastX = e.clientX;
+        camState.lastY = e.clientY;
+
+        camState.targetYaw -= dx * 0.0068;
+        camState.targetPitch = Math.max(-0.42, Math.min(0.88, camState.targetPitch + dy * 0.0054));
+      });
+
+      window.addEventListener('mouseup', (e) => {
+        if (!camState.isDragging) return;
+        const wasClick = !camState.movedDuringDrag;
+        const btn = camState.dragButton;
+        camState.isDragging = false;
+        camState.dragButton = -1;
+
+        if (wasClick && !activeTalkNpc && !activeFloorModal) {
+          if (btn === 0) triggerMeleeCombo(false);
+          else if (btn === 2) triggerMeleeCombo(true);
+        }
+      });
+
+      canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        camState.targetDistance = Math.max(2.2, Math.min(11.5, camState.targetDistance + e.deltaY * 0.004));
+      }, { passive: false });
+
+      let touchLastX = 0;
+      let touchLastY = 0;
+      canvas.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          touchLastX = e.touches[0].clientX;
+          touchLastY = e.touches[0].clientY;
+        }
+      }, { passive: true });
+
+      canvas.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 1) {
+          const dx = e.touches[0].clientX - touchLastX;
+          const dy = e.touches[0].clientY - touchLastY;
+          touchLastX = e.touches[0].clientX;
+          touchLastY = e.touches[0].clientY;
+          camState.targetYaw -= dx * 0.0078;
+          camState.targetPitch = Math.max(-0.4, Math.min(0.85, camState.targetPitch + dy * 0.006));
+        }
+      }, { passive: true });
+
+      document.getElementById('btn-sim-gate-entry')?.addEventListener('click', () => {
+        applyEntrySpawnPoint({
+          type: 'entrance',
+          pos: new THREE.Vector3(0, 0, 41.2),
+          yaw: Math.PI,
+          camYaw: 0,
+          camPitch: 0.14,
+          notice: '🚪 已模擬從南側大門進入大廳'
+        }, true);
+      });
+
+      document.getElementById('btn-sim-er-entry')?.addEventListener('click', () => {
+        applyEntrySpawnPoint({
+          type: 'er',
+          pos: new THREE.Vector3(24.5, 0, -15.2),
+          yaw: Math.PI,
+          camYaw: 0,
+          camPitch: 0.16,
+          notice: '🚑 已模擬從急診門口進入急診室'
+        }, true);
+      });
+
+      document.querySelectorAll('.tp-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const zKey = btn.getAttribute('data-zone');
+          const zInfo = ZONES[zKey];
+          if (!zInfo) return;
+          player.pos.copy(zInfo.pos);
+          player.yaw = zInfo.yaw;
+          camState.targetYaw = zInfo.yaw + Math.PI;
+          camState.yaw = camState.targetYaw;
+          camState.targetPos.set(zInfo.pos.x, zInfo.pos.y + 1.56, zInfo.pos.z);
+          spawnFloatingText(player.pos, `傳送至：${zInfo.label}`, 'text-teal-300');
+          updateCurrentZoneHUD();
+        });
+      });
+
+      function toggleFirstPerson() {
+        camState.firstPerson = !camState.firstPerson;
+        document.getElementById('btn-toggle-pov').textContent = camState.firstPerson ? '👁️ 第一人稱 (V)' : '👁️ 第三人稱 (V)';
+      }
+      document.getElementById('btn-toggle-pov')?.addEventListener('click', toggleFirstPerson);
+document.getElementById('btn-toggle-mouselock')?.addEventListener('click', togglePointerLockMode);
+document.getElementById('btn-cycle-lighting')?.addEventListener('click', cycleLightingMode);
+
+document.getElementById('btn-toggle-labels')?.addEventListener('click', () => {
+  showNpcLabels = !showNpcLabels;
+  const lblBtn = document.getElementById('btn-toggle-labels');
+  if (lblBtn) lblBtn.textContent = showNpcLabels ? '🏷️ 標籤: 開' : '🏷️ 標籤: 關';
 });
 
-window.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    const dx = e.clientX - prevMouseX;
-    const dy = e.clientY - prevMouseY;
-    prevMouseX = e.clientX;
-    prevMouseY = e.clientY;
-
-    camYaw -= dx * 0.006;
-    camPitch = Math.max(0.1, Math.min(1.2, camPitch + dy * 0.006));
+document.getElementById('btn-open-floors')?.addEventListener('click', () => {
+  openFloorModal(null);
 });
 
-window.addEventListener('mouseup', () => {
-    isDragging = false;
+document.getElementById('btn-clear-wanted')?.addEventListener('click', clearWantedAndHeal);
+
+document.getElementById('btn-toggle-help')?.addEventListener('click', () => {
+  const body = document.getElementById('help-body');
+  const btn = document.getElementById('btn-toggle-help');
+  if (body && btn) {
+    body.classList.toggle('hidden');
+    btn.textContent = body.classList.contains('hidden') ? '展開' : '收合';
+  }
 });
 
-window.addEventListener('contextmenu', (e) => e.preventDefault());
+      document.getElementById('btn-action-attack').addEventListener('click', () => triggerMeleeCombo(false));
+      document.getElementById('btn-action-heavy').addEventListener('click', () => triggerMeleeCombo(true));
 
-window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-});
+      document.getElementById('dlg-close-btn').addEventListener('click', closeDialogue);
+      document.getElementById('npc-talk-prompt').addEventListener('click', () => {
+        if (nearestNpc) openDialogue(nearestNpc);
+        else if (nearGrandPiano) {
+          SoundFX.playPianoNote(pianoNoteIndex);
+          pianoNoteIndex++;
+        }
+      });
 
-// ==========================================
-// 主遊戲迴圈 (Main Loop)
-// ==========================================
-const clock = new THREE.Clock();
+      document.querySelectorAll('.touch-pad').forEach((btn) => {
+        const k = btn.getAttribute('data-key');
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[k] = true; });
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[k] = false; });
+      });
 
-function animate() {
-    requestAnimationFrame(animate);
-    const dt = Math.min(clock.getDelta(), 0.05);
+      const sprintBtn = document.getElementById('btn-touch-sprint');
+      if (sprintBtn) {
+        sprintBtn.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          touchSprintActive = !touchSprintActive;
+          sprintBtn.classList.toggle('bg-sky-600/80', touchSprintActive);
+          sprintBtn.textContent = touchSprintActive ? '⚡ 衝刺中' : '⚡ 衝刺';
+        });
+      }
 
-    if (typeof updatePlayer === 'function') updatePlayer(dt);
-    if (typeof updateNPCs === 'function') updateNPCs(dt);
-    if (typeof updateRemotePlayers === 'function') updateRemotePlayers(dt);
-    if (typeof updateParticles === 'function') updateParticles(dt);
+      const jumpBtn = document.getElementById('btn-touch-jump');
+      if (jumpBtn) {
+        jumpBtn.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          if (player.onGround) { player.vel.y = 6.6; player.onGround = false; }
+        });
+      }
 
-    updateCamera();
-    checkInteractions();
-    updateMinimap();
+      const talkBtn = document.getElementById('btn-touch-talk');
+      if (talkBtn) {
+        talkBtn.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          if (nearestNpc) openDialogue(nearestNpc);
+        });
+      }
+    }
 
-    renderer.render(scene, camera);
-}
+    // --------------------------------------------------------------------------
+    // 17. 主場景初始化與 60FPS 高流暢主動畫迴圈
+    // --------------------------------------------------------------------------
+    function initScene() {
+      const canvas = document.getElementById('game-canvas');
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.BasicShadowMap;
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.08;
 
-// 啟動遊戲渲染
-animate();
-</script>
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xe6dfd3);
+      scene.fog = new THREE.FogExp2(0xe6dfd3, 0.0034);
+
+      camera = new THREE.PerspectiveCamera(56, window.innerWidth / window.innerHeight, 0.2, 140);
+
+      hemiLightRef = new THREE.HemisphereLight(0xfff8eb, 0xd6c7b2, 0.92);
+      scene.add(hemiLightRef);
+
+      dirLightRef = new THREE.DirectionalLight(0xffe8c2, 0.72);
+      dirLightRef.position.set(16, 36, 28);
+      dirLightRef.castShadow = true;
+      dirLightRef.shadow.mapSize.width = 1024;
+      dirLightRef.shadow.mapSize.height = 1024;
+      dirLightRef.shadow.camera.near = 2;
+      dirLightRef.shadow.camera.far = 95;
+      const d = 46;
+      dirLightRef.shadow.camera.left = -d;
+      dirLightRef.shadow.camera.right = d;
+      dirLightRef.shadow.camera.top = d;
+      dirLightRef.shadow.camera.bottom = -d;
+      scene.add(dirLightRef);
+
+      // 1. 建立 1F 醫院室內場景、玩家與 NPC
+      buildHospital1FInterior();
+      createPlayer();
+      createHospitalStaffAndPatients();
+
+      // 2. 套用入口來源定位（南側大門進入 vs 急診門口進入）
+      const entryCfg = resolveInitialEntryPoint();
+      applyEntrySpawnPoint(entryCfg, false);
+
+      // 3. 綁定鍵盤、滑鼠、觸控與樓層選單 UI 事件
+      setupInputsAndUI();
+
+      document.querySelectorAll('.floor-choice-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const floorKey = btn.getAttribute('data-floor');
+          selectFloorAndRedirect(floorKey);
+        });
+      });
+
+      const floorCloseBtn = document.getElementById('floor-modal-close');
+      if (floorCloseBtn) {
+        floorCloseBtn.addEventListener('click', () => closeFloorModal(true));
+      }
+
+      // 4. 啟動 1F 室內多人連線同步頻道
+      initMultiplayer1F();
+
+      // 5. 視窗縮放自適應
+      window.addEventListener('resize', () => {
+        cachedHalfW = window.innerWidth * 0.5;
+        cachedHalfH = window.innerHeight * 0.5;
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // 6. 隱藏載入遮罩並顯示歡迎提示
+      const loadingEl = document.getElementById('loading-overlay');
+      if (loadingEl) {
+        loadingEl.style.opacity = '0';
+        setTimeout(() => {
+          loadingEl.classList.add('hidden');
+          spawnFloatingText(
+            player.pos,
+            entryCfg.notice,
+            entryCfg.type === 'er' ? 'text-rose-300 text-lg' : 'text-amber-300 text-lg'
+          );
+        }, 450);
+      }
+
+      // 7. 啟動 60FPS 主渲染迴圈
+      animate();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const dt = Math.min(clock.getDelta(), 0.05);
+      frameCounter++;
+
+      // 更新遊戲內時鐘（每 2 秒推進 1 分鐘）
+      gameClockMinutes += dt * 0.5;
+      if (frameCounter % 15 === 0) {
+        const totalMins = Math.floor(gameClockMinutes) % (24 * 60);
+        const hh = String(Math.floor(totalMins / 60)).padStart(2, '0');
+        const mm = String(totalMins % 60).padStart(2, '0');
+        const clockEl = document.getElementById('hud-clock');
+        if (clockEl) clockEl.textContent = `${hh}:${mm}`;
+      }
+
+      updatePlayer(dt);
+      updateRemotePlayers1F(dt);
+      updateNPCs(dt);
+      updateVisualEffects(dt);
+      updateCamera(dt);
+
+      if (frameCounter % 2 === 0) {
+        updateNpcLabelsProjection();
+      }
+      if (frameCounter % 4 === 0) {
+        drawMinimap();
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('DOMContentLoaded', initScene);
+  </script>
 </body>
 </html>
