@@ -2652,25 +2652,20 @@ function updateRemotePlayers2F(dt) {
       // 西側隔間牆
       addWall(18.0, 36.25, 0.5, 16.5, 4.4, wallPinkMat, '牙科部西牆', 2, f2Y);
 
-      // 上方主招牌（置於電動門正前方 Z = 27.55）
-      addHangingSign(35.5, f2Y + 3.65, 27.55, 8.2, 0.88, '牙科部', 'DENTISTRY', '#9d174d', '#f9a8d4');
+      addHangingSign(35.5, f2Y + 3.45, 27.55, 4.2, 0.62, '牙科部', 'DENTISTRY', '#9d174d', '#f9a8d4');
 
-      // ▼▼▼ 1. 招牌下方補上整排隔間牆壁（左右兩段實牆＋門上方過樑，中央 X=35.5 留出 3.4m 電動門開口） ▼▼▼
-      // 左段牆 (X: 18.0 ~ 33.8，中心 25.9，寬度 15.8m)
-      addWall(25.9, 28.0, 15.8, 0.45, 4.4, wallPinkMat, '牙科部北側左牆', 2, f2Y);
-      // 右段牆 (X: 37.2 ~ 53.5，中心 45.35，寬度 16.3m)
-      addWall(45.35, 28.0, 16.3, 0.45, 4.4, wallPinkMat, '牙科部北側右牆', 2, f2Y);
-      // 電動門上方牆 (X: 35.5，寬度 3.4m，高度 1.8m，位於 y=2.6 至天花板 y=4.4)
-      addWall(35.5, 28.0, 3.4, 0.45, 1.8, wallPinkMat, '牙科部電動門上方牆', 2, f2Y + 2.6, false);
+      addWall(25.75, 28.0, 15.5, 0.45, 4.4, wallPinkMat, '牙科部北側左牆', 2, f2Y);
 
-      // ▼▼▼ 2. 牆壁上掛置兩幅高解析「牙科廣告燈箱看板」（面向走廊北側 -Z） ▼▼▼
+      addWall(45.5, 28.0, 16.0, 0.45, 4.4, wallPinkMat, '牙科部北側右牆', 2, f2Y);
+
+      addWall(35.5, 28.0, 4.0, 0.45, 1.8, wallPinkMat, '牙科部電動門上方牆', 2, f2Y + 2.6, false);
+
       const addDentalPoster = (px, pz, title, subtitle, tagline, accentHex) => {
         const c = document.createElement('canvas');
         c.width = 1024;
         c.height = 512;
         const ctx = c.getContext('2d');
 
-        // 漸層背景
         const grad = ctx.createLinearGradient(0, 0, 1024, 512);
         grad.addColorStop(0, '#fdf2f8');
         grad.addColorStop(0.55, '#fce7f3');
@@ -4994,7 +4989,7 @@ function updateRemotePlayers2F(dt) {
       if (dentalAutoDoorL && dentalAutoDoorR) {
         const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - 35.5, player.pos.z - 28.0) < 4.6);
         const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - 35.5, n.pos.z - 28.0) < 4.2);
-        const openDental = (nearPlayer || nearNpc) ? 1.55 : 0.0;
+        const openDental = (nearPlayer || nearNpc) ? 1.75 : 0.0;
         dentalAutoDoorL.position.x = THREE.MathUtils.lerp(dentalAutoDoorL.position.x, 34.65 - openDental, dt * 12);
         dentalAutoDoorR.position.x = THREE.MathUtils.lerp(dentalAutoDoorR.position.x, 36.35 + openDental, dt * 12);
       }
