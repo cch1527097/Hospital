@@ -2176,23 +2176,11 @@ function updateRemotePlayers2F(dt) {
       addWall(-38.5, -28.6, 25.0, 0.5, 4.4, wallCreamMat, '2F 醫師辦公室南牆', 2, f2Y);
       addHangingSign(-37.5, f2Y + 3.55, -28.6, 5.6, 0.85, '醫師辦公室・呼吸治療室', 'MEDICAL STAFF OFFICES & CONFERENCE', '#334155', '#fbbf24');
       addClinicDoorSet(-31.5, f2Y, -28.6, 0, '醫師辦公室');
-
-      // 5. 2F 南側西翼重構：嬰兒室 ＋ 產房 ＋ 婦產科病房 ＋ 護理站
+      
       buildObgynMaternityComplex(f2Y, glassMat, darkFrameMat, counterTopMat);
-
-      // 6. 2F 中南側：生殖醫學中心（整體往內退縮至 Z = 28.0，與南側外牆 Z = 44.5 密合）
-      addWall(-7.6, 36.25, 0.5, 16.5, 4.4, wallBlueMat, '泌尿科西牆', 2, f2Y);
-      addWall(-2.0, 36.25, 0.5, 16.5, 4.4, wallBlueMat, '泌尿科東牆', 2, f2Y);
-      addWall(-6.675, 28.0, 2.35, 0.5, 4.4, wallBlueMat, '泌尿科北側左牆', 2, f2Y);
-      addWall(-2.925, 28.0, 2.35, 0.5, 4.4, wallBlueMat, '泌尿科北側右牆', 2, f2Y);
-      addWall(-4.8,   28.0, 1.40, 0.5, 2.05, wallBlueMat, '泌尿科門上方牆', 2, f2Y + 2.35, false);
-
-      addHangingSign(-4.8, f2Y + 3.55, 27.55, 4.0, 0.82, '生殖醫學中心', 'Reproductive Medicine Center', '#0284c7');
-      addClinicDoorSet(-4.8, f2Y, 28.0, 0, '胎兒影像中心');
 
       buildCardiovascularCenter2F(f2Y, wallPinkMat, wallCreamMat);
 
-      // 7. 2F 南側東翼：牙科部
       buildDentalDepartment2F(f2Y, wallPinkMat, wallCreamMat, glassMat, counterTopMat);
 
       [
@@ -5162,7 +5150,6 @@ function updateRemotePlayers2F(dt) {
         drawZone(-43.5, 34, 16, 19, '#e0f2fe', '嬰兒室');
         drawZone(-25.5, 34.5, 12.5, 17, '#fce7f3', '產房');
         drawZone(-14.2, 33.5, 10, 17.5, '#fbcfe8', '婦產病房/護理站');
-        drawZone(-4.8, 36.25, 5.6, 16.5, '#dbeafe', '生殖/胎兒');
         drawZone(8.7, 36.25, 13.8, 16.5, '#fce7f3', '心血管中心');
         drawZone(35.5, 36.25, 35, 16.5, '#f3e8ff', '牙科部');
         drawZone(-24.7, 15.5, 19.4, 11.8, '#e2e8f0', '挑空');
