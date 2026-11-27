@@ -2503,7 +2503,6 @@ function updateRemotePlayers2F(dt) {
       loungeRug.rotation.x = -Math.PI / 2;
       loungeRug.position.set(-15.4, f2Y + 0.015, 32.5);
       scene.add(loungeRug);
-      }
 
       [
         { x: -16.8, z: 31.2, rotY: 0 },
@@ -2526,6 +2525,7 @@ function updateRemotePlayers2F(dt) {
       const bookRack = new THREE.Mesh(new THREE.BoxGeometry(0.45, 1.85, 1.35), ArchMaterials.woodCabinet);
       bookRack.position.set(-11.95, f2Y + 0.92, 34.8);
       scene.add(bookRack);
+    }
 
     function buildReproductiveCenter2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterTopMat) {
       // 中心點 X = -4.85 (介於婦產科病房 X = -11.5 與心血管中心 X = 1.8 之間，總寬 13.3m，深度 Z: 28.0 ~ 44.5)
