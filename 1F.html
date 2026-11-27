@@ -785,186 +785,294 @@ function updateRemotePlayers1F(dt) {
 
     const capsuleGeoCache = {
   // 1. 圓弧平滑膠囊幾何體生成器
-const capsuleGeomCache = new Map();
-function createSmoothCapsuleGeometry(radius, cylinderHeight, radialSegs = 16, capSegs = 8) {
-  const key = `${radius.toFixed(4)}_${cylinderHeight.toFixed(4)}_${radialSegs}_${capSegs}`;
-  if (capsuleGeomCache.has(key)) return capsuleGeomCache.get(key);
+    const capsuleGeomCache = new Map();
+    function createSmoothCapsuleGeometry(radius, cylinderHeight, radialSegs = 16, capSegs = 8) {
+      const key = `${radius.toFixed(4)}_${cylinderHeight.toFixed(4)}_${radialSegs}_${capSegs}`;
+      if (capsuleGeomCache.has(key)) return capsuleGeomCache.get(key);
 
-  const halfH = Math.max(0.001, cylinderHeight * 0.5);
-  const pts = [];
-  for (let i = 0; i <= capSegs; i++) {
-    const theta = -Math.PI * 0.5 + (i / capSegs) * (Math.PI * 0.5);
-    pts.push(new THREE.Vector2(Math.cos(theta) * radius, -halfH + Math.sin(theta) * radius));
-  }
-  for (let i = 0; i <= capSegs; i++) {
-    const theta = (i / capSegs) * (Math.PI * 0.5);
-    pts.push(new THREE.Vector2(Math.cos(theta) * radius, halfH + Math.sin(theta) * radius));
-  }
-  const geom = new THREE.LatheGeometry(pts, radialSegs);
-  geom.computeVertexNormals();
-  capsuleGeomCache.set(key, geom);
-  return geom;
-}
+      const halfH = Math.max(0.001, cylinderHeight * 0.5);
+      const pts = [];
+      for (let i = 0; i <= capSegs; i++) {
+        const theta = -Math.PI * 0.5 + (i / capSegs) * (Math.PI * 0.5);
+        pts.push(new THREE.Vector2(Math.cos(theta) * radius, -halfH + Math.sin(theta) * radius));
+      }
+      for (let i = 0; i <= capSegs; i++) {
+        const theta = (i / capSegs) * (Math.PI * 0.5);
+        pts.push(new THREE.Vector2(Math.cos(theta) * radius, halfH + Math.sin(theta) * radius));
+      }
+      const geom = new THREE.LatheGeometry(pts, radialSegs);
+      geom.computeVertexNormals();
+      capsuleGeomCache.set(key, geom);
+      return geom;
+    }
 
-// 2. 地面接觸軟陰影
-const groundShadowGeom = new THREE.CircleGeometry(0.42, 16);
-groundShadowGeom.rotateX(-Math.PI / 2);
-const groundShadowMat = new THREE.MeshBasicMaterial({
-  color: 0x0f172a,
-  transparent: true,
-  opacity: 0.28,
-  depthWrite: false
-});
+    // 供遠端多人連線角色使用的快取池
+    const capsuleGeoCache = {
+      head: getCachedSphereGeom(0.215, 20, 16),
+      hairCap: new THREE.SphereGeometry(0.224, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.56),
+      pelvisCyl: getCachedCylinderGeom(0.175, 0.165, 0.12, 16),
+      pelvisCap: getCachedSphereGeom(0.165, 16, 10),
+      torsoCyl: getCachedCylinderGeom(0.195, 0.185, 0.44, 18),
+      torsoCap: getCachedSphereGeom(0.195, 16, 10),
+      shoulderBall: getCachedSphereGeom(0.068, 12, 10),
+      upperArmCyl: createSmoothCapsuleGeometry(0.056, 0.16, 12, 6),
+      elbowBall: getCachedSphereGeom(0.052, 10, 8),
+      foreArmCyl: createSmoothCapsuleGeometry(0.048, 0.15, 12, 6),
+      cuffRing: new THREE.TorusGeometry(0.05, 0.01, 8, 14),
+      handBall: getCachedSphereGeom(0.054, 12, 10),
+      thighCyl: createSmoothCapsuleGeometry(0.074, 0.22, 12, 6),
+      kneeBall: getCachedSphereGeom(0.066, 10, 8),
+      shinCyl: createSmoothCapsuleGeometry(0.062, 0.22, 12, 6),
+      shoeBody: getCachedBoxGeom(0.135, 0.075, 0.18),
+      shoeToe: getCachedSphereGeom(0.068, 12, 10),
+      shoeHeel: getCachedSphereGeom(0.065, 12, 10),
+      nurseCap: getCachedBoxGeom(0.18, 0.05, 0.09),
+      nurseCapTop: getCachedBoxGeom(0.15, 0.03, 0.07),
+      visorBand: new THREE.CylinderGeometry(0.226, 0.226, 0.055, 18, 1, true, -0.65, 1.3),
+      visorRim: new THREE.CylinderGeometry(0.23, 0.23, 0.012, 18, 1, true, -0.68, 1.36),
+      combatAuraBall: getCachedSphereGeom(0.14, 10, 8),
+      footAuraBall: getCachedSphereGeom(0.17, 10, 8)
+    };
 
-// 3. 與 3F.html 完全一致的關節人偶建構器
-function createArticulatedCharacterMesh(opts = {}) {
-  const {
-    skinColor = 0xf5c6a5,
-    shirtColor = 0xffffff,
-    pantsColor = 0x1e293b,
-    shoeColor = 0xf8fafc,
-    hairColor = 0x1e293b,
-    roleType = 'civilian',
-    hasStethoscope = false,
-    hasGlasses = false,
-    hasPonytail = false,
-    isFemale = false
-  } = opts;
-
-  const root = new THREE.Group();
-  const dropShadow = new THREE.Mesh(groundShadowGeom, groundShadowMat);
-  dropShadow.position.y = 0.014;
-  root.add(dropShadow);
-
-  const skinMat = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.48, metalness: 0.04 });
-  const shirtMat = new THREE.MeshStandardMaterial({ color: shirtColor, roughness: 0.45, metalness: 0.05 });
-  const pantsMat = new THREE.MeshStandardMaterial({ color: pantsColor, roughness: 0.55, metalness: 0.05 });
-  const shoeMat = new THREE.MeshStandardMaterial({ color: shoeColor, roughness: 0.35, metalness: 0.15 });
-  const hairMat = new THREE.MeshStandardMaterial({ color: hairColor, roughness: 0.65 });
-  const eyeMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 });
-
-  const bodyRoot = new THREE.Group();
-  bodyRoot.position.y = 0.90;
-  root.add(bodyRoot);
-
-  const pelvis = new THREE.Mesh(createSmoothCapsuleGeometry(0.165, 0.08, 16, 8), pantsMat);
-  pelvis.scale.set(1.16, 0.85, 0.86);
-  pelvis.position.y = 0.02;
-  bodyRoot.add(pelvis);
-
-  const chest = new THREE.Mesh(
-    createSmoothCapsuleGeometry(isFemale ? 0.175 : 0.195, 0.28, 16, 8),
-    shirtMat
-  );
-  chest.scale.set(1.18, 1.0, 0.82);
-  chest.position.y = 0.26;
-  bodyRoot.add(chest);
-
-  const neck = new THREE.Mesh(createSmoothCapsuleGeometry(0.068, 0.06, 12, 6), skinMat);
-  neck.position.y = 0.48;
-  bodyRoot.add(neck);
-
-  const headGroup = new THREE.Group();
-  headGroup.position.y = 0.64;
-  bodyRoot.add(headGroup);
-
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.152, 18, 16), skinMat);
-  head.scale.set(0.95, 1.08, 0.98);
-  headGroup.add(head);
-
-  const hairCap = new THREE.Mesh(
-    new THREE.SphereGeometry(0.158, 18, 14, 0, Math.PI * 2, 0, Math.PI * 0.58),
-    hairMat
-  );
-  hairCap.position.set(0, 0.015, -0.01);
-  headGroup.add(hairCap);
-
-  if (hasPonytail || isFemale) {
-    const bun = new THREE.Mesh(new THREE.SphereGeometry(0.072, 12, 10), hairMat);
-    bun.position.set(0, 0.04, -0.155);
-    headGroup.add(bun);
-  }
-
-  if (roleType === 'nurse' || roleType === 'head_nurse') {
-    const capGroup = new THREE.Group();
-    capGroup.position.set(0, 0.158, -0.01);
-    capGroup.rotation.x = -0.12;
-
-    const capBody = new THREE.Mesh(
-      createSmoothCapsuleGeometry(0.036, 0.115, 12, 6),
-      new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25 })
-    );
-    capBody.rotation.z = Math.PI / 2;
-    capBody.scale.set(1.0, 1.0, 0.52);
-
-    const capStripe = new THREE.Mesh(
-      new THREE.BoxGeometry(0.12, 0.012, 0.042),
-      new THREE.MeshBasicMaterial({ color: roleType === 'head_nurse' ? 0x7c3aed : 0x0d9488 })
-    );
-    capStripe.position.set(0, 0.012, 0);
-
-    capGroup.add(capBody, capStripe);
-    headGroup.add(capGroup);
-  }
-
-  [-0.052, 0.052].forEach((ex) => {
-    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.017, 10, 8), eyeMat);
-    eye.position.set(ex, 0.01, 0.142);
-    headGroup.add(eye);
-  });
-
-  const nose = new THREE.Mesh(new THREE.SphereGeometry(0.016, 8, 6), skinMat);
-  nose.position.set(0, -0.015, 0.152);
-  headGroup.add(nose);
-
-  if (hasGlasses) {
-    const frameMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7, roughness: 0.25 });
-    [-0.052, 0.052].forEach((gx) => {
-      const rim = new THREE.Mesh(new THREE.TorusGeometry(0.033, 0.005, 8, 16), frameMat);
-      rim.position.set(gx, 0.012, 0.148);
-      headGroup.add(rim);
+    // 2. 地面接觸軟陰影
+    const groundShadowGeom = new THREE.CircleGeometry(0.42, 16);
+    groundShadowGeom.rotateX(-Math.PI / 2);
+    const groundShadowMat = new THREE.MeshBasicMaterial({
+      color: 0x0f172a,
+      transparent: true,
+      opacity: 0.28,
+      depthWrite: false
     });
-    const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.036, 0.005, 0.005), frameMat);
-    bridge.position.set(0, 0.014, 0.15);
-    headGroup.add(bridge);
-  }
 
-  if (roleType === 'doctor' || roleType === 'nurse' || roleType === 'head_nurse' || roleType === 'clerk') {
-    const coatMat = new THREE.MeshStandardMaterial({
-      color: roleType === 'clerk' ? 0xfce7f3 : roleType === 'head_nurse' ? 0xf3e8ff : 0xffffff,
-      roughness: 0.35
-    });
-    const coatSkirt = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.195, 0.22, 0.34, 18, 1, true),
-      coatMat
-    );
-    coatSkirt.material.side = THREE.DoubleSide;
-    coatSkirt.position.y = -0.02;
-    bodyRoot.add(coatSkirt);
+    // 3. 與 3F.html 完全一致的關節人偶建構器
+    function createArticulatedCharacterMesh(opts = {}) {
+      const {
+        skinColor = 0xf5c6a5,
+        shirtColor = 0xffffff,
+        pantsColor = 0x1e293b,
+        shoeColor = 0xf8fafc,
+        hairColor = 0x1e293b,
+        roleType = 'civilian',
+        hasStethoscope = false,
+        hasGlasses = false,
+        hasPonytail = false,
+        isFemale = false
+      } = opts;
 
-    const badge = new THREE.Mesh(
-      new THREE.BoxGeometry(0.065, 0.045, 0.014),
-      new THREE.MeshStandardMaterial({
-        color: roleType === 'doctor' ? 0x0284c7 : roleType === 'head_nurse' ? 0x7c3aed : 0x10b981,
-        emissive: 0x0f766e,
-        emissiveIntensity: 0.3
-      })
-    );
-    badge.position.set(-0.085, 0.33, 0.165);
-    bodyRoot.add(badge);
-  }
+      const root = new THREE.Group();
+      const dropShadow = new THREE.Mesh(groundShadowGeom, groundShadowMat);
+      dropShadow.position.y = 0.014;
+      root.add(dropShadow);
 
-  if (hasStethoscope) {
-    const stethCurve = new THREE.TorusGeometry(0.125, 0.011, 8, 16, Math.PI * 1.15);
-    const steth = new THREE.Mesh(
-      stethCurve,
-      new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3, metalness: 0.4 })
-    );
-    steth.rotation.x = Math.PI * 0.42;
-    steth.rotation.z = -Math.PI * 0.08;
-    steth.position.set(0, 0.37, 0.06);
-    bodyRoot.add(steth);
-  }
+      const skinMat = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.48, metalness: 0.04 });
+      const shirtMat = new THREE.MeshStandardMaterial({ color: shirtColor, roughness: 0.45, metalness: 0.05 });
+      const pantsMat = new THREE.MeshStandardMaterial({ color: pantsColor, roughness: 0.55, metalness: 0.05 });
+      const shoeMat = new THREE.MeshStandardMaterial({ color: shoeColor, roughness: 0.35, metalness: 0.15 });
+      const hairMat = new THREE.MeshStandardMaterial({ color: hairColor, roughness: 0.65 });
+      const eyeMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 });
+
+      const bodyRoot = new THREE.Group();
+      bodyRoot.position.y = 0.90;
+      root.add(bodyRoot);
+
+      const pelvis = new THREE.Mesh(createSmoothCapsuleGeometry(0.165, 0.08, 16, 8), pantsMat);
+      pelvis.scale.set(1.16, 0.85, 0.86);
+      pelvis.position.y = 0.02;
+      bodyRoot.add(pelvis);
+
+      const chest = new THREE.Mesh(
+        createSmoothCapsuleGeometry(isFemale ? 0.175 : 0.195, 0.28, 16, 8),
+        shirtMat
+      );
+      chest.scale.set(1.18, 1.0, 0.82);
+      chest.position.y = 0.26;
+      bodyRoot.add(chest);
+
+      const neck = new THREE.Mesh(createSmoothCapsuleGeometry(0.068, 0.06, 12, 6), skinMat);
+      neck.position.y = 0.48;
+      bodyRoot.add(neck);
+
+      const headGroup = new THREE.Group();
+      headGroup.position.y = 0.64;
+      bodyRoot.add(headGroup);
+
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.152, 18, 16), skinMat);
+      head.scale.set(0.95, 1.08, 0.98);
+      headGroup.add(head);
+
+      const hairCap = new THREE.Mesh(
+        new THREE.SphereGeometry(0.158, 18, 14, 0, Math.PI * 2, 0, Math.PI * 0.58),
+        hairMat
+      );
+      hairCap.position.set(0, 0.015, -0.01);
+      headGroup.add(hairCap);
+
+      if (hasPonytail || isFemale) {
+        const bun = new THREE.Mesh(new THREE.SphereGeometry(0.072, 12, 10), hairMat);
+        bun.position.set(0, 0.04, -0.155);
+        headGroup.add(bun);
+      }
+
+      if (roleType === 'nurse' || roleType === 'head_nurse') {
+        const capGroup = new THREE.Group();
+        capGroup.position.set(0, 0.158, -0.01);
+        capGroup.rotation.x = -0.12;
+
+        const capBody = new THREE.Mesh(
+          createSmoothCapsuleGeometry(0.036, 0.115, 12, 6),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25 })
+        );
+        capBody.rotation.z = Math.PI / 2;
+        capBody.scale.set(1.0, 1.0, 0.52);
+
+        const capStripe = new THREE.Mesh(
+          new THREE.BoxGeometry(0.12, 0.012, 0.042),
+          new THREE.MeshBasicMaterial({ color: roleType === 'head_nurse' ? 0x7c3aed : 0x0d9488 })
+        );
+        capStripe.position.set(0, 0.012, 0);
+
+        capGroup.add(capBody, capStripe);
+        headGroup.add(capGroup);
+      }
+
+      [-0.052, 0.052].forEach((ex) => {
+        const eye = new THREE.Mesh(new THREE.SphereGeometry(0.017, 10, 8), eyeMat);
+        eye.position.set(ex, 0.01, 0.142);
+        headGroup.add(eye);
+      });
+
+      const nose = new THREE.Mesh(new THREE.SphereGeometry(0.016, 8, 6), skinMat);
+      nose.position.set(0, -0.015, 0.152);
+      headGroup.add(nose);
+
+      if (hasGlasses) {
+        const frameMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7, roughness: 0.25 });
+        [-0.052, 0.052].forEach((gx) => {
+          const rim = new THREE.Mesh(new THREE.TorusGeometry(0.033, 0.005, 8, 16), frameMat);
+          rim.position.set(gx, 0.012, 0.148);
+          headGroup.add(rim);
+        });
+        const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.036, 0.005, 0.005), frameMat);
+        bridge.position.set(0, 0.014, 0.15);
+        headGroup.add(bridge);
+      }
+
+      if (roleType === 'doctor' || roleType === 'nurse' || roleType === 'head_nurse' || roleType === 'clerk') {
+        const coatMat = new THREE.MeshStandardMaterial({
+          color: roleType === 'clerk' ? 0xfce7f3 : roleType === 'head_nurse' ? 0xf3e8ff : 0xffffff,
+          roughness: 0.35
+        });
+        const coatSkirt = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.195, 0.22, 0.34, 18, 1, true),
+          coatMat
+        );
+        coatSkirt.material.side = THREE.DoubleSide;
+        coatSkirt.position.y = -0.02;
+        bodyRoot.add(coatSkirt);
+
+        const badge = new THREE.Mesh(
+          new THREE.BoxGeometry(0.065, 0.045, 0.014),
+          new THREE.MeshStandardMaterial({
+            color: roleType === 'doctor' ? 0x0284c7 : roleType === 'head_nurse' ? 0x7c3aed : 0x10b981,
+            emissive: 0x0f766e,
+            emissiveIntensity: 0.3
+          })
+        );
+        badge.position.set(-0.085, 0.33, 0.165);
+        bodyRoot.add(badge);
+      }
+
+      if (hasStethoscope) {
+        const stethCurve = new THREE.TorusGeometry(0.125, 0.011, 8, 16, Math.PI * 1.15);
+        const steth = new THREE.Mesh(
+          stethCurve,
+          new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3, metalness: 0.4 })
+        );
+        steth.rotation.x = Math.PI * 0.42;
+        steth.rotation.z = -Math.PI * 0.08;
+        steth.position.set(0, 0.37, 0.06);
+        bodyRoot.add(steth);
+      }
+
+      // 4. 四肢關節（左/右手臂、左/右雙腿）
+      function createArm(isLeft) {
+        const side = isLeft ? -1 : 1;
+        const shoulderPivot = new THREE.Group();
+        shoulderPivot.position.set(side * (isFemale ? 0.235 : 0.255), 0.39, 0);
+        bodyRoot.add(shoulderPivot);
+
+        const upperArm = new THREE.Mesh(createSmoothCapsuleGeometry(0.046, 0.17, 12, 6), shirtMat);
+        upperArm.position.y = -0.105;
+        shoulderPivot.add(upperArm);
+
+        const elbowPivot = new THREE.Group();
+        elbowPivot.position.y = -0.21;
+        shoulderPivot.add(elbowPivot);
+
+        const foreArm = new THREE.Mesh(createSmoothCapsuleGeometry(0.041, 0.16, 12, 6), skinMat);
+        foreArm.position.y = -0.095;
+        elbowPivot.add(foreArm);
+
+        const hand = new THREE.Mesh(new THREE.SphereGeometry(0.044, 10, 8), skinMat);
+        hand.position.y = -0.195;
+        elbowPivot.add(hand);
+
+        return { shoulderPivot, elbowPivot };
+      }
+
+      function createLeg(isLeft) {
+        const side = isLeft ? -1 : 1;
+        const hipPivot = new THREE.Group();
+        hipPivot.position.set(side * 0.095, -0.02, 0);
+        bodyRoot.add(hipPivot);
+
+        const thigh = new THREE.Mesh(createSmoothCapsuleGeometry(0.066, 0.28, 12, 6), pantsMat);
+        thigh.position.y = -0.17;
+        hipPivot.add(thigh);
+
+        const kneePivot = new THREE.Group();
+        kneePivot.position.y = -0.35;
+        hipPivot.add(kneePivot);
+
+        const shin = new THREE.Mesh(createSmoothCapsuleGeometry(0.056, 0.28, 12, 6), pantsMat);
+        shin.position.y = -0.165;
+        kneePivot.add(shin);
+
+        const shoe = new THREE.Mesh(createSmoothCapsuleGeometry(0.054, 0.11, 12, 6), shoeMat);
+        shoe.rotation.x = Math.PI / 2;
+        shoe.scale.set(1.12, 1.0, 0.78);
+        shoe.position.set(0, -0.34, 0.045);
+        kneePivot.add(shoe);
+
+        return { hipPivot, kneePivot };
+      }
+
+      const leftArm = createArm(true);
+      const rightArm = createArm(false);
+      const leftLeg = createLeg(true);
+      const rightLeg = createLeg(false);
+
+      root.traverse((obj) => {
+        if (obj.isMesh && obj !== dropShadow) {
+          obj.castShadow = true;
+          obj.receiveShadow = true;
+        }
+      });
+
+      return {
+        root,
+        bodyRoot,
+        headGroup,
+        leftArmPivot: leftArm.shoulderPivot,
+        rightArmPivot: rightArm.shoulderPivot,
+        leftElbowPivot: leftArm.elbowPivot,
+        rightElbowPivot: rightArm.elbowPivot,
+        leftLegPivot: leftLeg.hipPivot,
+        rightLegPivot: rightLeg.hipPivot,
+        leftKneePivot: leftLeg.kneePivot,
+        rightKneePivot: rightLeg.kneePivot
+      };
+    }
 
   function createLimbArm(sideSign) {
     const shoulder = new THREE.Group();
@@ -8437,287 +8545,167 @@ function checkTransportAndExitTriggers() {
       function togglePointerLockMode() {
         if (document.pointerLockElement === canvas) {
           document.exitPointerLock();
-        } else {
+        } else if (!activeTalkNpc && !activeFloorModal && !isRedirecting) {
           canvas.requestPointerLock?.();
         }
       }
 
+      function toggleFirstPerson() {
+        camState.firstPerson = !camState.firstPerson;
+        spawnFloatingText(
+          player.pos,
+          camState.firstPerson ? '👁️ 第一人稱視角' : '🎥 第三人稱視角',
+          'text-sky-300'
+        );
+      }
+
+      // PointerLock 狀態變更監聽
       document.addEventListener('pointerlockchange', () => {
         const locked = document.pointerLockElement === canvas;
         camState.pointerLocked = locked;
-        const btn = document.getElementById('btn-toggle-mouselock');
         const reticle = document.getElementById('pointer-lock-reticle');
-        if (locked) {
-          btn.textContent = '🔓 退出自由視角 (ESC)';
-          btn.classList.add('ring-2', 'ring-teal-300');
-          reticle.classList.remove('hidden');
-        } else {
-          btn.textContent = '🖱️ 自由視角 (M)';
-          btn.classList.remove('ring-2', 'ring-teal-300');
-          reticle.classList.add('hidden');
+        if (reticle) {
+          reticle.classList.toggle('hidden', !locked);
         }
       });
 
-      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-
+      // 滑鼠拖曳旋轉視角與左鍵近戰攻擊
       canvas.addEventListener('mousedown', (e) => {
+        SoundFX.ensureContext();
         if (activeTalkNpc || activeFloorModal || isRedirecting) return;
 
-        if (camState.pointerLocked) {
-          if (e.button === 0) triggerMeleeCombo(false);
-          else if (e.button === 2) triggerMeleeCombo(true);
-          return;
-        }
-
-        if (e.button === 0 || e.button === 2) {
-          camState.isDragging = true;
-          camState.dragButton = e.button;
-          camState.lastX = e.clientX;
-          camState.lastY = e.clientY;
-          camState.movedDuringDrag = false;
-        }
+        camState.isDragging = true;
+        camState.dragButton = e.button;
+        camState.lastX = e.clientX;
+        camState.lastY = e.clientY;
+        camState.movedDuringDrag = false;
       });
 
       window.addEventListener('mousemove', (e) => {
-        if (activeTalkNpc || activeFloorModal || isRedirecting) return;
-
         if (camState.pointerLocked) {
-          camState.targetYaw -= e.movementX * 0.0042;
-          camState.targetPitch = Math.max(-0.42, Math.min(0.88, camState.targetPitch + e.movementY * 0.0036));
+          camState.targetYaw -= e.movementX * 0.0028;
+          camState.targetPitch = THREE.MathUtils.clamp(
+            camState.targetPitch + e.movementY * 0.0024,
+            -0.35,
+            0.95
+          );
           return;
         }
 
         if (!camState.isDragging) return;
         const dx = e.clientX - camState.lastX;
         const dy = e.clientY - camState.lastY;
-        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+        if (Math.hypot(dx, dy) > 4) {
           camState.movedDuringDrag = true;
         }
         camState.lastX = e.clientX;
         camState.lastY = e.clientY;
 
-        camState.targetYaw -= dx * 0.0068;
-        camState.targetPitch = Math.max(-0.42, Math.min(0.88, camState.targetPitch + dy * 0.0054));
+        camState.targetYaw -= dx * 0.0055;
+        camState.targetPitch = THREE.MathUtils.clamp(
+          camState.targetPitch + dy * 0.0045,
+          -0.35,
+          0.95
+        );
       });
 
       window.addEventListener('mouseup', (e) => {
-        if (!camState.isDragging) return;
-        const wasClick = !camState.movedDuringDrag;
-        const btn = camState.dragButton;
+        if (camState.isDragging && e.button === 0 && !camState.movedDuringDrag) {
+          triggerMeleeCombo(false);
+        }
         camState.isDragging = false;
         camState.dragButton = -1;
-
-        if (wasClick && !activeTalkNpc && !activeFloorModal) {
-          if (btn === 0) triggerMeleeCombo(false);
-          else if (btn === 2) triggerMeleeCombo(true);
-        }
       });
 
+      // 滑鼠滾輪縮放視距
       canvas.addEventListener('wheel', (e) => {
         e.preventDefault();
-        camState.targetDistance = Math.max(2.2, Math.min(11.5, camState.targetDistance + e.deltaY * 0.004));
+        if (camState.firstPerson) return;
+        camState.targetDistance = THREE.MathUtils.clamp(
+          camState.targetDistance + e.deltaY * 0.004,
+          2.6,
+          11.5
+        );
       }, { passive: false });
 
-      let touchLastX = 0;
-      let touchLastY = 0;
-      canvas.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) {
-          touchLastX = e.touches[0].clientX;
-          touchLastY = e.touches[0].clientY;
-        }
-      }, { passive: true });
-
-      canvas.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 1) {
-          const dx = e.touches[0].clientX - touchLastX;
-          const dy = e.touches[0].clientY - touchLastY;
-          touchLastX = e.touches[0].clientX;
-          touchLastY = e.touches[0].clientY;
-          camState.targetYaw -= dx * 0.0078;
-          camState.targetPitch = Math.max(-0.4, Math.min(0.85, camState.targetPitch + dy * 0.006));
-        }
-      }, { passive: true });
-
-      document.getElementById('btn-sim-gate-entry')?.addEventListener('click', () => {
-        applyEntrySpawnPoint({
-          type: 'entrance',
-          pos: new THREE.Vector3(0, 0, 41.2),
-          yaw: Math.PI,
-          camYaw: 0,
-          camPitch: 0.14,
-          notice: '🚪 已模擬從南側大門進入大廳'
-        }, true);
-      });
-
-      document.getElementById('btn-sim-er-entry')?.addEventListener('click', () => {
-        applyEntrySpawnPoint({
-          type: 'er',
-          pos: new THREE.Vector3(24.5, 0, -15.2),
-          yaw: Math.PI,
-          camYaw: 0,
-          camPitch: 0.16,
-          notice: '🚑 已模擬從急診門口進入急診室'
-        }, true);
-      });
-
-      document.querySelectorAll('.tp-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const zKey = btn.getAttribute('data-zone');
-          const zInfo = ZONES[zKey];
-          if (!zInfo) return;
-          player.pos.copy(zInfo.pos);
-          player.yaw = zInfo.yaw;
-          camState.targetYaw = zInfo.yaw + Math.PI;
-          camState.yaw = camState.targetYaw;
-          camState.targetPos.set(zInfo.pos.x, zInfo.pos.y + 1.56, zInfo.pos.z);
-          spawnFloatingText(player.pos, `傳送至：${zInfo.label}`, 'text-teal-300');
-          updateCurrentZoneHUD();
-        });
-      });
-
-      function toggleFirstPerson() {
-        camState.firstPerson = !camState.firstPerson;
-        document.getElementById('btn-toggle-pov').textContent = camState.firstPerson ? '👁️ 第一人稱 (V)' : '👁️ 第三人稱 (V)';
-      }
-      document.getElementById('btn-toggle-pov')?.addEventListener('click', toggleFirstPerson);
-document.getElementById('btn-toggle-mouselock')?.addEventListener('click', togglePointerLockMode);
-document.getElementById('btn-cycle-lighting')?.addEventListener('click', cycleLightingMode);
-
-document.getElementById('btn-toggle-labels')?.addEventListener('click', () => {
-  showNpcLabels = !showNpcLabels;
-  const lblBtn = document.getElementById('btn-toggle-labels');
-  if (lblBtn) lblBtn.textContent = showNpcLabels ? '🏷️ 標籤: 開' : '🏷️ 標籤: 關';
-});
-
-document.getElementById('btn-open-floors')?.addEventListener('click', () => {
-  openFloorModal(null);
-});
-
-document.getElementById('btn-clear-wanted')?.addEventListener('click', clearWantedAndHeal);
-
-document.getElementById('btn-toggle-help')?.addEventListener('click', () => {
-  const body = document.getElementById('help-body');
-  const btn = document.getElementById('btn-toggle-help');
-  if (body && btn) {
-    body.classList.toggle('hidden');
-    btn.textContent = body.classList.contains('hidden') ? '展開' : '收合';
-  }
-});
-
-      document.getElementById('btn-action-attack').addEventListener('click', () => triggerMeleeCombo(false));
-      document.getElementById('btn-action-heavy').addEventListener('click', () => triggerMeleeCombo(true));
-
-      document.getElementById('dlg-close-btn').addEventListener('click', closeDialogue);
-      document.getElementById('npc-talk-prompt').addEventListener('click', () => {
-        if (nearestNpc) openDialogue(nearestNpc);
-        else if (nearGrandPiano) {
-          SoundFX.playPianoNote(pianoNoteIndex);
-          pianoNoteIndex++;
-        }
-      });
-
-      document.querySelectorAll('.touch-pad').forEach((btn) => {
-        const k = btn.getAttribute('data-key');
-        btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[k] = true; });
-        btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[k] = false; });
-      });
-
-      const sprintBtn = document.getElementById('btn-touch-sprint');
-      if (sprintBtn) {
-        sprintBtn.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          touchSprintActive = !touchSprintActive;
-          sprintBtn.classList.toggle('bg-sky-600/80', touchSprintActive);
-          sprintBtn.textContent = touchSprintActive ? '⚡ 衝刺中' : '⚡ 衝刺';
-        });
-      }
-
-      const jumpBtn = document.getElementById('btn-touch-jump');
-      if (jumpBtn) {
-        jumpBtn.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          if (player.onGround) { player.vel.y = 6.6; player.onGround = false; }
-        });
-      }
-
-      const talkBtn = document.getElementById('btn-touch-talk');
-      if (talkBtn) {
-        talkBtn.addEventListener('touchstart', (e) => {
-          e.preventDefault();
+      // 互動提示膠囊點擊
+      const talkPromptBtn = document.getElementById('npc-talk-prompt');
+      if (talkPromptBtn) {
+        talkPromptBtn.addEventListener('click', () => {
           if (nearestNpc) openDialogue(nearestNpc);
+          else if (nearGrandPiano) {
+            SoundFX.playPianoNote(pianoNoteIndex++);
+          }
         });
       }
-    }
 
-    // --------------------------------------------------------------------------
-    // 17. 主場景初始化與 60FPS 高流暢主動畫迴圈
-    // --------------------------------------------------------------------------
-    function initScene() {
-      const canvas = document.getElementById('game-canvas');
-      renderer = new THREE.WebGLRenderer({
-        canvas,
-        antialias: true,
-        powerPreference: 'high-performance'
-      });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.BasicShadowMap;
-      renderer.outputEncoding = THREE.sRGBEncoding;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.08;
+      // 對話視窗關閉按鈕
+      const dlgCloseBtn = document.getElementById('dlg-close-btn');
+      if (dlgCloseBtn) {
+        dlgCloseBtn.addEventListener('click', closeDialogue);
+      }
 
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xe6dfd3);
-      scene.fog = new THREE.FogExp2(0xe6dfd3, 0.0034);
-
-      camera = new THREE.PerspectiveCamera(56, window.innerWidth / window.innerHeight, 0.2, 140);
-
-      hemiLightRef = new THREE.HemisphereLight(0xfff8eb, 0xd6c7b2, 0.92);
-      scene.add(hemiLightRef);
-
-      dirLightRef = new THREE.DirectionalLight(0xffe8c2, 0.72);
-      dirLightRef.position.set(16, 36, 28);
-      dirLightRef.castShadow = true;
-      dirLightRef.shadow.mapSize.width = 1024;
-      dirLightRef.shadow.mapSize.height = 1024;
-      dirLightRef.shadow.camera.near = 2;
-      dirLightRef.shadow.camera.far = 95;
-      const d = 46;
-      dirLightRef.shadow.camera.left = -d;
-      dirLightRef.shadow.camera.right = d;
-      dirLightRef.shadow.camera.top = d;
-      dirLightRef.shadow.camera.bottom = -d;
-      scene.add(dirLightRef);
-
-      // 1. 建立 1F 醫院室內場景、玩家與 NPC
-      buildHospital1FInterior();
-      createPlayer();
-      createHospitalStaffAndPatients();
-
-      // 2. 套用入口來源定位（南側大門進入 vs 急診門口進入）
-      const entryCfg = resolveInitialEntryPoint();
-      applyEntrySpawnPoint(entryCfg, false);
-
-      // 3. 綁定鍵盤、滑鼠、觸控與樓層選單 UI 事件
-      setupInputsAndUI();
-
-      document.querySelectorAll('.floor-choice-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const floorKey = btn.getAttribute('data-floor');
-          selectFloorAndRedirect(floorKey);
-        });
-      });
-
+      // 樓層選擇視窗按鈕綁定
       const floorCloseBtn = document.getElementById('floor-modal-close');
       if (floorCloseBtn) {
         floorCloseBtn.addEventListener('click', () => closeFloorModal(true));
       }
+      document.querySelectorAll('.floor-choice-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const targetFloor = btn.getAttribute('data-floor');
+          if (targetFloor === '1F') {
+            closeFloorModal(true);
+          } else {
+            selectFloorAndRedirect(targetFloor);
+          }
+        });
+      });
 
-      // 4. 啟動 1F 室內多人連線同步頻道
-      initMultiplayer1F();
+      // 右下角動作按鈕與行動裝置虛擬搖桿
+      const btnAttack = document.getElementById('btn-action-attack');
+      const btnHeavy = document.getElementById('btn-action-heavy');
+      if (btnAttack) btnAttack.addEventListener('click', () => triggerMeleeCombo(false));
+      if (btnHeavy) btnHeavy.addEventListener('click', () => triggerMeleeCombo(true));
 
-      // 5. 視窗縮放自適應
+      const btnSprint = document.getElementById('btn-touch-sprint');
+      if (btnSprint) {
+        btnSprint.addEventListener('click', () => {
+          touchSprintActive = !touchSprintActive;
+          btnSprint.classList.toggle('bg-sky-500/40', touchSprintActive);
+        });
+      }
+
+      const btnTalk = document.getElementById('btn-touch-talk');
+      if (btnTalk) {
+        btnTalk.addEventListener('click', () => {
+          if (nearestNpc) openDialogue(nearestNpc);
+          else if (nearGrandPiano) SoundFX.playPianoNote(pianoNoteIndex++);
+        });
+      }
+
+      const btnJump = document.getElementById('btn-touch-jump');
+      if (btnJump) {
+        btnJump.addEventListener('pointerdown', () => {
+          if (player.onGround && !activeTalkNpc && !activeFloorModal) {
+            player.vel.y = 6.6;
+            player.onGround = false;
+          }
+        });
+      }
+
+      document.querySelectorAll('.touch-pad').forEach((pad) => {
+        const keyCode = pad.getAttribute('data-key');
+        pad.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          keys[keyCode] = true;
+        });
+        const release = () => { keys[keyCode] = false; };
+        pad.addEventListener('pointerup', release);
+        pad.addEventListener('pointerleave', release);
+        pad.addEventListener('pointercancel', release);
+      });
+
+      // 視窗大小自適應
       window.addEventListener('resize', () => {
         cachedHalfW = window.innerWidth * 0.5;
         cachedHalfH = window.innerHeight * 0.5;
@@ -8725,34 +8713,89 @@ document.getElementById('btn-toggle-help')?.addEventListener('click', () => {
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
+    }
 
-      // 6. 隱藏載入遮罩並顯示歡迎提示
-      const loadingEl = document.getElementById('loading-overlay');
-      if (loadingEl) {
-        loadingEl.style.opacity = '0';
-        setTimeout(() => {
-          loadingEl.classList.add('hidden');
-          spawnFloatingText(
-            player.pos,
-            entryCfg.notice,
-            entryCfg.type === 'er' ? 'text-rose-300 text-lg' : 'text-amber-300 text-lg'
-          );
-        }, 450);
-      }
+    // --------------------------------------------------------------------------
+    // 17. 主場景初始化與 60FPS 動畫迴圈
+    // --------------------------------------------------------------------------
+    function init() {
+      const canvas = document.getElementById('game-canvas');
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = LIGHTING_MODES[0].exposure;
 
-      // 7. 啟動 60FPS 主渲染迴圈
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(LIGHTING_MODES[0].bg);
+      scene.fog = new THREE.FogExp2(LIGHTING_MODES[0].fogColor, LIGHTING_MODES[0].fogDensity);
+
+      camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.15, 160);
+
+      // 全域光源配置
+      hemiLightRef = new THREE.HemisphereLight(
+        LIGHTING_MODES[0].hemiSky,
+        LIGHTING_MODES[0].hemiGround,
+        LIGHTING_MODES[0].hemiInt
+      );
+      hemiLightRef.position.set(0, 20, 0);
+      scene.add(hemiLightRef);
+
+      dirLightRef = new THREE.DirectionalLight(LIGHTING_MODES[0].dirColor, LIGHTING_MODES[0].dirInt);
+      dirLightRef.position.set(18, 32, 24);
+      dirLightRef.castShadow = true;
+      dirLightRef.shadow.mapSize.width = 2048;
+      dirLightRef.shadow.mapSize.height = 2048;
+      dirLightRef.shadow.camera.near = 2;
+      dirLightRef.shadow.camera.far = 110;
+      const d = 55;
+      dirLightRef.shadow.camera.left = -d;
+      dirLightRef.shadow.camera.right = d;
+      dirLightRef.shadow.camera.top = d;
+      dirLightRef.shadow.camera.bottom = -d;
+      scene.add(dirLightRef);
+
+      // 建構建築、角色與多人連線
+      buildHospital1FInterior();
+      createPlayer();
+      createHospitalStaffAndPatients();
+
+      const initialEntry = resolveInitialEntryPoint();
+      applyEntrySpawnPoint(initialEntry, false);
+
+      setupInputsAndUI();
+      initMultiplayer1F();
+
+      // 淡出載入遮罩並顯示入場歡迎浮字
+      const loadingOverlay = document.getElementById('loading-overlay');
+      setTimeout(() => {
+        if (loadingOverlay) {
+          loadingOverlay.style.opacity = '0';
+          setTimeout(() => {
+            loadingOverlay.classList.add('hidden');
+            spawnFloatingText(
+              player.pos,
+              initialEntry.notice,
+              initialEntry.type === 'er' ? 'text-rose-300 text-lg sm:text-xl' : 'text-amber-300 text-lg sm:text-xl'
+            );
+          }, 450);
+        }
+      }, 300);
+
       animate();
     }
 
     function animate() {
       requestAnimationFrame(animate);
-
       const dt = Math.min(clock.getDelta(), 0.05);
       frameCounter++;
 
-      // 更新遊戲內時鐘（每 2 秒推進 1 分鐘）
+      // 更新遊戲內時鐘顯示
       gameClockMinutes += dt * 0.5;
-      if (frameCounter % 15 === 0) {
+      if (frameCounter % 30 === 0) {
         const totalMins = Math.floor(gameClockMinutes) % (24 * 60);
         const hh = String(Math.floor(totalMins / 60)).padStart(2, '0');
         const mm = String(totalMins % 60).padStart(2, '0');
@@ -8761,22 +8804,20 @@ document.getElementById('btn-toggle-help')?.addEventListener('click', () => {
       }
 
       updatePlayer(dt);
-      updateRemotePlayers1F(dt);
       updateNPCs(dt);
+      updateRemotePlayers1F(dt);
       updateVisualEffects(dt);
       updateCamera(dt);
+      updateNpcLabelsProjection();
 
-      if (frameCounter % 2 === 0) {
-        updateNpcLabelsProjection();
-      }
-      if (frameCounter % 4 === 0) {
+      if (frameCounter % 3 === 0) {
         drawMinimap();
       }
 
       renderer.render(scene, camera);
     }
 
-    window.addEventListener('DOMContentLoaded', initScene);
+    window.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
