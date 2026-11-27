@@ -544,8 +544,8 @@ function updateOnlineList1F() {
   const total = remotePlayers1F.size + 1;
   if (countEl) countEl.textContent = `${total} 人在線`;
   if (listEl) {
-    const myRoleObj = (typeof ROLES !== 'undefined') ? ROLES.find(r => r.id === authRole) : null;
-    const myRoleLabel = myRoleObj ? myRoleObj.label : '同仁';
+    const myRoleObj = ROLE_STYLES_1F[authRole];
+const myRoleLabel = myRoleObj ? myRoleObj.label : '同仁';
 
     let html = `<div class="text-teal-300 font-bold">● ${authName} (${myRoleLabel} - 我)</div>`;
 
@@ -1072,96 +1072,6 @@ function updateRemotePlayers1F(dt) {
         rightKneePivot: rightLeg.kneePivot
       };
     }
-
-  function createLimbArm(sideSign) {
-    const shoulder = new THREE.Group();
-    shoulder.position.set(sideSign * 0.245, 0.41, 0);
-
-    const deltoid = new THREE.Mesh(new THREE.SphereGeometry(0.062, 12, 10), shirtMat);
-    shoulder.add(deltoid);
-
-    const upperArm = new THREE.Mesh(createSmoothCapsuleGeometry(0.05, 0.17, 12, 6), shirtMat);
-    upperArm.position.y = -0.11;
-    shoulder.add(upperArm);
-
-    const elbow = new THREE.Group();
-    elbow.position.y = -0.23;
-    shoulder.add(elbow);
-
-    const foreArm = new THREE.Mesh(createSmoothCapsuleGeometry(0.043, 0.16, 12, 6), skinMat);
-    foreArm.position.y = -0.10;
-    elbow.add(foreArm);
-
-    const hand = new THREE.Mesh(new THREE.SphereGeometry(0.048, 12, 10), skinMat);
-    hand.position.y = -0.22;
-    elbow.add(hand);
-
-    const aura = new THREE.Mesh(
-      new THREE.SphereGeometry(0.13, 12, 10),
-      new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.0 })
-    );
-    aura.position.y = -0.22;
-    elbow.add(aura);
-
-    bodyRoot.add(shoulder);
-    return { shoulder, elbow, aura };
-  }
-
-  function createLimbLeg(sideSign) {
-    const hip = new THREE.Group();
-    hip.position.set(sideSign * 0.105, -0.04, 0);
-
-    const thigh = new THREE.Mesh(createSmoothCapsuleGeometry(0.068, 0.28, 12, 6), pantsMat);
-    thigh.position.y = -0.18;
-    hip.add(thigh);
-
-    const knee = new THREE.Group();
-    knee.position.y = -0.38;
-    hip.add(knee);
-
-    const shin = new THREE.Mesh(createSmoothCapsuleGeometry(0.056, 0.28, 12, 6), pantsMat);
-    shin.position.y = -0.18;
-    knee.add(shin);
-
-    const shoe = new THREE.Mesh(createSmoothCapsuleGeometry(0.055, 0.14, 12, 6), shoeMat);
-    shoe.rotation.x = Math.PI / 2;
-    shoe.scale.set(1.0, 1.0, 0.8);
-    shoe.position.set(0, -0.38, 0.045);
-    knee.add(shoe);
-
-    const footAura = new THREE.Mesh(
-      new THREE.SphereGeometry(0.16, 12, 10),
-      new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.0 })
-    );
-    footAura.position.set(0, -0.36, 0.08);
-    knee.add(footAura);
-
-    bodyRoot.add(hip);
-    return { hip, knee, footAura };
-  }
-
-  const leftArm = createLimbArm(-1);
-  const rightArm = createLimbArm(1);
-  const leftLeg = createLimbLeg(-1);
-  const rightLeg = createLimbLeg(1);
-
-  return {
-    root,
-    bodyRoot,
-    headGroup,
-    leftShoulder: leftArm.shoulder,
-    leftElbow: leftArm.elbow,
-    leftFistAura: leftArm.aura,
-    rightShoulder: rightArm.shoulder,
-    rightElbow: rightArm.elbow,
-    rightFistAura: rightArm.aura,
-    leftHip: leftLeg.hip,
-    leftKnee: leftLeg.knee,
-    rightHip: rightLeg.hip,
-    rightKnee: rightLeg.knee,
-    rightFootAura: rightLeg.footAura
-  };
-}
 
     // 牆面與大型傢俱 AABB 碰撞箱
     const colliders = [];
