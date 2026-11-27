@@ -2183,6 +2183,8 @@ function updateRemotePlayers2F(dt) {
 
       buildDentalDepartment2F(f2Y, wallPinkMat, wallCreamMat, glassMat, counterTopMat);
 
+      addWall(-4.85, 44.0, 13.8, 0.35, 4.4, wallPinkMat, '2F 中南側走廊粉紅底牆', 2, f2Y);
+
       [
         { x: -16, z: 43.9, rotY: Math.PI },
         { x: 25.0, z: 43.9, rotY: Math.PI },
@@ -2475,11 +2477,11 @@ function updateRemotePlayers2F(dt) {
       colliders.push({ minX: -18.5, maxX: -13.1, minZ: 25.8, maxZ: 27.5, floor: 2, label: '婦產科護理站櫃檯' });
       addHangingSign(-15.8, f2Y + 3.65, 25.6, 5.2, 0.85, '婦產科護理站', 'MATERNITY NURSING STATION', '#be185d', '#f9a8d4');
 
-      // D. 婦產科病房（201 ~ 210 病房與紅色沙發交誼廳）
-      addWall(-9.2, 34.5, 0.45, 17.5, 4.4, stripedWallMat, '婦產科病房東側走廊牆', 2, f2Y);
-      [28.5, 33.5, 38.5].forEach((wz, idx) => {
-        addClinicDoorSet(-9.2, f2Y, wz, -Math.PI / 2, `病房 20${idx * 2 + 1}`, '#e297a8');
-        addClinicDoorSet(-19.2, f2Y, wz + 1.8, Math.PI / 2, `病房 20${idx * 2 + 2}`, '#e297a8');
+      // D. 婦產科病房（201 ~ 210 病房與紅色沙發交誼廳）— 東側走廊牆往內移至 X = -11.5
+      addWall(-11.5, 36.25, 0.45, 16.5, 4.4, stripedWallMat, '婦產科病房東側走廊牆', 2, f2Y);
+      [30.0, 34.5, 39.0].forEach((wz, idx) => {
+        addClinicDoorSet(-11.5, f2Y, wz, -Math.PI / 2, `病房 20${idx * 2 + 1}`, '#e297a8');
+        addClinicDoorSet(-19.2, f2Y, wz + 1.5, Math.PI / 2, `病房 20${idx * 2 + 2}`, '#e297a8');
       });
 
       const redSofaMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.48 });
@@ -2488,15 +2490,15 @@ function updateRemotePlayers2F(dt) {
         new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.85 })
       );
       loungeRug.rotation.x = -Math.PI / 2;
-      loungeRug.position.set(-14.2, f2Y + 0.015, 34.5);
-      scene.add(loungeRug);
+      loungeRug.position.set(-15.4, f2Y + 0.015, 34.5);
+    scene.add(loungeRug);
 
-      [
-        { x: -15.6, z: 33.2, rotY: 0 },
-        { x: -13.2, z: 33.2, rotY: 0 },
-        { x: -15.6, z: 35.8, rotY: Math.PI },
-        { x: -13.2, z: 35.8, rotY: Math.PI }
-      ].forEach((sf) => {
+    [
+      { x: -16.8, z: 33.2, rotY: 0 },
+      { x: -14.4, z: 33.2, rotY: 0 },
+      { x: -16.8, z: 35.8, rotY: Math.PI },
+      { x: -14.4, z: 35.8, rotY: Math.PI }
+    ].forEach((sf) => {
         const sofa = new THREE.Group();
         const seat = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.36, 0.78), redSofaMat);
         seat.position.y = 0.32;
@@ -2507,10 +2509,10 @@ function updateRemotePlayers2F(dt) {
         sofa.rotation.y = sf.rotY;
         scene.add(sofa);
       });
-      colliders.push({ minX: -16.6, maxX: -12.2, minZ: 32.6, maxZ: 36.4, floor: 2, label: '婦產科家屬交誼沙發區' });
+      colliders.push({ minX: -17.8, maxX: -13.4, minZ: 32.6, maxZ: 36.4, floor: 2, label: '婦產科家屬交誼沙發區' });
 
       const bookRack = new THREE.Mesh(new THREE.BoxGeometry(0.45, 1.85, 1.35), ArchMaterials.woodCabinet);
-      bookRack.position.set(-9.65, f2Y + 0.92, 35.5);
+      bookRack.position.set(-11.95, f2Y + 0.92, 35.5);
       const ledTickerTex = createSignTexture('婦產科病房', '', '#0f172a', '#f43f5e');
       const ledTicker = new THREE.Mesh(
         new THREE.BoxGeometry(1.4, 0.32, 0.22),
@@ -3515,11 +3517,11 @@ function updateRemotePlayers2F(dt) {
           badgeColor: '#ec4899',
           appearance: { coatColor: 0xf472b6, pantsColor: 0xffffff, isNurse: true },
           waypoints: [
-            new THREE.Vector3(-11.2, 4.6, 27.5),
-            new THREE.Vector3(-11.2, 4.6, 38.5),
-            new THREE.Vector3(-17.5, 4.6, 38.5),
-            new THREE.Vector3(-17.5, 4.6, 27.5)
-          ],
+          new THREE.Vector3(-12.8, 4.6, 28.5),
+          new THREE.Vector3(-12.8, 4.6, 38.5),
+          new THREE.Vector3(-17.5, 4.6, 38.5),
+          new THREE.Vector3(-17.5, 4.6, 28.5)
+        ],
           speed: 1.2,
           dialogue: '我正在婦產科 201~210 病房區巡房，指導新手媽媽親餵母乳與產後傷口照護，家屬也可在紅色沙發交誼區休息喔！',
           options: []
@@ -5021,7 +5023,7 @@ function updateRemotePlayers2F(dt) {
         else if (z < -13.5 && x < -4.0) zoneName = '2F 心導管室 / 麻醉恢復室 (感應電動門內)';
         else if (z > 22.0 && x < -35.5) zoneName = '2F 嬰兒室 (透明玻璃觀察櫥窗・新生兒照護)';
         else if (z > 22.0 && x >= -35.5 && x < -19.2) zoneName = '2F 產房 (Delivery Room・LDR 樂得兒產房)';
-        else if (z > 22.0 && x >= -19.2 && x < -9.2) zoneName = '2F 婦產科護理站 & 婦產科病房 (201~210)';
+        else if (z > 22.0 && x >= -19.2 && x < -11.5) zoneName = '2F 婦產科護理站 & 婦產科病房 (201~210)';
         else if (z > 27.5 && x >= 1.8 && x < 15.6) zoneName = '2F 心血管中心 (215/216 門診・心超室)';
         else if (z > 22.0 && x >= 18.0) zoneName = '2F 東南側・牙科部 (掛號櫃檯・候診區・診療室)';
         else if (z >= 4.0 && z <= 10.5 && Math.abs(x) < 12.0) zoneName = '2F 中央電梯廳 (B1 ~ 8F)';
@@ -5148,7 +5150,7 @@ function updateRemotePlayers2F(dt) {
         drawZone(19, -19.8, 29, 12.6, '#d1fae5', '開刀房');
         drawZone(-43.5, 34, 16, 19, '#e0f2fe', '嬰兒室');
         drawZone(-25.5, 34.5, 12.5, 17, '#fce7f3', '產房');
-        drawZone(-14.2, 33.5, 10, 17.5, '#fbcfe8', '婦產病房/護理站');
+        drawZone(-15.35, 33.5, 7.7, 17.5, '#fbcfe8', '婦產病房/護理站');
         drawZone(8.7, 36.25, 13.8, 16.5, '#fce7f3', '心血管中心');
         drawZone(35.5, 36.25, 35, 16.5, '#f3e8ff', '牙科部');
         drawZone(-24.7, 15.5, 19.4, 11.8, '#e2e8f0', '挑空');
