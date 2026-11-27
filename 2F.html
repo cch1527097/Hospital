@@ -2563,7 +2563,6 @@ function updateRemotePlayers2F(dt) {
 
     function buildDentalDepartment2F(f2Y, wallPinkMat, wallCreamMat, glassMat, counterTopMat) {
       addWall(18.0, 32.5, 0.5, 21.5, 4.4, wallPinkMat, '牙科部西牆', 2, f2Y);
-      addWall(37.5, 32.5, 0.5, 21.5, 4.4, wallCreamMat, '牙科 227~231 診間牆', 2, f2Y);
 
       addHangingSign(27.5, f2Y + 3.65, 21.8, 6.8, 0.88, '牙科部', 'DENTISTRY', '#9d174d', '#f9a8d4');
 
@@ -2584,9 +2583,6 @@ function updateRemotePlayers2F(dt) {
         scene.add(sofaRow, sofaBack);
         colliders.push({ minX: 19.8, maxX: 24.6, minZ: wz - 0.45, maxZ: wz + 0.45, floor: 2, label: '牙科候診等待椅' });
       });
-
-      addClinicDoorSet(37.5, f2Y, 26.5, -Math.PI / 2, '外科部');
-      addClinicDoorSet(37.5, f2Y, 33.5, -Math.PI / 2, '外科部');
 
       [27.2, 32.0, 36.8].forEach((dz) => {
         buildDentalChairUnit(31.8, dz, f2Y);
