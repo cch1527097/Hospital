@@ -784,41 +784,277 @@ function updateRemotePlayers1F(dt) {
     }
 
     const capsuleGeoCache = {
-  // 寫實頭部比例（縮小頭圍，拉長身形比例）
-  head: new THREE.SphereGeometry(0.115, 24, 20),
-  hairCap: new THREE.SphereGeometry(0.122, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.58),
-  nurseCap: new THREE.CylinderGeometry(0.065, 0.075, 0.04, 14),
-  nurseCapTop: new THREE.SphereGeometry(0.065, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.5),
-  visorBand: new THREE.CylinderGeometry(0.124, 0.124, 0.05, 20, 1, true, -Math.PI * 0.34, Math.PI * 0.68),
-  visorRim: new THREE.CylinderGeometry(0.126, 0.126, 0.01, 20, 1, true, -Math.PI * 0.35, Math.PI * 0.70),
+  // 1. 圓弧平滑膠囊幾何體生成器
+const capsuleGeomCache = new Map();
+function createSmoothCapsuleGeometry(radius, cylinderHeight, radialSegs = 16, capSegs = 8) {
+  const key = `${radius.toFixed(4)}_${cylinderHeight.toFixed(4)}_${radialSegs}_${capSegs}`;
+  if (capsuleGeomCache.has(key)) return capsuleGeomCache.get(key);
 
-  // 修長軀幹與骨盆（上寬下窄、自然肩線）
-  torsoCyl: new THREE.CylinderGeometry(0.175, 0.155, 0.52, 20),
-  torsoCap: new THREE.SphereGeometry(0.175, 20, 12),
-  pelvisCyl: new THREE.CylinderGeometry(0.155, 0.148, 0.14, 18),
-  pelvisCap: new THREE.SphereGeometry(0.148, 18, 10),
+  const halfH = Math.max(0.001, cylinderHeight * 0.5);
+  const pts = [];
+  for (let i = 0; i <= capSegs; i++) {
+    const theta = -Math.PI * 0.5 + (i / capSegs) * (Math.PI * 0.5);
+    pts.push(new THREE.Vector2(Math.cos(theta) * radius, -halfH + Math.sin(theta) * radius));
+  }
+  for (let i = 0; i <= capSegs; i++) {
+    const theta = (i / capSegs) * (Math.PI * 0.5);
+    pts.push(new THREE.Vector2(Math.cos(theta) * radius, halfH + Math.sin(theta) * radius));
+  }
+  const geom = new THREE.LatheGeometry(pts, radialSegs);
+  geom.computeVertexNormals();
+  capsuleGeomCache.set(key, geom);
+  return geom;
+}
 
-  // 寫實手臂（上臂＋前臂＋手掌）
-  shoulderBall: new THREE.SphereGeometry(0.062, 14, 12),
-  upperArmCyl: new THREE.CylinderGeometry(0.054, 0.046, 0.27, 14),
-  elbowBall: new THREE.SphereGeometry(0.046, 12, 10),
-  foreArmCyl: new THREE.CylinderGeometry(0.045, 0.036, 0.26, 14),
-  cuffRing: new THREE.TorusGeometry(0.040, 0.008, 8, 14),
-  handBall: new THREE.SphereGeometry(0.042, 12, 10),
+// 2. 地面接觸軟陰影
+const groundShadowGeom = new THREE.CircleGeometry(0.42, 16);
+groundShadowGeom.rotateX(-Math.PI / 2);
+const groundShadowMat = new THREE.MeshBasicMaterial({
+  color: 0x0f172a,
+  transparent: true,
+  opacity: 0.28,
+  depthWrite: false
+});
 
-  // 修長雙腿（大腿＋小腿總長約 0.84m，符合寫實比例）
-  thighCyl: new THREE.CylinderGeometry(0.076, 0.062, 0.42, 14),
-  kneeBall: new THREE.SphereGeometry(0.062, 12, 10),
-  shinCyl: new THREE.CylinderGeometry(0.060, 0.046, 0.42, 14),
+// 3. 與 3F.html 完全一致的關節人偶建構器
+function createArticulatedCharacterMesh(opts = {}) {
+  const {
+    skinColor = 0xf5c6a5,
+    shirtColor = 0xffffff,
+    pantsColor = 0x1e293b,
+    shoeColor = 0xf8fafc,
+    hairColor = 0x1e293b,
+    roleType = 'civilian',
+    hasStethoscope = false,
+    hasGlasses = false,
+    hasPonytail = false,
+    isFemale = false
+  } = opts;
 
-  // 運動鞋
-  shoeBody: new THREE.BoxGeometry(0.095, 0.065, 0.16),
-  shoeToe: new THREE.SphereGeometry(0.048, 12, 10),
-  shoeHeel: new THREE.SphereGeometry(0.048, 12, 10),
+  const root = new THREE.Group();
+  const dropShadow = new THREE.Mesh(groundShadowGeom, groundShadowMat);
+  dropShadow.position.y = 0.014;
+  root.add(dropShadow);
 
-  combatAuraBall: new THREE.SphereGeometry(0.09, 10, 8),
-  footAuraBall: new THREE.SphereGeometry(0.11, 10, 8)
-};
+  const skinMat = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.48, metalness: 0.04 });
+  const shirtMat = new THREE.MeshStandardMaterial({ color: shirtColor, roughness: 0.45, metalness: 0.05 });
+  const pantsMat = new THREE.MeshStandardMaterial({ color: pantsColor, roughness: 0.55, metalness: 0.05 });
+  const shoeMat = new THREE.MeshStandardMaterial({ color: shoeColor, roughness: 0.35, metalness: 0.15 });
+  const hairMat = new THREE.MeshStandardMaterial({ color: hairColor, roughness: 0.65 });
+  const eyeMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 });
+
+  const bodyRoot = new THREE.Group();
+  bodyRoot.position.y = 0.90;
+  root.add(bodyRoot);
+
+  const pelvis = new THREE.Mesh(createSmoothCapsuleGeometry(0.165, 0.08, 16, 8), pantsMat);
+  pelvis.scale.set(1.16, 0.85, 0.86);
+  pelvis.position.y = 0.02;
+  bodyRoot.add(pelvis);
+
+  const chest = new THREE.Mesh(
+    createSmoothCapsuleGeometry(isFemale ? 0.175 : 0.195, 0.28, 16, 8),
+    shirtMat
+  );
+  chest.scale.set(1.18, 1.0, 0.82);
+  chest.position.y = 0.26;
+  bodyRoot.add(chest);
+
+  const neck = new THREE.Mesh(createSmoothCapsuleGeometry(0.068, 0.06, 12, 6), skinMat);
+  neck.position.y = 0.48;
+  bodyRoot.add(neck);
+
+  const headGroup = new THREE.Group();
+  headGroup.position.y = 0.64;
+  bodyRoot.add(headGroup);
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.152, 18, 16), skinMat);
+  head.scale.set(0.95, 1.08, 0.98);
+  headGroup.add(head);
+
+  const hairCap = new THREE.Mesh(
+    new THREE.SphereGeometry(0.158, 18, 14, 0, Math.PI * 2, 0, Math.PI * 0.58),
+    hairMat
+  );
+  hairCap.position.set(0, 0.015, -0.01);
+  headGroup.add(hairCap);
+
+  if (hasPonytail || isFemale) {
+    const bun = new THREE.Mesh(new THREE.SphereGeometry(0.072, 12, 10), hairMat);
+    bun.position.set(0, 0.04, -0.155);
+    headGroup.add(bun);
+  }
+
+  if (roleType === 'nurse' || roleType === 'head_nurse') {
+    const capGroup = new THREE.Group();
+    capGroup.position.set(0, 0.158, -0.01);
+    capGroup.rotation.x = -0.12;
+
+    const capBody = new THREE.Mesh(
+      createSmoothCapsuleGeometry(0.036, 0.115, 12, 6),
+      new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25 })
+    );
+    capBody.rotation.z = Math.PI / 2;
+    capBody.scale.set(1.0, 1.0, 0.52);
+
+    const capStripe = new THREE.Mesh(
+      new THREE.BoxGeometry(0.12, 0.012, 0.042),
+      new THREE.MeshBasicMaterial({ color: roleType === 'head_nurse' ? 0x7c3aed : 0x0d9488 })
+    );
+    capStripe.position.set(0, 0.012, 0);
+
+    capGroup.add(capBody, capStripe);
+    headGroup.add(capGroup);
+  }
+
+  [-0.052, 0.052].forEach((ex) => {
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.017, 10, 8), eyeMat);
+    eye.position.set(ex, 0.01, 0.142);
+    headGroup.add(eye);
+  });
+
+  const nose = new THREE.Mesh(new THREE.SphereGeometry(0.016, 8, 6), skinMat);
+  nose.position.set(0, -0.015, 0.152);
+  headGroup.add(nose);
+
+  if (hasGlasses) {
+    const frameMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7, roughness: 0.25 });
+    [-0.052, 0.052].forEach((gx) => {
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(0.033, 0.005, 8, 16), frameMat);
+      rim.position.set(gx, 0.012, 0.148);
+      headGroup.add(rim);
+    });
+    const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.036, 0.005, 0.005), frameMat);
+    bridge.position.set(0, 0.014, 0.15);
+    headGroup.add(bridge);
+  }
+
+  if (roleType === 'doctor' || roleType === 'nurse' || roleType === 'head_nurse' || roleType === 'clerk') {
+    const coatMat = new THREE.MeshStandardMaterial({
+      color: roleType === 'clerk' ? 0xfce7f3 : roleType === 'head_nurse' ? 0xf3e8ff : 0xffffff,
+      roughness: 0.35
+    });
+    const coatSkirt = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.195, 0.22, 0.34, 18, 1, true),
+      coatMat
+    );
+    coatSkirt.material.side = THREE.DoubleSide;
+    coatSkirt.position.y = -0.02;
+    bodyRoot.add(coatSkirt);
+
+    const badge = new THREE.Mesh(
+      new THREE.BoxGeometry(0.065, 0.045, 0.014),
+      new THREE.MeshStandardMaterial({
+        color: roleType === 'doctor' ? 0x0284c7 : roleType === 'head_nurse' ? 0x7c3aed : 0x10b981,
+        emissive: 0x0f766e,
+        emissiveIntensity: 0.3
+      })
+    );
+    badge.position.set(-0.085, 0.33, 0.165);
+    bodyRoot.add(badge);
+  }
+
+  if (hasStethoscope) {
+    const stethCurve = new THREE.TorusGeometry(0.125, 0.011, 8, 16, Math.PI * 1.15);
+    const steth = new THREE.Mesh(
+      stethCurve,
+      new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3, metalness: 0.4 })
+    );
+    steth.rotation.x = Math.PI * 0.42;
+    steth.rotation.z = -Math.PI * 0.08;
+    steth.position.set(0, 0.37, 0.06);
+    bodyRoot.add(steth);
+  }
+
+  function createLimbArm(sideSign) {
+    const shoulder = new THREE.Group();
+    shoulder.position.set(sideSign * 0.245, 0.41, 0);
+
+    const deltoid = new THREE.Mesh(new THREE.SphereGeometry(0.062, 12, 10), shirtMat);
+    shoulder.add(deltoid);
+
+    const upperArm = new THREE.Mesh(createSmoothCapsuleGeometry(0.05, 0.17, 12, 6), shirtMat);
+    upperArm.position.y = -0.11;
+    shoulder.add(upperArm);
+
+    const elbow = new THREE.Group();
+    elbow.position.y = -0.23;
+    shoulder.add(elbow);
+
+    const foreArm = new THREE.Mesh(createSmoothCapsuleGeometry(0.043, 0.16, 12, 6), skinMat);
+    foreArm.position.y = -0.10;
+    elbow.add(foreArm);
+
+    const hand = new THREE.Mesh(new THREE.SphereGeometry(0.048, 12, 10), skinMat);
+    hand.position.y = -0.22;
+    elbow.add(hand);
+
+    const aura = new THREE.Mesh(
+      new THREE.SphereGeometry(0.13, 12, 10),
+      new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.0 })
+    );
+    aura.position.y = -0.22;
+    elbow.add(aura);
+
+    bodyRoot.add(shoulder);
+    return { shoulder, elbow, aura };
+  }
+
+  function createLimbLeg(sideSign) {
+    const hip = new THREE.Group();
+    hip.position.set(sideSign * 0.105, -0.04, 0);
+
+    const thigh = new THREE.Mesh(createSmoothCapsuleGeometry(0.068, 0.28, 12, 6), pantsMat);
+    thigh.position.y = -0.18;
+    hip.add(thigh);
+
+    const knee = new THREE.Group();
+    knee.position.y = -0.38;
+    hip.add(knee);
+
+    const shin = new THREE.Mesh(createSmoothCapsuleGeometry(0.056, 0.28, 12, 6), pantsMat);
+    shin.position.y = -0.18;
+    knee.add(shin);
+
+    const shoe = new THREE.Mesh(createSmoothCapsuleGeometry(0.055, 0.14, 12, 6), shoeMat);
+    shoe.rotation.x = Math.PI / 2;
+    shoe.scale.set(1.0, 1.0, 0.8);
+    shoe.position.set(0, -0.38, 0.045);
+    knee.add(shoe);
+
+    const footAura = new THREE.Mesh(
+      new THREE.SphereGeometry(0.16, 12, 10),
+      new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.0 })
+    );
+    footAura.position.set(0, -0.36, 0.08);
+    knee.add(footAura);
+
+    bodyRoot.add(hip);
+    return { hip, knee, footAura };
+  }
+
+  const leftArm = createLimbArm(-1);
+  const rightArm = createLimbArm(1);
+  const leftLeg = createLimbLeg(-1);
+  const rightLeg = createLimbLeg(1);
+
+  return {
+    root,
+    bodyRoot,
+    headGroup,
+    leftShoulder: leftArm.shoulder,
+    leftElbow: leftArm.elbow,
+    leftFistAura: leftArm.aura,
+    rightShoulder: rightArm.shoulder,
+    rightElbow: rightArm.elbow,
+    rightFistAura: rightArm.aura,
+    leftHip: leftLeg.hip,
+    leftKnee: leftLeg.knee,
+    rightHip: rightLeg.hip,
+    rightKnee: rightLeg.knee,
+    rightFootAura: rightLeg.footAura
+  };
+}
 
     // 牆面與大型傢俱 AABB 碰撞箱
     const colliders = [];
@@ -5893,20 +6129,44 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
         combatGlow: true
       });
 
-      player.mesh = rig.root;
-      player.bodyRoot = rig.bodyRoot;
-      player.leftShoulder = rig.leftShoulder;
-      player.rightShoulder = rig.rightShoulder;
-      player.leftElbow = rig.leftElbow;
-      player.rightElbow = rig.rightElbow;
-      player.leftHip = rig.leftHip;
-      player.rightHip = rig.rightHip;
-      player.leftKnee = rig.leftKnee;
-      player.rightKnee = rig.rightKnee;
-      player.rightFistAura = rig.rightFistAura;
-      player.leftFistAura = rig.leftFistAura;
-      player.rightFootAura = rig.rightFootAura;
-      player.mesh.position.copy(player.pos);
+      const ROLE_STYLES = {
+  educator:    { label: '衛教師', coat: 0xf59e0b, pants: 0x1e293b },
+  it_engineer: { label: '資訊工程師', coat: 0xd9381e, pants: 0x162b3d },
+  doctor:      { label: '主治醫師', coat: 0xf8fafc, pants: 0x1e293b },
+  nurse:       { label: '護理師', coat: 0x14b8a6, pants: 0x1e3a5f },
+  patient:     { label: '門診訪客', coat: 0xf1f5f9, pants: 0x111827 },
+  pharmacist:  { label: '藥師', coat: 0xf1f5f9, pants: 0x1e293b },
+  emt:         { label: '救護技術員', coat: 0xb91c1c, pants: 0x0f172a },
+  med_tech:    { label: '醫事檢驗師', coat: 0xe2e8f0, pants: 0x1e293b },
+  security:    { label: '園區警衛', coat: 0x0f172a, pants: 0x090d16 }
+};
+
+const myStyle = ROLE_STYLES[authRole] || ROLE_STYLES.nurse;
+const playerRig = createArticulatedCharacterMesh({
+  skinColor: 0xf4c29f,
+  shirtColor: myStyle.coat,
+  pantsColor: myStyle.pants,
+  shoeColor: 0xf8fafc,
+  hairColor: 0x1e293b,
+  roleType: authRole === 'doctor' ? 'doctor' : (authRole === 'nurse' ? 'nurse' : 'civilian')
+});
+playerRig.root.position.copy(player.pos);
+scene.add(playerRig.root);
+
+// 綁定骨骼參考以驅動走路、跑步與揮拳動畫
+player.mesh = playerRig.root;
+player.bodyRoot = playerRig.bodyRoot;
+player.leftShoulder = playerRig.leftShoulder;
+player.rightShoulder = playerRig.rightShoulder;
+player.leftElbow = playerRig.leftElbow;
+player.rightElbow = playerRig.rightElbow;
+player.leftHip = playerRig.leftHip;
+player.rightHip = playerRig.rightHip;
+player.leftKnee = playerRig.leftKnee;
+player.rightKnee = playerRig.rightKnee;
+player.leftFistAura = playerRig.leftFistAura;
+player.rightFistAura = playerRig.rightFistAura;
+player.rightFootAura = playerRig.rightFootAura;
 
       // 同步角色生命值與護甲至右上角 HUD 狀態條
       player.hp = role.health;
@@ -7467,39 +7727,38 @@ function checkTransportAndExitTriggers() {
       player.bodyRoot.rotation.x = THREE.MathUtils.lerp(player.bodyRoot.rotation.x, isMoving && player.isSprinting ? 0.12 : 0, 10 * dt);
 
       if (isMoving) {
-        const freq = player.isSprinting ? 14.5 : 9.5;
-        const amp = player.isSprinting ? 0.88 : 0.56;
+        const freq = player.isSprinting ? 14.5 : 9.8;
+        const amp = player.isSprinting ? 0.85 : 0.62;
         player.walkCycle += dt * freq;
-        const s = Math.sin(player.walkCycle);
+        const swing = Math.sin(player.walkCycle) * amp;
         const c = Math.cos(player.walkCycle);
 
-        player.leftHip.rotation.x = s * amp;
-        player.rightHip.rotation.x = -s * amp;
-        player.leftKnee.rotation.x = Math.max(0, -c) * (amp * 0.95);
-        player.rightKnee.rotation.x = Math.max(0, c) * (amp * 0.95);
+        player.leftHip.rotation.x = swing;
+        player.rightHip.rotation.x = -swing;
 
-        player.leftShoulder.rotation.x = -s * (amp * 0.85);
-        player.rightShoulder.rotation.x = s * (amp * 0.85);
-        player.leftShoulder.rotation.z = 0.08;
-        player.rightShoulder.rotation.z = -0.08;
-        player.leftElbow.rotation.x = -0.35 - Math.max(0, s) * 0.45;
-        player.rightElbow.rotation.x = -0.35 - Math.max(0, -s) * 0.45;
+        player.leftKnee.rotation.x = Math.max(0, -swing) * 0.85 + Math.max(0, c) * 0.25;
+        player.rightKnee.rotation.x = Math.max(0, swing) * 0.85 + Math.max(0, -c) * 0.25;
 
-        player.bodyRoot.position.y = Math.abs(c) * 0.055;
+        player.leftShoulder.rotation.x = -swing * 0.75;
+        player.rightShoulder.rotation.x = swing * 0.75;
+        player.leftShoulder.rotation.z = 0.06;
+        player.rightShoulder.rotation.z = -0.06;
+        player.leftElbow.rotation.x = -0.35 - Math.max(0, swing) * 0.25;
+        player.rightElbow.rotation.x = -0.35 - Math.max(0, -swing) * 0.25;
+
+        player.bodyRoot.position.y = 0.90 + Math.abs(c) * 0.035;
       } else {
-        const b = Math.sin(player.breathCycle);
-        player.bodyRoot.position.y = b * 0.014;
-        player.leftHip.rotation.x = THREE.MathUtils.lerp(player.leftHip.rotation.x, 0, 10 * dt);
-        player.rightHip.rotation.x = THREE.MathUtils.lerp(player.rightHip.rotation.x, 0, 10 * dt);
-        player.leftKnee.rotation.x = THREE.MathUtils.lerp(player.leftKnee.rotation.x, 0, 10 * dt);
-        player.rightKnee.rotation.x = THREE.MathUtils.lerp(player.rightKnee.rotation.x, 0, 10 * dt);
-
-        player.leftShoulder.rotation.x = THREE.MathUtils.lerp(player.leftShoulder.rotation.x, 0, 10 * dt);
-        player.rightShoulder.rotation.x = THREE.MathUtils.lerp(player.rightShoulder.rotation.x, 0, 10 * dt);
-        player.leftShoulder.rotation.z = 0.06 + b * 0.02;
-        player.rightShoulder.rotation.z = -0.06 - b * 0.02;
-        player.leftElbow.rotation.x = -0.14;
-        player.rightElbow.rotation.x = -0.14;
+        player.leftHip.rotation.x *= 0.8;
+        player.rightHip.rotation.x *= 0.8;
+        player.leftKnee.rotation.x *= 0.8;
+        player.rightKnee.rotation.x *= 0.8;
+        player.leftShoulder.rotation.x *= 0.8;
+        player.rightShoulder.rotation.x *= 0.8;
+        player.leftShoulder.rotation.z *= 0.8;
+        player.rightShoulder.rotation.z *= 0.8;
+        player.leftElbow.rotation.x *= 0.8;
+        player.rightElbow.rotation.x *= 0.8;
+        player.bodyRoot.position.y = 0.90 + Math.sin(clock.elapsedTime * 2.5) * 0.012;
       }
     }
 
