@@ -782,8 +782,7 @@ function updateRemotePlayers1F(dt) {
       }
       return geomCache.get(key);
     }
-
-    const capsuleGeoCache = {
+    
   // 1. 圓弧平滑膠囊幾何體生成器
     const capsuleGeomCache = new Map();
     function createSmoothCapsuleGeometry(radius, cylinderHeight, radialSegs = 16, capSegs = 8) {
@@ -8154,503 +8153,226 @@ function checkTransportAndExitTriggers() {
           npc.rightShoulder.rotation.x = s * 0.45;
           npc.bodyRoot.position.y = Math.abs(Math.cos(npc.walkPhase)) * 0.04;
         } else {
-          npc.leftHip.rotation.x = THREE.MathUtils.lerp(npc.leftHip.rotation.x, 0, 8 * dt);
-          npc.rightHip.rotation.x = THREE.MathUtils.lerp(npc.rightHip.rotation.x, 0, 8 * dt);
-          npc.leftShoulder.rotation.x = THREE.MathUtils.lerp(npc.leftShoulder.rotation.x, 0, 8 * dt);
-          npc.rightShoulder.rotation.x = THREE.MathUtils.lerp(npc.rightShoulder.rotation.x, 0, 8 * dt);
-          npc.bodyRoot.position.y = 0;
+          npc.leftHip.rotation.x = THREE.MathUtils.lerp(npc.leftHip.rotation.x, 0, dt * 8);
+            npc.rightHip.rotation.x = THREE.MathUtils.lerp(npc.rightHip.rotation.x, 0, dt * 8);
+            npc.leftKnee.rotation.x = THREE.MathUtils.lerp(npc.leftKnee.rotation.x, 0, dt * 8);
+            npc.rightKnee.rotation.x = THREE.MathUtils.lerp(npc.rightKnee.rotation.x, 0, dt * 8);
+            npc.leftArm.rotation.x = THREE.MathUtils.lerp(npc.leftArm.rotation.x, 0, dt * 8);
+            npc.rightArm.rotation.x = THREE.MathUtils.lerp(npc.rightArm.rotation.x, 0, dt * 8);
         }
-      }
+    });
+}
 
-      nearestNpc = closest;
-      const promptEl = document.getElementById('npc-talk-prompt');
-      if (nearestNpc && !activeTalkNpc && !activeFloorModal) {
-        promptEl.innerHTML = `按 <span class="px-2 py-0.5 mx-1 rounded-md bg-emerald-400 text-slate-950 font-black">E</span> 與 <span id="prompt-npc-name" class="text-amber-300">${nearestNpc.name} (${nearestNpc.role})</span> 交談`;
-        promptEl.classList.remove('hidden');
-      } else if (nearGrandPiano && !activeTalkNpc && !activeFloorModal) {
-        promptEl.innerHTML = `按 <span class="px-2 py-0.5 mx-1 rounded-md bg-emerald-400 text-slate-950 font-black">E</span> 彈奏大廳三角演奏鋼琴`;
-        promptEl.classList.remove('hidden');
-      } else {
-        promptEl.classList.add('hidden');
-      }
+// ==========================================
+// 攝影機更新與互動觸發
+// ==========================================
+function updateCamera() {
+    const targetX = player.x;
+    const targetY = player.y + 1.5;
+    const targetZ = player.z;
+
+    const camDist = 4.2;
+    const camX = targetX + Math.sin(camYaw) * Math.cos(camPitch) * camDist;
+    const camY = Math.max(0.8, targetY + Math.sin(camPitch) * camDist);
+    const camZ = targetZ + Math.cos(camYaw) * Math.cos(camPitch) * camDist;
+
+    camera.position.lerp(new THREE.Vector3(camX, camY, camZ), 0.25);
+    camera.lookAt(targetX, targetY, targetZ);
+}
+
+function checkInteractions() {
+    let promptText = '';
+    currentInteractable = null;
+
+    // 1. 檢查手扶梯與電梯傳送門
+    for (const p of portals) {
+        const dist = Math.hypot(player.x - p.x, player.z - p.z);
+        if (dist < 2.2) {
+            promptText = `按 [E] 搭乘${p.name}`;
+            currentInteractable = { type: 'portal', data: p };
+            break;
+        }
     }
 
-    const _projVec = new THREE.Vector3();
-    function updateNpcLabelsProjection() {
-      const camPos = camera.position;
-      for (let i = 0; i < npcs.length; i++) {
-        const npc = npcs[i];
-        const el = npc.labelEl;
-        if (!showNpcLabels || npc.state === 'ko') {
-          if (npc.lastLabelVisible) {
-            el.style.display = 'none';
-            npc.lastLabelVisible = false;
-          }
-          continue;
+    // 2. 檢查三角鋼琴
+    if (!currentInteractable) {
+        const distPiano = Math.hypot(player.x - 14.5, player.z - 22.0);
+        if (distPiano < 2.8) {
+            promptText = pianoPlaying ? '按 [E] 停止演奏鋼琴' : '按 [E] 彈奏三角鋼琴';
+            currentInteractable = { type: 'piano' };
         }
-
-        const dx = npc.pos.x - camPos.x;
-        const dy = npc.pos.y - camPos.y;
-        const dz = npc.pos.z - camPos.z;
-        const distSq = dx * dx + dy * dy + dz * dz;
-
-        if (distSq > 484) {
-          if (npc.lastLabelVisible) {
-            el.style.display = 'none';
-            npc.lastLabelVisible = false;
-          }
-          continue;
-        }
-
-        _projVec.set(npc.pos.x, npc.pos.y + (npc.isSupinePatient ? 0.92 : 1.92), npc.pos.z);
-        _projVec.project(camera);
-
-        if (_projVec.z > 1) {
-          if (npc.lastLabelVisible) {
-            el.style.display = 'none';
-            npc.lastLabelVisible = false;
-          }
-          continue;
-        }
-
-        if (!npc.lastLabelVisible) {
-          el.style.display = 'block';
-          npc.lastLabelVisible = true;
-        }
-
-        const sx = Math.round((_projVec.x + 1) * cachedHalfW);
-        const sy = Math.round((-_projVec.y + 1) * cachedHalfH);
-        if (sx !== npc.lastLabelX || sy !== npc.lastLabelY) {
-          el.style.transform = `translate3d(${sx}px, ${sy}px, 0) translate(-50%, -100%)`;
-          npc.lastLabelX = sx;
-          npc.lastLabelY = sy;
-        }
-      }
     }
 
-    function updateVisualEffects(dt) {
-      for (let i = slashEffects.length - 1; i >= 0; i--) {
-        const fx = slashEffects[i];
-        fx.life -= dt;
-        const ratio = Math.max(0, fx.life / fx.maxLife);
-        fx.mesh.material.opacity = ratio;
-        fx.mesh.scale.setScalar(1 + (1 - ratio) * 0.45);
-        if (fx.life <= 0) {
-          scene.remove(fx.mesh);
-          fx.mesh.geometry.dispose();
-          fx.mesh.material.dispose();
-          slashEffects.splice(i, 1);
+    // 3. 檢查附近 NPC
+    if (!currentInteractable) {
+        let minDist = 2.8;
+        for (const npc of npcs) {
+            if (npc.defeated) continue;
+            const d = Math.hypot(player.x - npc.mesh.position.x, player.z - npc.mesh.position.z);
+            if (d < minDist) {
+                minDist = d;
+                promptText = `按 [E] 與 ${npc.name} 對話`;
+                currentInteractable = { type: 'npc', data: npc };
+            }
         }
-      }
-
-      for (let i = impactParticles.length - 1; i >= 0; i--) {
-        const pt = impactParticles[i];
-        pt.life -= dt;
-        pt.vel.y -= 15 * dt;
-        pt.mesh.position.addScaledVector(pt.vel, dt);
-        pt.mesh.scale.setScalar(Math.max(0.01, pt.life / 0.36));
-        if (pt.life <= 0) {
-          scene.remove(pt.mesh);
-          pt.mesh.visible = false;
-          particlePool.push(pt.mesh);
-          impactParticles.splice(i, 1);
-        }
-      }
-
-      if (lotusChandelierGroup) {
-        lotusChandelierGroup.rotation.y += dt * 0.14;
-      }
-
-      // MRI 檢查床與患者同步前後掃描移動
-      if (mriSlidingTableMesh) {
-        const mriOffset = Math.sin(clock.elapsedTime * 0.7) * 0.75;
-        mriSlidingTableMesh.position.z = -23.8 + mriOffset;
-        if (mriPatientNpcRef) {
-          mriPatientNpcRef.pos.z = -23.0 + mriOffset;
-        }
-      }
-
-      if (ctSlidingTableMesh) {
-        ctSlidingTableMesh.position.z = -23.7 + Math.cos(clock.elapsedTime * 0.9) * 0.65;
-      }
-      if (erMonitorScreenMat) {
-        erMonitorScreenMat.emissiveIntensity = 0.48 + Math.sin(clock.elapsedTime * 9.5) * 0.18;
-      }
-
-      updateAutoSlidingDoors(dt);
-      updateEscalator(dt);
     }
 
-    function updateCamera(dt) {
-      camState.yaw = THREE.MathUtils.lerp(camState.yaw, camState.targetYaw, 18 * dt);
-      camState.pitch = THREE.MathUtils.lerp(camState.pitch, camState.targetPitch, 18 * dt);
-      camState.distance = THREE.MathUtils.lerp(camState.distance, camState.targetDistance, 14 * dt);
+    const promptEl = document.getElementById('interact-prompt');
+    if (promptText) {
+        promptEl.innerText = promptText;
+        promptEl.style.display = 'block';
+    } else {
+        promptEl.style.display = 'none';
+    }
+}
 
-      const shakeOffset = new THREE.Vector3();
-      if (camShake > 0.001) {
-        shakeOffset.set(
-          (Math.random() - 0.5) * camShake,
-          (Math.random() - 0.5) * camShake,
-          (Math.random() - 0.5) * camShake
-        );
-        camShake *= Math.pow(0.03, dt);
-      }
+function triggerInteraction() {
+    if (!currentInteractable) return;
 
-      const headTarget = new THREE.Vector3(player.pos.x, player.pos.y + 1.56, player.pos.z);
-      camState.targetPos.lerp(headTarget, 22 * dt);
+    if (currentInteractable.type === 'portal') {
+        openFloorModal();
+    } else if (currentInteractable.type === 'piano') {
+        togglePiano();
+    } else if (currentInteractable.type === 'npc') {
+        const npc = currentInteractable.data;
+        const msg = npc.dialogues[Math.floor(Math.random() * npc.dialogues.length)];
+        showToast(`${npc.name}：「${msg}」`);
+    }
+}
 
-      if (camState.firstPerson) {
-        player.mesh.visible = false;
-        const eyePos = new THREE.Vector3(player.pos.x, player.pos.y + 1.62, player.pos.z).add(shakeOffset);
-        camera.position.copy(eyePos);
-        const lookDir = new THREE.Vector3(
-          -Math.sin(camState.yaw) * Math.cos(camState.pitch),
-          -Math.sin(camState.pitch),
-          -Math.cos(camState.yaw) * Math.cos(camState.pitch)
-        );
-        camera.lookAt(eyePos.clone().add(lookDir));
-      } else {
-        player.mesh.visible = true;
-        const offsetX = Math.sin(camState.yaw) * Math.cos(camState.pitch) * camState.distance;
-        const offsetY = Math.sin(camState.pitch) * camState.distance + 0.52;
-        const offsetZ = Math.cos(camState.yaw) * Math.cos(camState.pitch) * camState.distance;
+// ==========================================
+// 小地圖繪製 (Minimap)
+// ==========================================
+const minimapCanvas = document.getElementById('minimap-canvas');
+const minimapCtx = minimapCanvas ? minimapCanvas.getContext('2d') : null;
 
-        const desiredCamPos = new THREE.Vector3(
-          camState.targetPos.x + offsetX,
-          Math.max(0.65, camState.targetPos.y + offsetY),
-          camState.targetPos.z + offsetZ
-        );
+function updateMinimap() {
+    if (!minimapCtx) return;
+    const w = minimapCanvas.width;
+    const h = minimapCanvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+    const scale = 2.4;
 
-        desiredCamPos.x = Math.max(-52.2, Math.min(52.2, desiredCamPos.x));
-        desiredCamPos.z = Math.max(-46.2, Math.min(43.8, desiredCamPos.z));
+    minimapCtx.clearRect(0, 0, w, h);
+    minimapCtx.fillStyle = '#0f172a';
+    minimapCtx.fillRect(0, 0, w, h);
 
-        camera.position.copy(desiredCamPos).add(shakeOffset);
-        camera.lookAt(camState.targetPos);
-      }
+    minimapCtx.save();
+    minimapCtx.translate(cx, cy);
+    minimapCtx.rotate(-camYaw);
+
+    // 繪製牆體/障礙物
+    minimapCtx.fillStyle = '#475569';
+    for (const c of colliders) {
+        const rx = (c.minX - player.x) * scale;
+        const rz = (c.minZ - player.z) * scale;
+        const rw = (c.maxX - c.minX) * scale;
+        const rh = (c.maxZ - c.minZ) * scale;
+        minimapCtx.fillRect(rx, rz, rw, rh);
     }
 
-    function updateCurrentZoneHUD() {
-      const x = player.pos.x;
-      const z = player.pos.z;
-      let label = '中央挑空鋼琴大廳';
-
-      if (z > 38.5) label = '南側入口大門廳 (走出大門連結 1index.html)';
-      else if (x > 37.2 && z >= -32.8 && z <= 2.2) label = '急診批價掛號 / 檢傷休息區';
-      else if (x >= 7.2 && x <= 37.2 && z >= -32.8 && z <= -13.5) label = '急診室 (CPR 急救區 / 留觀區)';
-      else if (x >= -34.5 && x <= -12.5 && z >= -32.8 && z <= -13.5) label = '放射科 (3.0T MRI / CT 檢查)';
-      else if (z >= -2.2 && z <= 1.2 && Math.abs(x) <= 11.5) label = '北側電梯大廳 (往 B1 / 2F~8F)';
-      else if (z >= 4.2 && z <= 10.5 && Math.abs(x) <= 13.5) label = '中央大廳・批價掛號處 / 品牌形象牆';
-      else if (x >= -5.5 && x <= 0.5 && z >= 12.2 && z <= 17.8) label = '中央橫向平行手扶梯大廳 (接觸可選樓層)';
-      else if (x < -14.2 && x > -18.2 && z >= 26.8 && z <= 34.2) label = '大廳左側・美美食品 M-MEI 門市';
-      else if (x > 14.2 && x < 18.2 && z >= 26.8 && z <= 34.2) label = '大廳右側・STARFUCKS';
-      else if (x < -36.2 && z >= 34.8) label = '西南側・向日葵超商';
-      else if (x < -36.2 && z >= 20.2 && z < 34.8) label = '西側・藝文廳 (向日葵醫院人文畫展)';
-      else if (Math.abs(x) <= 14.0 && z >= 20.5 && z <= 38.5) label = '挑空鋼琴大廳 (蓮花主燈 / 演奏鋼琴)';
-      else if (x < -15.5 && z >= 11 && z <= 19) label = '西側雙挑空採光中庭';
-      else if (x > 15.5 && z >= 11 && z <= 19) label = '東側雙挑空採光中庭';
-      else if (x < -18 && z > 19) label = '西側門診區 (十五診～二十七診)';
-      else if (x > 18 && x < 34.5 && z > 19) label = '東側門診區 (腸胃內科・一診～十二診)';
-      else if (x >= 35.0 && z > 19) label = '東南側・國際會議廳 / 員工餐廳';
-      else if (x < -11 && z >= -12.5 && z <= -1.5) label = '檢驗科 (抽血服務櫃檯)';
-      else if (x > 11 && z >= -12.5 && z <= -1.5) label = '藥劑科 (1~4號領藥窗口)';
-      else if (z < -33.0 && x < 0) label = '西北側・工務室 / 消防監控室';
-      else if (z < -33.0 && x >= 0) label = '東北側・1F 洗腎室';
-
-      document.getElementById('current-zone-label').textContent = label;
+    // 繪製 NPC 點位
+    for (const npc of npcs) {
+        if (npc.defeated) continue;
+        const nx = (npc.mesh.position.x - player.x) * scale;
+        const nz = (npc.mesh.position.z - player.z) * scale;
+        minimapCtx.fillStyle = npc.isHostile ? '#ef4444' : '#38bdf8';
+        minimapCtx.beginPath();
+        minimapCtx.arc(nx, nz, 2.5, 0, Math.PI * 2);
+        minimapCtx.fill();
     }
 
-    // --------------------------------------------------------------------------
-    // 15. 左下角 1F 平面圖雷達小地圖
-    // --------------------------------------------------------------------------
-    const minimapCanvas = document.getElementById('minimap-canvas');
-    const mctx = minimapCanvas.getContext('2d');
+    minimapCtx.restore();
 
-    function drawMinimap() {
-      const w = minimapCanvas.width;
-      const h = minimapCanvas.height;
-      const cx = w / 2;
-      const cy = h / 2;
-      const scale = 1.92;
+    // 中心玩家箭頭
+    minimapCtx.fillStyle = '#facc15';
+    minimapCtx.beginPath();
+    minimapCtx.moveTo(cx, cy - 6);
+    minimapCtx.lineTo(cx - 4, cy + 5);
+    minimapCtx.lineTo(cx + 4, cy + 5);
+    minimapCtx.closePath();
+    minimapCtx.fill();
+}
 
-      mctx.clearRect(0, 0, w, h);
+// ==========================================
+// 鍵盤與滑鼠控制監聽
+// ==========================================
+window.addEventListener('keydown', (e) => {
+    if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+    const k = e.key.toLowerCase();
+    keys[k] = true;
+    if (e.code === 'Space') keys[' '] = true;
+    if (k === 'e') triggerInteraction();
+});
 
-      mctx.save();
-      mctx.beginPath();
-      mctx.arc(cx, cy, cx - 2, 0, Math.PI * 2);
-      mctx.clip();
+window.addEventListener('keyup', (e) => {
+    const k = e.key.toLowerCase();
+    keys[k] = false;
+    if (e.code === 'Space') keys[' '] = false;
+});
 
-      mctx.fillStyle = '#fefce8';
-      mctx.fillRect(0, 0, w, h);
+let isDragging = false;
+let prevMouseX = 0;
+let prevMouseY = 0;
 
-      const toMap = (wx, wz) => ({
-        x: cx + (wx - player.pos.x) * scale,
-        y: cy + (wz - player.pos.z) * scale
-      });
-
-      const drawRoom = (x1, z1, x2, z2, fill) => {
-        const p1 = toMap(x1, z1);
-        const p2 = toMap(x2, z2);
-        mctx.fillStyle = fill;
-        mctx.fillRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
-        mctx.strokeStyle = '#15803d';
-        mctx.lineWidth = 1.1;
-        mctx.strokeRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
-      };
-
-      // 補完 drawMinimap() 平面圖房間區塊
-      drawRoom(-53.5, -47.5, -18.0, -36.5, '#fde68a'); // 工務/監控
-      drawRoom(18.0, -47.5, 53.5, -36.5, '#fbcfe8');   // 1F 洗腎室
-      drawRoom(-34.5, -32.8, -12.5, -13.5, '#bae6fd'); // 放射科 MRI/CT
-      drawRoom(7.2, -32.8, 37.2, -13.5, '#fbcfe8');    // 急診室
-      drawRoom(37.2, -32.8, 53.5, 2.2, '#fed7aa');     // 急診檢傷與休息區
-      drawRoom(-33.5, -10.8, -15.5, -6.0, '#bae6fd');  // 檢驗科
-      drawRoom(12.0, -10.8, 29.0, -6.0, '#bbf7d0');    // 藥劑科
-      drawRoom(-11.2, 0.8, 11.2, 4.0, '#38bdf8');      // 北側電梯
-      drawRoom(-12.2, 6.6, 9.2, 8.0, '#f472b6');       // 批價掛號處
-      drawRoom(-29.0, 11.3, -16.0, 18.7, '#e2e8f0');   // 西採光中庭
-      drawRoom(16.0, 11.3, 29.0, 18.7, '#e2e8f0');     // 東採光中庭
-      drawRoom(-53.1, 20.2, -36.2, 34.8, '#c7d2fe');   // 藝文廳
-      drawRoom(-53.1, 34.8, -36.2, 44.5, '#fdba74');   // 向日葵超商
-      drawRoom(-33.5, 21.8, -18.2, 37.2, '#fbcfe8');   // 西側門診
-      drawRoom(-18.0, 26.8, -14.2, 34.2, '#fed7aa');   // 美美食品
-      drawRoom(14.2, 26.8, 18.0, 34.2, '#bbf7d0');     // STARFUCKS
-      drawRoom(18.2, 21.8, 33.5, 37.2, '#fbcfe8');     // 東側門診
-      drawRoom(35.2, 20.0, 53.5, 44.5, '#bae6fd');     // 國際會議廳
-
-      // 繪製 NPC 小圓點
-      for (let i = 0; i < npcs.length; i++) {
-        const npc = npcs[i];
-        if (npc.state === 'ko') continue;
-        const p = toMap(npc.pos.x, npc.pos.z);
-        mctx.fillStyle = (npc.isErBrawler || npc.isOpdYeller) ? '#ef4444' : (npc.isGuard ? '#0284c7' : '#10b981');
-        mctx.beginPath();
-        mctx.arc(p.x, p.y, 2.8, 0, Math.PI * 2);
-        mctx.fill();
-      }
-
-      // 繪製遠端連線玩家
-      remotePlayers1F.forEach((rp) => {
-        const p = toMap(rp.group.position.x, rp.group.position.z);
-        mctx.fillStyle = '#38bdf8';
-        mctx.beginPath();
-        mctx.arc(p.x, p.y, 3.6, 0, Math.PI * 2);
-        mctx.fill();
-      });
-
-      // 繪製玩家自身方向箭頭
-      mctx.save();
-      mctx.translate(cx, cy);
-      mctx.rotate(-player.yaw + Math.PI);
-      mctx.fillStyle = '#e11d48';
-      mctx.beginPath();
-      mctx.moveTo(0, -6.5);
-      mctx.lineTo(4.5, 5);
-      mctx.lineTo(0, 2.5);
-      mctx.lineTo(-4.5, 5);
-      mctx.closePath();
-      mctx.fill();
-      mctx.restore();
-
-      mctx.restore();
+window.addEventListener('mousedown', (e) => {
+    if (e.target.closest('#ui-layer') || e.target.closest('#login-screen') || e.target.closest('#floor-modal')) return;
+    if (e.button === 0) {
+        isDragging = true;
+        prevMouseX = e.clientX;
+        prevMouseY = e.clientY;
+    } else if (e.button === 2) {
+        performAttack();
     }
+});
 
-    // --------------------------------------------------------------------------
-    // 16. 燈光切換、輸入控制與主渲染迴圈
-    // --------------------------------------------------------------------------
-    function cycleLightingMode() {
-      currentLightingIdx = (currentLightingIdx + 1) % LIGHTING_MODES.length;
-      const mode = LIGHTING_MODES[currentLightingIdx];
-      renderer.toneMappingExposure = mode.exposure;
-      scene.background.setHex(mode.bg);
-      scene.fog.color.setHex(mode.fogColor);
-      scene.fog.density = mode.fogDensity;
-      if (hemiLightRef) {
-        hemiLightRef.color.setHex(mode.hemiSky);
-        hemiLightRef.groundColor.setHex(mode.hemiGround);
-        hemiLightRef.intensity = mode.hemiInt;
-      }
-      if (dirLightRef) {
-        dirLightRef.color.setHex(mode.dirColor);
-        dirLightRef.intensity = mode.dirInt;
-      }
-      if (lotusPointLight) lotusPointLight.intensity = mode.lotusInt;
-      lotusPetalMats.forEach((m) => (m.emissiveIntensity = mode.lotusEmissive));
-      louverSconceMats.forEach((m) => (m.emissiveIntensity = mode.sconceEmissive));
-      spawnFloatingText(player.pos, mode.label, 'text-amber-300');
-    }
+window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - prevMouseX;
+    const dy = e.clientY - prevMouseY;
+    prevMouseX = e.clientX;
+    prevMouseY = e.clientY;
 
-    function setupControls() {
-      const canvas = document.getElementById('game-canvas');
+    camYaw -= dx * 0.006;
+    camPitch = Math.max(0.1, Math.min(1.2, camPitch + dy * 0.006));
+});
 
-      window.addEventListener('keydown', (e) => {
-        if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
-        keys[e.code] = true;
+window.addEventListener('mouseup', () => {
+    isDragging = false;
+});
 
-        if (e.code === 'KeyE') {
-          if (activeTalkNpc) {
-            closeDialogue();
-          } else if (nearestNpc) {
-            openDialogue(nearestNpc);
-          } else if (nearGrandPiano) {
-            SoundFX.playPianoNote(pianoNoteIndex++);
-            spawnFloatingText(new THREE.Vector3(0, 0.5, 31.8), '🎵 鋼琴和弦迴盪中...', 'text-teal-300');
-          }
-        } else if (e.code === 'Escape') {
-          if (activeTalkNpc) closeDialogue();
-          if (activeFloorModal) closeFloorModal(true);
-        } else if (e.code === 'KeyJ') {
-          triggerMeleeCombo(false);
-        } else if (e.code === 'KeyK') {
-          triggerMeleeCombo(true);
-        } else if (e.code === 'KeyL') {
-          cycleLightingMode();
-        } else if (e.code === 'KeyC') {
-          clearWantedAndHeal();
-        } else if (e.code === 'KeyV') {
-          camState.firstPerson = !camState.firstPerson;
-          spawnFloatingText(player.pos, camState.firstPerson ? '👁️ 切換第一人稱視角' : '🎥 切換第三人稱視角', 'text-sky-300');
-        }
-      });
+window.addEventListener('contextmenu', (e) => e.preventDefault());
 
-      window.addEventListener('keyup', (e) => {
-        keys[e.code] = false;
-      });
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
 
-      canvas.addEventListener('mousedown', (e) => {
-        if (activeTalkNpc || activeFloorModal) return;
-        camState.isDragging = true;
-        camState.dragButton = e.button;
-        camState.lastX = e.clientX;
-        camState.lastY = e.clientY;
-        camState.movedDuringDrag = false;
-      });
+// ==========================================
+// 主遊戲迴圈 (Main Loop)
+// ==========================================
+const clock = new THREE.Clock();
 
-      window.addEventListener('mousemove', (e) => {
-        if (!camState.isDragging) return;
-        const dx = e.clientX - camState.lastX;
-        const dy = e.clientY - camState.lastY;
-        if (Math.hypot(dx, dy) > 4) camState.movedDuringDrag = true;
-        camState.lastX = e.clientX;
-        camState.lastY = e.clientY;
+function animate() {
+    requestAnimationFrame(animate);
+    const dt = Math.min(clock.getDelta(), 0.05);
 
-        camState.targetYaw -= dx * 0.0055;
-        camState.targetPitch = THREE.MathUtils.clamp(camState.targetPitch + dy * 0.0045, -0.35, 1.05);
-      });
+    if (typeof updatePlayer === 'function') updatePlayer(dt);
+    if (typeof updateNPCs === 'function') updateNPCs(dt);
+    if (typeof updateRemotePlayers === 'function') updateRemotePlayers(dt);
+    if (typeof updateParticles === 'function') updateParticles(dt);
 
-      window.addEventListener('mouseup', (e) => {
-        if (camState.isDragging && !camState.movedDuringDrag && e.button === 0) {
-          triggerMeleeCombo(false);
-        }
-        camState.isDragging = false;
-      });
+    updateCamera();
+    checkInteractions();
+    updateMinimap();
 
-      canvas.addEventListener('wheel', (e) => {
-        camState.targetDistance = THREE.MathUtils.clamp(camState.targetDistance + e.deltaY * 0.004, 2.4, 12.0);
-      }, { passive: true });
+    renderer.render(scene, camera);
+}
 
-      // 按鈕與 Modal 綁定
-      document.getElementById('btn-action-attack').onclick = () => triggerMeleeCombo(false);
-      document.getElementById('btn-action-heavy').onclick = () => triggerMeleeCombo(true);
-      document.getElementById('dlg-close-btn').onclick = closeDialogue;
-      document.getElementById('floor-modal-close').onclick = () => closeFloorModal(true);
-
-      document.querySelectorAll('.floor-choice-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const floor = btn.getAttribute('data-floor');
-          if (floor === '1F') closeFloorModal(true);
-          else selectFloorAndRedirect(floor);
-        });
-      });
-
-      // 行動裝置虛擬按鍵
-      document.querySelectorAll('.touch-pad').forEach((btn) => {
-        const code = btn.getAttribute('data-key');
-        btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[code] = true; });
-        btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[code] = false; });
-      });
-      document.getElementById('btn-touch-sprint').onclick = () => { touchSprintActive = !touchSprintActive; };
-      document.getElementById('btn-touch-jump').onclick = () => { keys['Space'] = true; setTimeout(() => (keys['Space'] = false), 120); };
-      document.getElementById('btn-touch-talk').onclick = () => {
-        if (nearestNpc) openDialogue(nearestNpc);
-        else if (nearGrandPiano) SoundFX.playPianoNote(pianoNoteIndex++);
-      };
-
-      window.addEventListener('resize', () => {
-        cachedHalfW = window.innerWidth * 0.5;
-        cachedHalfH = window.innerHeight * 0.5;
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
-    }
-
-    function init() {
-      const canvas = document.getElementById('game-canvas');
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xe6dfd3);
-      scene.fog = new THREE.FogExp2(0xe6dfd3, 0.0034);
-
-      camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.15, 160);
-      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.08;
-
-      hemiLightRef = new THREE.HemisphereLight(0xfff8eb, 0xd6c7b2, 0.92);
-      scene.add(hemiLightRef);
-
-      dirLightRef = new THREE.DirectionalLight(0xffe8c2, 0.72);
-      dirLightRef.position.set(18, 36, 24);
-      dirLightRef.castShadow = true;
-      dirLightRef.shadow.mapSize.set(1024, 1024);
-      scene.add(dirLightRef);
-
-      buildHospital1FInterior();
-      createPlayer();
-      createHospitalStaffAndPatients();
-
-      const entryCfg = resolveInitialEntryPoint();
-      applyEntrySpawnPoint(entryCfg, false);
-
-      setupControls();
-      initMultiplayer1F();
-
-      const loading = document.getElementById('loading-overlay');
-      if (loading) {
-        loading.style.opacity = '0';
-        setTimeout(() => loading.remove(), 500);
-      }
-
-      animate();
-    }
-
-    function animate() {
-      requestAnimationFrame(animate);
-      const dt = Math.min(0.05, clock.getDelta());
-      frameCounter++;
-
-      updatePlayer(dt);
-      updateNPCs(dt);
-      updateRemotePlayers1F(dt);
-      updateVisualEffects(dt);
-      updateCamera(dt);
-      updateNpcLabelsProjection();
-
-      if (frameCounter % 2 === 0) drawMinimap();
-
-      // 更新右上角時鐘
-      gameClockMinutes += dt * 0.5;
-      const hh = String(Math.floor((gameClockMinutes / 60) % 24)).padStart(2, '0');
-      const mm = String(Math.floor(gameClockMinutes % 60)).padStart(2, '0');
-      document.getElementById('hud-clock').textContent = `${hh}:${mm}`;
-
-      renderer.render(scene, camera);
-    }
-
-    window.addEventListener('DOMContentLoaded', init);
-  </script>
+// 啟動遊戲渲染
+animate();
+</script>
 </body>
 </html>
