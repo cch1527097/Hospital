@@ -773,6 +773,10 @@ function updateRemotePlayers2F(dt) {
     let dentalAutoDoorR = null;
     let reproAutoDoorL = null;
     let reproAutoDoorR = null;
+    let anesthAutoDoorL = null;
+    let anesthAutoDoorR = null;
+    let hybridOrAutoDoorL = null;
+    let hybridOrAutoDoorR = null;
 
     // 3D 感應光圈參考（電梯 & 橫向手扶梯）
     const transportPads = [];
@@ -2203,6 +2207,136 @@ function updateRemotePlayers2F(dt) {
     }
 
       buildAnesthesiologyDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterWoodMat, counterTopMat);
+      buildHybridOrDepartment2F(f2Y, wallMintMat, wallCreamMat, glassMat, counterWoodMat, counterTopMat);
+
+      function buildHybridOrDepartment2F(f2Y, wallMintMat, wallCreamMat, glassMat, counterWoodMat, counterTopMat) {
+      // 西側隔間牆 (X = -24.0, Z: -47.5 ~ -28.6)，東側直接共用麻醉科西牆 (X = 2.0)
+      addWall(-24.0, -37.925, 0.5, 19.15, 4.4, wallMintMat, 'Hybrid OR 西牆', 2, f2Y);
+
+      // 南側走廊牆（開口中心 X = -11.0，總寬 3.6m，開口範圍 X: -12.8 ~ -9.2）
+      // 西段牆：X = -24.0 ~ -12.8 (中心 -18.4, 寬 11.2)
+      // 東段牆：X = -9.2 ~ 2.0 (中心 -3.6, 寬 11.2)
+      addWall(-18.4, -28.6, 11.2, 0.5, 4.4, wallMintMat, 'Hybrid OR 南側西段牆', 2, f2Y);
+      addWall(-3.6, -28.6, 11.2, 0.5, 4.4, wallMintMat, 'Hybrid OR 南側東段牆', 2, f2Y);
+
+      // 電動門上方門楣
+      const hybridHeader = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.82, 0.52), wallMintMat);
+      hybridHeader.position.set(-11.0, f2Y + 3.49, -28.6);
+      scene.add(hybridHeader);
+
+      // 雙開翡翠綠不鏽鋼無菌自動感應電動門 (中心 X = -11.0, Z = -28.6)
+      const hybridDoorMat = new THREE.MeshStandardMaterial({
+        color: 0x0f766e,
+        roughness: 0.25,
+        metalness: 0.45
+      });
+      hybridOrAutoDoorL = new THREE.Mesh(new THREE.BoxGeometry(1.78, 2.58, 0.14), hybridDoorMat);
+      hybridOrAutoDoorL.position.set(-11.89, f2Y + 1.29, -28.6);
+      hybridOrAutoDoorR = new THREE.Mesh(new THREE.BoxGeometry(1.78, 2.58, 0.14), hybridDoorMat);
+      hybridOrAutoDoorR.position.set(-10.11, f2Y + 1.29, -28.6);
+
+      const hGlassL = new THREE.Mesh(new THREE.BoxGeometry(0.45, 1.05, 0.17), glassMat);
+      hGlassL.position.set(0.32, 0.32, 0);
+      hybridOrAutoDoorL.add(hGlassL);
+
+      const hGlassR = hGlassL.clone();
+      hGlassR.position.set(-0.32, 0.32, 0);
+      hybridOrAutoDoorR.add(hGlassR);
+      scene.add(hybridOrAutoDoorL, hybridOrAutoDoorR);
+
+      // 門口發光主招牌（與右側麻醉科、血液透析中心同高度對齊）
+      addHangingSign(-11.0, f2Y + 3.45, -28.25, 5.4, 0.65, 'HYBRID OR', '複合式手術室・高階影像微創中心', '#065f46', '#34d399');
+
+      // 左側：鉛玻璃輻射隔離控制室 (X: -23.7 ~ -16.8, Z: -47.2 ~ -36.5)
+      addWall(-16.8, -41.8, 0.35, 10.6, 1.25, wallCreamMat, 'Hybrid OR 控制室防輻射矮牆', 2, f2Y);
+      addWall(-20.25, -36.5, 7.2, 0.35, 1.25, wallCreamMat, 'Hybrid OR 控制室南側矮牆', 2, f2Y);
+      const leadGlassSide = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.1, 10.4), glassMat);
+      leadGlassSide.position.set(-16.8, f2Y + 2.3, -41.8);
+      const leadGlassFront = new THREE.Mesh(new THREE.BoxGeometry(7.0, 2.1, 0.08), glassMat);
+      leadGlassFront.position.set(-20.25, f2Y + 2.3, -36.5);
+      scene.add(leadGlassSide, leadGlassFront);
+      addHangingSign(-20.2, f2Y + 3.3, -36.2, 4.4, 0.56, '影像導航控制室', 'IMAGING CONTROL ROOM', '#0f172a', '#38bdf8');
+
+      // 控制室內多螢幕主控台
+      addWall(-20.5, -40.5, 4.2, 0.9, 0.95, counterWoodMat, 'Hybrid OR 影像控制桌', 2, f2Y, false);
+      const ctrlTop = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.1, 1.05), counterTopMat);
+      ctrlTop.position.set(-20.5, f2Y + 0.98, -40.5);
+      scene.add(ctrlTop);
+
+      [-21.8, -20.5, -19.2].forEach((mx) => {
+        const mon = new THREE.Mesh(
+          new THREE.BoxGeometry(0.85, 0.52, 0.06),
+          new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x0ea5e9, emissiveIntensity: 0.85 })
+        );
+        mon.position.set(mx, f2Y + 1.38, -40.5);
+        scene.add(mon);
+      });
+
+      // 中央與右側：兩座大型 Hybrid OR 手術單元（懸吊式 C-arm 血管攝影機 ＋ 複合式手術台 ＋ 懸吊多畫面醫療大螢幕）
+      const buildHybridSuite = (sx, sz, roomTitle) => {
+        // 1. 複合式碳纖維手術台
+        buildOperatingTableUnit(sx, sz, roomTitle, f2Y);
+
+        // 2. 懸吊式多軸 C-arm 血管攝影成像系統
+        const cArmGroup = new THREE.Group();
+        const gantryRail = new THREE.Mesh(
+          new THREE.BoxGeometry(0.36, 0.22, 3.4),
+          ArchMaterials.stainlessSteel
+        );
+        gantryRail.position.set(0, 4.25, 0);
+
+        const cArmPillar = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.14, 0.16, 1.85, 16),
+          new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.35 })
+        );
+        cArmPillar.position.set(0, 3.35, -0.85);
+
+        const cArc = new THREE.Mesh(
+          new THREE.TorusGeometry(1.18, 0.12, 14, 32, Math.PI * 1.25),
+          new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.25, metalness: 0.45 })
+        );
+        cArc.position.set(0, 1.65, -0.35);
+        cArc.rotation.y = Math.PI / 2;
+        cArc.rotation.z = -Math.PI * 0.12;
+
+        // 平板偵測器 (Flat Panel Detector)
+        const detector = new THREE.Mesh(
+          new THREE.BoxGeometry(0.46, 0.16, 0.46),
+          new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.3 })
+        );
+        detector.position.set(0, 2.48, 0.35);
+
+        cArmGroup.add(gantryRail, cArmPillar, cArc, detector);
+        cArmGroup.position.set(sx, f2Y, sz);
+        scene.add(cArmGroup);
+
+        // 3. 大型懸吊雙聯醫療影像大螢幕 (顯示 3D 血管重建與生理波型)
+        const screenGroup = new THREE.Group();
+        const boomArm = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.05, 0.05, 1.35, 10),
+          ArchMaterials.stainlessSteel
+        );
+        boomArm.position.set(0, 3.65, 0);
+        const bezel = new THREE.Mesh(
+          new THREE.BoxGeometry(1.85, 0.92, 0.08),
+          new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3 })
+        );
+        bezel.position.set(0, 2.65, 0);
+        const displayPanel = new THREE.Mesh(
+          new THREE.PlaneGeometry(1.72, 0.80),
+          new THREE.MeshStandardMaterial({ color: 0x042f2e, emissive: 0x14b8a6, emissiveIntensity: 0.85 })
+        );
+        displayPanel.position.set(0, 2.65, 0.045);
+
+        screenGroup.add(boomArm, bezel, displayPanel);
+        screenGroup.position.set(sx - 1.55, f2Y, sz - 0.5);
+        screenGroup.rotation.y = Math.PI / 5;
+        scene.add(screenGroup);
+      };
+
+      buildHybridSuite(-10.5, -39.5, 'HYBRID OR-1 (心導管/主動脈微創)');
+      buildHybridSuite(-2.8, -39.5, 'HYBRID OR-2 (神經外科/3D影像導航)');
+    }
 
       // 2. 2F 東側空地：全面封閉式「開刀房 (OR-1 ~ OR-9)」與無菌自動感應電動門（朝西開門）
 addWall(44.25, -28.6, 18.5, 0.5, 4.4, wallMintMat, '開刀房北牆', 2, f2Y);
@@ -4166,6 +4300,64 @@ scene.add(reproHeader);
           options: []
         },
 
+        // ==================== 2F Hybrid OR 複合式手術室 NPC ====================
+        {
+          name: '陳敬文 心臟血管外科主任',
+          role: '2F Hybrid OR-1・複合式微創主動脈手術',
+          avatar: '🩺',
+          type: 'staff',
+          floor: 2,
+          baseY: 4.6,
+          badgeColor: '#10b981',
+          appearance: { coatColor: 0x0d9488, pantsColor: 0x0f766e, isDoctor: true },
+          waypoints: [
+            new THREE.Vector3(-8.8, 4.6, -37.2),
+            new THREE.Vector3(-8.8, 4.6, -41.5),
+            new THREE.Vector3(-12.2, 4.6, -41.5)
+          ],
+          speed: 1.15,
+          dialogue: '歡迎來到 2F Hybrid OR（複合式手術室）！這裡整合了高解析多軸 C-arm 3D 血管攝影與無菌外科手術台，可同步進行經導管微創與開放式手術！',
+          options: [
+            {
+              label: '請問 Hybrid OR 與一般開刀房有什麼優勢？',
+              reply: '病患無需在檢查室與開刀房之間來回移動，術中即時 3D 影像導航能大幅縮短手術時間、減少出血量並提升微創精準度！'
+            }
+          ]
+        },
+        {
+          name: '蘇怡君 放射師兼影像導航專員',
+          role: '2F Hybrid OR・影像導航控制室',
+          avatar: '🖥️',
+          type: 'staff',
+          floor: 2,
+          baseY: 4.6,
+          badgeColor: '#38bdf8',
+          appearance: { coatColor: 0x0284c7, pantsColor: 0x0369a1, isNurse: true },
+          waypoints: [new THREE.Vector3(-20.5, 4.6, -39.2)],
+          speed: 0,
+          yaw: 0,
+          dialogue: '我在防輻射鉛玻璃控制室操作 C-arm 3D 斷層血管重建影像，即時傳送到手術台旁的懸吊大螢幕協助醫師定位！',
+          options: []
+        },
+        {
+          name: '林欣樺 專責刷手護理師',
+          role: '2F Hybrid OR-2・無菌器械與導管準備',
+          avatar: '💉',
+          type: 'staff',
+          floor: 2,
+          baseY: 4.6,
+          badgeColor: '#34d399',
+          appearance: { coatColor: 0x10b981, pantsColor: 0x065f46, isNurse: true },
+          waypoints: [
+            new THREE.Vector3(-4.5, 4.6, -36.8),
+            new THREE.Vector3(-1.2, 4.6, -36.8),
+            new THREE.Vector3(-1.2, 4.6, -41.5)
+          ],
+          speed: 1.05,
+          dialogue: 'Hybrid OR-2 正在準備神經外科立體定位導航與血管攝影器械，室內維持正壓層流無菌環境！',
+          options: []
+        },
+
         // ==================== 2F 開刀房 NPC ====================
         {
           name: '陳冠宇 外科主治醫師',
@@ -5239,6 +5431,14 @@ scene.add(reproHeader);
         anesthAutoDoorR.position.x = THREE.MathUtils.lerp(anesthAutoDoorR.position.x, 14.45 + openAnesth, dt * 12);
       }
 
+      if (hybridOrAutoDoorL && hybridOrAutoDoorR) {
+        const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - (-11.0), player.pos.z - (-28.6)) < 4.8);
+        const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - (-11.0), n.pos.z - (-28.6)) < 4.4);
+        const openHybrid = (nearPlayer || nearNpc) ? 1.68 : 0.0;
+        hybridOrAutoDoorL.position.x = THREE.MathUtils.lerp(hybridOrAutoDoorL.position.x, -11.89 - openHybrid, dt * 12);
+        hybridOrAutoDoorR.position.x = THREE.MathUtils.lerp(hybridOrAutoDoorR.position.x, -10.11 + openHybrid, dt * 12);
+      }
+
       camState.yaw = lerpAngle(camState.yaw, camState.targetYaw, dt * 16);
       camState.pitch = THREE.MathUtils.lerp(camState.pitch, camState.targetPitch, dt * 16);
       camState.distance = THREE.MathUtils.lerp(camState.distance, camState.targetDistance, dt * 12);
@@ -5467,6 +5667,7 @@ scene.add(reproHeader);
         zoneName = '2F 中央挑空迴廊';
         if (z < -28.0 && x > 25.0) zoneName = '2F 東北側・血液透析中心 / CAPD 中心';
         else if (z < -28.0 && x >= 2.0 && x <= 25.0) zoneName = '2F 麻醉科 (術前評估門診・術後恢復室 PACU)';
+        else if (z < -28.0 && x >= -24.0 && x < 2.0) zoneName = '2F Hybrid OR (複合式手術室・影像導航控制室)';
         else if (x > 35.0 && z >= -26.0 && z <= 6.0) zoneName = '2F 開刀房 (OR-1 ~ OR-9・感應電動門內)';
         else if (z > 22.0 && x < -35.5) zoneName = '2F 嬰兒室 (透明玻璃觀察櫥窗・新生兒照護)';
         else if (z > 22.0 && x >= -35.5 && x < -19.2) zoneName = '2F 產房 (Delivery Room・LDR 樂得兒產房)';
@@ -5593,6 +5794,7 @@ scene.add(reproHeader);
       if (onSecondFloor) {
         drawZone(38, -37.5, 25, 18, '#fce7f3', '2F洗腎/CAPD');
         drawZone(13.6, -37.5, 23.2, 18, '#e0f2fe', '麻醉科');
+        drawZone(-11.0, -37.5, 26.0, 18, '#ccfbf1', 'Hybrid OR');
         drawZone(44.25, -10.0, 18.5, 32.0, '#d1fae5', '開刀房');
         drawZone(-43.5, 35, 16, 17, '#e0f2fe', '嬰兒室');
         drawZone(-25.5, 34.5, 12.5, 17, '#fce7f3', '產房');
