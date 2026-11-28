@@ -2087,6 +2087,123 @@ function updateRemotePlayers2F(dt) {
         }
       }
 
+      function buildAnesthesiologyDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterWoodMat, counterTopMat) {
+      // 西側隔間牆 (X = 2.0, Z: -47.5 ~ -28.6)，東側直接共用血液透析中心西牆 (X = 25.2)
+      addWall(2.0, -37.925, 0.5, 19.15, 4.4, wallBlueMat, '麻醉科西牆', 2, f2Y);
+
+      // 南側走廊牆（開口中心 X = 13.6，總寬 3.4m，開口範圍 X: 11.9 ~ 15.3）
+      // 西段牆：X = 2.0 ~ 11.9 (中心 6.95, 寬 9.9)
+      // 東段牆：X = 15.3 ~ 25.2 (中心 20.25, 寬 9.9)
+      addWall(6.95, -28.6, 9.9, 0.5, 4.4, wallBlueMat, '麻醉科南側西段牆', 2, f2Y);
+      addWall(20.25, -28.6, 9.9, 0.5, 4.4, wallBlueMat, '麻醉科南側東段牆', 2, f2Y);
+
+      // 電動門上方門楣
+      const anesthHeader = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.82, 0.52), wallBlueMat);
+      anesthHeader.position.set(13.6, f2Y + 3.49, -28.6);
+      scene.add(anesthHeader);
+
+      // 雙開湖水藍框玻璃自動感應電動門 (中心 X = 13.6, Z = -28.6)
+      const anesthDoorFrameMat = new THREE.MeshStandardMaterial({
+        color: 0x0284c7,
+        roughness: 0.28,
+        metalness: 0.45
+      });
+      const anesthGlassMat = new THREE.MeshPhysicalMaterial({
+        color: 0xe0f2fe,
+        transparent: true,
+        opacity: 0.28,
+        roughness: 0.08,
+        depthWrite: false
+      });
+
+      const createAnesthDoorLeaf = (w, h) => {
+        const leaf = new THREE.Group();
+        const t = 0.085, d = 0.12;
+        const topB = new THREE.Mesh(new THREE.BoxGeometry(w, t, d), anesthDoorFrameMat);
+        topB.position.y = h / 2 - t / 2;
+        const botB = new THREE.Mesh(new THREE.BoxGeometry(w, t * 1.4, d), anesthDoorFrameMat);
+        botB.position.y = -h / 2 + (t * 1.4) / 2;
+        const leftB = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), anesthDoorFrameMat);
+        leftB.position.x = -w / 2 + t / 2;
+        const rightB = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), anesthDoorFrameMat);
+        rightB.position.x = w / 2 - t / 2;
+        const pane = new THREE.Mesh(new THREE.BoxGeometry(w - t * 2, h - t * 2.4, 0.04), anesthGlassMat);
+        leaf.add(topB, botB, leftB, rightB, pane);
+        return leaf;
+      };
+
+      anesthAutoDoorL = createAnesthDoorLeaf(1.7, 2.58);
+      anesthAutoDoorL.position.set(12.75, f2Y + 1.29, -28.6);
+      anesthAutoDoorR = createAnesthDoorLeaf(1.7, 2.58);
+      anesthAutoDoorR.position.set(14.45, f2Y + 1.29, -28.6);
+      scene.add(anesthAutoDoorL, anesthAutoDoorR);
+
+      // 門口主發光招牌（風格與隔壁血液透析中心一致，方便一眼辨識）
+      addHangingSign(13.6, f2Y + 3.45, -28.25, 4.6, 0.65, '麻醉科', 'ANESTHESIOLOGY', '#0369a1', '#38bdf8');
+      addHangingSign(18.5, f2Y + 3.3, -34.2, 4.8, 0.65, '術後恢復室 (PACU)', 'POST-ANESTHESIA CARE UNIT', '#0f766e', '#5eead4');
+
+      // 內部半高隔間（X = 12.2, Z: -47.5 ~ -34.5），區隔左側「術前麻醉評估門診」與右側「術後恢復室 PACU」
+      addWall(12.2, -41.0, 0.35, 13.0, 1.25, wallBlueMat, '麻醉科內部分隔矮牆', 2, f2Y);
+      const midGlass = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.0, 12.8), glassMat);
+      midGlass.position.set(12.2, f2Y + 2.25, -41.0);
+      scene.add(midGlass);
+
+      // 左側：麻醉科術前評估報到櫃檯與兩間評估診間 (X: 2.3 ~ 12.0)
+      addWall(5.2, -31.8, 4.6, 1.0, 1.08, counterWoodMat, '麻醉科評估報到櫃檯', 2, f2Y, false);
+      const deskTop = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.12, 1.15), counterTopMat);
+      deskTop.position.set(5.2, f2Y + 1.12, -31.8);
+      const deskShield = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.82, 0.06), glassMat);
+      deskShield.position.set(5.2, f2Y + 1.56, -31.35);
+      scene.add(deskTop, deskShield);
+
+      // 兩間術前麻醉評估診間門 (Z = -42.5)
+      addWall(7.1, -42.5, 9.8, 0.45, 4.4, wallCreamMat, '術前麻醉評估診間牆', 2, f2Y);
+      addClinicDoorSet(4.8, f2Y, -42.5, 0, '231 術前麻醉評估', '#0284c7');
+      addClinicDoorSet(9.2, f2Y, -42.5, 0, '232 疼痛治療門診', '#0284c7');
+
+      // 候診座椅
+      const waitBenchMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.45 });
+      const bench = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.44, 0.72), waitBenchMat);
+      bench.position.set(6.5, f2Y + 0.22, -37.2);
+      const benchBack = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.46, 0.14), waitBenchMat);
+      benchBack.position.set(6.5, f2Y + 0.56, -37.5);
+      scene.add(bench, benchBack);
+      colliders.push({ minX: 4.3, maxX: 8.7, minZ: -37.7, maxZ: -36.7, floor: 2, label: '麻醉科候診椅' });
+
+      // 右側：術後恢復室 (PACU) 4 床恢復病床、生命徵象監視器與呼吸麻醉工作車 (X: 12.5 ~ 24.8)
+      [
+        { x: 15.8, z: -36.5 },
+        { x: 21.5, z: -36.5 },
+        { x: 15.8, z: -43.2 },
+        { x: 21.5, z: -43.2 }
+      ].forEach((bed) => {
+        buildHospitalBedUnit(bed.x, bed.z, 0x38bdf8, false, true, 2, f2Y);
+
+        // 床旁麻醉工作站與生理監視螢幕
+        const cart = new THREE.Mesh(
+          new THREE.BoxGeometry(0.62, 1.32, 0.58),
+          new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 })
+        );
+        cart.position.set(bed.x + 1.05, f2Y + 0.66, bed.z - 0.35);
+        const monitor = new THREE.Mesh(
+          new THREE.BoxGeometry(0.46, 0.34, 0.06),
+          new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x10b981, emissiveIntensity: 0.85 })
+        );
+        monitor.position.set(bed.x + 1.05, f2Y + 1.48, bed.z - 0.35);
+        scene.add(cart, monitor);
+        colliders.push({
+          minX: bed.x + 0.7,
+          maxX: bed.x + 1.4,
+          minZ: bed.z - 0.7,
+          maxZ: bed.z + 0.05,
+          floor: 2,
+          label: '麻醉生理監視工作車'
+        });
+      });
+    }
+
+      buildAnesthesiologyDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterWoodMat, counterTopMat);
+
       // 2. 2F 東側空地：全面封閉式「開刀房 (OR-1 ~ OR-9)」與無菌自動感應電動門（朝西開門）
 addWall(44.25, -28.6, 18.5, 0.5, 4.4, wallMintMat, '開刀房北牆', 2, f2Y);
 addWall(44.25, 6.0, 18.5, 0.5, 4.4, wallMintMat, '開刀房南牆', 2, f2Y);
@@ -3761,6 +3878,80 @@ scene.add(reproHeader);
           options: []
         },
 
+        // ==================== 2F 麻醉科 NPC ====================
+        {
+          name: '林志遠 麻醉部主任',
+          role: '2F 麻醉科・231 術前麻醉評估門診',
+          avatar: '🩺',
+          type: 'staff',
+          floor: 2,
+          baseY: 4.6,
+          badgeColor: '#38bdf8',
+          appearance: { coatColor: 0xffffff, pantsColor: 0x0369a1, isDoctor: true },
+          waypoints: [
+            new THREE.Vector3(6.2, 4.6, -34.2),
+            new THREE.Vector3(9.8, 4.6, -34.2),
+            new THREE.Vector3(9.8, 4.6, -40.2)
+          ],
+          speed: 1.15,
+          dialogue: '您好！歡迎來到 2F 麻醉科。手術前我們會在此為您進行完整的麻醉風險評估、氣道檢查與止痛方案說明！',
+          options: [
+            {
+              label: '請問全身麻醉與半身麻醉有什麼差別？',
+              reply: '全身麻醉會讓您在手術中完全睡著無痛感；半身麻醉則僅阻斷下半身痛覺、意識保持清醒，醫師會依手術部位為您選擇最安全的方式！'
+            }
+          ]
+        },
+        {
+          name: '陳怡安 麻醉專科護理師',
+          role: '2F 麻醉科・術前衛教與疼痛控制諮詢',
+          avatar: '👩‍⚕️',
+          type: 'staff',
+          floor: 2,
+          baseY: 4.6,
+          badgeColor: '#2dd4bf',
+          appearance: { coatColor: 0x38bdf8, pantsColor: 0x0284c7, isNurse: true },
+          waypoints: [new THREE.Vector3(5.2, 4.6, -30.5)],
+          speed: 0,
+          yaw: 0,
+          dialogue: '請先在麻醉科報到櫃檯插健保卡，術前需禁食禁水滿 8 小時，若有服用抗凝血劑或降血糖藥物請務必告知醫師喔！',
+          options: []
+        },
+        {
+          name: '張雅雯 恢復室護理師',
+          role: '2F 麻醉科・術後恢復室 (PACU) 照護',
+          avatar: '💉',
+          type: 'staff',
+          floor: 2,
+          baseY: 4.6,
+          badgeColor: '#10b981',
+          appearance: { coatColor: 0x10b981, pantsColor: 0x065f46, isNurse: true },
+          waypoints: [
+            new THREE.Vector3(14.5, 4.6, -34.5),
+            new THREE.Vector3(19.5, 4.6, -34.5),
+            new THREE.Vector3(19.5, 4.6, -41.2),
+            new THREE.Vector3(14.5, 4.6, -41.2)
+          ],
+          speed: 1.1,
+          dialogue: '這裡是麻醉科術後恢復室 (PACU)，我們正密切監測剛離開開刀房病患的血氧、心電圖與體溫，待完全清醒後就會護送回病房！',
+          options: []
+        },
+        {
+          name: '王建宏 先生 (PACU 術後恢復病患)',
+          role: '2F 麻醉科恢復室 1床・麻醉甦醒觀察中',
+          avatar: '🛌',
+          type: 'patient',
+          floor: 2,
+          baseY: 4.6,
+          badgeColor: '#60a5fa',
+          appearance: { coatColor: 0xbae6fd, pantsColor: 0x334155, isLyingBed: true },
+          waypoints: [new THREE.Vector3(15.8, 4.6, -36.5)],
+          speed: 0,
+          yaw: 0,
+          dialogue: '剛開完微創手術推來麻醉科恢復室，護理師幫我蓋了暖風被又調整止痛點滴，現在完全不會痛了！',
+          options: []
+        },
+
         // ==================== 2F 婦產科護理站 NPC（隨櫃檯一併內移至 Z = 42.3）====================
         {
           name: '陳怡君 護理長',
@@ -5040,6 +5231,14 @@ scene.add(reproHeader);
         dialysisAutoDoorR.position.x = THREE.MathUtils.lerp(dialysisAutoDoorR.position.x, 29.36 + openDia, dt * 12);
       }
 
+      if (anesthAutoDoorL && anesthAutoDoorR) {
+        const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - 13.6, player.pos.z - (-28.6)) < 4.6);
+        const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - 13.6, n.pos.z - (-28.6)) < 4.2);
+        const openAnesth = (nearPlayer || nearNpc) ? 1.62 : 0.0;
+        anesthAutoDoorL.position.x = THREE.MathUtils.lerp(anesthAutoDoorL.position.x, 12.75 - openAnesth, dt * 12);
+        anesthAutoDoorR.position.x = THREE.MathUtils.lerp(anesthAutoDoorR.position.x, 14.45 + openAnesth, dt * 12);
+      }
+
       camState.yaw = lerpAngle(camState.yaw, camState.targetYaw, dt * 16);
       camState.pitch = THREE.MathUtils.lerp(camState.pitch, camState.targetPitch, dt * 16);
       camState.distance = THREE.MathUtils.lerp(camState.distance, camState.targetDistance, dt * 12);
@@ -5267,6 +5466,7 @@ scene.add(reproHeader);
       } else if (y >= 2.3) {
         zoneName = '2F 中央挑空迴廊';
         if (z < -28.0 && x > 25.0) zoneName = '2F 東北側・血液透析中心 / CAPD 中心';
+        else if (z < -28.0 && x >= 2.0 && x <= 25.0) zoneName = '2F 麻醉科 (術前評估門診・術後恢復室 PACU)';
         else if (x > 35.0 && z >= -26.0 && z <= 6.0) zoneName = '2F 開刀房 (OR-1 ~ OR-9・感應電動門內)';
         else if (z > 22.0 && x < -35.5) zoneName = '2F 嬰兒室 (透明玻璃觀察櫥窗・新生兒照護)';
         else if (z > 22.0 && x >= -35.5 && x < -19.2) zoneName = '2F 產房 (Delivery Room・LDR 樂得兒產房)';
@@ -5392,6 +5592,7 @@ scene.add(reproHeader);
 
       if (onSecondFloor) {
         drawZone(38, -37.5, 25, 18, '#fce7f3', '2F洗腎/CAPD');
+        drawZone(13.6, -37.5, 23.2, 18, '#e0f2fe', '麻醉科');
         drawZone(44.25, -10.0, 18.5, 32.0, '#d1fae5', '開刀房');
         drawZone(-43.5, 35, 16, 17, '#e0f2fe', '嬰兒室');
         drawZone(-25.5, 34.5, 12.5, 17, '#fce7f3', '產房');
