@@ -2132,31 +2132,34 @@ addHangingSign(34.5, f2Y + 3.55, -10.0, 7.2, 0.88, '開刀房', 'OPERATING ROOMS
   buildOperatingTableUnit(44.5, oz, `OR-${idx + 1}`, f2Y);
 });
 
-      // 3. 2F 心導管室 / 麻醉恢復室（緊貼血液透析中心西側 X = 25.2，範圍 X: 12.0 ~ 25.2, Z: -26.2 ~ -13.5）
-      // 已完全移除原中北側西半部 MICU / SICU 與西北側「醫師辦公室 / 呼吸治療室」
+      // 3. 2F 心導管室 / 麻醉恢復室（整棟跨過血液透析中心，緊貼其最西側牆面）
       icuAutoDoorL = null;
       icuAutoDoorR = null;
 
-      // 北牆、西牆、東牆（東牆直接貼齊血液透析中心西牆 X = 25.2）
-      addWall(18.6, -26.2, 13.2, 0.5, 4.4, wallPinkMat, '心導管室北牆', 2, f2Y);
-      addWall(12.0, -19.85, 0.5, 13.2, 4.4, wallPinkMat, '心導管室西牆', 2, f2Y);
-      addWall(25.2, -19.85, 0.5, 13.2, 4.4, wallPinkMat, '心導管室東牆（貼齊血液透析中心）', 2, f2Y);
+      // ★ 請將 -15.0 換成你程式碼裡「血液透析中心最西側牆壁」的實際 X 座標！
+      const dialysisWestWallX = -15.0; 
+      const cathDx = dialysisWestWallX - 25.2; 
 
-      // 南牆分為電動門左右兩段（開口中心 X = 18.6，寬度 3.2m，範圍 X: 17.0 ~ 20.2）：
-      addWall(14.375, -13.5, 5.25, 0.45, 4.4, wallPinkMat, '心導管室南側西段封閉牆', 2, f2Y);
-      addWall(22.825, -13.5, 5.25, 0.45, 4.4, wallPinkMat, '心導管室南側東段封閉牆', 2, f2Y);
+      // 北牆、西牆、東牆（東牆 25.2 + cathDx 會剛好等於 dialysisWestWallX，完全緊貼！）
+      addWall(18.6 + cathDx, -26.2, 13.2, 0.5, 4.4, wallPinkMat, '心導管室北牆', 2, f2Y);
+      addWall(12.0 + cathDx, -19.85, 0.5, 13.2, 4.4, wallPinkMat, '心導管室西牆', 2, f2Y);
+      addWall(25.2 + cathDx, -19.85, 0.5, 13.2, 4.4, wallPinkMat, '心導管室東牆（貼齊血液透析中心）', 2, f2Y);
 
-      // 電動門上方門楣 (X = 18.6)
+      // 南牆分為電動門左右兩段
+      addWall(14.375 + cathDx, -13.5, 5.25, 0.45, 4.4, wallPinkMat, '心導管室南側西段封閉牆', 2, f2Y);
+      addWall(22.825 + cathDx, -13.5, 5.25, 0.45, 4.4, wallPinkMat, '心導管室南側東段封閉牆', 2, f2Y);
+
+      // 電動門上方門楣
       const cathHeader = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.8, 0.48), wallPinkMat);
-      cathHeader.position.set(18.6, f2Y + 3.5, -13.5);
+      cathHeader.position.set(18.6 + cathDx, f2Y + 3.5, -13.5);
       scene.add(cathHeader);
 
-      // 心導管室雙開自動感應電動門（中心 X = 18.6）
+      // 心導管室雙開自動感應電動門
       const cathDoorMat = new THREE.MeshStandardMaterial({ color: 0xbe123c, roughness: 0.25, metalness: 0.45 });
       cathAutoDoorL = new THREE.Mesh(new THREE.BoxGeometry(1.62, 2.58, 0.16), cathDoorMat);
-      cathAutoDoorL.position.set(17.79, f2Y + 1.29, -13.5);
+      cathAutoDoorL.position.set(17.79 + cathDx, f2Y + 1.29, -13.5);
       cathAutoDoorR = new THREE.Mesh(new THREE.BoxGeometry(1.62, 2.58, 0.16), cathDoorMat);
-      cathAutoDoorR.position.set(19.41, f2Y + 1.29, -13.5);
+      cathAutoDoorR.position.set(19.41 + cathDx, f2Y + 1.29, -13.5);
 
       const cathWinL = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.95, 0.19), glassMat);
       cathWinL.position.set(0.3, 0.35, 0);
@@ -2166,12 +2169,12 @@ addHangingSign(34.5, f2Y + 3.55, -10.0, 7.2, 0.88, '開刀房', 'OPERATING ROOMS
       cathAutoDoorR.add(cathWinR);
       scene.add(cathAutoDoorL, cathAutoDoorR);
 
-      // 心導管室主燈箱 (X = 18.6)
-      addHangingSign(18.6, f2Y + 3.55, -13.15, 5.4, 0.85, '心導管室・麻醉恢復室', 'CATHETERIZATION LAB', '#be123c', '#fda4af');
+      // 心導管室主燈箱
+      addHangingSign(18.6 + cathDx, f2Y + 3.55, -13.15, 5.4, 0.85, '心導管室・麻醉恢復室', 'CATHETERIZATION LAB', '#be123c', '#fda4af');
 
-      // 兩張心導管恢復病床（位於室內 X = 15.8 與 X = 21.4）
-      buildHospitalBedUnit(15.8, -21.2, 0xf43f5e, false, true, 2, f2Y);
-      buildHospitalBedUnit(21.4, -21.2, 0xf43f5e, false, true, 2, f2Y);
+      // 兩張心導管恢復病床
+      buildHospitalBedUnit(15.8 + cathDx, -21.2, 0xf43f5e, false, true, 2, f2Y);
+      buildHospitalBedUnit(21.4 + cathDx, -21.2, 0xf43f5e, false, true, 2, f2Y);
 
       buildObgynMaternityComplex(f2Y, glassMat, darkFrameMat, counterTopMat);
 
