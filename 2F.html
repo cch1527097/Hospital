@@ -2407,7 +2407,28 @@ function buildSicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counter
       new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 })
     );
     cart.position.set(ventX, f2Y + 0.68, b.z - 0.35);
-    const screen =
+    const cart = new THREE.Mesh(
+      new THREE.BoxGeometry(0.62, 1.35, 0.58),
+      new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 })
+    );
+    cart.position.set(ventX, f2Y + 0.68, b.z - 0.35);
+    const screen = new THREE.Mesh(
+      new THREE.BoxGeometry(0.46, 0.34, 0.06),
+      new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x10b981, emissiveIntensity: 0.85 })
+    );
+    screen.position.set(ventX, f2Y + 1.48, b.z - 0.35);
+    scene.add(cart, screen);
+
+    colliders.push({
+      minX: ventX - 0.35,
+      maxX: ventX + 0.35,
+      minZ: b.z - 0.7,
+      maxZ: b.z + 0.05,
+      floor: 2,
+      label: 'SICU 呼吸器與生理監視工作車'
+    });
+  });
+}
 
       // 2. 2F 東側空地：全面封閉式「開刀房 (OR-1 ~ OR-9)」與無菌自動感應電動門（朝西開門）
 addWall(44.25, -28.6, 18.5, 0.5, 4.4, wallMintMat, '開刀房北牆', 2, f2Y);
