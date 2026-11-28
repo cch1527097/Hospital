@@ -2057,25 +2057,6 @@ scene.add(dialysisHeader);
 // 南牆完整封閉 (X: 24.95 ~ 53.5，總寬 28.55m，中心 X = 39.225)，供開刀房北牆直接貼齊
 addWall(39.225, -28.6, 28.55, 0.5, 4.4, wallPinkMat, '2F 血液透析中心南側封閉牆', 2, f2Y);
 
-// 血液透析中心雙開自動感應電動門（位於西牆 X = 25.2, Z = -33.5，沿 Z 軸滑開）
-const dialysisDoorMat = new THREE.MeshStandardMaterial({
-  color: 0xbe185d,
-  roughness: 0.25,
-  metalness: 0.42
-});
-dialysisAutoDoorL = new THREE.Mesh(new THREE.BoxGeometry(0.16, 2.58, 1.72), dialysisDoorMat);
-dialysisAutoDoorL.position.set(25.2, f2Y + 1.29, -34.36);
-dialysisAutoDoorR = new THREE.Mesh(new THREE.BoxGeometry(0.16, 2.58, 1.72), dialysisDoorMat);
-dialysisAutoDoorR.position.set(25.2, f2Y + 1.29, -32.64);
-
-const diaWinL = new THREE.Mesh(new THREE.BoxGeometry(0.19, 1.15, 0.48), glassMat);
-diaWinL.position.set(0, 0.3, 0.32);
-dialysisAutoDoorL.add(diaWinL);
-const diaWinR = diaWinL.clone();
-diaWinR.position.set(0, 0.3, -0.32);
-dialysisAutoDoorR.add(diaWinR);
-scene.add(dialysisAutoDoorL, dialysisAutoDoorR);
-
 // CAPD 腹膜透析室隔間向東貼齊外牆 (X = 53.5)
 addWall(45.5, -36.5, 16.0, 0.45, 4.4, wallBlueMat, 'CAPD 腹膜透析室隔間', 2, f2Y);
 
@@ -5212,35 +5193,12 @@ scene.add(reproHeader);
         nurseryAutoDoorR.position.x = THREE.MathUtils.lerp(nurseryAutoDoorR.position.x, -36.14 + openNursery, dt * 12);
       }
 
-      if (dialysisAutoDoorL && dialysisAutoDoorR) {
-  const inDoorZone = (objPos) =>
-    Math.abs(objPos.y - 4.6) < 1.6 &&
-    Math.hypot(objPos.x - 25.2, objPos.z - (-33.5)) < 4.6;
-  const nearPlayer = inDoorZone(player.pos);
-  const nearNpc = npcs.some((n) => inDoorZone(n.pos));
-  const openDia = (nearPlayer || nearNpc) ? 1.62 : 0.0;
-  dialysisAutoDoorL.position.z = THREE.MathUtils.lerp(dialysisAutoDoorL.position.z, -34.36 - openDia, dt * 12);
-  dialysisAutoDoorR.position.z = THREE.MathUtils.lerp(dialysisAutoDoorR.position.z, -32.64 + openDia, dt * 12);
-}
-
       if (reproAutoDoorL && reproAutoDoorR) {
         const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - (-4.85), player.pos.z - 28.0) < 4.6);
         const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - (-4.85), n.pos.z - 28.0) < 4.2);
         const openRepro = (nearPlayer || nearNpc) ? 1.65 : 0.0;
         reproAutoDoorL.position.x = THREE.MathUtils.lerp(reproAutoDoorL.position.x, -5.65 - openRepro, dt * 12);
         reproAutoDoorR.position.x = THREE.MathUtils.lerp(reproAutoDoorR.position.x, -4.05 + openRepro, dt * 12);
-      }
-
-      if (dialysisAutoDoorL && dialysisAutoDoorR) {
-        const inDoorZone = (objPos) =>
-          Math.abs(objPos.y - 4.6) < 1.6 &&
-          objPos.x >= 35.0 && objPos.x <= 44.0 &&
-          objPos.z >= -34.0 && objPos.z <= -23.0;
-        const nearPlayer = inDoorZone(player.pos);
-        const nearNpc = npcs.some((n) => inDoorZone(n.pos));
-        const openDia = (nearPlayer || nearNpc) ? 1.62 : 0.0;
-        dialysisAutoDoorL.position.x = THREE.MathUtils.lerp(dialysisAutoDoorL.position.x, 38.64 - openDia, dt * 12);
-        dialysisAutoDoorR.position.x = THREE.MathUtils.lerp(dialysisAutoDoorR.position.x, 40.36 + openDia, dt * 12);
       }
 
       camState.yaw = lerpAngle(camState.yaw, camState.targetYaw, dt * 16);
