@@ -779,6 +779,8 @@ function updateRemotePlayers2F(dt) {
     let hybridOrAutoDoorR = null;
     let sicuAutoDoorL = null;
     let sicuAutoDoorR = null;
+    let micuAutoDoorL = null;
+    let micuAutoDoorR = null;
 
     // 3D 感應光圈參考（電梯 & 橫向手扶梯）
     const transportPads = [];
@@ -2422,6 +2424,106 @@ function buildSicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counter
       maxZ: b.z + 0.05,
       floor: 2,
       label: 'SICU 呼吸器與生理監視工作車'
+    });
+  });
+}
+
+      buildMicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterWoodMat, counterTopMat);
+
+function buildMicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterWoodMat, counterTopMat) {
+  // 座標規劃：X = -53.5 ~ -42.5，Z = -23.0 ~ +4.0
+  // 東牆位於 X = -42.5，距離 SICU 門口 (X = -38.5, Z = -28.6) 尚有 4m 寬走道，完全不擋住 SICU 門面與視線
+
+  // 1. 北側封閉牆 (Z = -23.0, X: -53.5 ~ -42.5, 中心 -48.0, 寬 11.0)
+  addWall(-48.0, -23.0, 11.0, 0.5, 4.4, wallBlueMat, 'MICU 北側封閉牆', 2, f2Y);
+
+  // 2. 南側封閉牆 (Z = +4.0, X: -53.5 ~ -42.5, 中心 -48.0, 寬 11.0)
+  addWall(-48.0, 4.0, 11.0, 0.5, 4.4, wallBlueMat, 'MICU 南側封閉牆', 2, f2Y);
+
+  // 3. 東側走廊牆（朝東開門，開口中心 Z = -9.5，總寬 3.6m，開口範圍 Z: -11.3 ~ -7.7）
+  // 北段牆：Z = -23.0 ~ -11.3 (中心 -17.15, 長 11.7)
+  // 南段牆：Z = -7.7 ~ +4.0 (中心 -1.85, 長 11.7)
+  addWall(-42.5, -17.15, 0.5, 11.7, 4.4, wallBlueMat, 'MICU 東側北段封閉牆', 2, f2Y);
+  addWall(-42.5, -1.85, 0.5, 11.7, 4.4, wallBlueMat, 'MICU 東側南段封閉牆', 2, f2Y);
+
+  // 電動門上方門楣
+  const micuHeader = new THREE.Mesh(new THREE.BoxGeometry(0.52, 1.82, 3.6), wallBlueMat);
+  micuHeader.position.set(-42.5, f2Y + 3.49, -9.5);
+  scene.add(micuHeader);
+
+  // 雙開無菌自動感應電動門 (中心 X = -42.5, Z = -9.5，沿 Z 軸左右滑開)
+  const micuDoorMat = new THREE.MeshStandardMaterial({ color: 0x0f766e, roughness: 0.25, metalness: 0.45 });
+  micuAutoDoorL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 2.58, 1.78), micuDoorMat);
+  micuAutoDoorL.position.set(-42.5, f2Y + 1.29, -10.39);
+  micuAutoDoorR = new THREE.Mesh(new THREE.BoxGeometry(0.14, 2.58, 1.78), micuDoorMat);
+  micuAutoDoorR.position.set(-42.5, f2Y + 1.29, -8.61);
+
+  const mGlassL = new THREE.Mesh(new THREE.BoxGeometry(0.17, 1.05, 0.45), glassMat);
+  mGlassL.position.set(0, 0.32, 0.32);
+  micuAutoDoorL.add(mGlassL);
+  const mGlassR = mGlassL.clone();
+  mGlassR.position.set(0, 0.32, -0.32);
+  micuAutoDoorR.add(mGlassR);
+  scene.add(micuAutoDoorL, micuAutoDoorR);
+
+  // 門口主發光燈箱（朝東面向中央走廊）
+  const micuSign = addHangingSign(-42.15, f2Y + 3.45, -9.5, 5.2, 0.65, 'MICU 內科加護病房', 'MEDICAL INTENSIVE CARE UNIT', '#134e4a', '#2dd4bf');
+  if (micuSign) micuSign.rotation.y = Math.PI / 2;
+
+  // 4. 中央隔離玻璃護理工作站 (X = -46.2, Z = -9.5，縱向配置)
+  addWall(-46.2, -9.5, 1.1, 6.2, 1.08, counterWoodMat, 'MICU 中央監護護理站', 2, f2Y, false);
+  const nsTop = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.12, 6.4), counterTopMat);
+  nsTop.position.set(-46.2, f2Y + 1.12, -9.5);
+  const nsGlass = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.85, 6.0), glassMat);
+  nsGlass.position.set(-45.7, f2Y + 1.56, -9.5);
+  scene.add(nsTop, nsGlass);
+
+  const nsSubSign = addHangingSign(-46.2, f2Y + 3.25, -9.5, 4.2, 0.55, 'MICU 中央生理監測站', 'MEDICAL ICU MONITORING', '#0f172a', '#2dd4bf');
+  if (nsSubSign) nsSubSign.rotation.y = Math.PI / 2;
+
+  // 護理站多床中央生理監視螢幕
+  [-11.5, -9.5, -7.5].forEach((mz) => {
+    const mon = new THREE.Mesh(
+      new THREE.BoxGeometry(0.06, 0.44, 0.68),
+      new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x10b981, emissiveIntensity: 0.85 })
+    );
+    mon.position.set(-46.2, f2Y + 1.48, mz);
+    scene.add(mon);
+  });
+
+  // 5. 5 床內科加護病床 + 呼吸器與血液透析/生理監視工作車（靠西牆 X = -50.8 縱向排列）
+  const micuBeds = [
+    { x: -50.8, z: -19.5 },
+    { x: -50.8, z: -14.5 },
+    { x: -50.8, z: -9.5 },
+    { x: -50.8, z: -4.5 },
+    { x: -50.8, z: 0.5 }
+  ];
+
+  micuBeds.forEach((b) => {
+    buildHospitalBedUnit(b.x, b.z, 0x14b8a6, false, true, 2, f2Y);
+
+    // 床旁呼吸器與生命徵象監視工作車
+    const cart = new THREE.Mesh(
+      new THREE.BoxGeometry(0.62, 1.35, 0.58),
+      new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 })
+    );
+    cart.position.set(b.x + 1.05, f2Y + 0.68, b.z - 0.55);
+
+    const screen = new THREE.Mesh(
+      new THREE.BoxGeometry(0.46, 0.34, 0.06),
+      new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x10b981, emissiveIntensity: 0.85 })
+    );
+    screen.position.set(b.x + 1.05, f2Y + 1.48, b.z - 0.55);
+    scene.add(cart, screen);
+
+    colliders.push({
+      minX: b.x + 0.7,
+      maxX: b.x + 1.4,
+      minZ: b.z - 0.9,
+      maxZ: b.z - 0.2,
+      floor: 2,
+      label: 'MICU 呼吸器與生理監視工作車'
     });
   });
 }
@@ -5592,6 +5694,15 @@ scene.add(reproHeader);
   sicuAutoDoorL.position.x = THREE.MathUtils.lerp(sicuAutoDoorL.position.x, -39.39 - openSicu, dt * 12);
   sicuAutoDoorR.position.x = THREE.MathUtils.lerp(sicuAutoDoorR.position.x, -37.61 + openSicu, dt * 12);
 }
+
+  if (micuAutoDoorL && micuAutoDoorR) {
+    const distMicu = Math.hypot(player.x - (-42.5), player.z - (-9.5));
+    const openMicu = (player.floor === 2 && distMicu < 4.5);
+    const targetL = openMicu ? -12.05 : -10.39;
+    const targetR = openMicu ? -6.95 : -8.61;
+    micuAutoDoorL.position.z += (targetL - micuAutoDoorL.position.z) * 0.12;
+    micuAutoDoorR.position.z += (targetR - micuAutoDoorR.position.z) * 0.12;
+  }
 
       camState.yaw = lerpAngle(camState.yaw, camState.targetYaw, dt * 16);
       camState.pitch = THREE.MathUtils.lerp(camState.pitch, camState.targetPitch, dt * 16);
