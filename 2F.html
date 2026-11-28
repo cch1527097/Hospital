@@ -5684,13 +5684,12 @@ scene.add(reproHeader);
 }
 
   if (micuAutoDoorL && micuAutoDoorR) {
-    const distMicu = Math.hypot(player.x - (-42.5), player.z - (-9.5));
-    const openMicu = (player.floor === 2 && distMicu < 4.5);
-    const targetL = openMicu ? -12.05 : -10.39;
-    const targetR = openMicu ? -6.95 : -8.61;
-    micuAutoDoorL.position.z += (targetL - micuAutoDoorL.position.z) * 0.12;
-    micuAutoDoorR.position.z += (targetR - micuAutoDoorR.position.z) * 0.12;
-  }
+        const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - (-42.5), player.pos.z - (-9.5)) < 4.8);
+        const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - (-42.5), n.pos.z - (-9.5)) < 4.4);
+        const openMicu = (nearPlayer || nearNpc) ? 1.68 : 0.0;
+        micuAutoDoorL.position.z = THREE.MathUtils.lerp(micuAutoDoorL.position.z, -10.39 - openMicu, dt * 12);
+        micuAutoDoorR.position.z = THREE.MathUtils.lerp(micuAutoDoorR.position.z, -8.61 + openMicu, dt * 12);
+      }
 
       camState.yaw = lerpAngle(camState.yaw, camState.targetYaw, dt * 16);
       camState.pitch = THREE.MathUtils.lerp(camState.pitch, camState.targetPitch, dt * 16);
