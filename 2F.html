@@ -777,6 +777,8 @@ function updateRemotePlayers2F(dt) {
     let anesthAutoDoorR = null;
     let hybridOrAutoDoorL = null;
     let hybridOrAutoDoorR = null;
+    let sicuAutoDoorL = null;
+    let sicuAutoDoorR = null;
 
     // 3D 感應光圈參考（電梯 & 橫向手扶梯）
     const transportPads = [];
@@ -2338,6 +2340,75 @@ function updateRemotePlayers2F(dt) {
       buildHybridSuite(-2.8, -39.5, 'HYBRID OR-2');
     }
 
+      buildSicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterWoodMat, counterTopMat);
+
+function buildSicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterWoodMat, counterTopMat) {
+  // 東側直接共用 Hybrid OR 西牆 (X = -24.0)，西側貼齊西側外牆 (X = -53.5)
+  // 南側走廊牆（開口中心 X = -38.5，總寬 3.6m，開口範圍 X: -40.3 ~ -36.7）
+  // 西段牆：X = -53.5 ~ -40.3 (中心 -46.9, 寬 13.2)
+  // 東段牆：X = -36.7 ~ -24.0 (中心 -30.35, 寬 12.7)
+  addWall(-46.9, -28.6, 13.2, 0.5, 4.4, wallBlueMat, 'SICU 南側西段封閉牆', 2, f2Y);
+  addWall(-30.35, -28.6, 12.7, 0.5, 4.4, wallBlueMat, 'SICU 南側東段封閉牆', 2, f2Y);
+
+  // 電動門上方門楣
+  const sicuHeader = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.82, 0.52), wallBlueMat);
+  sicuHeader.position.set(-38.5, f2Y + 3.49, -28.6);
+  scene.add(sicuHeader);
+
+  // 雙開無菌自動感應電動門 (中心 X = -38.5, Z = -28.6)
+  const sicuDoorMat = new THREE.MeshStandardMaterial({ color: 0x0369a1, roughness: 0.25, metalness: 0.45 });
+  sicuAutoDoorL = new THREE.Mesh(new THREE.BoxGeometry(1.78, 2.58, 0.14), sicuDoorMat);
+  sicuAutoDoorL.position.set(-39.39, f2Y + 1.29, -28.6);
+  sicuAutoDoorR = new THREE.Mesh(new THREE.BoxGeometry(1.78, 2.58, 0.14), sicuDoorMat);
+  sicuAutoDoorR.position.set(-37.61, f2Y + 1.29, -28.6);
+
+  const sGlassL = new THREE.Mesh(new THREE.BoxGeometry(0.45, 1.05, 0.17), glassMat);
+  sGlassL.position.set(0.32, 0.32, 0);
+  sicuAutoDoorL.add(sGlassL);
+  const sGlassR = sGlassL.clone();
+  sGlassR.position.set(-0.32, 0.32, 0);
+  sicuAutoDoorR.add(sGlassR);
+  scene.add(sicuAutoDoorL, sicuAutoDoorR);
+
+  // 門口主發光燈箱（與右側 Hybrid OR、麻醉科齊平）
+  addHangingSign(-38.5, f2Y + 3.45, -28.25, 5.4, 0.65, 'SICU 外科加護病房', 'SURGICAL INTENSIVE CARE UNIT', '#1e3a8a', '#38bdf8');
+
+  // 中央隔離玻璃護理工作站 (X = -38.5, Z = -36.5)
+  addWall(-38.5, -36.5, 6.4, 1.1, 1.08, counterWoodMat, 'SICU 中央監護護理站', 2, f2Y, false);
+  const nsTop = new THREE.Mesh(new THREE.BoxGeometry(6.6, 0.12, 1.25), counterTopMat);
+  nsTop.position.set(-38.5, f2Y + 1.12, -36.5);
+  const nsGlass = new THREE.Mesh(new THREE.BoxGeometry(6.2, 0.85, 0.06), glassMat);
+  nsGlass.position.set(-38.5, f2Y + 1.56, -36.0);
+  scene.add(nsTop, nsGlass);
+  addHangingSign(-38.5, f2Y + 3.25, -36.5, 4.4, 0.55, 'SICU 中央生理監測站', 'CENTRAL ICU MONITORING', '#0f172a', '#38bdf8');
+
+  // 護理站多床中央生理監視螢幕
+  [-40.5, -38.5, -36.5].forEach((mx) => {
+    const mon = new THREE.Mesh(
+      new THREE.BoxGeometry(0.68, 0.44, 0.06),
+      new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x10b981, emissiveIntensity: 0.85 })
+    );
+    mon.position.set(mx, f2Y + 1.48, -36.5);
+    scene.add(mon);
+  });
+
+  // 6 床獨立玻璃隔間加護病床 + 呼吸器與生理監視儀（西側 3 床、東側 3 床）
+  const icuBeds = [
+    { x: -49.5, z: -33.2 }, { x: -49.5, z: -38.8 }, { x: -49.5, z: -44.2 },
+    { x: -28.0, z: -33.2 }, { x: -28.0, z: -38.8 }, { x: -28.0, z: -44.2 }
+  ];
+  icuBeds.forEach((b) => {
+    buildHospitalBedUnit(b.x, b.z, 0x0ea5e9, false, true, 2, f2Y);
+
+    // 床旁呼吸器與生命徵象監視工作車
+    const ventX = b.x < -38.5 ? b.x + 1.1 : b.x - 1.1;
+    const cart = new THREE.Mesh(
+      new THREE.BoxGeometry(0.62, 1.35, 0.58),
+      new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 })
+    );
+    cart.position.set(ventX, f2Y + 0.68, b.z - 0.35);
+    const screen =
+
       // 2. 2F 東側空地：全面封閉式「開刀房 (OR-1 ~ OR-9)」與無菌自動感應電動門（朝西開門）
 addWall(44.25, -28.6, 18.5, 0.5, 4.4, wallMintMat, '開刀房北牆', 2, f2Y);
 addWall(44.25, 6.0, 18.5, 0.5, 4.4, wallMintMat, '開刀房南牆', 2, f2Y);
@@ -3270,6 +3341,9 @@ scene.add(reproHeader);
       addCofferedCeilingBay(38.0, y2F, -37.5, 24.0, 16.5, true);
       addCofferedCeilingBay(-25.5, y2F, 31.5, 16.5, 18.0, true);
       addCofferedCeilingBay(35.6, y2F, 36.25, 34.0, 16.0, true);
+      addCofferedCeilingBay(-38.5, y2F, -37.5, 28.0, 16.5, false);
+      addCofferedCeilingBay(-11.0, y2F, -37.5, 24.0, 16.5, false);
+      addCofferedCeilingBay(13.6, y2F, -37.5, 22.0, 16.5, false);
 
       const dummy = new THREE.Object3D();
       const lightGeom = new THREE.CylinderGeometry(0.16, 0.16, 0.03, 16);
@@ -4589,6 +4663,56 @@ scene.add(reproHeader);
         options: []
       },
 
+      {
+  name: '張志豪 外科加護病房主任',
+  role: '2F SICU・外科重症醫學專科醫師',
+  avatar: '🩺',
+  type: 'staff',
+  floor: 2,
+  baseY: 4.6,
+  badgeColor: '#38bdf8',
+  appearance: { coatColor: 0xffffff, pantsColor: 0x1e3a8a, isDoctor: true },
+  waypoints: [
+    new THREE.Vector3(-43.5, 4.6, -34.5),
+    new THREE.Vector3(-43.5, 4.6, -42.5),
+    new THREE.Vector3(-33.5, 4.6, -42.5),
+    new THREE.Vector3(-33.5, 4.6, -34.5)
+  ],
+  speed: 1.15,
+  dialogue: '歡迎來到 2F SICU 外科加護病房！我們專責照護重大手術後與外科重症病患，24 小時嚴密監控呼吸器與血液動力學。',
+  options: []
+},
+{
+  name: '林美惠 SICU 護理師',
+  role: '2F SICU 中央監護站・重症專科護理師',
+  avatar: '👩‍⚕️',
+  type: 'staff',
+  floor: 2,
+  baseY: 4.6,
+  badgeColor: '#2dd4bf',
+  appearance: { coatColor: 0x0284c7, pantsColor: 0x0f172a, isNurse: true },
+  waypoints: [new THREE.Vector3(-38.5, 4.6, -35.2)],
+  speed: 0,
+  yaw: Math.PI,
+  dialogue: '您好！這裡是 SICU 中央生理監測站，請先穿戴隔離衣並完成手部消毒再進入病室探視家屬喔！',
+  options: []
+},
+{
+  name: '趙建國 先生 (SICU 1床術後重症患者)',
+  role: '2F SICU 1床・重大手術後重症監護中',
+  avatar: '🛌',
+  type: 'patient',
+  floor: 2,
+  baseY: 4.6,
+  badgeColor: '#60a5fa',
+  appearance: { coatColor: 0x93c5fd, pantsColor: 0x334155, isLyingBed: true },
+  waypoints: [new THREE.Vector3(-49.5, 4.6, -33.2)],
+  speed: 0,
+  yaw: 0,
+  dialogue: '（病患正連接心電圖與呼吸器，在醫護團隊 24 小時密切照護下穩定恢復中）',
+  options: []
+},
+
         // ==================== 1F 大廳代表 NPC ====================
         {
           name: '林佳穎 急診護理師',
@@ -5444,6 +5568,14 @@ scene.add(reproHeader);
         hybridOrAutoDoorR.position.x = THREE.MathUtils.lerp(hybridOrAutoDoorR.position.x, -10.11 + openHybrid, dt * 12);
       }
 
+      if (sicuAutoDoorL && sicuAutoDoorR) {
+  const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - (-38.5), player.pos.z - (-28.6)) < 4.8);
+  const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - (-38.5), n.pos.z - (-28.6)) < 4.4);
+  const openSicu = (nearPlayer || nearNpc) ? 1.68 : 0.0;
+  sicuAutoDoorL.position.x = THREE.MathUtils.lerp(sicuAutoDoorL.position.x, -39.39 - openSicu, dt * 12);
+  sicuAutoDoorR.position.x = THREE.MathUtils.lerp(sicuAutoDoorR.position.x, -37.61 + openSicu, dt * 12);
+}
+
       camState.yaw = lerpAngle(camState.yaw, camState.targetYaw, dt * 16);
       camState.pitch = THREE.MathUtils.lerp(camState.pitch, camState.targetPitch, dt * 16);
       camState.distance = THREE.MathUtils.lerp(camState.distance, camState.targetDistance, dt * 12);
@@ -5673,6 +5805,7 @@ scene.add(reproHeader);
         if (z < -28.0 && x > 25.0) zoneName = '2F 東北側・血液透析中心 / CAPD 中心';
         else if (z < -28.0 && x >= 2.0 && x <= 25.0) zoneName = '2F 麻醉科 (術前評估門診・術後恢復室 PACU)';
         else if (z < -28.0 && x >= -24.0 && x < 2.0) zoneName = '2F Hybrid OR (複合式手術室・影像導航控制室)';
+        else if (z < -28.0 && x < -24.0) zoneName = '2F 西北側・SICU 外科加護病房';
         else if (x > 35.0 && z >= -26.0 && z <= 6.0) zoneName = '2F 開刀房 (OR-1 ~ OR-9・感應電動門內)';
         else if (z > 22.0 && x < -35.5) zoneName = '2F 嬰兒室 (透明玻璃觀察櫥窗・新生兒照護)';
         else if (z > 22.0 && x >= -35.5 && x < -19.2) zoneName = '2F 產房 (Delivery Room・LDR 樂得兒產房)';
@@ -5800,6 +5933,7 @@ scene.add(reproHeader);
         drawZone(38, -37.5, 25, 18, '#fce7f3', '2F洗腎/CAPD');
         drawZone(13.6, -37.5, 23.2, 18, '#e0f2fe', '麻醉科');
         drawZone(-11.0, -37.5, 26.0, 18, '#ccfbf1', 'Hybrid OR');
+        drawZone(-38.75, -37.5, 29.5, 18, '#dbeafe', 'SICU');
         drawZone(44.25, -10.0, 18.5, 32.0, '#d1fae5', '開刀房');
         drawZone(-43.5, 35, 16, 17, '#e0f2fe', '嬰兒室');
         drawZone(-25.5, 34.5, 12.5, 17, '#fce7f3', '產房');
