@@ -4551,16 +4551,12 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
       addWaitingBenchRow(26.8, 26.2, Math.PI / 2, 4);
       addWaitingBenchRow(26.8, 31.6, Math.PI / 2, 4);
 
-      // ==========================================
-      // 1. 國際會議廳西隔間牆（往西延伸至 x = 33.2 補齊右側縫隙，北端 z = 20.0，南端 z = 44.5）
-      // ==========================================
-      addWall(33.2, 32.25, 0.5, 24.5, 4.4, wallMarbleBlueMat, '國際會議廳西牆');
+      // 1. 國際會議廳西隔間牆（延伸北端至 z = 20.0 與北牆完美接合，南端至 z = 44.5 外牆）
+      addWall(35.2, 32.25, 0.5, 24.5, 4.4, wallMarbleBlueMat, '國際會議廳西牆');
 
-      // 2. 國際會議廳北側隔間圍牆（x = 33.2 ~ 53.5，於中央 x = 44.35 留出 3.8m 自動門洞：x = 42.45 ~ 46.25）
-      // 西段從 33.20 到 42.45 -> 寬度 9.25，中心點 37.825（已往西延伸補齊縫隙）
-      addWall(37.825, 20.0, 9.25, 0.5, 4.4, wallMarbleBlueMat, '國際會議廳北牆西段');
-      // 東段從 46.25 到 53.50 -> 寬度 7.25，中心點 49.875
-      addWall(49.875, 20.0, 7.25, 0.5, 4.4, wallMarbleBlueMat, '國際會議廳北牆東段');
+      // 2. 國際會議廳北側隔間圍牆（x = 35.2 ~ 53.5，總寬 18.3m，於中央 x = 44.35 留出 3.8m 自動門洞：x = 42.45 ~ 46.25）
+      addWall(38.825, 20.0, 7.25, 0.5, 4.4, wallMarbleBlueMat, '國際會議廳北牆西段'); // x: 35.20 -> 42.45
+      addWall(49.875, 20.0, 7.25, 0.5, 4.4, wallMarbleBlueMat, '國際會議廳北牆東段'); // x: 46.25 -> 53.50
 
       // 3. 國際會議廳北側出入口自動感應玻璃雙開門
       addAutoSlidingDoorUnit({
@@ -4579,131 +4575,27 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
 
       addWallMountedSign(44.35, 3.68, 19.64, 5.2, 0.90, '國際會議廳', 'CONFERENCE HALL', '#1e3a8a', '#93c5fd', Math.PI);
 
-      // ==========================================
-      // 4. 會議廳內部重新設計（地毯、舞台、講台、左右分區桌椅）
-      // ==========================================
-      // (A) 會議廳地毯地板 (x: 33.45 ~ 53.25, z: 20.25 ~ 44.25)
-      const hallCarpet = new THREE.Mesh(
-        new THREE.PlaneGeometry(19.8, 24.0),
-        getCachedStandardMat(0x1e293b, 0.9, 0.05)
-      );
-      hallCarpet.rotation.x = -Math.PI / 2;
-      hallCarpet.position.set(43.35, 0.015, 32.25);
-      scene.add(hallCarpet);
-
-      // 中央迎賓紅毯走道（對齊大門中心 x = 44.35，從入口延伸至舞台前）
-      const centerAisle = new THREE.Mesh(
-        new THREE.PlaneGeometry(2.6, 19.5),
-        getCachedStandardMat(0x7f1d1d, 0.85, 0.05)
-      );
-      centerAisle.rotation.x = -Math.PI / 2;
-      centerAisle.position.set(44.35, 0.02, 30.0);
-      scene.add(centerAisle);
-
-      // (B) 南側演講舞台區 (z = 40.2 ~ 44.2, x = 35.0 ~ 52.5)
-      const stageMat = getCachedStandardMat(0x451a03, 0.6, 0.1);
-      const stage = new THREE.Mesh(getCachedBoxGeom(17.5, 0.36, 4.0), stageMat);
-      stage.position.set(43.75, 0.18, 42.2);
-      stage.castShadow = true;
-      stage.receiveShadow = true;
-      scene.add(stage);
-      colliders.push({ minX: 35.0, maxX: 52.5, minZ: 40.2, maxZ: 44.2, label: '會議廳舞台' });
-
-      // 舞台中央階梯
-      const stageStep = new THREE.Mesh(getCachedBoxGeom(2.8, 0.18, 0.6), stageMat);
-      stageStep.position.set(44.35, 0.09, 39.9);
-      scene.add(stageStep);
-
-      // 演講台 (Podium) 與麥克風（位於舞台左側 x = 39.2, z = 41.0）
-      const podium = new THREE.Mesh(
-        getCachedBoxGeom(1.1, 1.15, 0.75),
-        getCachedStandardMat(0x78350f, 0.45, 0.1)
-      );
-      podium.position.set(39.2, 0.36 + 0.575, 41.0);
-      podium.castShadow = true;
-      scene.add(podium);
-
-      const mic = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.015, 0.015, 0.38, 8),
-        getCachedStandardMat(0x111827, 0.3, 0.8)
-      );
-      mic.position.set(39.2, 1.65, 40.85);
-      mic.rotation.x = -0.3;
-      scene.add(mic);
-
-      // 貴賓與談席長桌（舞台中央偏右 x = 45.8, z = 41.6）
-      const vipTable = new THREE.Mesh(
-        getCachedBoxGeom(5.2, 0.76, 0.95),
-        getCachedStandardMat(0x78350f, 0.45, 0.1)
-      );
-      vipTable.position.set(45.8, 0.36 + 0.38, 41.6);
-      scene.add(vipTable);
-
-      const vipSkirt = new THREE.Mesh(
-        getCachedBoxGeom(5.24, 0.74, 0.05),
-        getCachedStandardMat(0x1e3a8a, 0.85, 0.05)
-      );
-      vipSkirt.position.set(45.8, 0.36 + 0.37, 41.11);
-      scene.add(vipSkirt);
-
-      // (C) 觀眾席：左右兩側各 4 排會議長桌與座椅（中間留出 2.6m 走道）
-      const deskMat = getCachedStandardMat(0xb45309, 0.45, 0.05);
-      const chairMat = getCachedStandardMat(0x1e3a8a, 0.7, 0.1);
-      const legMat = getCachedStandardMat(0x334155, 0.4, 0.6);
-
-      for (let r = 0; r < 4; r++) {
-        const tz = 24.5 + r * 3.6; // z: 24.5, 28.1, 31.7, 35.3
-        // 西側區中心 x = 38.6（寬 6.4m），東側區中心 x = 49.6（寬 5.6m）
-        const zones = [
-          { cx: 38.6, w: 6.4, seats: 5 },
-          { cx: 49.6, w: 5.6, seats: 4 }
-        ];
-
-        zones.forEach(zone => {
-          // 會議長桌
-          const tbl = new THREE.Mesh(getCachedBoxGeom(zone.w, 0.08, 0.8), deskMat);
-          tbl.position.set(zone.cx, 0.76, tz);
-          tbl.castShadow = true;
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 2; c++) {
+          const tx = 40.5 + c * 6.5;
+          const tz = 26.5 + r * 5.2;
+          const tbl = new THREE.Mesh(
+            getCachedBoxGeom(3.6, 0.1, 1.3),
+            getCachedStandardMat(0x92400e, 0.45, 0.05)
+          );
+          tbl.position.set(tx, 0.78, tz);
           scene.add(tbl);
-          colliders.push({
-            minX: zone.cx - zone.w / 2 - 0.1,
-            maxX: zone.cx + zone.w / 2 + 0.1,
-            minZ: tz - 0.45,
-            maxZ: tz + 0.75,
-            label: '會議桌椅區'
-          });
-
-          // 桌腳
-          [-zone.w / 2 + 0.3, zone.w / 2 - 0.3].forEach(offsetX => {
-            const leg = new THREE.Mesh(getCachedBoxGeom(0.08, 0.74, 0.65), legMat);
-            leg.position.set(zone.cx + offsetX, 0.37, tz);
-            scene.add(leg);
-          });
-
-          // 會議椅（位於桌子北側 -Z，人員坐下時面向南方 +Z 舞台）
-          const spacing = (zone.w - 1.0) / (zone.seats - 1);
-          for (let s = 0; s < zone.seats; s++) {
-            const sx = (zone.cx - (zone.w - 1.0) / 2) + s * spacing;
-            const sz = tz - 0.55;
-
-            const seat = new THREE.Mesh(getCachedBoxGeom(0.52, 0.08, 0.5), chairMat);
-            seat.position.set(sx, 0.46, sz);
-            scene.add(seat);
-
-            const back = new THREE.Mesh(getCachedBoxGeom(0.52, 0.48, 0.08), chairMat);
-            back.position.set(sx, 0.72, sz - 0.22);
-            scene.add(back);
-          }
-        });
-      }
-
-      // ==========================================
-      // 5. 國際會議廳：南牆電動大布幕與天花板投影機（已移出迴圈，只生成一次）
+          colliders.push({ minX: tx - 1.9, maxX: tx + 1.9, minZ: tz - 0.75, maxZ: tz + 0.75, label: '會議餐桌' });
+        }
+        // ==========================================
+      // 國際會議廳：南牆電動大布幕與天花板投影機
       // ==========================================
       const screenGroup = new THREE.Group();
-      screenGroup.position.set(44.35, 2.65, 44.15);
+      // 緊貼南側外牆內側 (z = 44.15)，中心對齊大門中軸線 (x = 44.35)，面向北方 (-Z)
+      screenGroup.position.set(44.35, 2.55, 44.15);
       screenGroup.rotation.y = Math.PI;
 
+      // 1. 上方電動布幕收納外殼
       const casing = new THREE.Mesh(
         new THREE.BoxGeometry(7.2, 0.24, 0.26),
         new THREE.MeshStandardMaterial({ color: 0x263238, roughness: 0.4, metalness: 0.5 })
@@ -4712,12 +4604,14 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
       casing.castShadow = true;
       screenGroup.add(casing);
 
+      // 2. 布幕黑色邊框
       const screenFrame = new THREE.Mesh(
         new THREE.BoxGeometry(6.8, 3.2, 0.04),
         new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8 })
       );
       screenGroup.add(screenFrame);
 
+      // 3. 投影簡報畫面貼圖
       const slideCanvas = document.createElement('canvas');
       slideCanvas.width = 1024;
       slideCanvas.height = 512;
@@ -4772,6 +4666,7 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
       screenSurface.position.z = 0.025;
       screenGroup.add(screenSurface);
 
+      // 4. 下方配重軸桿
       const bottomBar = new THREE.Mesh(
         new THREE.CylinderGeometry(0.035, 0.035, 6.9, 16),
         new THREE.MeshStandardMaterial({ color: 0x37474f, metalness: 0.6, roughness: 0.3 })
@@ -4782,10 +4677,11 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
 
       scene.add(screenGroup);
 
-      // 天花板懸吊式投影機
+      // 5. 天花板懸吊式投影機 (位於布幕正前方 x = 44.35, z = 38.5)
       const projGroup = new THREE.Group();
       projGroup.position.set(44.35, 4.15, 38.5);
 
+      // 吊桿與底座
       const mountBase = new THREE.Mesh(
         new THREE.CylinderGeometry(0.18, 0.18, 0.06, 16),
         new THREE.MeshStandardMaterial({ color: 0x455a64, metalness: 0.5 })
@@ -4800,6 +4696,7 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
       pole.position.y = 0.38;
       projGroup.add(pole);
 
+      // 投影機機身 (鏡頭朝向 +Z 南側布幕)
       const projBody = new THREE.Mesh(
         new THREE.BoxGeometry(0.56, 0.22, 0.68),
         new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35, metalness: 0.2 })
@@ -4807,6 +4704,7 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
       projBody.castShadow = true;
       projGroup.add(projBody);
 
+      // 投影機鏡頭圈與發光鏡片
       const lensRing = new THREE.Mesh(
         new THREE.CylinderGeometry(0.075, 0.085, 0.1, 20),
         new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.6, roughness: 0.3 })
@@ -4826,6 +4724,7 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
       lensGlass.position.set(0.1, -0.02, 0.412);
       projGroup.add(lensGlass);
 
+      // 半透明投影光束錐 (從鏡頭射向南牆布幕)
       const beamCone = new THREE.Mesh(
         new THREE.ConeGeometry(1.8, 5.4, 24, 1, true),
         new THREE.MeshBasicMaterial({
@@ -4842,7 +4741,7 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
 
       scene.add(projGroup);
       }
-    
+
       // E. 北半部醫療區：檢驗科、藥劑科、放射科 (MRI/CT) 與急診室（含無縫補齊隔間牆）
       buildLaboratoryArea(wallMarbleBlueMat, counterWoodMat, counterTopMat, glassMat);
       buildPharmacyArea(wallMarbleMintMat, counterWoodMat, counterTopMat, glassMat);
