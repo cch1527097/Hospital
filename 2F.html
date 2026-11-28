@@ -2428,17 +2428,22 @@ function buildSicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counter
   });
 }
 
-      function buildMicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterWoodMat, counterTopMat) {
-  // 座標規劃：X = -53.5 ~ -42.5，Z = -28.6 ~ +4.0
-  // 北側直接共用 SICU 南側西段封閉牆 (Z = -28.6)，無縫貼齊消除凹槽死角
+      buildMicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterWoodMat, counterTopMat);
 
-  // 1. 南側封閉牆 (Z = +4.0, X: -53.5 ~ -42.5, 中心 -48.0, 寬 11.0)
+function buildMicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterWoodMat, counterTopMat) {
+  // 座標規劃：X = -53.5 ~ -42.5，Z = -23.0 ~ +4.0
+  // 東牆位於 X = -42.5，距離 SICU 門口 (X = -38.5, Z = -28.6) 尚有 4m 寬走道，完全不擋住 SICU 門面與視線
+
+  // 1. 北側封閉牆 (Z = -23.0, X: -53.5 ~ -42.5, 中心 -48.0, 寬 11.0)
+  addWall(-48.0, -23.0, 11.0, 0.5, 4.4, wallBlueMat, 'MICU 北側封閉牆', 2, f2Y);
+
+  // 2. 南側封閉牆 (Z = +4.0, X: -53.5 ~ -42.5, 中心 -48.0, 寬 11.0)
   addWall(-48.0, 4.0, 11.0, 0.5, 4.4, wallBlueMat, 'MICU 南側封閉牆', 2, f2Y);
 
-  // 2. 東側走廊牆（朝東開門，開口中心 Z = -9.5，總寬 3.6m，開口範圍 Z: -11.3 ~ -7.7）
-  // 北段牆：從 Z = -28.6 延伸至 -11.3 (中心 -19.95, 長 17.3)
-  // 南段牆：從 Z = -7.7 延伸至 +4.0 (中心 -1.85, 長 11.7)
-  addWall(-42.5, -19.95, 0.5, 17.3, 4.4, wallBlueMat, 'MICU 東側北段封閉牆', 2, f2Y);
+  // 3. 東側走廊牆（朝東開門，開口中心 Z = -9.5，總寬 3.6m，開口範圍 Z: -11.3 ~ -7.7）
+  // 北段牆：Z = -23.0 ~ -11.3 (中心 -17.15, 長 11.7)
+  // 南段牆：Z = -7.7 ~ +4.0 (中心 -1.85, 長 11.7)
+  addWall(-42.5, -17.15, 0.5, 11.7, 4.4, wallBlueMat, 'MICU 東側北段封閉牆', 2, f2Y);
   addWall(-42.5, -1.85, 0.5, 11.7, 4.4, wallBlueMat, 'MICU 東側南段封閉牆', 2, f2Y);
 
   // 電動門上方門楣
@@ -2465,19 +2470,19 @@ function buildSicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counter
   const micuSign = addHangingSign(-42.15, f2Y + 3.45, -9.5, 5.2, 0.65, 'MICU 內科加護病房', 'MEDICAL INTENSIVE CARE UNIT', '#134e4a', '#2dd4bf');
   if (micuSign) micuSign.rotation.y = Math.PI / 2;
 
-  // 3. 中央隔離玻璃護理工作站 (X = -46.2, Z = -11.0，縱向配置)
-  addWall(-46.2, -11.0, 1.1, 7.2, 1.08, counterWoodMat, 'MICU 中央監護護理站', 2, f2Y, false);
-  const nsTop = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.12, 7.4), counterTopMat);
-  nsTop.position.set(-46.2, f2Y + 1.12, -11.0);
-  const nsGlass = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.85, 7.0), glassMat);
-  nsGlass.position.set(-45.7, f2Y + 1.56, -11.0);
+  // 4. 中央隔離玻璃護理工作站 (X = -46.2, Z = -9.5，縱向配置)
+  addWall(-46.2, -9.5, 1.1, 6.2, 1.08, counterWoodMat, 'MICU 中央監護護理站', 2, f2Y, false);
+  const nsTop = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.12, 6.4), counterTopMat);
+  nsTop.position.set(-46.2, f2Y + 1.12, -9.5);
+  const nsGlass = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.85, 6.0), glassMat);
+  nsGlass.position.set(-45.7, f2Y + 1.56, -9.5);
   scene.add(nsTop, nsGlass);
 
-  const nsSubSign = addHangingSign(-46.2, f2Y + 3.25, -11.0, 4.2, 0.55, 'MICU 中央生理監測站', 'MEDICAL ICU MONITORING', '#0f172a', '#2dd4bf');
+  const nsSubSign = addHangingSign(-46.2, f2Y + 3.25, -9.5, 4.2, 0.55, 'MICU 中央生理監測站', 'MEDICAL ICU MONITORING', '#0f172a', '#2dd4bf');
   if (nsSubSign) nsSubSign.rotation.y = Math.PI / 2;
 
   // 護理站多床中央生理監視螢幕
-  [-13.2, -11.0, -8.8].forEach((mz) => {
+  [-11.5, -9.5, -7.5].forEach((mz) => {
     const mon = new THREE.Mesh(
       new THREE.BoxGeometry(0.06, 0.44, 0.68),
       new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x10b981, emissiveIntensity: 0.85 })
@@ -2486,9 +2491,8 @@ function buildSicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counter
     scene.add(mon);
   });
 
-  // 4. 6 床內科加護病床 + 呼吸器與生理監視工作車（善用延伸至 Z = -28.6 的北側空間，擴增為 6 床）
+  // 5. 5 床內科加護病床 + 呼吸器與血液透析/生理監視工作車（靠西牆 X = -50.8 縱向排列）
   const micuBeds = [
-    { x: -50.8, z: -24.5 },
     { x: -50.8, z: -19.5 },
     { x: -50.8, z: -14.5 },
     { x: -50.8, z: -9.5 },
