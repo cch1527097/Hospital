@@ -2190,24 +2190,6 @@ addHangingSign(34.5, f2Y + 3.55, -10.0, 7.2, 0.88, '開刀房', 'OPERATING ROOMS
         { x: 14.8, z: 10.6, rotY: -Math.PI / 2 }
       ].forEach((hp) => addFireHydrantCabinet(hp.x, hp.z, hp.rotY, f2Y));
     }
-      
-      buildObgynMaternityComplex(f2Y, glassMat, darkFrameMat, counterTopMat);
-
-      buildCardiovascularCenter2F(f2Y, wallPinkMat, wallCreamMat);
-
-      buildDentalDepartment2F(f2Y, wallPinkMat, wallCreamMat, glassMat, counterTopMat);
-
-      buildReproductiveCenter2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterTopMat);
-
-      addWall(-4.85, 44.0, 13.8, 0.35, 4.4, wallPinkMat, '2F 中南側走廊粉紅底牆', 2, f2Y);
-
-      [
-        { x: -16, z: 43.9, rotY: Math.PI },
-        { x: 25.0, z: 43.9, rotY: Math.PI },
-        { x: -14.8, z: 10.6, rotY: Math.PI / 2 },
-        { x: 14.8, z: 10.6, rotY: -Math.PI / 2 }
-      ].forEach((hp) => addFireHydrantCabinet(hp.x, hp.z, hp.rotY, f2Y));
-    }
 
     function buildObgynMaternityComplex(f2Y, glassMat, darkFrameMat, counterTopMat) {
       const stripedWallMat = ArchMaterials.wallObgynStriped;
