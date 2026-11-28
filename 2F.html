@@ -2044,59 +2044,57 @@ function updateRemotePlayers2F(dt) {
 
       addHangingSign(0, f2Y + 3.65, 7.6, 6.8, 0.88, '向日葵醫院電梯廳', '產房・嬰兒室・婦產科病房・開刀房・ICU・牙科', '#0f4c5c', '#fbbf24');
 
-      // 1. 2F 東北側：2F 血液透析中心 & CAPD 腹膜透析中心（電動門設於正前方牆面中央 X = 39.5，兩側牆面完全密合）
-      // 西牆延伸至北側外牆 (Z: -47.5 ~ -28.35)，消除北端縫隙
-      addWall(25.2, -37.925, 0.5, 19.15, 4.4, wallPinkMat, '2F 血液透析中心西牆', 2, f2Y);
+      // 1. 2F 東北側：2F 血液透析中心 & CAPD 腹膜透析中心（電動門改設於西牆 X = 25.2, Z = -33.5，南牆完全封閉）
+// 西牆分為南北兩段，中間留出 3.4m 電動門開口 (開口 Z: -35.2 ~ -31.8)
+addWall(25.2, -41.35, 0.5, 12.3, 4.4, wallPinkMat, '2F 血液透析中心西側北段封閉牆', 2, f2Y);
+addWall(25.2, -30.1, 0.5, 3.4, 4.4, wallPinkMat, '2F 血液透析中心西側南段封閉牆', 2, f2Y);
 
-      // 南牆分為電動門左右兩段（開口中心 X = 39.5，寬度 3.4m，範圍 X: 37.8 ~ 41.2）：
-      // 西段牆：X = 24.95 ~ 37.8 (中心 31.375, 寬 12.85)
-      // 東段牆：X = 41.2 ~ 53.5 (中心 47.35, 寬 12.3)，貼齊東側外牆徹底補齊縫隙
-      addWall(31.375, -28.6, 12.85, 0.5, 4.4, wallPinkMat, '2F 血液透析中心南側西段封閉牆', 2, f2Y);
-      addWall(47.35, -28.6, 12.3, 0.5, 4.4, wallPinkMat, '2F 血液透析中心南側東段封閉牆', 2, f2Y);
+// 電動門上方門楣 (X = 25.2, Z = -33.5)
+const dialysisHeader = new THREE.Mesh(new THREE.BoxGeometry(0.52, 1.82, 3.4), wallPinkMat);
+dialysisHeader.position.set(25.2, f2Y + 3.49, -33.5);
+scene.add(dialysisHeader);
 
-      // 電動門上方門楣 (X = 39.5)
-      const dialysisHeader = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.82, 0.52), wallPinkMat);
-      dialysisHeader.position.set(39.5, f2Y + 3.49, -28.6);
-      scene.add(dialysisHeader);
+// 南牆完整封閉 (X: 24.95 ~ 53.5，總寬 28.55m，中心 X = 39.225)，供開刀房北牆直接貼齊
+addWall(39.225, -28.6, 28.55, 0.5, 4.4, wallPinkMat, '2F 血液透析中心南側封閉牆', 2, f2Y);
 
-      // 血液透析中心雙開自動感應電動門（位於 X = 39.5，含透明觀察窗）
-      const dialysisDoorMat = new THREE.MeshStandardMaterial({
-        color: 0xbe185d,
-        roughness: 0.25,
-        metalness: 0.42
-      });
-      dialysisAutoDoorL = new THREE.Mesh(new THREE.BoxGeometry(1.72, 2.58, 0.16), dialysisDoorMat);
-      dialysisAutoDoorL.position.set(38.64, f2Y + 1.29, -28.6);
-      dialysisAutoDoorR = new THREE.Mesh(new THREE.BoxGeometry(1.72, 2.58, 0.16), dialysisDoorMat);
-      dialysisAutoDoorR.position.set(40.36, f2Y + 1.29, -28.6);
+// 血液透析中心雙開自動感應電動門（位於西牆 X = 25.2, Z = -33.5，沿 Z 軸滑開）
+const dialysisDoorMat = new THREE.MeshStandardMaterial({
+  color: 0xbe185d,
+  roughness: 0.25,
+  metalness: 0.42
+});
+dialysisAutoDoorL = new THREE.Mesh(new THREE.BoxGeometry(0.16, 2.58, 1.72), dialysisDoorMat);
+dialysisAutoDoorL.position.set(25.2, f2Y + 1.29, -34.36);
+dialysisAutoDoorR = new THREE.Mesh(new THREE.BoxGeometry(0.16, 2.58, 1.72), dialysisDoorMat);
+dialysisAutoDoorR.position.set(25.2, f2Y + 1.29, -32.64);
 
-      const diaWinL = new THREE.Mesh(new THREE.BoxGeometry(0.48, 1.15, 0.19), glassMat);
-      diaWinL.position.set(0.32, 0.3, 0);
-      dialysisAutoDoorL.add(diaWinL);
-      const diaWinR = diaWinL.clone();
-      diaWinR.position.set(-0.32, 0.3, 0);
-      dialysisAutoDoorR.add(diaWinR);
-      scene.add(dialysisAutoDoorL, dialysisAutoDoorR);
+const diaWinL = new THREE.Mesh(new THREE.BoxGeometry(0.19, 1.15, 0.48), glassMat);
+diaWinL.position.set(0, 0.3, 0.32);
+dialysisAutoDoorL.add(diaWinL);
+const diaWinR = diaWinL.clone();
+diaWinR.position.set(0, 0.3, -0.32);
+dialysisAutoDoorR.add(diaWinR);
+scene.add(dialysisAutoDoorL, dialysisAutoDoorR);
 
-      // CAPD 腹膜透析室隔間向東貼齊外牆 (X = 53.5)
-      addWall(45.5, -36.5, 16.0, 0.45, 4.4, wallBlueMat, 'CAPD 腹膜透析室隔間', 2, f2Y);
+// CAPD 腹膜透析室隔間向東貼齊外牆 (X = 53.5)
+addWall(45.5, -36.5, 16.0, 0.45, 4.4, wallBlueMat, 'CAPD 腹膜透析室隔間', 2, f2Y);
 
-      // 懸掛燈箱同步移至電動門正上方 (X = 39.5)
-      addHangingSign(39.5, f2Y + 3.6, -28.25, 6.8, 0.88, '血液透析中心', 'HEMODIALYSIS', '#be123c', '#fda4af');
-      addHangingSign(35.0, f2Y + 3.3, -35.8, 5.4, 0.72, '血液透析中心', 'HEMODIALYSIS CENTER', '#0369a1', '#7dd3fc');
+// 主燈箱移至西牆電動門正上方 (rotY = -Math.PI / 2 朝向西側走廊)
+addHangingSign(24.85, f2Y + 3.6, -33.5, 6.8, 0.88, '血液透析中心', 'HEMODIALYSIS', '#be123c', '#fda4af', -Math.PI / 2);
+addHangingSign(35.0, f2Y + 3.3, -35.8, 5.4, 0.72, '血液透析中心', 'HEMODIALYSIS CENTER', '#0369a1', '#7dd3fc');
 
-      for (let row = 0; row < 2; row++) {
-        for (let col = 0; col < 3; col++) {
-          buildHospitalBedUnit(30.5 + col * 6.5, -33.2 - row * 7.2, 0x38bdf8, true, true, 2, f2Y);
-        }
-      }
+for (let row = 0; row < 2; row++) {
+  for (let col = 0; col < 3; col++) {
+    buildHospitalBedUnit(30.5 + col * 6.5, -33.2 - row * 7.2, 0x38bdf8, true, true, 2, f2Y);
+  }
+}
 
       // 2. 2F 東側空地：全面封閉式「開刀房 (OR-1 ~ OR-9)」與無菌自動感應電動門（朝西開門）
-addWall(44.25, -26.0, 18.5, 0.5, 4.4, wallMintMat, '開刀房北牆', 2, f2Y);
+addWall(44.25, -28.6, 18.5, 0.5, 4.4, wallMintMat, '開刀房北牆', 2, f2Y);
 addWall(44.25, 6.0, 18.5, 0.5, 4.4, wallMintMat, '開刀房南牆', 2, f2Y);
 
 // 西側走廊牆分為南北兩段，中間留出 3.6m 電動門開口 (門中心 Z = -10.0，開口 Z: -11.8 ~ -8.2)
-addWall(35.0, -18.9, 0.45, 14.2, 4.4, wallMintMat, '開刀房西側北段封閉牆', 2, f2Y);
+addWall(35.0, -20.325, 0.45, 17.05, 4.4, wallMintMat, '開刀房西側北段封閉牆', 2, f2Y);
 addWall(35.0, -1.1, 0.45, 14.2, 4.4, wallMintMat, '開刀房西側南段封閉牆', 2, f2Y);
 
 // 電動門上方門楣
@@ -2124,7 +2122,7 @@ orAutoDoorR.add(orGlassR);
 scene.add(orAutoDoorL, orAutoDoorR);
 
 // 門外護理站與懸掛主燈箱 (rotY = -Math.PI / 2 朝向西側走廊)
-addWall(33.5, -18.5, 1.05, 4.8, 1.05, counterWoodMat, '開刀房管制護理站 (N/S)', 2, f2Y, false);
+addWall(33.5, -21.5, 1.05, 4.8, 1.05, counterWoodMat, '開刀房管制護理站 (N/S)', 2, f2Y, false);
 addHangingSign(34.5, f2Y + 3.55, -10.0, 7.2, 0.88, '開刀房', 'OPERATING ROOMS', '#065f46', '#6ee7b7', -Math.PI / 2);
 
 // 三座手術台改為沿 Z 軸排列於室內
@@ -5214,13 +5212,16 @@ scene.add(reproHeader);
         nurseryAutoDoorR.position.x = THREE.MathUtils.lerp(nurseryAutoDoorR.position.x, -36.14 + openNursery, dt * 12);
       }
 
-      if (deliveryAutoDoorL && deliveryAutoDoorR) {
-        const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - (-25.6), player.pos.z - 26.5) < 4.6);
-        const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - (-25.6), n.pos.z - 26.5) < 4.2);
-        const openDr = (nearPlayer || nearNpc) ? 1.68 : 0.0;
-        deliveryAutoDoorL.position.x = THREE.MathUtils.lerp(deliveryAutoDoorL.position.x, -26.56 - openDr, dt * 12);
-        deliveryAutoDoorR.position.x = THREE.MathUtils.lerp(deliveryAutoDoorR.position.x, -24.64 + openDr, dt * 12);
-      }
+      if (dialysisAutoDoorL && dialysisAutoDoorR) {
+  const inDoorZone = (objPos) =>
+    Math.abs(objPos.y - 4.6) < 1.6 &&
+    Math.hypot(objPos.x - 25.2, objPos.z - (-33.5)) < 4.6;
+  const nearPlayer = inDoorZone(player.pos);
+  const nearNpc = npcs.some((n) => inDoorZone(n.pos));
+  const openDia = (nearPlayer || nearNpc) ? 1.62 : 0.0;
+  dialysisAutoDoorL.position.z = THREE.MathUtils.lerp(dialysisAutoDoorL.position.z, -34.36 - openDia, dt * 12);
+  dialysisAutoDoorR.position.z = THREE.MathUtils.lerp(dialysisAutoDoorR.position.z, -32.64 + openDia, dt * 12);
+}
 
       if (reproAutoDoorL && reproAutoDoorR) {
         const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - (-4.85), player.pos.z - 28.0) < 4.6);
