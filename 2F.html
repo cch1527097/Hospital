@@ -761,8 +761,6 @@ function updateRemotePlayers2F(dt) {
     let orAutoDoorR = null;
     let icuAutoDoorL = null;
     let icuAutoDoorR = null;
-    let cathAutoDoorL = null;
-    let cathAutoDoorR = null;
     let nurseryAutoDoorL = null;
     let nurseryAutoDoorR = null;
     let deliveryAutoDoorL = null;
@@ -1842,7 +1840,6 @@ function updateRemotePlayers2F(dt) {
           scene.add(zf);
         };
         addZoneFloor(44.25, -10.0, 18.0, 31.5, new THREE.MeshStandardMaterial({ color: 0xcbe5dc, roughness: 0.35 }));
-        addZoneFloor(18.6, -19.8, 12.8, 12.2, new THREE.MeshStandardMaterial({ color: 0xfce7f3, roughness: 0.35 }));
         addZoneFloor(38.0, -37.5, 25.0, 17.5, ArchMaterials.woodFloorWarm);
         addZoneFloor(35.6, 36.25, 35.0, 16.5, ArchMaterials.woodFloorWarm);
         addZoneFloor(-31.0, 31.5, 28.0, 20.0, new THREE.MeshStandardMaterial({ color: 0xf7e3eb, roughness: 0.42 }));
@@ -4999,14 +4996,6 @@ scene.add(reproHeader);
         icuAutoDoorR.position.x = THREE.MathUtils.lerp(icuAutoDoorR.position.x, -22.69 + openIcu, dt * 12);
       }
 
-      if (cathAutoDoorL && cathAutoDoorR) {
-        const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - 18.6, player.pos.z - (-13.5)) < 4.6);
-        const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - 18.6, n.pos.z - (-13.5)) < 4.2);
-        const openCath = (nearPlayer || nearNpc) ? 1.42 : 0.0;
-        cathAutoDoorL.position.x = THREE.MathUtils.lerp(cathAutoDoorL.position.x, 17.79 - openCath, dt * 12);
-        cathAutoDoorR.position.x = THREE.MathUtils.lerp(cathAutoDoorR.position.x, 19.41 + openCath, dt * 12);
-      }
-
       if (cardioAutoDoorL && cardioAutoDoorR) {
         const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - 9.9, player.pos.z - 28.0) < 4.6);
         const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - 9.9, n.pos.z - 28.0) < 4.2);
@@ -5278,7 +5267,6 @@ scene.add(reproHeader);
         zoneName = '2F 中央挑空迴廊';
         if (z < -28.0 && x > 25.0) zoneName = '2F 東北側・血液透析中心 / CAPD 中心';
         else if (x > 35.0 && z >= -26.0 && z <= 6.0) zoneName = '2F 開刀房 (OR-1 ~ OR-9・感應電動門內)';
-        else if (z < -13.5 && z >= -26.2 && x >= 12.0 && x <= 25.2) zoneName = '2F 心導管室 / 麻醉恢復室 (感應電動門內)';
         else if (z > 22.0 && x < -35.5) zoneName = '2F 嬰兒室 (透明玻璃觀察櫥窗・新生兒照護)';
         else if (z > 22.0 && x >= -35.5 && x < -19.2) zoneName = '2F 產房 (Delivery Room・LDR 樂得兒產房)';
         else if (z > 22.0 && x >= -19.2 && x < -11.5) zoneName = '2F 婦產科護理站 & 婦產科病房 (201~210)';
@@ -5403,7 +5391,6 @@ scene.add(reproHeader);
 
       if (onSecondFloor) {
         drawZone(38, -37.5, 25, 18, '#fce7f3', '2F洗腎/CAPD');
-        drawZone(18.6, -19.8, 13.2, 12.6, '#ffe4e6', '心導管室');
         drawZone(44.25, -10.0, 18.5, 32.0, '#d1fae5', '開刀房');
         drawZone(-43.5, 35, 16, 17, '#e0f2fe', '嬰兒室');
         drawZone(-25.5, 34.5, 12.5, 17, '#fce7f3', '產房');
