@@ -2043,32 +2043,28 @@ function updateRemotePlayers2F(dt) {
       scene.add(ceil2FCenter);
 
       addHangingSign(0, f2Y + 3.65, 7.6, 6.8, 0.88, '向日葵醫院電梯廳', '產房・嬰兒室・婦產科病房・開刀房・ICU・牙科', '#0f4c5c', '#fbbf24');
+      
+      addWall(25.2, -37.925, 0.5, 19.15, 4.4, wallPinkMat, '2F 血液透析中心西牆', 2, f2Y);
+      addWall(28.375, -28.6, 6.85, 0.5, 4.4, wallPinkMat, '2F 血液透析中心南側西段封閉牆', 2, f2Y);
+      addWall(44.35, -28.6, 18.3, 0.5, 4.4, wallPinkMat, '2F 血液透析中心南側東段封閉牆', 2, f2Y);
 
-      // 1. 2F 東北側：2F 血液透析中心 & CAPD 腹膜透析中心（電動門改設於西牆 X = 25.2, Z = -33.5，南牆完全封閉）
-// 西牆分為南北兩段，中間留出 3.4m 電動門開口 (開口 Z: -35.2 ~ -31.8)
-addWall(25.2, -41.35, 0.5, 12.3, 4.4, wallPinkMat, '2F 血液透析中心西側北段封閉牆', 2, f2Y);
-addWall(25.2, -30.1, 0.5, 3.4, 4.4, wallPinkMat, '2F 血液透析中心西側南段封閉牆', 2, f2Y);
+      // 門口上方門楣 (X = 33.5, Z = -28.6)
+      const dialysisHeader = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.82, 0.52), wallPinkMat);
+      dialysisHeader.position.set(33.5, f2Y + 3.49, -28.6);
+      scene.add(dialysisHeader);
 
-// 電動門上方門楣 (X = 25.2, Z = -33.5)
-const dialysisHeader = new THREE.Mesh(new THREE.BoxGeometry(0.52, 1.82, 3.4), wallPinkMat);
-dialysisHeader.position.set(25.2, f2Y + 3.49, -33.5);
-scene.add(dialysisHeader);
+      // CAPD 腹膜透析室隔間向東貼齊外牆 (X = 53.5)
+      addWall(45.5, -36.5, 16.0, 0.45, 4.4, wallBlueMat, 'CAPD 腹膜透析室隔間', 2, f2Y);
 
-// 南牆完整封閉 (X: 24.95 ~ 53.5，總寬 28.55m，中心 X = 39.225)，供開刀房北牆直接貼齊
-addWall(39.225, -28.6, 28.55, 0.5, 4.4, wallPinkMat, '2F 血液透析中心南側封閉牆', 2, f2Y);
+      // 主燈箱同步移至南牆新門口正上方 (X = 33.5)
+      addHangingSign(33.5, f2Y + 3.6, -28.25, 6.8, 0.88, '血液透析中心', 'HEMODIALYSIS', '#be123c', '#fda4af');
+      addHangingSign(35.0, f2Y + 3.3, -35.8, 5.4, 0.72, '血液透析中心', 'HEMODIALYSIS CENTER', '#0369a1', '#7dd3fc');
 
-// CAPD 腹膜透析室隔間向東貼齊外牆 (X = 53.5)
-addWall(45.5, -36.5, 16.0, 0.45, 4.4, wallBlueMat, 'CAPD 腹膜透析室隔間', 2, f2Y);
-
-// 主燈箱移至西牆電動門正上方 (rotY = -Math.PI / 2 朝向西側走廊)
-addHangingSign(24.85, f2Y + 3.6, -33.5, 6.8, 0.88, '血液透析中心', 'HEMODIALYSIS', '#be123c', '#fda4af', -Math.PI / 2);
-addHangingSign(35.0, f2Y + 3.3, -35.8, 5.4, 0.72, '血液透析中心', 'HEMODIALYSIS CENTER', '#0369a1', '#7dd3fc');
-
-for (let row = 0; row < 2; row++) {
-  for (let col = 0; col < 3; col++) {
-    buildHospitalBedUnit(30.5 + col * 6.5, -33.2 - row * 7.2, 0x38bdf8, true, true, 2, f2Y);
-  }
-}
+      for (let row = 0; row < 2; row++) {
+        for (let col = 0; col < 3; col++) {
+          buildHospitalBedUnit(30.5 + col * 6.5, -33.2 - row * 7.2, 0x38bdf8, true, true, 2, f2Y);
+        }
+      }
 
       // 2. 2F 東側空地：全面封閉式「開刀房 (OR-1 ~ OR-9)」與無菌自動感應電動門（朝西開門）
 addWall(44.25, -28.6, 18.5, 0.5, 4.4, wallMintMat, '開刀房北牆', 2, f2Y);
