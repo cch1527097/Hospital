@@ -871,7 +871,7 @@ function updateRemotePlayers2F(dt) {
       f2_nursery:       { label: '2F 嬰兒室 (透明玻璃觀察櫥窗・新生兒照護)', pos: new THREE.Vector3(-42.5, 4.6, 22.6), yaw: Math.PI },
       f2_obgyn_ward:    { label: '2F 婦產科病房 (201~210)・紅色沙發交誼廳', pos: new THREE.Vector3(-15.5, 4.6, 27.5), yaw: -Math.PI / 2 },
       f2_renal:         { label: '2F 東北側・洗腎室 / CAPD 中心 (李文清 / 許麗美醫師)', pos: new THREE.Vector3(34.5, 4.6, -31.5), yaw: Math.PI },
-      f2_or:            { label: '2F 開刀房 (OR-1 ~ OR-9・自動感應電動門)', pos: new THREE.Vector3(18.5, 4.6, -11.5), yaw: Math.PI },
+      f2_or:            { label: '2F 開刀房 (OR-1 ~ OR-9・自動感應電動門)', pos: new THREE.Vector3(32.5, 4.6, -10.0), yaw: -Math.PI / 2 },
       f2_icu:           { label: '2F 內外科ICU / 心導管室 (自動感應電動門)', pos: new THREE.Vector3(-23.5, 4.6, -11.5), yaw: Math.PI },
       f2_cardio:        { label: '2F 心血管中心 (215/216 門診・心超室)', pos: new THREE.Vector3(8.5, 4.6, 29.2), yaw: Math.PI },
       f2_dental:        { label: '2F 東南側・牙科部 (掛號櫃檯・候診等待區)', pos: new THREE.Vector3(24.5, 4.6, 23.2), yaw: Math.PI },
@@ -1859,7 +1859,7 @@ function updateRemotePlayers2F(dt) {
           zf.receiveShadow = true;
           scene.add(zf);
         };
-        addZoneFloor(19.0, -19.8, 29.0, 12.2, new THREE.MeshStandardMaterial({ color: 0xcbe5dc, roughness: 0.35 }));
+        addZoneFloor(44.25, -10.0, 18.0, 31.5, new THREE.MeshStandardMaterial({ color: 0xcbe5dc, roughness: 0.35 }));
         addZoneFloor(-19.0, -19.8, 29.0, 12.2, new THREE.MeshStandardMaterial({ color: 0xd0e4f2, roughness: 0.35 }));
         addZoneFloor(38.0, -37.5, 25.0, 17.5, ArchMaterials.woodFloorWarm);
         addZoneFloor(35.6, 36.25, 35.0, 16.5, ArchMaterials.woodFloorWarm);
@@ -2091,39 +2091,46 @@ function updateRemotePlayers2F(dt) {
         }
       }
 
-      // 2. 2F 中北側東半部：全面封閉式「開刀房 (OR-1 ~ OR-9)」與無菌自動感應電動門
-      addWall(19.0, -26.2, 30.0, 0.5, 4.4, wallMintMat, '開刀房北牆', 2, f2Y);
-      addWall(4.2, -19.8, 0.5, 13.0, 4.4, wallMintMat, '開刀房西牆', 2, f2Y);
-      addWall(33.8, -19.8, 0.5, 13.0, 4.4, wallMintMat, '開刀房東牆', 2, f2Y);
-      addWall(10.5, -13.5, 12.6, 0.45, 4.4, wallMintMat, '開刀房南側西段封閉牆', 2, f2Y);
-      addWall(27.0, -13.5, 13.6, 0.45, 4.4, wallMintMat, '開刀房南側東段封閉牆', 2, f2Y);
-      const orHeader = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.8, 0.48), wallMintMat);
-      orHeader.position.set(18.5, f2Y + 3.5, -13.5);
-      scene.add(orHeader);
+      // 2. 2F 東側空地：全面封閉式「開刀房 (OR-1 ~ OR-9)」與無菌自動感應電動門（朝西開門）
+addWall(44.25, -26.0, 18.5, 0.5, 4.4, wallMintMat, '開刀房北牆', 2, f2Y);
+addWall(44.25, 6.0, 18.5, 0.5, 4.4, wallMintMat, '開刀房南牆', 2, f2Y);
 
-      const orDoorMat = new THREE.MeshStandardMaterial({
-        color: 0x059669,
-        roughness: 0.25,
-        metalness: 0.45
-      });
-      orAutoDoorL = new THREE.Mesh(new THREE.BoxGeometry(1.72, 2.58, 0.16), orDoorMat);
-      orAutoDoorL.position.set(17.64, f2Y + 1.29, -13.5);
-      orAutoDoorR = new THREE.Mesh(new THREE.BoxGeometry(1.72, 2.58, 0.16), orDoorMat);
-      orAutoDoorR.position.set(19.36, f2Y + 1.29, -13.5);
-      const orGlassL = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.95, 0.19), glassMat);
-      orGlassL.position.set(0.35, 0.35, 0);
-      orAutoDoorL.add(orGlassL);
-      const orGlassR = orGlassL.clone();
-      orGlassR.position.set(-0.35, 0.35, 0);
-      orAutoDoorR.add(orGlassR);
-      scene.add(orAutoDoorL, orAutoDoorR);
+// 西側走廊牆分為南北兩段，中間留出 3.6m 電動門開口 (門中心 Z = -10.0，開口 Z: -11.8 ~ -8.2)
+addWall(35.0, -18.9, 0.45, 14.2, 4.4, wallMintMat, '開刀房西側北段封閉牆', 2, f2Y);
+addWall(35.0, -1.1, 0.45, 14.2, 4.4, wallMintMat, '開刀房西側南段封閉牆', 2, f2Y);
 
-      addWall(9.5, -12.1, 4.8, 1.05, 1.05, counterWoodMat, '開刀房管制護理站 (N/S)', 2, f2Y, false);
-      addHangingSign(18.5, f2Y + 3.55, -13.15, 7.2, 0.88, '開刀房', 'OPERATING ROOMS', '#065f46', '#6ee7b7');
+// 電動門上方門楣
+const orHeader = new THREE.Mesh(new THREE.BoxGeometry(0.48, 1.8, 3.6), wallMintMat);
+orHeader.position.set(35.0, f2Y + 3.5, -10.0);
+scene.add(orHeader);
 
-      [14.5, 21.0, 27.5].forEach((ox, idx) => {
-        buildOperatingTableUnit(ox, -20.8, `OR-${idx + 1}`, f2Y);
-      });
+// 雙開無菌自動感應電動門 (沿 Z 軸開合)
+const orDoorMat = new THREE.MeshStandardMaterial({
+  color: 0x059669,
+  roughness: 0.25,
+  metalness: 0.45
+});
+orAutoDoorL = new THREE.Mesh(new THREE.BoxGeometry(0.16, 2.58, 1.72), orDoorMat);
+orAutoDoorL.position.set(35.0, f2Y + 1.29, -10.86);
+orAutoDoorR = new THREE.Mesh(new THREE.BoxGeometry(0.16, 2.58, 1.72), orDoorMat);
+orAutoDoorR.position.set(35.0, f2Y + 1.29, -9.14);
+
+const orGlassL = new THREE.Mesh(new THREE.BoxGeometry(0.19, 0.95, 0.45), glassMat);
+orGlassL.position.set(0, 0.35, 0.35);
+orAutoDoorL.add(orGlassL);
+const orGlassR = orGlassL.clone();
+orGlassR.position.set(0, 0.35, -0.35);
+orAutoDoorR.add(orGlassR);
+scene.add(orAutoDoorL, orAutoDoorR);
+
+// 門外護理站與懸掛主燈箱 (rotY = -Math.PI / 2 朝向西側走廊)
+addWall(33.5, -18.5, 1.05, 4.8, 1.05, counterWoodMat, '開刀房管制護理站 (N/S)', 2, f2Y, false);
+addHangingSign(34.5, f2Y + 3.55, -10.0, 7.2, 0.88, '開刀房', 'OPERATING ROOMS', '#065f46', '#6ee7b7', -Math.PI / 2);
+
+// 三座手術台改為沿 Z 軸排列於室內
+[-20.0, -10.0, 0.0].forEach((oz, idx) => {
+  buildOperatingTableUnit(44.5, oz, `OR-${idx + 1}`, f2Y);
+});
 
       // 3. 2F 中北側西半部：全面封閉式「內科 ICU / 外科 ICU & 心導管室」與雙自動感應電動門
       addWall(-19.0, -26.2, 30.0, 0.5, 4.4, wallBlueMat, 'ICU 與心導管室北牆', 2, f2Y);
@@ -3083,7 +3090,7 @@ scene.add(reproHeader);
       addCofferedCeilingBay(-44.0, y2F, 15.5, 17.5, 11.0, false);
       addCofferedCeilingBay(44.0, y2F, 15.5, 17.5, 11.0, false);
       addCofferedCeilingBay(0, y2F, -11.5, 88.0, 4.4, false);
-      addCofferedCeilingBay(19.0, y2F, -19.8, 28.0, 11.5, false);
+      addCofferedCeilingBay(44.25, y2F, -10.0, 17.5, 30.0, false);
       addCofferedCeilingBay(-19.0, y2F, -19.8, 28.0, 11.5, false);
       addCofferedCeilingBay(38.0, y2F, -37.5, 24.0, 16.5, true);
       addCofferedCeilingBay(-25.5, y2F, 31.5, 16.5, 18.0, true);
@@ -4059,7 +4066,7 @@ scene.add(reproHeader);
           baseY: 4.6,
           badgeColor: '#10b981',
           appearance: { coatColor: 0x0d9488, pantsColor: 0x0f766e, isDoctor: true },
-          waypoints: [new THREE.Vector3(14.5, 4.6, -18.5), new THREE.Vector3(24.5, 4.6, -18.5)],
+          waypoints: [new THREE.Vector3(41.5, 4.6, -18.0), new THREE.Vector3(41.5, 4.6, -2.0)],
           speed: 1.25,
           dialogue: '您已通過感應電動門進入 2F 無菌開刀房手術區，我們剛完成一台微創腹腔鏡手術，病人生命徵象非常穩定！',
           options: []
@@ -4073,7 +4080,7 @@ scene.add(reproHeader);
           baseY: 4.6,
           badgeColor: '#10b981',
           appearance: { coatColor: 0x10b981, pantsColor: 0x065f46, isNurse: true },
-          waypoints: [new THREE.Vector3(21.0, 4.6, -22.2), new THREE.Vector3(27.5, 4.6, -22.2)],
+          waypoints: [new THREE.Vector3(47.5, 4.6, -15.0), new THREE.Vector3(47.5, 4.6, -5.0)],
           speed: 1.15,
           dialogue: '開刀房感應電動門維持室內正壓無菌隔離，我們正進行手術器械清點與無菌鋪單準備！',
           options: []
@@ -4087,7 +4094,7 @@ scene.add(reproHeader);
           baseY: 4.6,
           badgeColor: '#38bdf8',
           appearance: { coatColor: 0x0284c7, pantsColor: 0x0369a1, isDoctor: true },
-          waypoints: [new THREE.Vector3(14.5, 4.6, -22.5)],
+          waypoints: [new THREE.Vector3(44.5, 4.6, -21.8)],
           speed: 0,
           yaw: 0,
           dialogue: '我是麻醉科劉醫師，手術全程我們都會透過精密生理監視器守護病患的呼吸、血氧與麻醉深度！',
@@ -4102,7 +4109,7 @@ scene.add(reproHeader);
           baseY: 4.6,
           badgeColor: '#2dd4bf',
           appearance: { coatColor: 0x38bdf8, pantsColor: 0x0284c7, isNurse: true },
-          waypoints: [new THREE.Vector3(9.5, 4.6, -10.8)],
+          waypoints: [new THREE.Vector3(32.2, 4.6, -18.5)],
           speed: 0,
           yaw: 0,
           dialogue: '走近開刀房雙開感應電動門即可自動開啟進入無菌手術走廊；家屬請在等候區留意手術動態看板！',
@@ -5152,7 +5159,6 @@ scene.add(reproHeader);
       player.mesh.position.copy(player.pos);
       player.mesh.rotation.y = player.yaw;
 
-      // ★ BUG #7 修復：提高所有自動感應電動門的感應半徑 (4.8m) 與滑動插值速度 (dt * 12)，衝刺時也能順暢開門不穿模
       if (leftSlidingDoor && rightSlidingDoor) {
         const distEntrance = Math.hypot(player.pos.x, player.pos.z - 44.5);
         const openAmount = (distEntrance < 5.0 && player.pos.y < 2.2) ? 2.2 : 0.0;
@@ -5161,12 +5167,12 @@ scene.add(reproHeader);
       }
 
       if (orAutoDoorL && orAutoDoorR) {
-        const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - 18.5, player.pos.z - (-13.5)) < 4.8);
-        const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - 18.5, n.pos.z - (-13.5)) < 4.4);
-        const openOr = (nearPlayer || nearNpc) ? 1.52 : 0.0;
-        orAutoDoorL.position.x = THREE.MathUtils.lerp(orAutoDoorL.position.x, 17.64 - openOr, dt * 12);
-        orAutoDoorR.position.x = THREE.MathUtils.lerp(orAutoDoorR.position.x, 19.36 + openOr, dt * 12);
-      }
+  const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - 35.0, player.pos.z - (-10.0)) < 4.8);
+  const nearNpc = npcs.some((n) => (Math.abs(n.pos.y - 4.6) < 1.6) && Math.hypot(n.pos.x - 35.0, n.pos.z - (-10.0)) < 4.4);
+  const openOr = (nearPlayer || nearNpc) ? 1.52 : 0.0;
+  orAutoDoorL.position.z = THREE.MathUtils.lerp(orAutoDoorL.position.z, -10.86 - openOr, dt * 12);
+  orAutoDoorR.position.z = THREE.MathUtils.lerp(orAutoDoorR.position.z, -9.14 + openOr, dt * 12);
+}
 
       if (icuAutoDoorL && icuAutoDoorR) {
         const nearPlayer = (Math.abs(player.pos.y - 4.6) < 1.6) && (Math.hypot(player.pos.x - (-23.5), player.pos.z - (-13.5)) < 4.8);
@@ -5464,7 +5470,7 @@ scene.add(reproHeader);
         zoneName = '2F 中央挑空迴廊';
         if (z < -28.0 && x > 25.0) zoneName = '2F 東北側・血液透析中心 / CAPD 中心';
         else if (z < -28.0 && x < -25.0) zoneName = '2F 西北側・醫師辦公室 / RT 辦公室';
-        else if (z < -13.5 && x >= 4.0) zoneName = '2F 開刀房 (OR-1 ~ OR-9・感應電動門內)';
+        else if (x > 35.0 && z >= -26.0 && z <= 6.0) zoneName = '2F 開刀房 (OR-1 ~ OR-9・感應電動門內)';
         else if (z < -13.5 && x < -14.5) zoneName = '2F 內科 ICU / 外科 ICU (感應電動門內)';
         else if (z < -13.5 && x < -4.0) zoneName = '2F 心導管室 / 麻醉恢復室 (感應電動門內)';
         else if (z > 22.0 && x < -35.5) zoneName = '2F 嬰兒室 (透明玻璃觀察櫥窗・新生兒照護)';
@@ -5594,7 +5600,7 @@ scene.add(reproHeader);
         drawZone(-38, -37.5, 24, 18, '#fef3c7', '醫師辦公室');
         drawZone(-24.5, -19.8, 18, 12.6, '#dbeafe', '內外科ICU');
         drawZone(-9.5, -19.8, 10, 12.6, '#ffe4e6', '心導管室');
-        drawZone(19, -19.8, 29, 12.6, '#d1fae5', '開刀房');
+        drawZone(44.25, -10.0, 18.5, 32.0, '#d1fae5', '開刀房');
         drawZone(-43.5, 35, 16, 17, '#e0f2fe', '嬰兒室');
         drawZone(-25.5, 34.5, 12.5, 17, '#fce7f3', '產房');
         drawZone(-15.35, 33.5, 7.7, 17.5, '#fbcfe8', '婦產病房/護理站');
