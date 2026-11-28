@@ -2044,20 +2044,63 @@ function updateRemotePlayers2F(dt) {
 
       addHangingSign(0, f2Y + 3.65, 7.6, 6.8, 0.88, '向日葵醫院電梯廳', '產房・嬰兒室・婦產科病房・開刀房・ICU・牙科', '#0f4c5c', '#fbbf24');
       
+      // 1. 2F 東北側：2F 血液透析中心 & CAPD 腹膜透析中心（不透明玻璃電動門左移至 X = 28.5, Z = -28.6）
+      // 西牆完整封閉，延伸至北側外牆 (Z: -47.5 ~ -28.35)
       addWall(25.2, -37.925, 0.5, 19.15, 4.4, wallPinkMat, '2F 血液透析中心西牆', 2, f2Y);
-      addWall(28.375, -28.6, 6.85, 0.5, 4.4, wallPinkMat, '2F 血液透析中心南側西段封閉牆', 2, f2Y);
-      addWall(44.35, -28.6, 18.3, 0.5, 4.4, wallPinkMat, '2F 血液透析中心南側東段封閉牆', 2, f2Y);
 
-      // 門口上方門楣 (X = 33.5, Z = -28.6)
+      // 南牆分為門口左右兩段（開口中心 X = 28.5，寬度 3.4m，範圍 X: 26.8 ~ 30.2）：
+      // 西段門柱牆：X = 24.95 ~ 26.8 (中心 25.875, 寬 1.85)
+      // 東段封閉牆：X = 30.2 ~ 53.5 (中心 41.85, 寬 23.3)，一路延伸貼齊東側外牆
+      addWall(25.875, -28.6, 1.85, 0.5, 4.4, wallPinkMat, '2F 血液透析中心南側西段封閉牆', 2, f2Y);
+      addWall(41.85, -28.6, 23.3, 0.5, 4.4, wallPinkMat, '2F 血液透析中心南側東段封閉牆', 2, f2Y);
+
+      // 門口上方門楣 (X = 28.5, Z = -28.6)
       const dialysisHeader = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.82, 0.52), wallPinkMat);
-      dialysisHeader.position.set(33.5, f2Y + 3.49, -28.6);
+      dialysisHeader.position.set(28.5, f2Y + 3.49, -28.6);
       scene.add(dialysisHeader);
+
+      // ▼▼▼ 雙開不透明霧面玻璃自動感應電動門（中心 X = 28.5，總寬 3.4m，單扇 1.72m × 2.58m） ▼▼▼
+      const diaDoorFrameMat = new THREE.MeshStandardMaterial({
+        color: 0xbe185d,
+        roughness: 0.3,
+        metalness: 0.45
+      });
+      const opaqueFrostedGlassMat = new THREE.MeshStandardMaterial({
+        color: 0xf1f5f9,
+        roughness: 0.22,
+        metalness: 0.15,
+        transparent: false
+      });
+
+      const createOpaqueGlassDoorLeaf = (w, h) => {
+        const leaf = new THREE.Group();
+        const t = 0.085;
+        const d = 0.14;
+        const topB = new THREE.Mesh(new THREE.BoxGeometry(w, t, d), diaDoorFrameMat);
+        topB.position.y = h / 2 - t / 2;
+        const botB = new THREE.Mesh(new THREE.BoxGeometry(w, t * 1.4, d), diaDoorFrameMat);
+        botB.position.y = -h / 2 + (t * 1.4) / 2;
+        const leftB = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), diaDoorFrameMat);
+        leftB.position.x = -w / 2 + t / 2;
+        const rightB = new THREE.Mesh(new THREE.BoxGeometry(t, h, d), diaDoorFrameMat);
+        rightB.position.x = w / 2 - t / 2;
+        const opaquePane = new THREE.Mesh(new THREE.BoxGeometry(w - t * 2, h - t * 2.4, 0.08), opaqueFrostedGlassMat);
+        leaf.add(topB, botB, leftB, rightB, opaquePane);
+        return leaf;
+      };
+
+      dialysisAutoDoorL = createOpaqueGlassDoorLeaf(1.72, 2.58);
+      dialysisAutoDoorL.position.set(27.64, f2Y + 1.29, -28.6);
+      dialysisAutoDoorR = createOpaqueGlassDoorLeaf(1.72, 2.58);
+      dialysisAutoDoorR.position.set(29.36, f2Y + 1.29, -28.6);
+      scene.add(dialysisAutoDoorL, dialysisAutoDoorR);
+      // ▲▲▲ 不透明玻璃電動門建立完成 ▲▲▲
 
       // CAPD 腹膜透析室隔間向東貼齊外牆 (X = 53.5)
       addWall(45.5, -36.5, 16.0, 0.45, 4.4, wallBlueMat, 'CAPD 腹膜透析室隔間', 2, f2Y);
 
-      // 主燈箱同步移至南牆新門口正上方 (X = 33.5)
-      addHangingSign(33.5, f2Y + 3.6, -28.25, 6.8, 0.88, '血液透析中心', 'HEMODIALYSIS', '#be123c', '#fda4af');
+      // 招牌縮小為 4.2 x 0.62，並對齊新門口正上方 (X = 28.5)
+      addHangingSign(28.5, f2Y + 3.45, -28.25, 4.2, 0.62, '血液透析中心', 'HEMODIALYSIS', '#be123c', '#fda4af');
       addHangingSign(35.0, f2Y + 3.3, -35.8, 5.4, 0.72, '血液透析中心', 'HEMODIALYSIS CENTER', '#0369a1', '#7dd3fc');
 
       for (let row = 0; row < 2; row++) {
@@ -5195,6 +5238,17 @@ scene.add(reproHeader);
         const openRepro = (nearPlayer || nearNpc) ? 1.65 : 0.0;
         reproAutoDoorL.position.x = THREE.MathUtils.lerp(reproAutoDoorL.position.x, -5.65 - openRepro, dt * 12);
         reproAutoDoorR.position.x = THREE.MathUtils.lerp(reproAutoDoorR.position.x, -4.05 + openRepro, dt * 12);
+      }
+
+      if (dialysisAutoDoorL && dialysisAutoDoorR) {
+        const inDoorZone = (objPos) =>
+          Math.abs(objPos.y - 4.6) < 1.6 &&
+          Math.hypot(objPos.x - 28.5, objPos.z - (-28.6)) < 4.6;
+        const nearPlayer = inDoorZone(player.pos);
+        const nearNpc = npcs.some((n) => inDoorZone(n.pos));
+        const openDia = (nearPlayer || nearNpc) ? 1.62 : 0.0;
+        dialysisAutoDoorL.position.x = THREE.MathUtils.lerp(dialysisAutoDoorL.position.x, 27.64 - openDia, dt * 12);
+        dialysisAutoDoorR.position.x = THREE.MathUtils.lerp(dialysisAutoDoorR.position.x, 29.36 + openDia, dt * 12);
       }
 
       camState.yaw = lerpAngle(camState.yaw, camState.targetYaw, dt * 16);
