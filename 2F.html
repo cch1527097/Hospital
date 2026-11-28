@@ -2378,7 +2378,12 @@ addHangingSign(34.5, f2Y + 3.55, -10.0, 7.2, 0.88, '開刀房', 'OPERATING ROOMS
 [-20.0, -10.0, 0.0].forEach((oz, idx) => {
   buildOperatingTableUnit(44.5, oz, `OR-${idx + 1}`, f2Y);
 });
-      }
+
+      buildObgynMaternityComplex(f2Y, glassMat, darkFrameMat, counterTopMat);
+buildReproductiveCenter2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterTopMat);
+buildCardiovascularCenter2F(f2Y, wallPinkMat, wallCreamMat);
+buildDentalDepartment2F(f2Y, wallPinkMat, wallCreamMat, glassMat, counterTopMat);
+}
 
     function buildObgynMaternityComplex(f2Y, glassMat, darkFrameMat, counterTopMat) {
       const stripedWallMat = ArchMaterials.wallObgynStriped;
