@@ -2561,6 +2561,30 @@ addHangingSign(34.5, f2Y + 3.55, -10.0, 7.2, 0.88, '開刀房', 'OPERATING ROOMS
 buildReproductiveCenter2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterTopMat);
 buildCardiovascularCenter2F(f2Y, wallPinkMat, wallCreamMat);
 buildDentalDepartment2F(f2Y, wallPinkMat, wallCreamMat, glassMat, counterTopMat);
+      // 2F 北側中央走道等候沙發椅區（位於 X = -13.5 ~ +13.5 兩柱之間，Z = -13.5，不擋住各科電動門）
+      const corridorSofaMat = new THREE.MeshStandardMaterial({ color: 0x0d9488, roughness: 0.45 });
+      const sofaFrameMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.4, roughness: 0.3 });
+      [-8.5, -2.8, 2.8, 8.5].forEach((sx) => {
+        const sofaGroup = new THREE.Group();
+        const base = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.16, 1.35), sofaFrameMat);
+        base.position.y = 0.08;
+        const seat = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.28, 1.42), corridorSofaMat);
+        seat.position.y = 0.30;
+        const back = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.44, 0.22), corridorSofaMat);
+        back.position.set(0, 0.62, 0);
+        sofaGroup.add(base, seat, back);
+        sofaGroup.position.set(sx, f2Y, -13.5);
+        scene.add(sofaGroup);
+
+        colliders.push({
+          minX: sx - 1.7,
+          maxX: sx + 1.7,
+          minZ: -14.3,
+          maxZ: -12.7,
+          floor: 2,
+          label: '2F 中央走道等候沙發椅'
+        });
+      });
 }
 
     function buildObgynMaternityComplex(f2Y, glassMat, darkFrameMat, counterTopMat) {
