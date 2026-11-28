@@ -2076,7 +2076,6 @@ function updateRemotePlayers2F(dt) {
       dialysisAutoDoorR = createOpaqueGlassDoorLeaf(1.72, 2.58);
       dialysisAutoDoorR.position.set(29.36, f2Y + 1.29, -28.6);
       scene.add(dialysisAutoDoorL, dialysisAutoDoorR);
-      // ▲▲▲ 不透明玻璃電動門建立完成 ▲▲▲
 
       // CAPD 腹膜透析室隔間向東貼齊外牆 (X = 53.5)
       addWall(45.5, -36.5, 16.0, 0.45, 4.4, wallBlueMat, 'CAPD 腹膜透析室隔間', 2, f2Y);
@@ -2131,68 +2130,6 @@ addHangingSign(34.5, f2Y + 3.55, -10.0, 7.2, 0.88, '開刀房', 'OPERATING ROOMS
 [-20.0, -10.0, 0.0].forEach((oz, idx) => {
   buildOperatingTableUnit(44.5, oz, `OR-${idx + 1}`, f2Y);
 });
-
-      // 3. 2F 心導管室 / 麻醉恢復室（整棟跨過血液透析中心，緊貼其最西側牆面）
-      icuAutoDoorL = null;
-      icuAutoDoorR = null;
-
-      // ★ 請將 -15.0 換成你程式碼裡「血液透析中心最西側牆壁」的實際 X 座標！
-      const dialysisWestWallX = -15.0; 
-      const cathDx = dialysisWestWallX - 25.2; 
-
-      // 北牆、西牆、東牆（東牆 25.2 + cathDx 會剛好等於 dialysisWestWallX，完全緊貼！）
-      addWall(18.6 + cathDx, -26.2, 13.2, 0.5, 4.4, wallPinkMat, '心導管室北牆', 2, f2Y);
-      addWall(12.0 + cathDx, -19.85, 0.5, 13.2, 4.4, wallPinkMat, '心導管室西牆', 2, f2Y);
-      addWall(25.2 + cathDx, -19.85, 0.5, 13.2, 4.4, wallPinkMat, '心導管室東牆（貼齊血液透析中心）', 2, f2Y);
-
-      // 南牆分為電動門左右兩段
-      addWall(14.375 + cathDx, -13.5, 5.25, 0.45, 4.4, wallPinkMat, '心導管室南側西段封閉牆', 2, f2Y);
-      addWall(22.825 + cathDx, -13.5, 5.25, 0.45, 4.4, wallPinkMat, '心導管室南側東段封閉牆', 2, f2Y);
-
-      // 電動門上方門楣
-      const cathHeader = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.8, 0.48), wallPinkMat);
-      cathHeader.position.set(18.6 + cathDx, f2Y + 3.5, -13.5);
-      scene.add(cathHeader);
-
-      // 心導管室雙開自動感應電動門
-      const cathDoorMat = new THREE.MeshStandardMaterial({ color: 0xbe123c, roughness: 0.25, metalness: 0.45 });
-      cathAutoDoorL = new THREE.Mesh(new THREE.BoxGeometry(1.62, 2.58, 0.16), cathDoorMat);
-      cathAutoDoorL.position.set(17.79 + cathDx, f2Y + 1.29, -13.5);
-      cathAutoDoorR = new THREE.Mesh(new THREE.BoxGeometry(1.62, 2.58, 0.16), cathDoorMat);
-      cathAutoDoorR.position.set(19.41 + cathDx, f2Y + 1.29, -13.5);
-
-      const cathWinL = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.95, 0.19), glassMat);
-      cathWinL.position.set(0.3, 0.35, 0);
-      cathAutoDoorL.add(cathWinL);
-      const cathWinR = cathWinL.clone();
-      cathWinR.position.set(-0.3, 0.35, 0);
-      cathAutoDoorR.add(cathWinR);
-      scene.add(cathAutoDoorL, cathAutoDoorR);
-
-      // 心導管室主燈箱
-      addHangingSign(18.6 + cathDx, f2Y + 3.55, -13.15, 5.4, 0.85, '心導管室・麻醉恢復室', 'CATHETERIZATION LAB', '#be123c', '#fda4af');
-
-      // 兩張心導管恢復病床
-      buildHospitalBedUnit(15.8 + cathDx, -21.2, 0xf43f5e, false, true, 2, f2Y);
-      buildHospitalBedUnit(21.4 + cathDx, -21.2, 0xf43f5e, false, true, 2, f2Y);
-
-      buildObgynMaternityComplex(f2Y, glassMat, darkFrameMat, counterTopMat);
-
-      buildCardiovascularCenter2F(f2Y, wallPinkMat, wallCreamMat);
-
-      buildDentalDepartment2F(f2Y, wallPinkMat, wallCreamMat, glassMat, counterTopMat);
-
-      buildReproductiveCenter2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterTopMat);
-
-      addWall(-4.85, 44.0, 13.8, 0.35, 4.4, wallPinkMat, '2F 中南側走廊粉紅底牆', 2, f2Y);
-
-      [
-        { x: -16, z: 43.9, rotY: Math.PI },
-        { x: 25.0, z: 43.9, rotY: Math.PI },
-        { x: -14.8, z: 10.6, rotY: Math.PI / 2 },
-        { x: 14.8, z: 10.6, rotY: -Math.PI / 2 }
-      ].forEach((hp) => addFireHydrantCabinet(hp.x, hp.z, hp.rotY, f2Y));
-    }
 
     function buildObgynMaternityComplex(f2Y, glassMat, darkFrameMat, counterTopMat) {
       const stripedWallMat = ArchMaterials.wallObgynStriped;
@@ -4097,65 +4034,6 @@ scene.add(reproHeader);
           speed: 0,
           yaw: 0,
           dialogue: '走近開刀房雙開感應電動門即可自動開啟進入無菌手術走廊；家屬請在等候區留意手術動態看板！',
-          options: []
-        },
-        {
-          name: '張雅雯 護理師',
-          role: '2F 心導管室 / 麻醉恢復室・床邊照護',
-          avatar: '❤️',
-          type: 'staff',
-          floor: 2,
-          baseY: 4.6,
-          badgeColor: '#f43f5e',
-          appearance: { coatColor: 0xf472b6, pantsColor: 0x9d174d, isNurse: true },
-          waypoints: [new THREE.Vector3(17.5, 4.6, -20.8), new THREE.Vector3(20.5, 4.6, -20.8)],
-          speed: 1.0,
-          dialogue: '這裡是心導管術後恢復室，就在血液透析中心隔壁，病患正接受靜脈點滴與心電圖監測，請保持安靜！',
-          options: []
-        },
-        {
-          name: '李明輝 先生 (心導管恢復床吊點滴)',
-          role: '2F 心導管室・術後點滴休養中',
-          avatar: '🛌',
-          type: 'patient',
-          floor: 2,
-          baseY: 4.6,
-          badgeColor: '#fb7185',
-          appearance: { coatColor: 0xbae6fd, pantsColor: 0x334155, isLyingBed: true },
-          waypoints: [new THREE.Vector3(15.8, 4.6, -21.2)],
-          speed: 0,
-          yaw: 0,
-          dialogue: '剛做完心導管血管支架檢查，正在恢復室吊點滴觀察中！',
-          options: []
-        },
-        {
-          name: '陳淑貞 女士 (ICU 2床吊點滴)',
-          role: '2F 外科 ICU・術後點滴輸液觀察中',
-          avatar: '🛌',
-          type: 'patient',
-          floor: 2,
-          baseY: 4.6,
-          badgeColor: '#60a5fa',
-          appearance: { coatColor: 0xf9a8d4, pantsColor: 0x475569, isLyingBed: true },
-          waypoints: [new THREE.Vector3(-19.8, 4.6, -21.2)],
-          speed: 0,
-          yaw: 0,
-          dialogue: '加護病房醫護團隊 24 小時都在床邊照顧，點滴有微電腦控制，讓人很安心。',
-          options: []
-        },
-        {
-          name: '李明輝 先生 (心導管恢復床吊點滴)',
-          role: '2F 心導管室・術後點滴休養中',
-          avatar: '🛌',
-          type: 'patient',
-          floor: 2,
-          baseY: 4.6,
-          badgeColor: '#fb7185',
-          appearance: { coatColor: 0xbae6fd, pantsColor: 0x334155, isLyingBed: true },
-          waypoints: [new THREE.Vector3(-11.2, 4.6, -21.2)],
-          speed: 0,
-          yaw: 0,
-          dialogue: '剛做完心導管血管支架檢查，正在恢復室吊點滴觀察中！',
           options: []
         },
 
