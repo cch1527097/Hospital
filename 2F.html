@@ -2431,27 +2431,14 @@ function buildSicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counter
       buildMicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterWoodMat, counterTopMat);
 
 function buildMicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counterWoodMat, counterTopMat) {
-  // 座標規劃：X = -53.5 ~ -42.5，Z = -23.0 ~ +4.0
-  // 東牆位於 X = -42.5，距離 SICU 門口 (X = -38.5, Z = -28.6) 尚有 4m 寬走道，完全不擋住 SICU 門面與視線
-
-  // 1. 北側封閉牆 (Z = -23.0, X: -53.5 ~ -42.5, 中心 -48.0, 寬 11.0)
-  addWall(-48.0, -23.0, 11.0, 0.5, 4.4, wallBlueMat, 'MICU 北側封閉牆', 2, f2Y);
-
-  // 2. 南側封閉牆 (Z = +4.0, X: -53.5 ~ -42.5, 中心 -48.0, 寬 11.0)
   addWall(-48.0, 4.0, 11.0, 0.5, 4.4, wallBlueMat, 'MICU 南側封閉牆', 2, f2Y);
-
-  // 3. 東側走廊牆（朝東開門，開口中心 Z = -9.5，總寬 3.6m，開口範圍 Z: -11.3 ~ -7.7）
-  // 北段牆：Z = -23.0 ~ -11.3 (中心 -17.15, 長 11.7)
-  // 南段牆：Z = -7.7 ~ +4.0 (中心 -1.85, 長 11.7)
-  addWall(-42.5, -17.15, 0.5, 11.7, 4.4, wallBlueMat, 'MICU 東側北段封閉牆', 2, f2Y);
+  addWall(-42.5, -19.95, 0.5, 17.3, 4.4, wallBlueMat, 'MICU 東側北段封閉牆', 2, f2Y);
   addWall(-42.5, -1.85, 0.5, 11.7, 4.4, wallBlueMat, 'MICU 東側南段封閉牆', 2, f2Y);
 
-  // 電動門上方門楣
   const micuHeader = new THREE.Mesh(new THREE.BoxGeometry(0.52, 1.82, 3.6), wallBlueMat);
   micuHeader.position.set(-42.5, f2Y + 3.49, -9.5);
   scene.add(micuHeader);
 
-  // 雙開無菌自動感應電動門 (中心 X = -42.5, Z = -9.5，沿 Z 軸左右滑開)
   const micuDoorMat = new THREE.MeshStandardMaterial({ color: 0x0f766e, roughness: 0.25, metalness: 0.45 });
   micuAutoDoorL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 2.58, 1.78), micuDoorMat);
   micuAutoDoorL.position.set(-42.5, f2Y + 1.29, -10.39);
@@ -2493,6 +2480,7 @@ function buildMicuDepartment2F(f2Y, wallBlueMat, wallCreamMat, glassMat, counter
 
   // 5. 5 床內科加護病床 + 呼吸器與血液透析/生理監視工作車（靠西牆 X = -50.8 縱向排列）
   const micuBeds = [
+    { x: -50.8, z: -24.5 },
     { x: -50.8, z: -19.5 },
     { x: -50.8, z: -14.5 },
     { x: -50.8, z: -9.5 },
