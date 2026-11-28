@@ -4664,23 +4664,28 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
       panelDesk.castShadow = true;
       scene.add(panelDesk);
 
-      // 5. 左右兩翼 5 排階梯式演講廳觀眾席 (由南往北 Z 漸小、高度漸升，全部面朝南側講台)
+      // 延長中央紅地毯直通北側大門口 (Z: 20.3 ~ 39.5)
+      centerAisle.scale.z = 1.0;
+      centerAisle.geometry = getCachedBoxGeom(2.9, 0.05, 19.2);
+      centerAisle.position.set(44.35, 0.025, 29.9);
+
+      // 5. 左右兩翼 7 排滿版階梯式演講廳觀眾席 (補齊後方直到北牆大門前，共 98 席)
       const riserMat = getCachedStandardMat(0x334155, 0.8, 0.05);
       const seatMat = getCachedStandardMat(0x1d4ed8, 0.65, 0.05);
       const deskTopMat = getCachedStandardMat(0xd97706, 0.5, 0.05);
       const frameDarkMat = getCachedStandardMat(0x1e293b, 0.4, 0.6);
 
-      const totalRows = 5;
-      const rowDepth = 2.6;
-      const firstRowZ = 37.2; // 第 1 排最靠近講台，往北 (Z = 37.2 -> 26.8) 逐排升高
+      const totalRows = 7;
+      const rowDepth = 2.35;
+      const firstRowZ = 37.3; // 第 1 排最靠近講台，第 7 排延伸至 Z = 23.2 (大門前保留 2m 緩衝玄關)
 
       [-1, 1].forEach((side) => {
-        // side = -1 為西側翼區 (X: 36.2 ~ 42.6)，side = 1 為東側翼區 (X: 46.1 ~ 52.5)
-        const wingCenterX = side === -1 ? 39.4 : 49.3;
-        const wingWidth = 6.4;
+        // side = -1 緊貼西木牆 (X: 35.6 ~ 42.4)，side = 1 緊貼東木牆 (X: 46.3 ~ 53.1)
+        const wingCenterX = side === -1 ? 39.0 : 49.7;
+        const wingWidth = 6.8;
 
         for (let r = 0; r < totalRows; r++) {
-          const stepH = (r + 1) * 0.22; // 每排升高 0.22m (0.22 ~ 1.10m)
+          const stepH = (r + 1) * 0.19; // 每排升高 0.19m (最高第 7 排為 1.33m)
           const rowZ = firstRowZ - r * rowDepth;
 
           // (A) 階梯地台
@@ -4696,24 +4701,24 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
           scene.add(edgeLine);
 
           // (B) 該排前方寫字長桌板 (位於座椅南側)
-          const deskZ = rowZ + 0.72;
-          const deskTop = new THREE.Mesh(getCachedBoxGeom(wingWidth - 0.2, 0.06, 0.45), deskTopMat);
+          const deskZ = rowZ + 0.66;
+          const deskTop = new THREE.Mesh(getCachedBoxGeom(wingWidth - 0.15, 0.06, 0.42), deskTopMat);
           deskTop.position.set(wingCenterX, stepH + 0.72, deskZ);
           deskTop.castShadow = true;
           scene.add(deskTop);
 
-          const deskFrontBoard = new THREE.Mesh(getCachedBoxGeom(wingWidth - 0.2, 0.48, 0.04), frameDarkMat);
-          deskFrontBoard.position.set(wingCenterX, stepH + 0.46, deskZ + 0.2);
+          const deskFrontBoard = new THREE.Mesh(getCachedBoxGeom(wingWidth - 0.15, 0.48, 0.04), frameDarkMat);
+          deskFrontBoard.position.set(wingCenterX, stepH + 0.46, deskZ + 0.18);
           scene.add(deskFrontBoard);
 
-          // (C) 每排 6 張折疊演講座椅 (面朝 +Z 南側講台)
-          const seatsPerRow = 6;
-          const seatSpacing = (wingWidth - 0.8) / (seatsPerRow - 1);
-          const startSeatX = wingCenterX - (wingWidth - 0.8) * 0.5;
+          // (C) 每排 7 張折疊演講座椅 (面朝 +Z 南側講台)
+          const seatsPerRow = 7;
+          const seatSpacing = (wingWidth - 0.75) / (seatsPerRow - 1);
+          const startSeatX = wingCenterX - (wingWidth - 0.75) * 0.5;
 
           for (let s = 0; s < seatsPerRow; s++) {
             const sx = startSeatX + s * seatSpacing;
-            const sz = rowZ - 0.25;
+            const sz = rowZ - 0.22;
 
             // 椅墊
             const cushion = new THREE.Mesh(getCachedBoxGeom(0.56, 0.1, 0.5), seatMat);
@@ -4721,7 +4726,7 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
             cushion.castShadow = true;
             scene.add(cushion);
 
-            // 椅背 (在北側 sz - 0.22，讓椅子朝南)
+            // 椅背
             const backrest = new THREE.Mesh(getCachedBoxGeom(0.54, 0.58, 0.1), seatMat);
             backrest.position.set(sx, stepH + 0.74, sz - 0.22);
             backrest.rotation.x = -0.12;
@@ -4735,7 +4740,7 @@ colliders.push({ minX: -6.34, maxX: -5.66, minZ: 32.68, maxZ: 34.98, label: '藝
           }
         }
 
-        // 整區階梯觀眾席碰撞箱 (保留中央紅地毯走道 X: 42.6~46.1 可自由通行)
+        // 整區 7 排階梯觀眾席碰撞箱 (保留大門口 X: 42.4~46.3, Z: 20.0~22.0 進門玄關與中央走道)
         colliders.push({
           minX: wingCenterX - wingWidth * 0.5,
           maxX: wingCenterX + wingWidth * 0.5,
